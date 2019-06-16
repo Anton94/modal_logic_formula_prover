@@ -1,0 +1,1 @@
+add_executable (formula_proover source.cpp)
