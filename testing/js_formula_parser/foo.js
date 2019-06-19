@@ -1,3 +1,7 @@
+// Things to do
+// Add implication and equivalency
+// Allow stacking of negations i.e. !!!!a
+
 const createToken = chevrotain.createToken;
 const Lexer = chevrotain.Lexer;
 const CstParser = chevrotain.CstParser;
@@ -43,7 +47,7 @@ class JsonParser extends CstParser {
         $.RULE("disjunction", () => {
             $.SUBRULE($.conjunction, { LABEL : "lhs" })
             $.MANY(() => {
-                $.CONSUME(Dis)
+                $.CONSUME(Dis, { LABEL : "mid" })
                 $.SUBRULE2($.conjunction, { LABEL : "rhs" })  
             })
         })
@@ -51,18 +55,18 @@ class JsonParser extends CstParser {
         $.RULE("conjunction", () => {
             $.SUBRULE($.atomic, { LABEL : "lhs" })
             $.MANY(() => {
-                $.CONSUME(Con)
+                $.CONSUME(Con, { LABEL : "mid" })
                 $.SUBRULE2($.atomic, { LABEL : "rhs" })
             })
         })
 
         $.RULE("atomic", () => {
             $.OPTION(() => {
-                $.CONSUME(Neg)
+                $.CONSUME(Neg, { LABEL : "neg" })
             })
             $.OR([
-                { ALT: () => $.SUBRULE($.parenthesis) },
-                { ALT: () => $.CONSUME(StringLiteral) }
+                { ALT: () => $.SUBRULE($.parenthesis, { LABEL : "lhs" }) },
+                { ALT: () => $.CONSUME(StringLiteral, { LABEL : "lhs" }) }
             ])
         })
 

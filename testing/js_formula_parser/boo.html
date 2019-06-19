@@ -5,8 +5,35 @@
 		<!--script src="https://unpkg.com/chevrotain/lib/chevrotain.min.js"></script-->
 		<script src="./foo.js"></script>
 		<script>
+			function simplify(cst) {
+				if (!cst.hasOwnProperty("name")) {
+					return { 
+						"name": "string", 
+						"value": cst.image
+					};
+				}
+				if (cst.children.hasOwnProperty("neg")) {
+					return {
+						"name": "neg", 
+						"value": simplify(cst.children["lhs"][0])
+					};
+				} else if (cst.children.hasOwnProperty("rhs")) {
+					children = [simplify(cst.children["lhs"][0])];
+					cst.children["rhs"].forEach((x) => {
+						children.push(simplify(x));
+					});
+					return {
+						"name": cst.children["mid"][0].image,
+						"value": children
+					};
+				} else if (cst.children.hasOwnProperty("lhs")) {
+					return simplify(cst.children["lhs"][0]);
+				}
+				throw Error("This is not permitted");
+			}
 			function prove(formula) {
-				document.getElementById("output").innerHTML = JSON.stringify(parse(formula).cst, undefined, 3);
+				var simple = simplify(parse(formula).cst);
+				document.getElementById("output").innerHTML = JSON.stringify(simple, undefined, 3) + "\n\n" + JSON.stringify(parse(formula).cst, undefined, 3);
 			}
 		</script>
 	</head>
