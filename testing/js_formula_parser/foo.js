@@ -128,7 +128,7 @@ function parse(text) {
     // any top level rule may be used as an entry point
     const cst = parser.disjunction()
     document.getElementById("output").innerHTML = "";
-    printa(cst, 0);
+
     return {
         cst: cst,
         lexErrors: lexResult.errors,
