@@ -1,7 +1,3 @@
-// Things to do
-// Add implication and equivalency
-// Allow stacking of negations i.e. !!!!a
-
 const createToken = chevrotain.createToken;
 const Lexer = chevrotain.Lexer;
 const CstParser = chevrotain.CstParser;
@@ -10,6 +6,8 @@ const CstParser = chevrotain.CstParser;
 const BinOperator = createToken({name : "BinOperator", pattern: Lexer.NA})
 const Dis = createToken({ name: "Dis", pattern: /\|/, categories: BinOperator })
 const Con = createToken({ name: "Con", pattern: /&/, categories: BinOperator })
+const Imp = createToken({ name: "Imp", pattern: /=>/, categories: BinOperator })
+const Equ = createToken({ name: "Equ", pattern: /<->/, categories: BinOperator })
 const Neg = createToken({ name: "Neg", pattern: /!/ })
 const StringLiteral = createToken({
     name: "StringLiteral",
@@ -27,6 +25,8 @@ const allTokens = [
     WhiteSpace,
     Dis,
     Con,
+    Imp,
+    Equ,
     Neg,
     LParen,
     RParen,
@@ -53,15 +53,31 @@ class JsonParser extends CstParser {
         })
 
         $.RULE("conjunction", () => {
-            $.SUBRULE($.atomic, { LABEL : "lhs" })
+            $.SUBRULE($.implication, { LABEL : "lhs" })
             $.MANY(() => {
                 $.CONSUME(Con, { LABEL : "mid" })
+                $.SUBRULE2($.implication, { LABEL : "rhs" })
+            })
+        })
+
+        $.RULE("implication", () => {
+            $.SUBRULE($.equivalence, { LABEL : "lhs" })
+            $.MANY(() => {
+                $.CONSUME(Imp, { LABEL : "mid" })
+                $.SUBRULE2($.equivalence, { LABEL : "rhs" })
+            })
+        })
+
+        $.RULE("equivalence", () => {
+            $.SUBRULE($.atomic, { LABEL : "lhs" })
+            $.MANY(() => {
+                $.CONSUME(Equ, { LABEL : "mid" })
                 $.SUBRULE2($.atomic, { LABEL : "rhs" })
             })
         })
 
         $.RULE("atomic", () => {
-            $.OPTION(() => {
+            $.MANY(() => {
                 $.CONSUME(Neg, { LABEL : "neg" })
             })
             $.OR([

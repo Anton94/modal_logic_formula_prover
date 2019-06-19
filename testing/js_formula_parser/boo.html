@@ -11,14 +11,20 @@
 						"name": "string", 
 						"value": cst.image
 					};
-				}
-				if (cst.children.hasOwnProperty("neg")) {
-					return {
+				} else if (cst.children.hasOwnProperty("neg")) {
+					var negValue = {
 						"name": "neg", 
 						"value": simplify(cst.children["lhs"][0])
 					};
+					for (var i = 1; i < cst.children["neg"].length; ++i) {
+						negValue = {
+							"name": "neg",
+							"value": negValue
+						}
+					}
+					return negValue;
 				} else if (cst.children.hasOwnProperty("rhs")) {
-					children = [simplify(cst.children["lhs"][0])];
+					var children = [simplify(cst.children["lhs"][0])];
 					cst.children["rhs"].forEach((x) => {
 						children.push(simplify(x));
 					});
