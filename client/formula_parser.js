@@ -3,12 +3,21 @@ const Lexer = chevrotain.Lexer;
 const CstParser = chevrotain.CstParser;
 
 // ----------------- lexer -----------------
-const BinOperator = createToken({name : "BinOperator", pattern: Lexer.NA})
-const Dis = createToken({ name: "Dis", pattern: /\|/, categories: BinOperator })
-const Con = createToken({ name: "Con", pattern: /&/, categories: BinOperator })
-const Imp = createToken({ name: "Imp", pattern: /=>/, categories: BinOperator })
-const Equ = createToken({ name: "Equ", pattern: /<->/, categories: BinOperator })
+
+const Sub = createToken({ name: "Sub", pattern: /<=/ })
+const Contact = createToken({ name: "Contact", pattern: /C/ })
+
+const Dis = createToken({ name: "Dis", pattern: /\|/ })
+const Con = createToken({ name: "Con", pattern: /&/ })
+const Imp = createToken({ name: "Imp", pattern: /=>/ })
+const Equ = createToken({ name: "Equ", pattern: /<->/ })
 const Neg = createToken({ name: "Neg", pattern: /!/ })
+
+// Term operations
+const TCon = createToken({ name: "TCon", pattern: /n/ })
+const TDis = createToken({ name: "TDis", pattern: /u/ })
+const TStar = createToken({ name: "TStar", pattern: /\*/ })
+
 const StringLiteral = createToken({
     name: "StringLiteral",
     pattern: /\w+/
@@ -23,15 +32,23 @@ const WhiteSpace = createToken({
 
 const allTokens = [
     WhiteSpace,
+
+    Sub,
+    Contact,
+
     Dis,
     Con,
     Imp,
     Equ,
     Neg,
+
+    TCon,
+    TDis,
+    TStar,
+
     LParen,
     RParen,
-    StringLiteral,
-    BinOperator
+    StringLiteral
 ]
 
 const JsonLexer = new Lexer(allTokens)
@@ -80,7 +97,39 @@ class JsonParser extends CstParser {
             $.MANY(() => {
                 $.CONSUME(Neg, { LABEL: "neg" })
             })
+            $.SUBRULE($.less, { LABEL: "lhs" })
+        })
+
+        $.RULE("less", () => {
+            $.SUBRULE($.contact, { LABEL: "lhs" })
+            $.OPTION(() => {
+                $.CONSUME(Sub, { LABEL: "mid" })
+                $.SUBRULE2($.contact, { LABEL: "rhs" })
+            })
+        })
+
+        $.RULE("contact", () => {
+            $.SUBRULE($.Tconjunction, { LABEL: "lhs" })
+            $.OPTION(() => {
+                $.CONSUME(Contact, { LABEL: "mid" })
+                $.SUBRULE2($.Tconjunction, { LABEL: "rhs" })
+            })
+        })
+
+        $.RULE("Tdisjunction", () => {
+            $.SUBRULE($.Tconjunction, { LABEL: "lhs" })
+            $.MANY(() => {
+                $.CONSUME(TDis, { LABEL: "mid" })
+                $.SUBRULE2($.Tconjunction, { LABEL: "rhs" })  
+            })
+        })
+
+        $.RULE("Tconjunction", () => {
             $.SUBRULE($.atomic, { LABEL: "lhs" })
+            $.MANY(() => {
+                $.CONSUME(TCon, { LABEL: "mid" })
+                $.SUBRULE2($.atomic, { LABEL: "rhs" })
+            })
         })
 
 
