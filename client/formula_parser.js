@@ -69,20 +69,26 @@ class JsonParser extends CstParser {
         })
 
         $.RULE("equivalence", () => {
-            $.SUBRULE($.atomic, { LABEL : "lhs" })
+            $.SUBRULE($.negation, { LABEL : "lhs" })
             $.MANY(() => {
                 $.CONSUME(Equ, { LABEL : "mid" })
-                $.SUBRULE2($.atomic, { LABEL : "rhs" })
+                $.SUBRULE2($.negation, { LABEL : "rhs" })
             })
         })
 
-        $.RULE("atomic", () => {
+        $.RULE("negation", () => {
             $.MANY(() => {
-                $.CONSUME(Neg, { LABEL : "neg" })
+                $.CONSUME(Neg, { LABEL: "neg" })
             })
+            $.SUBRULE($.atomic, { LABEL: "lhs" })
+        })
+
+
+
+        $.RULE("atomic", () => {
             $.OR([
-                { ALT: () => $.SUBRULE($.parenthesis, { LABEL : "lhs" }) },
-                { ALT: () => $.CONSUME(StringLiteral, { LABEL : "lhs" }) }
+                { ALT: () => $.SUBRULE($.parenthesis, { LABEL: "lhs" }) },
+                { ALT: () => $.CONSUME(StringLiteral, { LABEL: "lhs" }) }
             ])
         })
 
