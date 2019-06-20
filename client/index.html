@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://unpkg.com/chevrotain/lib/chevrotain.js"></script>
+		<!--script src="https://unpkg.com/chevrotain/lib/chevrotain.min.js"></script-->
+		<script src="./formula_parser.js"></script>
+		<script>
+			function prove(formula) {
+				var simple = simplify(parse(formula).cst);
+				document.getElementById("output").innerHTML = JSON.stringify(simple, undefined, 3) + "\n\n" + JSON.stringify(parse(formula).cst, undefined, 3);
+			}
+		</script>
+	</head>
+	<body>
+		<div id="formula_input">
+			<input id="formula"/>
+			<button onclick="prove(document.getElementById('formula').value)">Prove</button>
+		</div>
+		<div id="formula_output">
+			<pre id="output"></pre>
+		</div>
+	</body>
+</html>

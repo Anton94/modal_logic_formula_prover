@@ -141,6 +141,39 @@ function printa(cst, width) {
     }
 }
 
+function simplify(cst) {
+    if (!cst.hasOwnProperty("name")) {
+        return { 
+            "name": "string", 
+            "value": cst.image
+        };
+    } else if (cst.children.hasOwnProperty("neg")) {
+        var negValue = {
+            "name": "neg", 
+            "value": simplify(cst.children["lhs"][0])
+        };
+        for (var i = 1; i < cst.children["neg"].length; ++i) {
+            negValue = {
+                "name": "neg",
+                "value": negValue
+            }
+        }
+        return negValue;
+    } else if (cst.children.hasOwnProperty("rhs")) {
+        var children = [simplify(cst.children["lhs"][0])];
+        cst.children["rhs"].forEach((x) => {
+            children.push(simplify(x));
+        });
+        return {
+            "name": cst.children["mid"][0].image,
+            "value": children
+        };
+    } else if (cst.children.hasOwnProperty("lhs")) {
+        return simplify(cst.children["lhs"][0]);
+    }
+    throw Error("This is not permitted");
+}
+
 function parse(text) {
     const lexResult = JsonLexer.tokenize(text)
     // setting a new input will RESET the parser instance's state.
