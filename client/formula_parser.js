@@ -1,3 +1,5 @@
+// TODO
+
 const createToken = chevrotain.createToken;
 const Lexer = chevrotain.Lexer;
 const CstParser = chevrotain.CstParser;
@@ -14,16 +16,19 @@ const Equ = createToken({ name: "Equ", pattern: /<->/ })
 const Neg = createToken({ name: "Neg", pattern: /!/ })
 
 // Term operations
-const TCon = createToken({ name: "TCon", pattern: /n/ })
-const TDis = createToken({ name: "TDis", pattern: /u/ })
+const TCon = createToken({ name: "TCon", pattern: /@/ })
+const TDis = createToken({ name: "TDis", pattern: /#/ })
 const TStar = createToken({ name: "TStar", pattern: /\*/ })
 
+const True = createToken({ name: "True", pattern: "T" })
+const False = createToken({ name: "False", pattern: "F" })
 const StringLiteral = createToken({
     name: "StringLiteral",
-    pattern: /\w+/
+    pattern: /[a-z0-9]+/
 })
 const LParen = createToken({ name: "LParen", pattern: /\(/ })
 const RParen = createToken({ name: "RParen", pattern: /\)/ })
+const Comma = createToken({ name: "Comma", pattern: /,/ })
 const WhiteSpace = createToken({
     name: "WhiteSpace",
     pattern: /\s+/,
@@ -32,23 +37,31 @@ const WhiteSpace = createToken({
 
 const allTokens = [
     WhiteSpace,
+    Comma,
 
+// atomic formula
     Sub,
     Contact,
 
+// formula operation
     Dis,
     Con,
     Imp,
     Equ,
     Neg,
 
+// term operation
     TCon,
     TDis,
     TStar,
 
     LParen,
     RParen,
-    StringLiteral
+
+// atomic term
+    StringLiteral,
+    True,
+    False
 ]
 
 const JsonLexer = new Lexer(allTokens)
@@ -61,6 +74,7 @@ class JsonParser extends CstParser {
 
         const $ = this
 
+    // Formula Operations
         $.RULE("disjunction", () => {
             $.SUBRULE($.conjunction, { LABEL : "lhs" })
             $.MANY(() => {
@@ -97,25 +111,36 @@ class JsonParser extends CstParser {
             $.MANY(() => {
                 $.CONSUME(Neg, { LABEL: "neg" })
             })
-            $.SUBRULE($.less, { LABEL: "lhs" })
+            $.SUBRULE($.atomic_formula, { LABEL: "lhs" })
         })
 
-        $.RULE("less", () => {
-            $.SUBRULE($.contact, { LABEL: "lhs" })
-            $.OPTION(() => {
-                $.CONSUME(Sub, { LABEL: "mid" })
-                $.SUBRULE2($.contact, { LABEL: "rhs" })
-            })
+        $.RULE("atomic_formula", () => {
+            $.OR([
+                {
+                    ALT: () => $.SUBRULE($.parenthesis_formula, { LABEL: "lhs" })
+                },
+                { ALT: () => {
+                        $.OR1([
+                            { ALT: () => $.CONSUME(Sub, { LABEL: "mid" }) },
+                            { ALT: () => $.CONSUME(Contact, { LABEL: "mid" }) }
+                        ])
+                        $.CONSUME(LParen)
+                        $.SUBRULE($.Tdisjunction, { LABEL: "lhs" })
+                        $.CONSUME(Comma)
+                        $.SUBRULE2($.Tdisjunction, { LABEL: "rhs" })
+                        $.CONSUME(RParen)
+                    }
+                }
+            ])
         })
 
-        $.RULE("contact", () => {
-            $.SUBRULE($.Tconjunction, { LABEL: "lhs" })
-            $.OPTION(() => {
-                $.CONSUME(Contact, { LABEL: "mid" })
-                $.SUBRULE2($.Tconjunction, { LABEL: "rhs" })
-            })
+        $.RULE("parenthesis_formula", () => {
+            $.CONSUME(LParen)
+            $.SUBRULE($.disjunction, { LABEL : "lhs" })
+            $.CONSUME(RParen)
         })
 
+    // Term operations
         $.RULE("Tdisjunction", () => {
             $.SUBRULE($.Tconjunction, { LABEL: "lhs" })
             $.MANY(() => {
@@ -125,25 +150,33 @@ class JsonParser extends CstParser {
         })
 
         $.RULE("Tconjunction", () => {
-            $.SUBRULE($.atomic, { LABEL: "lhs" })
+            $.SUBRULE($.star, { LABEL: "lhs" })
             $.MANY(() => {
                 $.CONSUME(TCon, { LABEL: "mid" })
-                $.SUBRULE2($.atomic, { LABEL: "rhs" })
+                $.SUBRULE2($.star, { LABEL: "rhs" })
             })
         })
 
+        $.RULE("star", () => {
+            $.MANY(() => {
+                $.CONSUME(TStar, { LABEL: "star" })
+            })
+            $.SUBRULE($.atomic_term, { LABEL: "lhs" })
+        })
 
 
-        $.RULE("atomic", () => {
+        $.RULE("atomic_term", () => {
             $.OR([
-                { ALT: () => $.SUBRULE($.parenthesis, { LABEL: "lhs" }) },
+                { ALT: () => $.SUBRULE($.parenthesis_term, { LABEL: "lhs" }) },
+                { ALT: () => $.CONSUME(True, { LABEL: "lhs" }) },
+                { ALT: () => $.CONSUME(False, { LABEL: "lhs" }) },
                 { ALT: () => $.CONSUME(StringLiteral, { LABEL: "lhs" }) }
             ])
         })
 
-        $.RULE("parenthesis", () => {
+        $.RULE("parenthesis_term", () => {
             $.CONSUME(LParen)
-            $.SUBRULE($.disjunction, { LABEL : "lhs" })
+            $.SUBRULE($.Tdisjunction, { LABEL : "lhs" })
             $.CONSUME(RParen)
         })
 
@@ -165,43 +198,24 @@ function appenda(text, width, skip_new_line) {
     output.innerHTML = output.innerHTML + "&emsp;".repeat(width) + text + "<br/>";
 }
 
-
-function printa(cst, width) {
-    if (cst.children.hasOwnProperty("Neg")) {
-        appenda("!", width, true);
-
-        if (cst.children.hasOwnProperty("parenthesis")) {
-            printa(cst.children["parenthesis"][0], width);
-        } else if (cst.children.hasOwnProperty("StringLiteral")) {
-            appenda(cst.children["StringLiteral"].image, width);
-        } else {
-            throw "Negated something whicis not ( ) or variable";
-        }
-    } else if (cst.children.hasOwnProperty("Dis") || cst.children.hasOwnProperty("Con")) {
-        printa(cst.children["lhs"][0], width + 1);
-        appenda(cst.children.hasOwnProperty("Dis") ? "|" : "&", width);
-        printa(cst.children["rhs"][0], width + 1);
-    } else if (cst.children.hasOwnProperty("parenthesis")) {
-        printa(cst.children["parenthesis"][0], width);
-    } else if (cst.children.hasOwnProperty("LParen")) {
-        appenda("(", width);
-        printa(cst.children["lhs"][0], width + 1);
-        appenda(")", width);
-    } else if (cst.children.hasOwnProperty("StringLiteral")) {
-        appenda(cst.children["StringLiteral"][0].image, width);
-    } else if (cst.children.hasOwnProperty("lhs")){
-        printa(cst.children["lhs"][0], width)
-    } else if (Object.keys(cst.children).length > 0) {
-        throw "Not good  " + JSON.stringify(cst.children);
-    }
-}
-
 function simplify(cst) {
     if (!cst.hasOwnProperty("name")) {
         return { 
             "name": "string", 
             "value": cst.image
         };
+    } else if (cst.children.hasOwnProperty("star")) {
+        var starValue = {
+            "name": "star",
+            "value": simplify(cst.children["lhs"][0])
+        };
+        for (var i = 1; i <cst.children["star"].length; ++i) {
+            starValue = {
+                "name": "star",
+                "value": starValue
+            }
+        }
+        return starValue;
     } else if (cst.children.hasOwnProperty("neg")) {
         var negValue = {
             "name": "neg", 
@@ -243,3 +257,7 @@ function parse(text) {
         parseErrors: parser.errors
     }
 }
+
+
+
+// (<=((a#b)@c, (b#m@c))|C(a,b))&C(b,m)

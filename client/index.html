@@ -7,7 +7,8 @@
 		<script>
 			function prove(formula) {
 				var simple = simplify(parse(formula).cst);
-				document.getElementById("output").innerHTML = JSON.stringify(simple, undefined, 3) + "\n\n" + JSON.stringify(parse(formula).cst, undefined, 3);
+				document.getElementById("output").innerHTML = JSON.stringify(simple, undefined, 3) + "\n\n";
+				document.getElementById("output").innerHTML += JSON.stringify(parse(formula).cst, undefined, 3);
 			}
 		</script>
 	</head>
