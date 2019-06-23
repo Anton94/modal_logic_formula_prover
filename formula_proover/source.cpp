@@ -3,6 +3,7 @@
 
 #include "nlohmann_json\json.hpp"
 #include "cmd_options\cxxopts.hpp"
+#include "formula.h"
 
 using json = nlohmann::json;
 
@@ -30,13 +31,18 @@ int main(int argc, char* argv[])
 			auto formula_arg = result["formula"].as<std::string>();
 
 			std::cout << "Parsing forumla: " << formula_arg << std::endl;
-			json formula = json::parse(formula_arg);
-			std::cout << formula.dump(4) << std::endl;
+			json formula_json = json::parse(formula_arg);
+			std::cout << "Parsed into json: \n" << formula_json.dump(4) << std::endl;
+
+			std::cout << "Building a formula tree with the parsed one...\n\t";
+			formula f;
+			std::cout << (f.build(formula_json) ? "success" : "failed") << " ";
+			std::cout << f << std::endl;
 		}
 	}
 	catch (const cxxopts::OptionException& e)
 	{
-		std::cerr << e.what() << std::endl;
+		std::cerr << "arg error: " << e.what() << std::endl;
 	}
 
 	return 0;
