@@ -13,7 +13,7 @@ const Dis = createToken({ name: "Dis", pattern: /\|/ })
 const Con = createToken({ name: "Con", pattern: /&/ })
 const Imp = createToken({ name: "Imp", pattern: /=>/ })
 const Equ = createToken({ name: "Equ", pattern: /<->/ })
-const Neg = createToken({ name: "Neg", pattern: /!/ })
+const Neg = createToken({ name: "Neg", pattern: /~/ })
 
 // Term operations
 const TCon = createToken({ name: "TCon", pattern: /@/ })
@@ -198,32 +198,48 @@ function appenda(text, width, skip_new_line) {
     output.innerHTML = output.innerHTML + "&emsp;".repeat(width) + text + "<br/>";
 }
 
+
+const symbol_to_explanation =  {
+    "<=": "less",
+    "C": "contact",
+    "|": "disjunction",
+    "&": "conjunction",
+    "=>": "implication",
+    "<->": "equivalence",
+    "~": "negation",
+    "@": "Tconjunction",
+    "#": "Tdisjunction",
+    "*": "star",
+    "T": "true",
+    "F": "false"
+}
+
 function simplify(cst) {
     if (!cst.hasOwnProperty("name")) {
         return { 
             "name": "string", 
-            "value": cst.image
+            "value":symbol_to_explanation[cst.image]
         };
     } else if (cst.children.hasOwnProperty("star")) {
         var starValue = {
-            "name": "star",
+            "name": symbol_to_explanation["*"],
             "value": simplify(cst.children["lhs"][0])
         };
         for (var i = 1; i <cst.children["star"].length; ++i) {
             starValue = {
-                "name": "star",
+                "name": symbol_to_explanation["*"],
                 "value": starValue
             }
         }
         return starValue;
     } else if (cst.children.hasOwnProperty("neg")) {
         var negValue = {
-            "name": "neg", 
+            "name": symbol_to_explanation["~"], 
             "value": simplify(cst.children["lhs"][0])
         };
         for (var i = 1; i < cst.children["neg"].length; ++i) {
             negValue = {
-                "name": "neg",
+                "name": symbol_to_explanation["~"],
                 "value": negValue
             }
         }
@@ -234,7 +250,7 @@ function simplify(cst) {
             children.push(simplify(x));
         });
         return {
-            "name": cst.children["mid"][0].image,
+            "name": symbol_to_explanation[cst.children["mid"][0].image],
             "value": children
         };
     } else if (cst.children.hasOwnProperty("lhs")) {
