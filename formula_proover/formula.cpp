@@ -15,7 +15,7 @@ std::string& formula::operation_to_symbol(operation_t op)
 		"|",
 		"~",
 		"<=",
-		"c",
+		"C",
 		"INVALID",
 	};
 
@@ -27,8 +27,16 @@ bool formula::is_term_operation() const
 	return op_ == operation_t::le || op_ == operation_t::c;
 }
 
+bool formula::is_formula_operation() const
+{
+	return op_ == operation_t::conjunction ||
+		   op_ == operation_t::disjunction ||
+		   op_ == operation_t::negation;
+}
+
 formula::formula()
 	: op_(operation_t::invalid)
+	, hash_(0ul)
 	, left_f_(nullptr)
 	, right_f_(nullptr)
 {
@@ -53,6 +61,24 @@ formula::~formula()
 	}
 }
 
+bool formula::operator==(const formula& rhs) const
+{
+	assert(op_ != operation_t::invalid);
+	if (hash_ != rhs.hash_ || op_ != rhs.op_)
+	{
+		return false;
+	}
+
+	assert(left_t_ && right_t_ && rhs.left_f_ && rhs.right_f_);
+	if (is_term_operation())
+	{
+		return *left_t_ == *rhs.left_t_  && *right_t_ == *rhs.right_t_;
+	}
+
+	assert(is_formula_operation());
+	return *left_f_ == *rhs.left_f_  && *right_f_ == *rhs.right_f_;
+}
+
 bool formula::build(json& f)
 {
 	if (!f.contains("name"))
@@ -71,53 +97,49 @@ bool formula::build(json& f)
 	{
 		op_ = operation_t::le;
 
-		left_t_ = new (std::nothrow) term();
-		right_t_ = new (std::nothrow) term();
-		assert(left_t_ && right_t_);
-
-		auto& value_field = f["value"];
-		if (!value_field.is_array() || value_field.size() != 2)
+		if (!create_terms(f))
 		{
 			return false;
 		}
 
-		left_t_->build(value_field[0]);
-		right_t_->build(value_field[1]);
+		hash_ = ((left_t_->get_hash() & 0xFFFFFFFF) * 2654435761) +
+			((right_t_->get_hash() & 0xFFFFFFFF) * 2654435761);
 	}
-	// else if (op == "c")
+	else if (op == "C")
+	{
+		op_ = operation_t::c;
+
+		if (!create_terms(f))
+		{
+			return false;
+		}
+
+		hash_ = ((left_t_->get_hash() & 0xFFFFFFFF) * 2654435761) +
+			((right_t_->get_hash() & 0xFFFFFFFF) * 2654435761);
+	}
 	else if (op == "and")
 	{
 		op_ = operation_t::conjunction;
 
-		left_f_ = new (std::nothrow) formula();
-		right_f_ = new (std::nothrow) formula();
-		assert(left_f_ && right_f_);
-
-		auto& value_field = f["value"];
-		if (!value_field.is_array() || value_field.size() != 2)
+		if (!create_formulas(f))
 		{
 			return false;
 		}
 
-		left_f_->build(value_field[0]);
-		right_f_->build(value_field[1]);
+		hash_ = ((left_f_->get_hash() & 0xFFFFFFFF) * 2654435761) +
+			((right_f_->get_hash() & 0xFFFFFFFF) * 2654435761);
 	}
 	else if (op == "or")
 	{
 		op_ = operation_t::disjunction;
 
-		left_f_ = new (std::nothrow) formula();
-		right_f_ = new (std::nothrow) formula();
-		assert(left_f_ && right_f_);
-
-		auto& value_field = f["value"];
-		if (!value_field.is_array() || value_field.size() != 2)
+		if (!create_formulas(f))
 		{
 			return false;
 		}
 
-		left_f_->build(value_field[0]);
-		right_f_->build(value_field[1]);
+		hash_ = ((left_f_->get_hash() & 0xFFFFFFFF) * 2654435761) +
+				((right_f_->get_hash() & 0xFFFFFFFF) * 2654435761);
 	}
 	else if (op == "neg")
 	{
@@ -127,12 +149,14 @@ bool formula::build(json& f)
 		assert(left_f_);
 
 		auto& value_field = f["value"];
-		if (!value_field.is_object())
+
+		if (!value_field.is_object() ||
+			!left_f_->build(value_field))
 		{
 			return false;
 		}
 
-		left_f_->build(value_field);
+		hash_ = (left_f_->hash_ & 0xFFFFFFFF) * 2654435761;
 	}
 	else
 	{
@@ -140,7 +164,45 @@ bool formula::build(json& f)
 		return false;
 	}
 
+	const auto op_code = (static_cast<unsigned>(op_) + 7) * 31;
+	hash_ += (op_code & 0xFFFFFFFF) * 2654435723;
+
 	return true;
+}
+
+bool formula::create_terms(json& f)
+{
+	left_t_ = new (std::nothrow) term();
+	right_t_ = new (std::nothrow) term();
+	assert(left_t_ && right_t_);
+
+	auto& value_field = f["value"];
+	if (!value_field.is_array() || value_field.size() != 2)
+	{
+		return false;
+	}
+
+	return left_t_->build(value_field[0]) && right_t_->build(value_field[1]);
+}
+
+bool formula::create_formulas(json& f)
+{
+	left_f_ = new (std::nothrow) formula();
+	right_f_ = new (std::nothrow) formula();
+	assert(left_f_ && right_f_);
+
+	auto& value_field = f["value"];
+	if (!value_field.is_array() || value_field.size() != 2)
+	{
+		return false;
+	}
+
+	return left_f_->build(value_field[0]) && right_f_->build(value_field[1]);
+}
+
+std::size_t formula::get_hash() const
+{
+	return hash_;
 }
 
 std::ostream& operator<<(std::ostream& out, const formula& f)
@@ -151,15 +213,15 @@ std::ostream& operator<<(std::ostream& out, const formula& f)
 	}
 	else if (f.is_term_operation())
 	{
-		out << "(" << *f.left_t_ << " " << formula::operation_to_symbol(f.op_) << " " << *f.right_t_ << ")";
+		out << "[" << formula::operation_to_symbol(f.op_) << "[" << *f.left_t_ << ", " << *f.right_t_ << "]]";
 	}
 	else if (f.op_ == formula::operation_t::negation)
 	{
-		out << "(" << formula::operation_to_symbol(f.op_) << *f.left_f_ << ")";
+		out << "[" << formula::operation_to_symbol(f.op_) << *f.left_f_ << "]";
 	}
 	else
 	{
-		out << "(" << *f.left_f_ << " " << formula::operation_to_symbol(f.op_) << " " << *f.right_f_ << ")";
+		out << "[" << *f.left_f_ << " " << formula::operation_to_symbol(f.op_) << " " << *f.right_f_ << "]";
 	}
 
 	return out;

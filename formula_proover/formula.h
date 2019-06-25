@@ -15,7 +15,13 @@ public:
 	formula(const formula&) = delete;
 	formula& operator=(const formula&) = delete;
 
+	formula(formula&&) noexcept = default;
+	formula& operator=(formula&&) noexcept = default;
+
+	bool operator==(const formula& rhs) const;
+
 	bool build(json& f);
+	std::size_t get_hash() const;
 
 	friend std::ostream& operator<<(std::ostream& out, const formula& f);
 private:
@@ -34,8 +40,13 @@ private:
 
 	static std::string& operation_to_symbol(operation_t op);
 	bool is_term_operation() const;
+	bool is_formula_operation() const;
+
+	bool create_terms(json& f);
+	bool create_formulas(json& f);
 
 	operation_t op_;
+	std::size_t hash_;
 	union
 	{
 		struct
@@ -50,3 +61,17 @@ private:
 		};
 	};
 };
+
+namespace std
+{
+
+template<>
+struct hash<formula>
+{
+	std::size_t operator()(const formula& f) const
+	{
+		return f.get_hash();
+	}
+};
+
+}

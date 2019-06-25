@@ -38,6 +38,11 @@ int main(int argc, char* argv[])
 			formula f;
 			std::cout << (f.build(formula_json) ? "success" : "failed") << " ";
 			std::cout << f << std::endl;
+
+			std::unordered_set<formula> dummy_formulas;
+			//dummy_formulas.insert(formula());
+			std::unordered_set<term> dummy_terms;
+			//dummy_terms.emplace(term());
 		}
 	}
 	catch (const cxxopts::OptionException& e)

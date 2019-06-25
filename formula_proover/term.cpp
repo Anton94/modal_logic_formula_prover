@@ -4,11 +4,17 @@
 
 term::term()
 	: is_in_DNF(false)
+	, hash_(0ul)
 {
 }
 
 term::~term()
 {
+}
+
+bool term::operator==(const term& rhs) const
+{
+	return hash_ == rhs.hash_ && term_raw == rhs.term_raw;
 }
 
 bool term::build(json& t)
@@ -19,8 +25,14 @@ bool term::build(json& t)
 	}
 
 	term_raw = t["value"];
+	hash_ = std::hash<json>()(term_raw);
 
 	return true;
+}
+
+std::size_t term::get_hash() const
+{
+	return hash_;
 }
 
 std::ostream& operator<<(std::ostream& out, const term& t)
