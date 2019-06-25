@@ -6,18 +6,18 @@ const CstParser = chevrotain.CstParser;
 
 // ----------------- lexer -----------------
 
-const Sub = createToken({ name: "Sub", pattern: /<=/ })
+const Less = createToken({ name: "Less", pattern: /<=/ })
 const Contact = createToken({ name: "Contact", pattern: /C/ })
 
 const Dis = createToken({ name: "Dis", pattern: /\|/ })
 const Con = createToken({ name: "Con", pattern: /&/ })
-const Imp = createToken({ name: "Imp", pattern: /=>/ })
+const Imp = createToken({ name: "Imp", pattern: /->/ })
 const Equ = createToken({ name: "Equ", pattern: /<->/ })
 const Neg = createToken({ name: "Neg", pattern: /~/ })
 
 // Term operations
-const TCon = createToken({ name: "TCon", pattern: /@/ })
-const TDis = createToken({ name: "TDis", pattern: /#/ })
+const TCon = createToken({ name: "TCon", pattern: /\+/ })
+const TDis = createToken({ name: "TDis", pattern: /-/ })
 const TStar = createToken({ name: "TStar", pattern: /\*/ })
 
 const True = createToken({ name: "True", pattern: "T" })
@@ -40,7 +40,7 @@ const allTokens = [
     Comma,
 
 // atomic formula
-    Sub,
+    Less,
     Contact,
 
 // formula operation
@@ -121,7 +121,7 @@ class JsonParser extends CstParser {
                 },
                 { ALT: () => {
                         $.OR1([
-                            { ALT: () => $.CONSUME(Sub, { LABEL: "mid" }) },
+                            { ALT: () => $.CONSUME(Less, { LABEL: "mid" }) },
                             { ALT: () => $.CONSUME(Contact, { LABEL: "mid" }) }
                         ])
                         $.CONSUME(LParen)
@@ -164,7 +164,7 @@ class JsonParser extends CstParser {
             $.SUBRULE($.atomic_term, { LABEL: "lhs" })
         })
 
-
+        // atomic
         $.RULE("atomic_term", () => {
             $.OR([
                 { ALT: () => $.SUBRULE($.parenthesis_term, { LABEL: "lhs" }) },
@@ -185,26 +185,12 @@ class JsonParser extends CstParser {
     }
 }
 
-// ----------------- wrapping it all together -----------------
-
-// reuse the same parser instance.
-const parser = new JsonParser()
-
-var jsonToken = allTokens;
-var res_par = JsonParser;
-
-function appenda(text, width, skip_new_line) {
-    var output = document.getElementById("output");
-    output.innerHTML = output.innerHTML + "&emsp;".repeat(width) + text + "<br/>";
-}
-
-
 const symbol_to_explanation =  {
     "<=": "less",
     "C": "contact",
     "|": "disjunction",
     "&": "conjunction",
-    "=>": "implication",
+    "->": "implication",
     "<->": "equivalence",
     "~": "negation",
     "@": "Tconjunction",
@@ -259,8 +245,16 @@ function simplify(cst) {
     throw Error("This is not permitted");
 }
 
-function parse(text) {
-    const lexResult = JsonLexer.tokenize(text)
+// ----------------- wrapping it all together -----------------
+
+// reuse the same parser instance.
+const parser = new JsonParser()
+
+var jsonToken = allTokens;
+var res_par = JsonParser;
+
+function parse(formula) {
+    const lexResult = JsonLexer.tokenize(formula)
     // setting a new input will RESET the parser instance's state.
     parser.input = lexResult.tokens
     // any top level rule may be used as an entry point
@@ -275,5 +269,10 @@ function parse(text) {
 }
 
 
+function formula_to_json(formula) {
+    return simplify(parse(formula).cst);
+}
+ 
 
-// (<=((a#b)@c, (b#m@c))|C(a,b))&C(b,m)
+// (<=((a-b)+c, (b-m+c))|C(a,b))&C(b,m)
+// <=(a,b)<->C(a,b)-><=(m,b)
