@@ -1,6 +1,6 @@
 #pragma once
 
-#include "nlohmann_json\json.hpp"
+#include "nlohmann_json/json.hpp"
 #include <ostream>
 
 class term

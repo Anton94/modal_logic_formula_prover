@@ -1,7 +1,7 @@
 #pragma once
 
 #include "term.h"
-#include "nlohmann_json\json.hpp"
+#include "nlohmann_json/json.hpp"
 #include <ostream>
 
 class formula

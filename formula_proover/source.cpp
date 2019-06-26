@@ -1,8 +1,9 @@
 #include <iostream>
 #include <string>
 
-#include "nlohmann_json\json.hpp"
-#include "cmd_options\cxxopts.hpp"
+#include "nlohmann_json/json.hpp"
+#include "cmd_options/cxxopts.hpp"
+
 #include "formula.h"
 
 using json = nlohmann::json;
