@@ -96,7 +96,7 @@ bool formula::build(json& f)
         }
 
         hash_ = ((left_t_->get_hash() & 0xFFFFFFFF) * 2654435761) +
-                ((right_t_->get_hash() & 0xFFFFFFFF) * 2654435761);
+                ((right_t_->get_hash() & 0xFFFFFFFF) * 2654435741);
     }
     else if(op == "C")
     {
@@ -108,7 +108,7 @@ bool formula::build(json& f)
         }
 
         hash_ = ((left_t_->get_hash() & 0xFFFFFFFF) * 2654435761) +
-                ((right_t_->get_hash() & 0xFFFFFFFF) * 2654435761);
+                ((right_t_->get_hash() & 0xFFFFFFFF) * 2654435741);
     }
     else if(op == "and")
     {
@@ -120,7 +120,7 @@ bool formula::build(json& f)
         }
 
         hash_ = ((left_f_->get_hash() & 0xFFFFFFFF) * 2654435761) +
-                ((right_f_->get_hash() & 0xFFFFFFFF) * 2654435761);
+                ((right_f_->get_hash() & 0xFFFFFFFF) * 2654435741);
     }
     else if(op == "or")
     {
@@ -132,7 +132,7 @@ bool formula::build(json& f)
         }
 
         hash_ = ((left_f_->get_hash() & 0xFFFFFFFF) * 2654435761) +
-                ((right_f_->get_hash() & 0xFFFFFFFF) * 2654435761);
+                ((right_f_->get_hash() & 0xFFFFFFFF) * 2654435741);
     }
     else if(op == "neg")
     {
