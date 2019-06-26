@@ -10,8 +10,12 @@ class term
 public:
     term();
     ~term();
+
     term(const term&) = delete;
     term& operator=(const term&) = delete;
+
+    term(term&&) noexcept = default;
+    term& operator=(term&&) noexcept = default;
 
     bool operator==(const term& rhs) const;
 
@@ -24,8 +28,6 @@ private:
     bool is_in_DNF; // TODO: make DNF form, but only when needed
     std::size_t hash_;
     json term_raw;
-
-private:
 };
 
 namespace std
@@ -39,4 +41,5 @@ struct hash<term>
         return t.get_hash();
     }
 };
+
 }
