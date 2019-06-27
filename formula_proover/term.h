@@ -36,7 +36,7 @@ namespace std
 template <>
 struct hash<term>
 {
-    std::size_t operator()(const term& t) const
+    auto operator()(const term& t) const -> std::size_t
     {
         return t.get_hash();
     }

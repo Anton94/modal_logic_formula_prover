@@ -67,9 +67,10 @@ namespace std
 template <>
 struct hash<formula>
 {
-    std::size_t operator()(const formula& f) const
+    auto operator()(const formula& f) const -> std::size_t
     {
         return f.get_hash();
     }
 };
+
 }
