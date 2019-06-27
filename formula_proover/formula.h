@@ -2,7 +2,10 @@
 
 #include "nlohmann_json/json.hpp"
 #include "term.h"
+
 #include <ostream>
+
+class tableau;
 
 class formula
 {
@@ -41,6 +44,8 @@ public:
     friend std::ostream& operator<<(std::ostream& out, const formula& f);
 
 private:
+    friend tableau;
+
     static auto operation_to_symbol(operation_t op) -> std::string&;
 
     auto create_terms(json& f) -> bool;

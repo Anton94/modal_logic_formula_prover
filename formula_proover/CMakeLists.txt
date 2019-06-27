@@ -1,1 +1,1 @@
-add_executable (formula_proover source.cpp formula.cpp formula.h term.h term.cpp)
+add_executable (formula_proover source.cpp formula.cpp formula.h term.h term.cpp tableau.cpp tableau.h)
