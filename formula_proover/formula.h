@@ -9,23 +9,6 @@ class formula
     using json = nlohmann::json;
 
 public:
-    formula();
-    ~formula();
-
-    formula(const formula&) = delete;
-    formula& operator=(const formula&) = delete;
-
-    formula(formula&&) noexcept = default;
-    formula& operator=(formula&&) noexcept = default;
-
-    auto operator==(const formula& rhs) const -> bool;
-
-    auto build(json& f) -> bool;
-    auto get_hash() const -> std::size_t;
-
-    friend std::ostream& operator<<(std::ostream& out, const formula& f);
-
-private:
     enum class operation_type : char
     {
         conjunction,
@@ -38,9 +21,27 @@ private:
     };
     using operation_t = operation_type;
 
-    static auto operation_to_symbol(operation_t op) -> std::string&;
+    formula();
+    ~formula();
+    formula(const formula&) = delete;
+    formula& operator=(const formula&) = delete;
+    formula(formula&&) noexcept = default;
+    formula& operator=(formula&&) noexcept = default;
+
+    auto operator==(const formula& rhs) const -> bool;
+
+    auto build(json& f) -> bool;
+    auto get_hash() const -> std::size_t;
+
+    auto get_operation_type() const -> operation_t;
+
     auto is_term_operation() const -> bool;
     auto is_formula_operation() const -> bool;
+
+    friend std::ostream& operator<<(std::ostream& out, const formula& f);
+
+private:
+    static auto operation_to_symbol(operation_t op) -> std::string&;
 
     auto create_terms(json& f) -> bool;
     auto create_formulas(json& f) -> bool;

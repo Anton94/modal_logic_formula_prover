@@ -197,6 +197,11 @@ auto formula::get_hash() const -> std::size_t
     return hash_;
 }
 
+auto formula::get_operation_type() const -> operation_t
+{
+    return op_;
+}
+
 std::ostream& operator<<(std::ostream& out, const formula& f)
 {
     if(f.op_ == formula::operation_t::invalid)
