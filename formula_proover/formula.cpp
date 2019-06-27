@@ -2,31 +2,6 @@
 
 #include <cassert>
 
-std::string& formula::operation_to_symbol(operation_t op)
-{
-    assert(static_cast<char>(operation_t::conjunction) == 0 &&
-           static_cast<char>(operation_t::disjunction) == 1 &&
-           static_cast<char>(operation_t::negation) == 2 &&
-           static_cast<char>(operation_t::le) == 3 &&
-           static_cast<char>(operation_t::c) == 4 &&
-           static_cast<char>(operation_t::invalid) == 5);
-    static std::string representations[] = {
-        "&", "|", "~", "<=", "C", "INVALID",
-    };
-
-    return representations[static_cast<int>(op)];
-}
-
-bool formula::is_term_operation() const
-{
-    return op_ == operation_t::le || op_ == operation_t::c;
-}
-
-bool formula::is_formula_operation() const
-{
-    return op_ == operation_t::conjunction || op_ == operation_t::disjunction || op_ == operation_t::negation;
-}
-
 formula::formula()
     : op_(operation_t::invalid)
     , hash_(0ul)
@@ -54,7 +29,7 @@ formula::~formula()
     }
 }
 
-bool formula::operator==(const formula& rhs) const
+auto formula::operator==(const formula& rhs) const -> bool
 {
     assert(op_ != operation_t::invalid);
     if(hash_ != rhs.hash_ || op_ != rhs.op_)
@@ -72,7 +47,7 @@ bool formula::operator==(const formula& rhs) const
     return *left_f_ == *rhs.left_f_ && *right_f_ == *rhs.right_f_;
 }
 
-bool formula::build(json& f)
+auto formula::build(json& f) -> bool
 {
     if(!f.contains("name"))
     {
@@ -162,7 +137,32 @@ bool formula::build(json& f)
     return true;
 }
 
-bool formula::create_terms(json& f)
+auto formula::operation_to_symbol(operation_t op) -> std::string&
+{
+	assert(static_cast<char>(operation_t::conjunction) == 0 &&
+		static_cast<char>(operation_t::disjunction) == 1 &&
+		static_cast<char>(operation_t::negation) == 2 &&
+		static_cast<char>(operation_t::le) == 3 &&
+		static_cast<char>(operation_t::c) == 4 &&
+		static_cast<char>(operation_t::invalid) == 5);
+	static std::string representations[] = {
+		"&", "|", "~", "<=", "C", "INVALID",
+	};
+
+	return representations[static_cast<int>(op)];
+}
+
+auto formula::is_term_operation() const -> bool
+{
+	return op_ == operation_t::le || op_ == operation_t::c;
+}
+
+auto formula::is_formula_operation() const -> bool
+{
+	return op_ == operation_t::conjunction || op_ == operation_t::disjunction || op_ == operation_t::negation;
+}
+
+auto formula::create_terms(json& f) -> bool
 {
     left_t_ = new(std::nothrow) term();
     right_t_ = new(std::nothrow) term();
@@ -177,7 +177,7 @@ bool formula::create_terms(json& f)
     return left_t_->build(value_field[0]) && right_t_->build(value_field[1]);
 }
 
-bool formula::create_formulas(json& f)
+auto formula::create_formulas(json& f) -> bool
 {
     left_f_ = new(std::nothrow) formula();
     right_f_ = new(std::nothrow) formula();
@@ -192,7 +192,7 @@ bool formula::create_formulas(json& f)
     return left_f_->build(value_field[0]) && right_f_->build(value_field[1]);
 }
 
-std::size_t formula::get_hash() const
+auto formula::get_hash() const -> std::size_t
 {
     return hash_;
 }

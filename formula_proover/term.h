@@ -17,10 +17,10 @@ public:
     term(term&&) noexcept = default;
     term& operator=(term&&) noexcept = default;
 
-    bool operator==(const term& rhs) const;
+    auto operator==(const term& rhs) const -> bool;
 
-    bool build(json& t /*, which are the variables which will be used for the DNF of the term*/);
-    std::size_t get_hash() const;
+    auto build(json& t /*, which are the variables which will be used for the DNF of the term*/) -> bool;
+    auto get_hash() const ->std::size_t;
 
     friend std::ostream& operator<<(std::ostream& out, const term& t);
 

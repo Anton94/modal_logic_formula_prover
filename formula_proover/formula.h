@@ -18,10 +18,10 @@ public:
     formula(formula&&) noexcept = default;
     formula& operator=(formula&&) noexcept = default;
 
-    bool operator==(const formula& rhs) const;
+    auto operator==(const formula& rhs) const -> bool;
 
-    bool build(json& f);
-    std::size_t get_hash() const;
+    auto build(json& f) -> bool;
+    auto get_hash() const -> std::size_t;
 
     friend std::ostream& operator<<(std::ostream& out, const formula& f);
 
@@ -38,12 +38,12 @@ private:
     };
     using operation_t = operation_type;
 
-    static std::string& operation_to_symbol(operation_t op);
-    bool is_term_operation() const;
-    bool is_formula_operation() const;
+    static auto operation_to_symbol(operation_t op) -> std::string&;
+    auto is_term_operation() const -> bool;
+    auto is_formula_operation() const -> bool;
 
-    bool create_terms(json& f);
-    bool create_formulas(json& f);
+    auto create_terms(json& f) -> bool;
+    auto create_formulas(json& f) -> bool;
 
     operation_t op_;
     std::size_t hash_;

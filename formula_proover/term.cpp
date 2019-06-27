@@ -12,12 +12,12 @@ term::~term()
 {
 }
 
-bool term::operator==(const term& rhs) const
+auto term::operator==(const term& rhs) const -> bool
 {
     return hash_ == rhs.hash_ && term_raw == rhs.term_raw;
 }
 
-bool term::build(json& t)
+auto term::build(json& t) -> bool
 {
     if(!t.contains("value"))
     {
@@ -30,7 +30,7 @@ bool term::build(json& t)
     return true;
 }
 
-std::size_t term::get_hash() const
+auto term::get_hash() const -> std::size_t
 {
     return hash_;
 }
