@@ -5,6 +5,7 @@
 #include "nlohmann_json/json.hpp"
 
 #include "formula.h"
+#include "tableau.h"
 
 using json = nlohmann::json;
 
@@ -38,10 +39,10 @@ int main(int argc, char* argv[])
             std::cout << (f.build(formula_json) ? "success" : "failed") << " ";
             std::cout << f << std::endl;
 
-            std::unordered_set<formula> dummy_formulas;
-            dummy_formulas.insert(formula());
-            std::unordered_set<term> dummy_terms;
-            dummy_terms.emplace(term());
+            tableau t;
+            std::cout << "The formula is " << (t.proof(f) ? "" : "not ") << "a tautology." << std::endl;
+
+
         }
     }
     catch(const cxxopts::OptionException& e)

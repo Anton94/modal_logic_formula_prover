@@ -39,6 +39,7 @@ public:
     auto get_operation_type() const -> operation_t;
 
     auto is_term_operation() const -> bool;
+    auto is_atomic() const -> bool;
     auto is_formula_operation() const -> bool;
 
     friend std::ostream& operator<<(std::ostream& out, const formula& f);

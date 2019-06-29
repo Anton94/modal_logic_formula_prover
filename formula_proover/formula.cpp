@@ -37,7 +37,13 @@ auto formula::operator==(const formula& rhs) const -> bool
         return false;
     }
 
-    assert(left_t_ && right_t_ && rhs.left_f_ && rhs.right_f_);
+    assert(left_f_ && rhs.left_f_);
+    if (op_ == operation_t::negation)
+    {
+        return *left_f_ == *rhs.left_f_;
+    }
+
+    assert(right_f_ && rhs.right_f_);
     if(is_term_operation())
     {
         return *left_t_ == *rhs.left_t_ && *right_t_ == *rhs.right_t_;
@@ -155,6 +161,11 @@ auto formula::operation_to_symbol(operation_t op) -> std::string&
 auto formula::is_term_operation() const -> bool
 {
 	return op_ == operation_t::le || op_ == operation_t::c;
+}
+
+auto formula::is_atomic() const -> bool
+{
+    return is_term_operation();
 }
 
 auto formula::is_formula_operation() const -> bool
