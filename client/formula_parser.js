@@ -204,7 +204,7 @@ function simplify(cst) {
     if (!cst.hasOwnProperty("name")) {
         return { 
             "name": "string", 
-            "value":symbol_to_explanation[cst.image]
+            "value": cst.image
         };
     } else if (cst.children.hasOwnProperty("star")) {
         var starValue = {
