@@ -2,6 +2,7 @@
 
 #include "nlohmann_json/json.hpp"
 #include <ostream>
+#include <unordered_set>
 
 class term
 {
@@ -28,6 +29,8 @@ private:
     bool is_in_DNF; // TODO: make DNF form, but only when needed
     std::size_t hash_;
     json term_raw;
+
+	std::unordered_set<std::vector<bool>>* dnf_kmonoms_;
 };
 
 namespace std
