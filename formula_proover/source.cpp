@@ -6,11 +6,16 @@
 
 #include "formula.h"
 #include "tableau.h"
+#include "logger.h"
 
 using json = nlohmann::json;
 
 int main(int argc, char* argv[])
 {
+    set_trace_logger([](const std::string& s) { std::cout << s << std::endl;});
+    set_info_logger([](const std::string& s) { std::cout << s << std::endl;});
+    set_error_logger([](const std::string& s) { std::cerr << s << std::endl;});
+
     try
     {
         cxxopts::Options options("FormulaProover", "One line description of MyProgram");
@@ -30,19 +35,16 @@ int main(int argc, char* argv[])
         {
             auto formula_arg = result["formula"].as<std::string>();
 
-            std::cout << "Parsing forumla: " << formula_arg << std::endl;
+            info() << "Parsing forumla: " << formula_arg;
             json formula_json = json::parse(formula_arg);
-            std::cout << "Parsed into json: \n" << formula_json.dump(4) << std::endl;
+            info() << "Parsed into json: \n" << formula_json.dump(4);
 
-            std::cout << "Building a formula tree with the parsed one...\n\t";
+            info() << "Building a formula tree with the parsed one...";
             formula f;
-            std::cout << (f.build(formula_json) ? "success" : "failed") << " ";
-            std::cout << f << std::endl;
+            info() << "\t" << (f.build(formula_json) ? "success" : "failed") << " " << f;
 
             tableau t;
-            std::cout << "The formula is " << (t.proof(f) ? "" : "not ") << "a tautology." << std::endl;
-
-
+            info() << "The formula is " << (t.proof(f) ? "" : "not ") << "a tautology.";
         }
     }
     catch(const cxxopts::OptionException& e)
