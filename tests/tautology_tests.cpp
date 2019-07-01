@@ -174,3 +174,285 @@ TEST_CASE("tautology 4", "[tautology]")
          })"_json,
         true);
 }
+
+TEST_CASE("tautology 5", "[tautology]")
+{
+    // (C(a, b) | <=(a, b)) | (~C(a,b) & <=(a,b))
+    is_tautology(R"(
+        {
+            "name": "disjunction",
+            "value": [
+               {
+                  "name": "disjunction",
+                  "value": [
+                     {
+                        "name": "contact",
+                        "value": [
+                           {
+                              "name": "string",
+                              "value": "a"
+                           },
+                           {
+                              "name": "string",
+                              "value": "b"
+                           }
+                        ]
+                     },
+                     {
+                        "name": "less",
+                        "value": [
+                           {
+                              "name": "string",
+                              "value": "a"
+                           },
+                           {
+                              "name": "string",
+                              "value": "b"
+                           }
+                        ]
+                     }
+                  ]
+               },
+               {
+                  "name": "conjunction",
+                  "value": [
+                     {
+                        "name": "negation",
+                        "value": {
+                           "name": "contact",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "a"
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "b"
+                              }
+                           ]
+                        }
+                     },
+                     {
+                        "name": "less",
+                        "value": [
+                           {
+                              "name": "string",
+                              "value": "a"
+                           },
+                           {
+                              "name": "string",
+                              "value": "b"
+                           }
+                        ]
+                     }
+                  ]
+               }
+            ]
+         }
+        )"_json,
+        false);
+}
+
+TEST_CASE("tautology 6", "[tautology]")
+{
+    // C(a, b) & ~C(a, c)
+    is_tautology(R"(
+         {
+            "name": "conjunction",
+            "value": [
+               {
+                  "name": "contact",
+                  "value": [
+                     {
+                        "name": "string",
+                        "value": "a"
+                     },
+                     {
+                        "name": "string",
+                        "value": "b"
+                     }
+                  ]
+               },
+               {
+                  "name": "negation",
+                  "value": {
+                     "name": "contact",
+                     "value": [
+                        {
+                           "name": "string",
+                           "value": "a"
+                        },
+                        {
+                           "name": "string",
+                           "value": "c"
+                        }
+                     ]
+                  }
+               }
+            ]
+        }
+        )"_json,
+        false);
+}
+
+TEST_CASE("tautology 7", "[tautology]")
+{
+    // (C(a, b) | ~C(a, b)) & (C(a,b) | ~C(a,b))
+    is_tautology(R"(
+        {
+            "name": "conjunction",
+            "value": [
+               {
+                  "name": "disjunction",
+                  "value": [
+                     {
+                        "name": "contact",
+                        "value": [
+                           {
+                              "name": "string",
+                              "value": "a"
+                           },
+                           {
+                              "name": "string",
+                              "value": "b"
+                           }
+                        ]
+                     },
+                     {
+                        "name": "negation",
+                        "value": {
+                           "name": "contact",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "a"
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "b"
+                              }
+                           ]
+                        }
+                     }
+                  ]
+               },
+               {
+                  "name": "disjunction",
+                  "value": [
+                     {
+                        "name": "contact",
+                        "value": [
+                           {
+                              "name": "string",
+                              "value": "a"
+                           },
+                           {
+                              "name": "string",
+                              "value": "b"
+                           }
+                        ]
+                     },
+                     {
+                        "name": "negation",
+                        "value": {
+                           "name": "contact",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "a"
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "b"
+                              }
+                           ]
+                        }
+                     }
+                  ]
+               }
+            ]
+        }
+        )"_json,
+        true);
+}
+
+TEST_CASE("tautology 8", "[tautology]")
+{
+    // (C(a, b) | ~C(a, b)) & (C(a,b) | ~C(a,c))
+    is_tautology(R"(
+            {
+               "name": "conjunction",
+               "value": [
+                  {
+                     "name": "disjunction",
+                     "value": [
+                        {
+                           "name": "contact",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "a"
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "b"
+                              }
+                           ]
+                        },
+                        {
+                           "name": "negation",
+                           "value": {
+                              "name": "contact",
+                              "value": [
+                                 {
+                                    "name": "string",
+                                    "value": "a"
+                                 },
+                                 {
+                                    "name": "string",
+                                    "value": "b"
+                                 }
+                              ]
+                           }
+                        }
+                     ]
+                  },
+                  {
+                     "name": "disjunction",
+                     "value": [
+                        {
+                           "name": "contact",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "a"
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "b"
+                              }
+                           ]
+                        },
+                        {
+                           "name": "negation",
+                           "value": {
+                              "name": "contact",
+                              "value": [
+                                 {
+                                    "name": "string",
+                                    "value": "a"
+                                 },
+                                 {
+                                    "name": "string",
+                                    "value": "c"
+                                 }
+                              ]
+                           }
+                        }
+                     ]
+                  }
+               ]
+            }
+        )"_json,
+        false);
+}
