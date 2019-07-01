@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
 
         if(result.count("help"))
         {
-            std::cout << options.help() << std::endl;
+            info() << options.help();
             return 0;
         }
 
@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
     }
     catch(const cxxopts::OptionException& e)
     {
-        std::cerr << "arg error: " << e.what() << std::endl;
+        error() << "arg error: " << e.what();
     }
 
     return 0;
