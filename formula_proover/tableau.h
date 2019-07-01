@@ -3,6 +3,7 @@
 #include "formula.h"
 
 #include <unordered_set>
+#include <ostream>
 
 class tableau
 {
@@ -14,7 +15,7 @@ public:
     tableau& operator=(tableau&&) noexcept = default;
 
     // Checks if the formula is a tautology or not
-    auto proof(const formula& f) -> bool;
+    auto is_tautology(const formula& f) -> bool;
 
 private:
     void clear();
@@ -29,6 +30,8 @@ private:
     void add_formula_to_F(const formula* f);
     void remove_formula_from_T(const formula* f);
     void remove_formula_from_F(const formula* f);
+
+    void log_state() const;
 
     struct formula_ptr_hasher
     {
@@ -48,4 +51,6 @@ private:
     formulas_t formulas_F_;
     formulas_t atomic_formulas_T_;
     formulas_t atomic_formulas_F_;
+
+    friend std::ostream& operator<<(std::ostream& out, const tableau::formulas_t& formulas);
 };
