@@ -16,114 +16,161 @@ auto is_tautology = [](const json& formula_json, bool expected_result) {
 
 TEST_CASE("tautology 1", "[tautology]")
 {
+    // C(a, b) | ~C(a,b)
     is_tautology(
-        R"({ "name": "or",
-             "value": [
-                 {
-                     "name": "or",
+        R"({
+            "name": "disjunction",
+            "value": [
+               {
+                  "name": "contact",
+                  "value": [
+                     {
+                        "name": "string",
+                        "value": "a"
+                     },
+                     {
+                        "name": "string",
+                        "value": "b"
+                     }
+                  ]
+               },
+               {
+                  "name": "negation",
+                  "value": {
+                     "name": "contact",
                      "value": [
-                         {
-                             "name": "le",
-                             "value": [
-                                 {
-                                     "name": "string",
-                                     "value": "a"
-                                 },
-                                 {
-                                     "name": "string",
-                                     "value": "b"
-                                 }
-                             ]
-                         },
-                         {
-                             "name": "neg",
-                             "value": {
-                                 "name": "le",
-                                 "value": [
-                                     {
-                                         "name": "string",
-                                         "value": "a"
-                                     },
-                                     {
-                                         "name": "string",
-                                         "value": "b"
-                                     }
-                                 ]
-                             }
-                         }
+                        {
+                           "name": "string",
+                           "value": "a"
+                        },
+                        {
+                           "name": "string",
+                           "value": "b"
+                        }
                      ]
-                 },
-                 {
-                     "name": "C",
-                     "value": [
-                         {
-                             "name": "string",
-                             "value": "a"
-                         },
-                         {
-                             "name": "string",
-                             "value": "b"
-                         }
-                     ]
-                 }
-             ]
+                  }
+               }
+            ]
         })"_json,
         true);
 }
 
 TEST_CASE("tautology 2", "[tautology]")
 {
+    // C(a, b)
     is_tautology(
-        R"({ "name": "or",
-             "value": [
-                 {
-                     "name": "or",
-                     "value": [
-                         {
-                             "name": "le",
-                             "value": [
-                                 {
-                                     "name": "string",
-                                     "value": "a"
-                                 },
-                                 {
-                                     "name": "string",
-                                     "value": "b"
-                                 }
-                             ]
-                         },
-                         {
-                             "name": "neg",
-                             "value": {
-                                 "name": "le",
-                                 "value": [
-                                     {
-                                         "name": "string",
-                                         "value": "a"
-                                     },
-                                     {
-                                         "name": "string",
-                                         "value": "b"
-                                     }
-                                 ]
-                             }
-                         }
-                     ]
-                 },
-                 {
-                     "name": "C",
-                     "value": [
-                         {
-                             "name": "string",
-                             "value": "a"
-                         },
-                         {
-                             "name": "string",
-                             "value": "b"
-                         }
-                     ]
-                 }
-             ]
+        R"({
+            "name": "contact",
+            "value": [
+               {
+                  "name": "string",
+                  "value": "a"
+               },
+               {
+                  "name": "string",
+                  "value": "b"
+               }
+            ]
         })"_json,
+        false);
+}
+
+TEST_CASE("tautology 3", "[tautology]")
+{
+    // C(a, b) & ~C(a,b)
+    is_tautology(
+        R"({
+            "name": "conjunction",
+            "value": [
+               {
+                  "name": "contact",
+                  "value": [
+                     {
+                        "name": "string",
+                        "value": "a"
+                     },
+                     {
+                        "name": "string",
+                        "value": "b"
+                     }
+                  ]
+               },
+               {
+                  "name": "negation",
+                  "value": {
+                     "name": "contact",
+                     "value": [
+                        {
+                           "name": "string",
+                           "value": "a"
+                        },
+                        {
+                           "name": "string",
+                           "value": "b"
+                        }
+                     ]
+                  }
+               }
+            ]
+        })"_json,
+        false);
+}
+
+TEST_CASE("tautology 4", "[tautology]")
+{
+    // (C(a, b) | <=(a, b)) | ~C(a,b)
+    is_tautology(
+        R"({
+            "name": "disjunction",
+            "value": [
+               {
+                  "name": "disjunction",
+                  "value": [
+                     {
+                        "name": "contact",
+                        "value": [
+                           {
+                              "name": "string",
+                              "value": "a"
+                           },
+                           {
+                              "name": "string",
+                              "value": "b"
+                           }
+                        ]
+                     },
+                     {
+                        "name": "less",
+                        "value": [
+                           {
+                              "name": "string",
+                              "value": "a"
+                           },
+                           {
+                              "name": "string",
+                              "value": "b"
+                           }
+                        ]
+                     }
+                  ]
+               },
+               {
+                  "name": "negation",
+                  "value": {
+                     "name": "contact",
+                     "value": [
+                        {
+                           "name": "string",
+                           "value": "a"
+                        },
+                        {
+                           "name": "string",
+                           "value": "b"
+                        }
+                     ]
+                  }
+               }
+            ]
+         })"_json,
         true);
 }
