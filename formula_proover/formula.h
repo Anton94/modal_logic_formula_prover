@@ -54,17 +54,21 @@ private:
 
     operation_t op_;
     std::size_t hash_;
+
+    struct child_formulas
+    {
+        formula* left;
+        formula* right;
+    };
+    struct child_terms
+    {
+        term* left;
+        term* right;
+    };
+
     union {
-        struct
-        {
-            formula* left_f_;
-            formula* right_f_;
-        };
-        struct
-        {
-            term* left_t_;
-            term* right_t_;
-        };
+        child_formulas child_f_;
+        child_terms child_t_;
     };
 };
 

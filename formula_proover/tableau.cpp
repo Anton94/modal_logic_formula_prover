@@ -35,7 +35,7 @@ auto tableau::step() -> bool
 
         if (f->get_operation_type() == formula::operation_t::negation)
         {
-            auto not_negated_f = f->left_f_;
+            auto not_negated_f = f->child_f_.left;
             if (check_contradiction_in_T(not_negated_f))
             {
                 return true;
@@ -48,8 +48,8 @@ auto tableau::step() -> bool
 
         if (f->get_operation_type() == formula::operation_t::conjunction)
         {
-            auto left_f = f->left_f_;
-            auto right_f = f->right_f_;
+            auto left_f = f->child_f_.left;
+            auto right_f = f->child_f_.right;
 
             if (check_contradiction_in_F(left_f))
             {
@@ -73,8 +73,8 @@ auto tableau::step() -> bool
 
         assert(f->get_operation_type() == formula::operation_t::disjunction);
 
-        auto left_f = f->left_f_;
-        auto right_f = f->right_f_;
+        auto left_f = f->child_f_.left;
+        auto right_f = f->child_f_.right;
 
         // left branch of the path
         auto res = true;
@@ -108,7 +108,7 @@ auto tableau::step() -> bool
 
     if (f->get_operation_type() == formula::operation_t::negation)
     {
-        auto not_negated_f = f->left_f_;
+        auto not_negated_f = f->child_f_.left;
         if (check_contradiction_in_F(not_negated_f))
         {
             return true;
@@ -121,8 +121,8 @@ auto tableau::step() -> bool
 
     if (f->get_operation_type() == formula::operation_t::disjunction)
     {
-        auto left_f = f->left_f_;
-        auto right_f = f->right_f_;
+        auto left_f = f->child_f_.left;
+        auto right_f = f->child_f_.right;
 
         if (check_contradiction_in_T(left_f))
         {
@@ -146,8 +146,8 @@ auto tableau::step() -> bool
 
     assert(f->get_operation_type() == formula::operation_t::conjunction);
 
-    auto left_f = f->left_f_;
-    auto right_f = f->right_f_;
+    auto left_f = f->child_f_.left;
+    auto right_f = f->child_f_.right;
 
     // left branch of the path
     auto res = true;
