@@ -66,7 +66,7 @@ auto formula::build(json& f) -> bool
     }
 
     auto op = name_field.get<std::string>();
-    if(op == "le")
+    if(op == "less")
     {
         op_ = operation_t::le;
 
@@ -78,7 +78,7 @@ auto formula::build(json& f) -> bool
         hash_ = ((child_t_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
                 ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
     }
-    else if(op == "C")
+    else if(op == "contact")
     {
         op_ = operation_t::c;
 
@@ -90,7 +90,7 @@ auto formula::build(json& f) -> bool
         hash_ = ((child_t_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
                 ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
     }
-    else if(op == "and")
+    else if(op == "conjunction")
     {
         op_ = operation_t::conjunction;
 
@@ -102,7 +102,7 @@ auto formula::build(json& f) -> bool
         hash_ = ((child_f_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
                 ((child_f_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
     }
-    else if(op == "or")
+    else if(op == "disjunction")
     {
         op_ = operation_t::disjunction;
 
@@ -114,7 +114,7 @@ auto formula::build(json& f) -> bool
         hash_ = ((child_f_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
                 ((child_f_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
     }
-    else if(op == "neg")
+    else if(op == "negation")
     {
         op_ = operation_t::negation;
 

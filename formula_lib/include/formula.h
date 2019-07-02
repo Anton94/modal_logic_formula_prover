@@ -1,7 +1,7 @@
 #pragma once
 
 #include "nlohmann_json/json.hpp"
-#include "term.h"
+#include "../private/term.h"
 
 #include <ostream>
 
