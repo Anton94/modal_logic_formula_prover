@@ -193,9 +193,9 @@ const symbol_to_explanation =  {
     "->": "implication",
     "<->": "equivalence",
     "~": "negation",
-    "@": "Tconjunction",
-    "#": "Tdisjunction",
-    "*": "star",
+    "+": "Tand",
+    "-": "Tor",
+    "*": "Tstar",
     "T": "true",
     "F": "false"
 }
