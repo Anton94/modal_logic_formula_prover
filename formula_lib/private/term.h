@@ -11,26 +11,38 @@ class term
 public:
     term();
     ~term();
-
     term(const term&) = delete;
     term& operator=(const term&) = delete;
-
     term(term&&) noexcept = default;
     term& operator=(term&&) noexcept = default;
 
     auto operator==(const term& rhs) const -> bool;
 
-    auto build(json& t /*, which are the variables which will be used for the DNF of the term*/) -> bool;
-    auto get_hash() const ->std::size_t;
+    auto build(json& t) -> bool;
+    auto get_hash() const -> std::size_t;
 
     friend std::ostream& operator<<(std::ostream& out, const term& t);
 
 private:
-    bool is_in_DNF; // TODO: make DNF form, but only when needed
-    std::size_t hash_;
-    json term_raw;
+    enum class operation_type : char
+    {
+        plus,  // union
+        minus, // intersection
+        star,
+        literal,
 
-	std::unordered_set<std::vector<bool>>* dnf_kmonoms_;
+        invalid,
+    };
+    using operation_t = operation_type;
+
+    bool is_in_DNF_; // TODO: make DNF form, but only when needed
+    operation_t op_;
+    term* left_;
+    term* right_;
+    std::string variable_; // TODO: hide it, or move the variables and keep just references
+    std::size_t hash_;
+
+//    std::unordered_set<std::vector<bool>>* dnf_kmonoms_;
 };
 
 namespace std
@@ -44,5 +56,4 @@ struct hash<term>
         return t.get_hash();
     }
 };
-
 }
