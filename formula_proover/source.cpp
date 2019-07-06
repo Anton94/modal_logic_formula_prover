@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
         info() << "\t" << (f.build(formula_json) ? "success" : "failed") << " " << f;
 
         tableau t;
-        info() << "The formula is " << (t.is_tautology(f) ? "" : "not ") << "a tautology.";
+        info() << "The formula is " << (t.is_satisfiable(f) ? "" : "not ") << "satisfiable.";
     }
     catch(const cxxopts::OptionException& e)
     {

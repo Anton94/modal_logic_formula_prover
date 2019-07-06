@@ -1,13 +1,13 @@
 #include "tableau.h"
 #include "logger.h"
 
-auto tableau::is_tautology(const formula& f) -> bool
+auto tableau::is_satisfiable(const formula& f) -> bool
 {
     clear();
 
     // if the negation of @f is not satisfiable, then @f is a tautology
-    info() << "Running a tautology checking of " << f;
-    add_formula_to_F(&f);
+    info() << "Running a satisfiability checking of " << f;
+    add_formula_to_T(&f);
 
     return step();
 }
@@ -30,7 +30,7 @@ auto tableau::step() -> bool
         // TODO: fill some info for the state of formulas which are not contradicting, etc...
         // TODO: expand the terms make the checks for contradictions in them
         trace() << "There is no contradiciton in the path";
-        return false;
+        return true;
     }
 
     if (!formulas_T_.empty())
@@ -48,7 +48,7 @@ auto tableau::step() -> bool
             if (check_contradiction_in_T(not_negated_f))
             {
                 trace() << "Found a contradiction - " << *not_negated_f << " found in T formulas";
-                return true;
+                return false;
             }
             add_formula_to_F(not_negated_f);
             auto res = step();
@@ -64,14 +64,14 @@ auto tableau::step() -> bool
             if (check_contradiction_in_F(left_f))
             {
                 trace() << "Found a contradiction with left child " << *left_f << " which has been found in F";
-                return true;
+                return false;
             }
             add_formula_to_T(left_f);
 
             if (check_contradiction_in_F(right_f))
             {
                 trace() << "Found a contradiction with right child " << *right_f << " which has been found in F";
-                return true;
+                return false;
             }
             add_formula_to_T(right_f);
 
@@ -90,16 +90,14 @@ auto tableau::step() -> bool
 
         trace() << "Will split to two subtrees: " << *left_f << " and " << *right_f;
 
-        // left branch of the path
-        auto res = true;
         if (!check_contradiction_in_F(left_f))
         {
             add_formula_to_T(left_f);
-            res &= step();
-            if (!res)
+
+            if (step())
             {
                 // there was no contradiction in that path, so there is no need to continue with the right path
-                return false;
+                return true;
             }
             remove_formula_from_T(left_f);
         }
@@ -107,10 +105,13 @@ auto tableau::step() -> bool
         if (!check_contradiction_in_F(right_f))
         {
             add_formula_to_T(right_f);
-            res &= step();
+            if (step())
+            {
+                return true;
+            }
             remove_formula_from_T(right_f);
         }
-        return res;
+        return false;
     }
 
     // almost analogous but taking a formula from Fs
@@ -128,7 +129,7 @@ auto tableau::step() -> bool
         if (check_contradiction_in_F(not_negated_f))
         {
             trace() << "Found a contradiction - " << *not_negated_f << " found in F formulas";
-            return true;
+            return false;
         }
         add_formula_to_T(not_negated_f);
         auto res = step();
@@ -144,14 +145,14 @@ auto tableau::step() -> bool
         if (check_contradiction_in_T(left_f))
         {
             trace() << "Found a contradiction with right child " << *left_f << " which has been found in T";
-            return true;
+            return false;
         }
         add_formula_to_F(left_f);
 
         if (check_contradiction_in_T(right_f))
         {
             trace() << "Found a contradiction with right child " << *right_f << " which has been found in T";
-            return true;
+            return false;
         }
         add_formula_to_F(right_f);
 
@@ -171,15 +172,13 @@ auto tableau::step() -> bool
     trace() << "Will split to two subtrees: " << *left_f << " and " << *right_f;
 
     // left branch of the path
-    auto res = true;
     if (!check_contradiction_in_T(left_f))
     {
         add_formula_to_F(left_f);
-        res &= step();
-        if (!res)
+        if (step())
         {
             // there was no contradiction in that path, so there is no need to continue with the right path
-            return false;
+            return true;
         }
         remove_formula_from_F(left_f);
     }
@@ -187,10 +186,13 @@ auto tableau::step() -> bool
     if (!check_contradiction_in_T(right_f))
     {
         add_formula_to_F(right_f);
-        res &= step();
+        if (step())
+        {
+            return true;
+        }
         remove_formula_from_F(right_f);
     }
-    return res;
+    return false;
 }
 
 auto tableau::check_contradiction_in_T(const formula* f) const -> bool

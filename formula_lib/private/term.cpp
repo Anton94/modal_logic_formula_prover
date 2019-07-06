@@ -42,6 +42,7 @@ auto term::operator==(const term& rhs) const -> bool
 
 auto term::build(json& t) -> bool
 {
+    // todo: clean
     // check the json for correct information
     if(!t.contains("name"))
     {
@@ -156,7 +157,7 @@ std::ostream& operator<<(std::ostream& out, const term& t)
             out << "[" << *t.left_ << " + " << *t.right_ << "]";
             break;
         case term::operation_t::star_:
-            out << "[" << t.variable_ << "]*";
+            out << "[" << *t.left_ << "]*";
             break;
         case term::operation_t::literal_:
             out << t.variable_;

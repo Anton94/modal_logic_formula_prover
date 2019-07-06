@@ -215,7 +215,7 @@ std::ostream& operator<<(std::ostream& out, const formula& f)
         out << "[" << *f.child_f_.left << " | " << *f.child_f_.right << "]";
         break;
     case formula::operation_t::negation:
-        out << "[~" << *f.child_f_.left << "]";
+        out << "~" << *f.child_f_.left;
         break;
     case formula::operation_t::le:
         out << "<=[" << *f.child_t_.left << ", " << *f.child_t_.right << "]";

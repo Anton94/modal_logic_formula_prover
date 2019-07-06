@@ -14,8 +14,8 @@ public:
     tableau(tableau&&) = default;
     tableau& operator=(tableau&&) noexcept = default;
 
-    // Checks if the formula is a tautology or not
-    auto is_tautology(const formula& f) -> bool;
+    // Checks if the formula is satisfiable or not
+    auto is_satisfiable(const formula& f) -> bool;
 
 private:
     void clear();
