@@ -27,7 +27,6 @@ auto tableau::step() -> bool
 
     if (formulas_T_.empty() && formulas_F_.empty())
     {
-        // TODO: fill some info for the state of formulas which are not contradicting, etc...
         // TODO: expand the terms make the checks for contradictions in them
         trace() << "There is no contradiciton in the path";
         return true;
@@ -293,7 +292,7 @@ std::ostream& operator<<(std::ostream& out, const tableau::formulas_t& formulas)
 {
     for (const auto f_ptr : formulas)
     {
-        out << *f_ptr << "; ";
+        out << *f_ptr << " <" << f_ptr->get_hash() << "> ";
     }
 
     return out;
