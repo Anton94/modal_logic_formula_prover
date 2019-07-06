@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
             formula_json = json::parse(in);
         }
 
-        info() << "Parsed into json: \n" << formula_json.dump(4);
+        info() << "Parsed into json:\n" << formula_json.dump(4);
 
         info() << "Building a formula tree with the parsed one...";
         formula f;

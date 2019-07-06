@@ -8,7 +8,7 @@
 
 int main(int argc, char* argv[])
 {
-    set_trace_logger([](const std::string& s) { std::cout << s << std::endl; });
+    //set_trace_logger([](const std::string& s) { std::cout << s << std::endl; });
     set_info_logger([](const std::string& s) { std::cout << s << std::endl; });
     set_error_logger([](const std::string& s) { std::cerr << s << std::endl; });
 

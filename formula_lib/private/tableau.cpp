@@ -5,7 +5,6 @@ auto tableau::is_satisfiable(const formula& f) -> bool
 {
     clear();
 
-    // if the negation of @f is not satisfiable, then @f is a tautology
     info() << "Running a satisfiability checking of " << f;
     add_formula_to_T(&f);
 
