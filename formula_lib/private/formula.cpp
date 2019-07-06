@@ -54,11 +54,11 @@ auto formula::operator==(const formula& rhs) const -> bool
 
 auto formula::build(json& f) -> bool
 {
+    // check the json for correct information
     if(!f.contains("name"))
     {
         return false;
     }
-
     auto& name_field = f["name"];
     if(!name_field.is_string())
     {
@@ -66,53 +66,33 @@ auto formula::build(json& f) -> bool
     }
 
     auto op = name_field.get<std::string>();
-    if(op == "less")
+    if (op == "conjunction")
     {
-        op_ = operation_t::le;
-
-        if(!create_terms(f))
+        if (!construct_binary_formula(f, operation_t::conjunction))
         {
             return false;
         }
-
-        hash_ = ((child_t_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
-                ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
+    }
+    else if (op == "disjunction")
+    {
+        if (!construct_binary_formula(f, operation_t::disjunction))
+        {
+            return false;
+        }
+    }
+    else if(op == "less")
+    {
+        if (!construct_binary_term(f, operation_t::le))
+        {
+            return false;
+        }
     }
     else if(op == "contact")
     {
-        op_ = operation_t::c;
-
-        if(!create_terms(f))
+        if(!construct_binary_term(f, operation_t::c))
         {
             return false;
         }
-
-        hash_ = ((child_t_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
-                ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
-    }
-    else if(op == "conjunction")
-    {
-        op_ = operation_t::conjunction;
-
-        if(!create_formulas(f))
-        {
-            return false;
-        }
-
-        hash_ = ((child_f_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
-                ((child_f_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
-    }
-    else if(op == "disjunction")
-    {
-        op_ = operation_t::disjunction;
-
-        if(!create_formulas(f))
-        {
-            return false;
-        }
-
-        hash_ = ((child_f_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
-                ((child_f_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
     }
     else if(op == "negation")
     {
@@ -136,25 +116,11 @@ auto formula::build(json& f) -> bool
         return false;
     }
 
-    const auto op_code = (static_cast<unsigned>(op_) + 7) * 31;
+    // add also the operation to the hash
+    const auto op_code = static_cast<unsigned>(op_) + 1;
     hash_ += (op_code & 0xFFFFFFFF) * 2654435723;
 
     return true;
-}
-
-auto formula::operation_to_symbol(operation_t op) -> std::string&
-{
-	assert(static_cast<char>(operation_t::conjunction) == 0 &&
-		static_cast<char>(operation_t::disjunction) == 1 &&
-		static_cast<char>(operation_t::negation) == 2 &&
-		static_cast<char>(operation_t::le) == 3 &&
-		static_cast<char>(operation_t::c) == 4 &&
-		static_cast<char>(operation_t::invalid) == 5);
-	static std::string representations[] = {
-		"&", "|", "~", "<=", "C", "INVALID",
-	};
-
-	return representations[static_cast<int>(op)];
 }
 
 auto formula::is_term_operation() const -> bool
@@ -172,34 +138,60 @@ auto formula::is_formula_operation() const -> bool
 	return op_ == operation_t::conjunction || op_ == operation_t::disjunction || op_ == operation_t::negation;
 }
 
-auto formula::create_terms(json& f) -> bool
+auto formula::construct_binary_term(json& f, operation_t op) -> bool
 {
+    op_ = op;
+    assert(is_term_operation());
+
     child_t_.left = new(std::nothrow) term();
     child_t_.right = new(std::nothrow) term();
     assert(child_t_.left && child_t_.right);
 
+    // check the json for correct information
     auto& value_field = f["value"];
     if(!value_field.is_array() || value_field.size() != 2)
     {
         return false;
     }
 
-    return child_t_.left->build(value_field[0]) && child_t_.right->build(value_field[1]);
+    // recursive construction of the child terms
+    if (!child_t_.left->build(value_field[0]) || !child_t_.right->build(value_field[1]))
+    {
+        return false;
+    }
+
+    // add child's hashes
+    hash_ = ((child_f_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
+        ((child_f_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
+    return true;
 }
 
-auto formula::create_formulas(json& f) -> bool
+auto formula::construct_binary_formula(json& f, operation_t op) -> bool
 {
+    op_ = op;
+    assert(op_ == operation_t::conjunction || op_ == operation_t::disjunction);
+
     child_f_.left = new(std::nothrow) formula();
     child_f_.right = new(std::nothrow) formula();
     assert(child_f_.left && child_f_.right);
 
+    // check the json for correct information
     auto& value_field = f["value"];
     if(!value_field.is_array() || value_field.size() != 2)
     {
         return false;
     }
 
-    return child_f_.left->build(value_field[0]) && child_f_.right->build(value_field[1]);
+    // recursive construction of the child terms
+    if (!child_f_.left->build(value_field[0]) || !child_f_.right->build(value_field[1]))
+    {
+        return false;
+    }
+
+    // add child's hashes
+    hash_ = ((child_f_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
+        ((child_f_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
+    return true;
 }
 
 auto formula::get_hash() const -> std::size_t
@@ -214,21 +206,28 @@ auto formula::get_operation_type() const -> operation_t
 
 std::ostream& operator<<(std::ostream& out, const formula& f)
 {
-    if(f.op_ == formula::operation_t::invalid)
+    switch (f.op_)
     {
+    case formula::operation_t::conjunction:
+        out << "[" << *f.child_f_.left << " & " << *f.child_f_.right << "]";
+        break;
+    case formula::operation_t::disjunction:
+        out << "[" << *f.child_f_.left << " | " << *f.child_f_.right << "]";
+        break;
+    case formula::operation_t::negation:
+        out << "[~" << *f.child_f_.left << "]";
+        break;
+    case formula::operation_t::le:
+        out << "<=[" << *f.child_t_.left << ", " << *f.child_t_.right << "]";
+        break;
+    case formula::operation_t::c:
+        out << "C[" << *f.child_t_.left << ", " << *f.child_t_.right << "]";
+        break;
+    case formula::operation_t::invalid:
         out << "UNDEFINED";
-    }
-    else if(f.is_term_operation())
-    {
-        out << "[" << formula::operation_to_symbol(f.op_) << "[" << *f.child_t_.left << ", " << *f.child_t_.right << "]]";
-    }
-    else if(f.op_ == formula::operation_t::negation)
-    {
-        out << "[" << formula::operation_to_symbol(f.op_) << *f.child_f_.left << "]";
-    }
-    else
-    {
-        out << "[" << *f.child_f_.left << " " << formula::operation_to_symbol(f.op_) << " " << *f.child_f_.right << "]";
+        break;
+    default:
+        assert(false && "Unrecognized.");
     }
 
     return out;

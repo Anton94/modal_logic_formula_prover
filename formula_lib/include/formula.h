@@ -47,10 +47,8 @@ public:
 private:
     friend tableau;
 
-    static auto operation_to_symbol(operation_t op) -> std::string&;
-
-    auto create_terms(json& f) -> bool;
-    auto create_formulas(json& f) -> bool;
+    auto construct_binary_term(json& f, operation_t op) -> bool;
+    auto construct_binary_formula(json& f, operation_t op) -> bool;
 
     operation_t op_;
     std::size_t hash_;
