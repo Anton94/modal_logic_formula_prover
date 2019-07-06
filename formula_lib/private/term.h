@@ -20,6 +20,7 @@ public:
 
     auto build(json& t) -> bool;
     auto get_hash() const -> std::size_t;
+    void clear();
 
     friend std::ostream& operator<<(std::ostream& out, const term& t);
 
@@ -37,6 +38,7 @@ private:
 
     auto construct_binary_operation(json& t, operation_t op) -> bool;
     auto is_binary_operaton() const -> bool;
+    void free();
 
     bool is_in_DNF_; // TODO: make DNF form, but only when needed
     operation_t op_;

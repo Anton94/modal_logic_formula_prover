@@ -1,4 +1,5 @@
 #include "formula.h"
+#include "logger.h"
 
 #include <cassert>
 
@@ -11,21 +12,7 @@ formula::formula()
 
 formula::~formula()
 {
-    if(op_ == operation_t::invalid)
-    {
-        return;
-    }
-
-    if(is_term_operation())
-    {
-        delete child_t_.left;
-        delete child_t_.right;
-    }
-    else
-    {
-        delete child_f_.left;
-        delete child_f_.right;
-    }
+    free();
 }
 
 auto formula::operator==(const formula& rhs) const -> bool
@@ -54,6 +41,8 @@ auto formula::operator==(const formula& rhs) const -> bool
 
 auto formula::build(json& f) -> bool
 {
+    clear();
+
     // check the json for correct information
     if(!f.contains("name"))
     {
@@ -108,7 +97,7 @@ auto formula::build(json& f) -> bool
             return false;
         }
 
-        hash_ = (child_f_.left->hash_ & 0xFFFFFFFF) * 2654435761;
+        hash_ = (child_f_.left->get_hash() & 0xFFFFFFFF) * 2654435761;
     }
     else
     {
@@ -120,7 +109,16 @@ auto formula::build(json& f) -> bool
     const auto op_code = static_cast<unsigned>(op_) + 1;
     hash_ += (op_code & 0xFFFFFFFF) * 2654435723;
 
+    trace() << *this << " <" << hash_ << ">";
     return true;
+}
+
+void formula::clear()
+{
+    free();
+    op_ = operation_t::invalid;
+    hash_ = 0;
+    child_f_ = { nullptr, nullptr };
 }
 
 auto formula::is_term_operation() const -> bool
@@ -161,8 +159,8 @@ auto formula::construct_binary_term(json& f, operation_t op) -> bool
     }
 
     // add child's hashes
-    hash_ = ((child_f_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
-        ((child_f_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
+    hash_ = ((child_t_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
+        ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
     return true;
 }
 
@@ -231,4 +229,23 @@ std::ostream& operator<<(std::ostream& out, const formula& f)
     }
 
     return out;
+}
+
+void formula::free()
+{
+    if (op_ == operation_t::invalid)
+    {
+        return;
+    }
+
+    if (is_term_operation())
+    {
+        delete child_t_.left;
+        delete child_t_.right;
+    }
+    else
+    {
+        delete child_f_.left;
+        delete child_f_.right;
+    }
 }

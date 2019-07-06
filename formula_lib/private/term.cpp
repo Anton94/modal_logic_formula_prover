@@ -1,4 +1,5 @@
 #include "term.h"
+#include "logger.h"
 
 #include <cassert>
 
@@ -13,8 +14,7 @@ term::term()
 
 term::~term()
 {
-    delete left_;
-    delete right_;
+    free();
 }
 
 auto term::operator==(const term& rhs) const -> bool
@@ -42,7 +42,8 @@ auto term::operator==(const term& rhs) const -> bool
 
 auto term::build(json& t) -> bool
 {
-    // todo: clean
+    clear();
+
     // check the json for correct information
     if(!t.contains("name"))
     {
@@ -96,7 +97,7 @@ auto term::build(json& t) -> bool
             return false;
         }
 
-        hash_ = (left_->hash_ & 0xFFFFFFFF) * 2654435761;
+        hash_ = (left_->get_hash() & 0xFFFFFFFF) * 2654435761;
     }
     else
     {
@@ -108,7 +109,18 @@ auto term::build(json& t) -> bool
     const auto op_code = static_cast<unsigned>(op_) + 1;
     hash_ += (op_code & 0xFFFFFFFF) * 2654435723;
 
+    trace() << *this << " <" << hash_ << ">";
     return true;
+}
+
+auto term::get_hash() const -> std::size_t
+{
+    return hash_;
+}
+
+auto term::is_binary_operaton() const -> bool
+{
+    return op_ == operation_t::union_ || op_ == operation_t::intersaction_;
 }
 
 auto term::construct_binary_operation(json& t, operation_t op) -> bool
@@ -141,9 +153,14 @@ auto term::construct_binary_operation(json& t, operation_t op) -> bool
     return true;
 }
 
-auto term::get_hash() const -> std::size_t
+void term::clear()
 {
-    return hash_;
+    free();
+    is_in_DNF_ = false;
+    op_ = operation_t::invalid_;
+    left_ = right_ = nullptr;
+    variable_.clear();
+    hash_ = 0;
 }
 
 std::ostream& operator<<(std::ostream& out, const term& t)
@@ -172,7 +189,8 @@ std::ostream& operator<<(std::ostream& out, const term& t)
     return out;
 }
 
-auto term::is_binary_operaton() const -> bool
+void term::free()
 {
-    return op_ == operation_t::union_ || op_ == operation_t::intersaction_;
+    delete left_;
+    delete right_;
 }

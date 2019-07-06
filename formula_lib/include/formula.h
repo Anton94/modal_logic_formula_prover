@@ -37,6 +37,7 @@ public:
     auto get_hash() const -> std::size_t;
 
     auto get_operation_type() const -> operation_t;
+    void clear();
 
     auto is_term_operation() const -> bool;
     auto is_atomic() const -> bool;
@@ -49,6 +50,7 @@ private:
 
     auto construct_binary_term(json& f, operation_t op) -> bool;
     auto construct_binary_formula(json& f, operation_t op) -> bool;
+    void free();
 
     operation_t op_;
     std::size_t hash_;
