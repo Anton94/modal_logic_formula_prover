@@ -26,14 +26,17 @@ public:
 private:
     enum class operation_type : char
     {
-        plus,  // union
-        minus, // intersection
-        star,
-        literal,
+        union_,
+        intersaction_,
+        star_,
+        literal_,
 
-        invalid,
+        invalid_,
     };
     using operation_t = operation_type;
+
+    auto construct_binary_operation(json& t, operation_t op) -> bool;
+    auto is_binary_operaton() const -> bool;
 
     bool is_in_DNF_; // TODO: make DNF form, but only when needed
     operation_t op_;
