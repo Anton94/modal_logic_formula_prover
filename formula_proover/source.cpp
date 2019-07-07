@@ -57,6 +57,11 @@ int main(int argc, char* argv[])
         formula f;
         info() << "\t" << (f.build(formula_json) ? "success" : "failed") << " " << f;
 
+        info() << "Getting the used variables...";
+        variables_t variables;
+        f.get_variables(variables);
+        info() << "Variables: " << variables;
+
         tableau t;
         info() << "The formula is " << (t.is_satisfiable(f) ? "" : "not ") << "satisfiable.";
     }

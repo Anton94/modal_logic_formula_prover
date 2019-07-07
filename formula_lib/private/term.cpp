@@ -163,6 +163,26 @@ void term::clear()
     hash_ = 0;
 }
 
+void term::get_variables(variables_t& out_variables) const
+{
+    if (is_binary_operaton())
+    {
+        assert(left_ && right_);
+        left_->get_variables(out_variables);
+        right_->get_variables(out_variables);
+    }
+    else if (op_ == operation_t::star_)
+    {
+        assert(left_);
+        left_->get_variables(out_variables);
+    }
+    else
+    {
+        assert(op_ == operation_t::literal_);
+        out_variables.insert(variable_);
+    }
+}
+
 std::ostream& operator<<(std::ostream& out, const term& t)
 {
     switch (t.op_)

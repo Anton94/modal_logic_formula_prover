@@ -2,6 +2,7 @@
 
 #include "nlohmann_json/json.hpp"
 #include "../private/term.h"
+#include "types.h"
 
 #include <ostream>
 
@@ -42,6 +43,8 @@ public:
     auto is_term_operation() const -> bool;
     auto is_atomic() const -> bool;
     auto is_formula_operation() const -> bool;
+
+    void get_variables(variables_t& out_variables) const;
 
     friend std::ostream& operator<<(std::ostream& out, const formula& f);
 

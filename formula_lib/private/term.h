@@ -3,6 +3,7 @@
 #include "nlohmann_json/json.hpp"
 #include <ostream>
 #include <unordered_set>
+#include "types.h"
 
 class term
 {
@@ -21,6 +22,8 @@ public:
     auto build(json& t) -> bool;
     auto get_hash() const -> std::size_t;
     void clear();
+
+    void get_variables(variables_t& out_variables) const;
 
     friend std::ostream& operator<<(std::ostream& out, const term& t);
 
