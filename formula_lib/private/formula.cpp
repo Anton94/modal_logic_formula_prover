@@ -1,5 +1,6 @@
 #include "formula.h"
 #include "logger.h"
+#include "term.h"
 
 #include <cassert>
 

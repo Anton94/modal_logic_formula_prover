@@ -1,12 +1,12 @@
 #pragma once
 
 #include "nlohmann_json/json.hpp"
-#include "../private/term.h"
 #include "types.h"
 
 #include <ostream>
 
 class tableau;
+class term;
 
 class formula
 {
