@@ -225,6 +225,33 @@ void formula::get_variables(variables_t& out_variables) const
     }
 }
 
+auto formula::evaluate(const variable_evaluations_t& variable_evaluations) const -> bool
+{
+    switch (op_)
+    {
+    case formula::operation_t::conjunction:
+        assert(child_f_.left && child_f_.right);
+        return child_f_.left->evaluate(variable_evaluations) && child_f_.right->evaluate(variable_evaluations);
+    case formula::operation_t::disjunction:
+        assert(child_f_.left && child_f_.right);
+        return child_f_.left->evaluate(variable_evaluations) || child_f_.right->evaluate(variable_evaluations);
+    case formula::operation_t::negation:
+        assert(child_f_.left);
+        return !child_f_.left->evaluate(variable_evaluations);
+    case formula::operation_t::le:
+        assert(child_t_.left && child_t_.right);
+        // <=(a, b) is satisfied if a & b* = 0, i.e. a == 0 or b* == 0 <-> a == 0 or b == 1
+        return !child_t_.left->evaluate(variable_evaluations) || child_t_.right->evaluate(variable_evaluations);
+    case formula::operation_t::c:
+        assert(child_t_.left && child_t_.right);
+        // C(a, b) is satisfied if a != 0 and b != 0
+        return child_t_.left->evaluate(variable_evaluations) && child_t_.right->evaluate(variable_evaluations);
+    default:
+        assert(false && "Unrecognized.");
+        return false;
+    }
+}
+
 std::ostream& operator<<(std::ostream& out, const formula& f)
 {
     switch (f.op_)

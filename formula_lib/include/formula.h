@@ -45,6 +45,7 @@ public:
     auto is_formula_operation() const -> bool;
 
     void get_variables(variables_t& out_variables) const;
+    auto evaluate(const variable_evaluations_t& variable_evaluations) const -> bool;
 
     friend std::ostream& operator<<(std::ostream& out, const formula& f);
 

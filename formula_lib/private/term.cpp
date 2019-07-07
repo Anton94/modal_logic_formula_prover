@@ -183,6 +183,28 @@ void term::get_variables(variables_t& out_variables) const
     }
 }
 
+auto term::evaluate(const variable_evaluations_t& variable_evaluations) const -> bool
+{
+    switch (op_)
+    {
+    case term::operation_t::union_:
+        assert(left_ && right_);
+        return left_->evaluate(variable_evaluations) || right_->evaluate(variable_evaluations);
+    case term::operation_t::intersaction_:
+        assert(left_ && right_);
+        return left_->evaluate(variable_evaluations) && right_->evaluate(variable_evaluations);
+    case term::operation_t::star_:
+        assert(left_);
+        return !left_->evaluate(variable_evaluations);
+    case term::operation_t::literal_:
+        assert(variable_evaluations.find(variable_) != variable_evaluations.end());
+        return variable_evaluations.find(variable_)->second; // returns the evaluation for the variable
+    default:
+        assert(false && "Unrecognized.");
+        return false;
+    }
+}
+
 std::ostream& operator<<(std::ostream& out, const term& t)
 {
     switch (t.op_)
