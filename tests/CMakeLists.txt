@@ -4,5 +4,5 @@ add_subdirectory(../formula_lib formula_lib)
 
 include_directories(${FORMULA_LIB_INCLUDE_DIR})
 
-add_executable(tests source.cpp satisfiability_tests.cpp variables_retrieving.cpp)
+add_executable(tests source.cpp satisfiability_tests.cpp variables_retrieving.cpp evaluation_tests.cpp)
 target_link_libraries(tests formula_lib)
