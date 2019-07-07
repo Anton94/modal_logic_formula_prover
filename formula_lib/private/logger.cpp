@@ -20,6 +20,7 @@ auto get_error_logger_func() -> logger_func_t&
     static logger_func_t logger_func;
     return logger_func;
 }
+
 }
 
 void set_trace_logger(const logger_func_t& f)

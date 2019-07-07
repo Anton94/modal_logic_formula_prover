@@ -230,19 +230,19 @@ std::ostream& operator<<(std::ostream& out, const formula& f)
     switch (f.op_)
     {
     case formula::operation_t::conjunction:
-        out << "[" << *f.child_f_.left << " & " << *f.child_f_.right << "]";
+        out << "(" << *f.child_f_.left << " & " << *f.child_f_.right << ")";
         break;
     case formula::operation_t::disjunction:
-        out << "[" << *f.child_f_.left << " | " << *f.child_f_.right << "]";
+        out << "(" << *f.child_f_.left << " | " << *f.child_f_.right << ")";
         break;
     case formula::operation_t::negation:
         out << "~" << *f.child_f_.left;
         break;
     case formula::operation_t::le:
-        out << "<=[" << *f.child_t_.left << ", " << *f.child_t_.right << "]";
+        out << "<=(" << *f.child_t_.left << ", " << *f.child_t_.right << ")";
         break;
     case formula::operation_t::c:
-        out << "C[" << *f.child_t_.left << ", " << *f.child_t_.right << "]";
+        out << "C(" << *f.child_t_.left << ", " << *f.child_t_.right << ")";
         break;
     case formula::operation_t::invalid:
         out << "UNDEFINED";
