@@ -1,9 +1,11 @@
 #pragma once
 
-#include "formula.h"
+#include "formula_mgr.h"
 
 #include <ostream>
 #include <unordered_set>
+
+class formula;
 
 class tableau
 {
@@ -15,7 +17,7 @@ public:
     tableau& operator=(tableau&&) noexcept = default;
 
     // Checks if the formula is satisfiable or not
-    auto is_satisfiable(const formula& f) -> bool;
+    auto is_satisfiable(const formula_mgr& f) -> bool;
 
 private:
     void clear();

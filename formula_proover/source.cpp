@@ -5,7 +5,7 @@
 #include "cmd_options/cxxopts.hpp"
 #include "nlohmann_json/json.hpp"
 
-#include "formula.h"
+#include "formula_mgr.h"
 #include "logger.h"
 #include "tableau.h"
 
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
         info() << "Parsed into json:\n" << formula_json.dump(4);
 
         info() << "Building a formula tree with the parsed one...";
-        formula f;
+        formula_mgr f;
         info() << "\t" << (f.build(formula_json) ? "success" : "failed") << " " << f;
 
         info() << "Getting the used variables...";

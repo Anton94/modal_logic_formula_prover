@@ -7,7 +7,7 @@ using json = nlohmann::json;
 
 auto variables_check = [](const json& formula_json, const variables_t& expected_variables) {
     auto copy_f = formula_json;
-    formula f;
+    formula_mgr f;
     CHECK(f.build(copy_f));
 
     variables_t variables;

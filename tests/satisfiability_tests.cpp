@@ -7,7 +7,7 @@ using json = nlohmann::json;
 
 auto is_satisfiable = [](const json& formula_json, bool expected_result) {
     auto copy_f = formula_json;
-    formula f;
+    formula_mgr f;
     CHECK(f.build(copy_f));
 
     tableau t;

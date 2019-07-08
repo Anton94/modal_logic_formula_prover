@@ -1,12 +1,13 @@
 #include "tableau.h"
+#include "formula.h"
 #include "logger.h"
 
-auto tableau::is_satisfiable(const formula& f) -> bool
+auto tableau::is_satisfiable(const formula_mgr& f) -> bool
 {
     clear();
 
     info() << "Running a satisfiability checking of " << f;
-    add_formula_to_T(&f);
+    add_formula_to_T(&f.f_);
 
     return step();
 }

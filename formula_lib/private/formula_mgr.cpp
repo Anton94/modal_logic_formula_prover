@@ -1,8 +1,6 @@
-#include "evaluator.h"
+#include "formula_mgr.h"
 #include "logger.h"
 
-namespace evaluator
-{
 
 namespace
 {
@@ -31,7 +29,7 @@ auto has_satisfiable_evaluation(const formula& f, variable_evaluations_t& evalua
     if(it == evaluations.end())
     {
         auto res = f.evaluate(evaluations);
-        info() << "Evaluation with " << evaluations << " " << (res ? "succeeded" : "failed");
+        trace() << "Evaluation with " << evaluations << " " << (res ? "succeeded" : "failed");
         return res;
     }
 
@@ -49,11 +47,21 @@ auto has_satisfiable_evaluation(const formula& f, variable_evaluations_t& evalua
 }
 }
 
-auto has_satisfiable_evaluation(const formula& f) -> bool
+auto formula_mgr::build(json& f) -> bool
 {
-    info() << "Running satisfiable evalution checking of " << f;
+    return f_.build(f);
+}
+
+void formula_mgr::get_variables(variables_t& out_variables) const
+{
+    return f_.get_variables(out_variables);
+}
+
+auto formula_mgr::brute_force_evaluate() const -> bool
+{
+    info() << "Running brute force evalution checking of " << f_;
     variables_t variables;
-    f.get_variables(variables);
+    f_.get_variables(variables);
 
     variable_evaluations_t evaluations;
     for(const auto& variable : variables)
@@ -61,6 +69,16 @@ auto has_satisfiable_evaluation(const formula& f) -> bool
         evaluations[variable] = false;
     }
 
-    return has_satisfiable_evaluation(f, evaluations, evaluations.begin());
+    return has_satisfiable_evaluation(f_, evaluations, evaluations.begin());
 }
+
+void formula_mgr::clear()
+{
+    f_.clear();
+}
+
+std::ostream& operator<<(std::ostream& out, const formula_mgr& f)
+{
+    out << f.f_;
+    return out;
 }
