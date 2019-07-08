@@ -87,5 +87,4 @@ struct hash<formula>
         return f.get_hash();
     }
 };
-
 }

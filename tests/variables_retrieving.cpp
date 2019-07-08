@@ -53,7 +53,7 @@ TEST_CASE("variables_check 1", "[variables_check]")
                }
             ]
         })"_json,
-        { "a", "b" });
+        {"a", "b"});
 }
 
 TEST_CASE("variables_check 2", "[variables_check]")
@@ -73,7 +73,7 @@ TEST_CASE("variables_check 2", "[variables_check]")
                }
             ]
         })"_json,
-        { "a" });
+        {"a"});
 }
 
 TEST_CASE("variables_check 2.1", "[variables_check]")
@@ -93,7 +93,7 @@ TEST_CASE("variables_check 2.1", "[variables_check]")
                }
             ]
         })"_json,
-        { "axxa" });
+        {"axxa"});
 }
 
 TEST_CASE("variables_check 2.2", "[variables_check]")
@@ -113,7 +113,7 @@ TEST_CASE("variables_check 2.2", "[variables_check]")
                }
             ]
         })"_json,
-        { "axxa" });
+        {"axxa"});
 }
 
 TEST_CASE("variables_check 2.3", "[variables_check]")
@@ -133,7 +133,7 @@ TEST_CASE("variables_check 2.3", "[variables_check]")
                }
             ]
         })"_json,
-        { "a", "b" });
+        {"a", "b"});
 }
 
 TEST_CASE("variables_check 3", "[variables_check]")
@@ -174,7 +174,7 @@ TEST_CASE("variables_check 3", "[variables_check]")
                }
             ]
         })"_json,
-        { "a", "b" });
+        {"a", "b"});
 }
 
 TEST_CASE("variables_check 4", "[variables_check]")
@@ -233,14 +233,14 @@ TEST_CASE("variables_check 4", "[variables_check]")
                }
             ]
          })"_json,
-         { "a", "b" });
+        {"a", "b"});
 }
 
 TEST_CASE("variables_check 5", "[variables_check]")
 {
     // (C(a, b) | <=(a, b)) | (~C(a,b) & <=(a,b))
-    variables_check(R"(
-        {
+    variables_check(
+        R"({
             "name": "disjunction",
             "value": [
                {
@@ -309,16 +309,15 @@ TEST_CASE("variables_check 5", "[variables_check]")
                   ]
                }
             ]
-         }
-        )"_json,
-        { "a", "b" });
+        })"_json,
+        {"a", "b"});
 }
 
 TEST_CASE("variables_check 6", "[variables_check]")
 {
     // C(a, b) & ~C(a, c)
-    variables_check(R"(
-         {
+    variables_check(
+        R"({
             "name": "conjunction",
             "value": [
                {
@@ -351,16 +350,15 @@ TEST_CASE("variables_check 6", "[variables_check]")
                   }
                }
             ]
-        }
-        )"_json,
-        { "a", "b", "c" });
+        })"_json,
+        {"a", "b", "c"});
 }
 
 TEST_CASE("variables_check 7", "[variables_check]")
 {
     // (C(a, b) | ~C(a, b)) & (C(a,b) | ~C(a,b))
-    variables_check(R"(
-        {
+    variables_check(
+        R"({
             "name": "conjunction",
             "value": [
                {
@@ -432,158 +430,22 @@ TEST_CASE("variables_check 7", "[variables_check]")
                   ]
                }
             ]
-        }
-        )"_json,
-        { "a", "b" });
+        })"_json,
+        {"a", "b"});
 }
 
 TEST_CASE("variables_check 8", "[variables_check]")
 {
     // (C(a, b) | ~C(a, b)) & (C(a,b) | ~C(a,c))
-    variables_check(R"(
-            {
-               "name": "conjunction",
-               "value": [
-                  {
-                     "name": "disjunction",
-                     "value": [
-                        {
-                           "name": "contact",
-                           "value": [
-                              {
-                                 "name": "string",
-                                 "value": "a"
-                              },
-                              {
-                                 "name": "string",
-                                 "value": "b"
-                              }
-                           ]
-                        },
-                        {
-                           "name": "negation",
-                           "value": {
-                              "name": "contact",
-                              "value": [
-                                 {
-                                    "name": "string",
-                                    "value": "a"
-                                 },
-                                 {
-                                    "name": "string",
-                                    "value": "b"
-                                 }
-                              ]
-                           }
-                        }
-                     ]
-                  },
-                  {
-                     "name": "disjunction",
-                     "value": [
-                        {
-                           "name": "contact",
-                           "value": [
-                              {
-                                 "name": "string",
-                                 "value": "a"
-                              },
-                              {
-                                 "name": "string",
-                                 "value": "b"
-                              }
-                           ]
-                        },
-                        {
-                           "name": "negation",
-                           "value": {
-                              "name": "contact",
-                              "value": [
-                                 {
-                                    "name": "string",
-                                    "value": "a"
-                                 },
-                                 {
-                                    "name": "string",
-                                    "value": "c"
-                                 }
-                              ]
-                           }
-                        }
-                     ]
-                  }
-               ]
-            }
-        )"_json,
-        { "a", "b", "c" });
-}
-
-TEST_CASE("variables_check 9", "[variables_check]")
-{
-    // C(a, *b) & ~C(a, b + h)
-    variables_check(R"(
-        {
+    variables_check(
+        R"({
            "name": "conjunction",
            "value": [
               {
-                 "name": "contact",
+                 "name": "disjunction",
                  "value": [
                     {
-                       "name": "string",
-                       "value": "a"
-                    },
-                    {
-                       "name": "Tstar",
-                       "value": {
-                          "name": "string",
-                          "value": "b"
-                       }
-                    }
-                 ]
-              },
-              {
-                 "name": "negation",
-                 "value": {
-                    "name": "contact",
-                    "value": [
-                       {
-                          "name": "string",
-                          "value": "a"
-                       },
-                       {
-                          "name": "Tand",
-                          "value": [
-                             {
-                                "name": "string",
-                                "value": "b"
-                             },
-                             {
-                                "name": "string",
-                                "value": "h"
-                             }
-                          ]
-                       }
-                    ]
-                 }
-              }
-           ]
-        }
-        )"_json,
-        { "a", "b", "h" });
-}
-
-TEST_CASE("variables_check 10", "[variables_check]")
-{
-    // C(a - c, (*b) + h) & ~C(a - c, (*b) + h)
-    variables_check(R"(
-        {
-           "name": "conjunction",
-           "value": [
-              {
-                 "name": "contact",
-                 "value": [
-                    {
-                       "name": "Tor",
+                       "name": "contact",
                        "value": [
                           {
                              "name": "string",
@@ -591,35 +453,48 @@ TEST_CASE("variables_check 10", "[variables_check]")
                           },
                           {
                              "name": "string",
-                             "value": "c"
+                             "value": "b"
                           }
                        ]
                     },
                     {
-                       "name": "Tand",
-                       "value": [
-                          {
-                             "name": "Tstar",
-                             "value": {
+                       "name": "negation",
+                       "value": {
+                          "name": "contact",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "a"
+                             },
+                             {
                                 "name": "string",
                                 "value": "b"
                              }
-                          },
-                          {
-                             "name": "string",
-                             "value": "h"
-                          }
-                       ]
+                          ]
+                       }
                     }
                  ]
               },
               {
-                 "name": "negation",
-                 "value": {
-                    "name": "contact",
-                    "value": [
-                       {
-                          "name": "Tor",
+                 "name": "disjunction",
+                 "value": [
+                    {
+                       "name": "contact",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "a"
+                          },
+                          {
+                             "name": "string",
+                             "value": "b"
+                          }
+                       ]
+                    },
+                    {
+                       "name": "negation",
+                       "value": {
+                          "name": "contact",
                           "value": [
                              {
                                 "name": "string",
@@ -630,37 +505,156 @@ TEST_CASE("variables_check 10", "[variables_check]")
                                 "value": "c"
                              }
                           ]
-                       },
-                       {
-                          "name": "Tand",
-                          "value": [
-                             {
-                                "name": "Tstar",
-                                "value": {
-                                   "name": "string",
-                                   "value": "b"
-                                }
-                             },
-                             {
-                                "name": "string",
-                                "value": "h"
-                             }
-                          ]
                        }
-                    ]
-                 }
+                    }
+                 ]
               }
            ]
-        }
-        )"_json,
-        { "a", "b", "c", "h" });
+        })"_json,
+        {"a", "b", "c"});
+}
+
+TEST_CASE("variables_check 9", "[variables_check]")
+{
+    // C(a, *b) & ~C(a, b + h)
+    variables_check(
+        R"({
+            "name": "conjunction",
+            "value": [
+               {
+                  "name": "contact",
+                  "value": [
+                     {
+                        "name": "string",
+                        "value": "a"
+                     },
+                     {
+                        "name": "Tstar",
+                        "value": {
+                           "name": "string",
+                           "value": "b"
+                        }
+                     }
+                  ]
+               },
+               {
+                  "name": "negation",
+                  "value": {
+                     "name": "contact",
+                     "value": [
+                        {
+                           "name": "string",
+                           "value": "a"
+                        },
+                        {
+                           "name": "Tand",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "b"
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "h"
+                              }
+                           ]
+                        }
+                     ]
+                  }
+               }
+            ]
+        })"_json,
+        {"a", "b", "h"});
+}
+
+TEST_CASE("variables_check 10", "[variables_check]")
+{
+    // C(a - c, (*b) + h) & ~C(a - c, (*b) + h)
+    variables_check(
+        R"({
+            "name": "conjunction",
+            "value": [
+               {
+                  "name": "contact",
+                  "value": [
+                     {
+                        "name": "Tor",
+                        "value": [
+                           {
+                              "name": "string",
+                              "value": "a"
+                           },
+                           {
+                              "name": "string",
+                              "value": "c"
+                           }
+                        ]
+                     },
+                     {
+                        "name": "Tand",
+                        "value": [
+                           {
+                              "name": "Tstar",
+                              "value": {
+                                 "name": "string",
+                                 "value": "b"
+                              }
+                           },
+                           {
+                              "name": "string",
+                              "value": "h"
+                           }
+                        ]
+                     }
+                  ]
+               },
+               {
+                  "name": "negation",
+                  "value": {
+                     "name": "contact",
+                     "value": [
+                        {
+                           "name": "Tor",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "a"
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "c"
+                              }
+                           ]
+                        },
+                        {
+                           "name": "Tand",
+                           "value": [
+                              {
+                                 "name": "Tstar",
+                                 "value": {
+                                    "name": "string",
+                                    "value": "b"
+                                 }
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "h"
+                              }
+                           ]
+                        }
+                     ]
+                  }
+               }
+            ]
+        })"_json,
+        {"a", "b", "c", "h"});
 }
 
 TEST_CASE("variables_check 11", "[variables_check]")
 {
     // (C(a, b) & (C(f, h) & C(j, k))) & ~((C(a, b) & C(f, h)) & C(j, k)){ "a", "b", "f", "h", "j", "k" }
-    variables_check(R"(
-        {
+    variables_check(
+        R"({
            "name": "conjunction",
            "value": [
               {
@@ -765,16 +759,15 @@ TEST_CASE("variables_check 11", "[variables_check]")
                  }
               }
            ]
-        }
-        )"_json,
-        { "a", "b", "f", "h", "j", "k" });
+        })"_json,
+        {"a", "b", "f", "h", "j", "k"});
 }
 
 TEST_CASE("variables_check 12", "[variables_check]")
 {
     // (C(a, b) & (C(f, h) & C(j, k))) & ~((C(a, b) & C(f, h)) & C(j, Fxa))
-    variables_check(R"(
-        {
+    variables_check(
+        R"({
            "name": "conjunction",
            "value": [
               {
@@ -879,7 +872,6 @@ TEST_CASE("variables_check 12", "[variables_check]")
                  }
               }
            ]
-        }
-        )"_json,
-        { "a", "b", "f", "h", "j", "k", "Fxa" });
+        })"_json,
+        {"a", "b", "f", "h", "j", "k", "Fxa"});
 }

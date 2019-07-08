@@ -19,12 +19,13 @@ public:
     template <typename T>
     logger& operator<<(T&& v)
     {
-        if (f_)
+        if(f_)
         {
             s_ << v;
         }
         return *this;
     }
+
 private:
     const logger_func_t& f_;
     std::stringstream s_;

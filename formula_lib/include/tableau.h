@@ -2,8 +2,8 @@
 
 #include "formula.h"
 
-#include <unordered_set>
 #include <ostream>
+#include <unordered_set>
 
 class tableau
 {
@@ -35,7 +35,7 @@ private:
 
     struct formula_ptr_hasher
     {
-        auto operator()(const formula* const& f) const->std::size_t;
+        auto operator()(const formula* const& f) const -> std::size_t;
     };
 
     struct formula_ptr_comparator
@@ -43,10 +43,7 @@ private:
         auto operator()(const formula* const& lhs, const formula* const& rhs) const -> bool;
     };
 
-    using formulas_t = std::unordered_set<
-                        const formula*,
-                        formula_ptr_hasher,
-                        formula_ptr_comparator>;
+    using formulas_t = std::unordered_set<const formula*, formula_ptr_hasher, formula_ptr_comparator>;
     formulas_t formulas_T_;
     formulas_t formulas_F_;
     formulas_t atomic_formulas_T_;

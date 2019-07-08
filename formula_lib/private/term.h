@@ -1,9 +1,9 @@
 #pragma once
 
 #include "nlohmann_json/json.hpp"
+#include "types.h"
 #include <ostream>
 #include <unordered_set>
-#include "types.h"
 
 class term
 {
@@ -51,7 +51,7 @@ private:
     std::string variable_; // TODO: hide it, or move the variables and keep just references
     std::size_t hash_;
 
-//    std::unordered_set<std::vector<bool>>* dnf_kmonoms_;
+    //    std::unordered_set<std::vector<bool>>* dnf_kmonoms_;
 };
 
 namespace std

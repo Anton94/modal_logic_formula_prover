@@ -178,8 +178,8 @@ TEST_CASE("satisfiable 4", "[satisfiability]")
 TEST_CASE("satisfiable 5", "[satisfiability]")
 {
     // (C(a, b) | <=(a, b)) | (~C(a,b) & <=(a,b))
-    is_satisfiable(R"(
-        {
+    is_satisfiable(
+        R"({
             "name": "disjunction",
             "value": [
                {
@@ -248,16 +248,15 @@ TEST_CASE("satisfiable 5", "[satisfiability]")
                   ]
                }
             ]
-         }
-        )"_json,
+        })"_json,
         true);
 }
 
 TEST_CASE("satisfiable 6", "[satisfiability]")
 {
     // C(a, b) & ~C(a, c)
-    is_satisfiable(R"(
-         {
+    is_satisfiable(
+        R"({
             "name": "conjunction",
             "value": [
                {
@@ -290,16 +289,15 @@ TEST_CASE("satisfiable 6", "[satisfiability]")
                   }
                }
             ]
-        }
-        )"_json,
+        })"_json,
         true);
 }
 
 TEST_CASE("satisfiable 7", "[satisfiability]")
 {
     // (C(a, b) | ~C(a, b)) & (C(a,b) | ~C(a,b))
-    is_satisfiable(R"(
-        {
+    is_satisfiable(
+        R"({
             "name": "conjunction",
             "value": [
                {
@@ -371,22 +369,36 @@ TEST_CASE("satisfiable 7", "[satisfiability]")
                   ]
                }
             ]
-        }
-        )"_json,
+        })"_json,
         true);
 }
 
 TEST_CASE("satisfiable 8", "[satisfiability]")
 {
     // (C(a, b) | ~C(a, b)) & (C(a,b) | ~C(a,c))
-    is_satisfiable(R"(
-            {
-               "name": "conjunction",
-               "value": [
-                  {
-                     "name": "disjunction",
-                     "value": [
-                        {
+    is_satisfiable(
+        R"({
+            "name": "conjunction",
+            "value": [
+               {
+                  "name": "disjunction",
+                  "value": [
+                     {
+                        "name": "contact",
+                        "value": [
+                           {
+                              "name": "string",
+                              "value": "a"
+                           },
+                           {
+                              "name": "string",
+                              "value": "b"
+                           }
+                        ]
+                     },
+                     {
+                        "name": "negation",
+                        "value": {
                            "name": "contact",
                            "value": [
                               {
@@ -398,29 +410,29 @@ TEST_CASE("satisfiable 8", "[satisfiability]")
                                  "value": "b"
                               }
                            ]
-                        },
-                        {
-                           "name": "negation",
-                           "value": {
-                              "name": "contact",
-                              "value": [
-                                 {
-                                    "name": "string",
-                                    "value": "a"
-                                 },
-                                 {
-                                    "name": "string",
-                                    "value": "b"
-                                 }
-                              ]
-                           }
                         }
-                     ]
-                  },
-                  {
-                     "name": "disjunction",
-                     "value": [
-                        {
+                     }
+                  ]
+               },
+               {
+                  "name": "disjunction",
+                  "value": [
+                     {
+                        "name": "contact",
+                        "value": [
+                           {
+                              "name": "string",
+                              "value": "a"
+                           },
+                           {
+                              "name": "string",
+                              "value": "b"
+                           }
+                        ]
+                     },
+                     {
+                        "name": "negation",
+                        "value": {
                            "name": "contact",
                            "value": [
                               {
@@ -429,39 +441,23 @@ TEST_CASE("satisfiable 8", "[satisfiability]")
                               },
                               {
                                  "name": "string",
-                                 "value": "b"
+                                 "value": "c"
                               }
                            ]
-                        },
-                        {
-                           "name": "negation",
-                           "value": {
-                              "name": "contact",
-                              "value": [
-                                 {
-                                    "name": "string",
-                                    "value": "a"
-                                 },
-                                 {
-                                    "name": "string",
-                                    "value": "c"
-                                 }
-                              ]
-                           }
                         }
-                     ]
-                  }
-               ]
-            }
-        )"_json,
+                     }
+                  ]
+               }
+            ]
+        })"_json,
         true);
 }
 
 TEST_CASE("satisfiable 9", "[satisfiability]")
 {
     // C(a, *b) & ~C(a, b + h)
-    is_satisfiable(R"(
-        {
+    is_satisfiable(
+        R"({
            "name": "conjunction",
            "value": [
               {
@@ -506,16 +502,15 @@ TEST_CASE("satisfiable 9", "[satisfiability]")
                  }
               }
            ]
-        }
-        )"_json,
+        })"_json,
         true);
 }
 
 TEST_CASE("satisfiable 10", "[satisfiability]")
 {
     // C(a - c, (*b) + h) & ~C(a - c, (*b) + h)
-    is_satisfiable(R"(
-        {
+    is_satisfiable(
+        R"({
            "name": "conjunction",
            "value": [
               {
@@ -590,16 +585,15 @@ TEST_CASE("satisfiable 10", "[satisfiability]")
                  }
               }
            ]
-        }
-        )"_json,
+        })"_json,
         false);
 }
 
 TEST_CASE("satisfiable 11", "[satisfiability]")
 {
     // (C(a, b) & (C(f, h) & C(j, k))) & ~((C(a, b) & C(f, h)) & C(j, k))
-    is_satisfiable(R"(
-        {
+    is_satisfiable(
+        R"({
            "name": "conjunction",
            "value": [
               {
@@ -704,16 +698,15 @@ TEST_CASE("satisfiable 11", "[satisfiability]")
                  }
               }
            ]
-        }
-        )"_json,
+        })"_json,
         false);
 }
 
 TEST_CASE("satisfiable 12", "[satisfiability]")
 {
     // (C(a, b) & (C(f, h) & C(j, k))) & ~((C(a, b) & C(f, h)) & C(j, F))
-    is_satisfiable(R"(
-        {
+    is_satisfiable(
+        R"({
            "name": "conjunction",
            "value": [
               {
@@ -818,7 +811,6 @@ TEST_CASE("satisfiable 12", "[satisfiability]")
                  }
               }
            ]
-        }
-        )"_json,
+        })"_json,
         true);
 }

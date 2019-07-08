@@ -7,5 +7,4 @@ namespace evaluator
 {
 
 auto has_satisfiable_evaluation(const formula& f) -> bool;
-
 }

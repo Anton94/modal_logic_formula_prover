@@ -1,9 +1,9 @@
 #pragma once
 
-#include <unordered_set>
-#include <unordered_map>
-#include <string>
 #include <ostream>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
 
 using variables_t = std::unordered_set<std::string>;
 std::ostream& operator<<(std::ostream& out, const variables_t& variables);

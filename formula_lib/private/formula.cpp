@@ -25,7 +25,7 @@ auto formula::operator==(const formula& rhs) const -> bool
     }
 
     assert(child_f_.left && rhs.child_f_.left);
-    if (op_ == operation_t::negation)
+    if(op_ == operation_t::negation)
     {
         return *child_f_.left == *rhs.child_f_.left;
     }
@@ -56,23 +56,23 @@ auto formula::build(json& f) -> bool
     }
 
     auto op = name_field.get<std::string>();
-    if (op == "conjunction")
+    if(op == "conjunction")
     {
-        if (!construct_binary_formula(f, operation_t::conjunction))
+        if(!construct_binary_formula(f, operation_t::conjunction))
         {
             return false;
         }
     }
-    else if (op == "disjunction")
+    else if(op == "disjunction")
     {
-        if (!construct_binary_formula(f, operation_t::disjunction))
+        if(!construct_binary_formula(f, operation_t::disjunction))
         {
             return false;
         }
     }
     else if(op == "less")
     {
-        if (!construct_binary_term(f, operation_t::le))
+        if(!construct_binary_term(f, operation_t::le))
         {
             return false;
         }
@@ -119,12 +119,12 @@ void formula::clear()
     free();
     op_ = operation_t::invalid;
     hash_ = 0;
-    child_f_ = { nullptr, nullptr };
+    child_f_ = {nullptr, nullptr};
 }
 
 auto formula::is_term_operation() const -> bool
 {
-	return op_ == operation_t::le || op_ == operation_t::c;
+    return op_ == operation_t::le || op_ == operation_t::c;
 }
 
 auto formula::is_atomic() const -> bool
@@ -134,7 +134,7 @@ auto formula::is_atomic() const -> bool
 
 auto formula::is_formula_operation() const -> bool
 {
-	return op_ == operation_t::conjunction || op_ == operation_t::disjunction || op_ == operation_t::negation;
+    return op_ == operation_t::conjunction || op_ == operation_t::disjunction || op_ == operation_t::negation;
 }
 
 auto formula::construct_binary_term(json& f, operation_t op) -> bool
@@ -154,14 +154,14 @@ auto formula::construct_binary_term(json& f, operation_t op) -> bool
     }
 
     // recursive construction of the child terms
-    if (!child_t_.left->build(value_field[0]) || !child_t_.right->build(value_field[1]))
+    if(!child_t_.left->build(value_field[0]) || !child_t_.right->build(value_field[1]))
     {
         return false;
     }
 
     // add child's hashes
     hash_ = ((child_t_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
-        ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
+            ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
     return true;
 }
 
@@ -182,14 +182,14 @@ auto formula::construct_binary_formula(json& f, operation_t op) -> bool
     }
 
     // recursive construction of the child terms
-    if (!child_f_.left->build(value_field[0]) || !child_f_.right->build(value_field[1]))
+    if(!child_f_.left->build(value_field[0]) || !child_f_.right->build(value_field[1]))
     {
         return false;
     }
 
     // add child's hashes
     hash_ = ((child_f_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
-        ((child_f_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
+            ((child_f_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
     return true;
 }
 
@@ -205,13 +205,13 @@ auto formula::get_operation_type() const -> operation_t
 
 void formula::get_variables(variables_t& out_variables) const
 {
-    if (is_term_operation())
+    if(is_term_operation())
     {
         assert(child_t_.left && child_t_.right);
         child_t_.left->get_variables(out_variables);
         child_t_.right->get_variables(out_variables);
     }
-    else if (op_ == operation_t::negation)
+    else if(op_ == operation_t::negation)
     {
         assert(child_f_.left);
         child_f_.left->get_variables(out_variables);
@@ -227,55 +227,59 @@ void formula::get_variables(variables_t& out_variables) const
 
 auto formula::evaluate(const variable_evaluations_t& variable_evaluations) const -> bool
 {
-    switch (op_)
+    switch(op_)
     {
-    case formula::operation_t::conjunction:
-        assert(child_f_.left && child_f_.right);
-        return child_f_.left->evaluate(variable_evaluations) && child_f_.right->evaluate(variable_evaluations);
-    case formula::operation_t::disjunction:
-        assert(child_f_.left && child_f_.right);
-        return child_f_.left->evaluate(variable_evaluations) || child_f_.right->evaluate(variable_evaluations);
-    case formula::operation_t::negation:
-        assert(child_f_.left);
-        return !child_f_.left->evaluate(variable_evaluations);
-    case formula::operation_t::le:
-        assert(child_t_.left && child_t_.right);
-        // <=(a, b) is satisfied if a & b* = 0, i.e. a == 0 or b* == 0 <-> a == 0 or b == 1
-        return !child_t_.left->evaluate(variable_evaluations) || child_t_.right->evaluate(variable_evaluations);
-    case formula::operation_t::c:
-        assert(child_t_.left && child_t_.right);
-        // C(a, b) is satisfied if a != 0 and b != 0
-        return child_t_.left->evaluate(variable_evaluations) && child_t_.right->evaluate(variable_evaluations);
-    default:
-        assert(false && "Unrecognized.");
-        return false;
+        case formula::operation_t::conjunction:
+            assert(child_f_.left && child_f_.right);
+            return child_f_.left->evaluate(variable_evaluations) &&
+                   child_f_.right->evaluate(variable_evaluations);
+        case formula::operation_t::disjunction:
+            assert(child_f_.left && child_f_.right);
+            return child_f_.left->evaluate(variable_evaluations) ||
+                   child_f_.right->evaluate(variable_evaluations);
+        case formula::operation_t::negation:
+            assert(child_f_.left);
+            return !child_f_.left->evaluate(variable_evaluations);
+        case formula::operation_t::le:
+            assert(child_t_.left && child_t_.right);
+            // <=(a, b) is satisfied if a & b* = 0, i.e. a == 0 or b* == 0 <-> a == 0 or b == 1
+            return !child_t_.left->evaluate(variable_evaluations) ||
+                   child_t_.right->evaluate(variable_evaluations);
+        case formula::operation_t::c:
+            assert(child_t_.left && child_t_.right);
+            // C(a, b) is satisfied if a != 0 and b != 0
+            return child_t_.left->evaluate(variable_evaluations) &&
+                   child_t_.right->evaluate(variable_evaluations);
+        default:
+            assert(false && "Unrecognized.");
+            return false;
     }
 }
 
 std::ostream& operator<<(std::ostream& out, const formula& f)
 {
-    switch (f.op_)
+    switch(f.op_)
     {
-    case formula::operation_t::conjunction:
-        out << "(" << *f.child_f_.left << " & " << *f.child_f_.right << ")";
-        break;
-    case formula::operation_t::disjunction:
-        out << "(" << *f.child_f_.left << " | " << *f.child_f_.right << ")";
-        break;
-    case formula::operation_t::negation:
-        out << "~" << *f.child_f_.left;
-        break;
-    case formula::operation_t::le:
-        out << "<=(" << *f.child_t_.left << ", " << *f.child_t_.right << ")";
-        break;
-    case formula::operation_t::c:
-        out << "C(" << *f.child_t_.left << ", " << *f.child_t_.right << ")";
-        break;
-    case formula::operation_t::invalid:
-        out << "UNDEFINED";
-        break;
-    default:
-        assert(false && "Unrecognized.");
+        case formula::operation_t::conjunction:
+            out << "(" << *f.child_f_.left << " & " << *f.child_f_.right << ")";
+            break;
+        case formula::operation_t::disjunction:
+            out << "(" << *f.child_f_.left << " | " << *f.child_f_.right << ")";
+            break;
+        case formula::operation_t::negation:
+            out << "~" << *f.child_f_.left;
+            break;
+        case formula::operation_t::le:
+            out << "<=(" << *f.child_t_.left << ", " << *f.child_t_.right << ")";
+            break;
+        case formula::operation_t::c:
+            out << "C(" << *f.child_t_.left << ", " << *f.child_t_.right << ")";
+            break;
+        case formula::operation_t::invalid:
+            out << "UNDEFINED";
+            break;
+        default:
+            assert(false && "Unrecognized.");
     }
 
     return out;
@@ -283,12 +287,12 @@ std::ostream& operator<<(std::ostream& out, const formula& f)
 
 void formula::free()
 {
-    if (op_ == operation_t::invalid)
+    if(op_ == operation_t::invalid)
     {
         return;
     }
 
-    if (is_term_operation())
+    if(is_term_operation())
     {
         delete child_t_.left;
         delete child_t_.right;
