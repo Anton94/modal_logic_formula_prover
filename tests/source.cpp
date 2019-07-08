@@ -9,9 +9,9 @@
 int main(int argc, char* argv[])
 {
     // If some test fails, enable the loggers for more info
-    // set_trace_logger([](const std::string& s) { std::cout << s << std::endl; });
-    // set_info_logger([](const std::string& s) { std::cout << s << std::endl; });
-    set_error_logger([](const std::string& s) { std::cerr << s << std::endl; });
+    set_trace_logger([](std::stringstream&& s) { std::cout << s.rdbuf() << std::endl; });
+    set_info_logger([](std::stringstream&& s) { std::cout << s.rdbuf() << std::endl; });
+    set_error_logger([](std::stringstream&& s) { std::cerr << s.rdbuf() << std::endl; });
 
     int result = Catch::Session().run(argc, argv);
     // potential teardown

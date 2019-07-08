@@ -13,10 +13,11 @@ using json = nlohmann::json;
 
 int main(int argc, char* argv[])
 {
-    set_trace_logger([](const std::string& s) { std::cout << s << std::endl; });
-    set_info_logger([](const std::string& s) { std::cout << s << std::endl; });
-    set_error_logger([](const std::string& s) { std::cerr << s << std::endl; });
+    set_trace_logger([](std::stringstream&& s) { std::cout << s.rdbuf() << std::endl; });
+    set_info_logger([](std::stringstream&& s) { std::cout << s.rdbuf() << std::endl; });
+    set_error_logger([](std::stringstream&& s) { std::cout << s.rdbuf() << std::endl; });
 
+    error();
     try
     {
         cxxopts::Options options("FormulaProover", "One line description of MyProgram");

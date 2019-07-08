@@ -2,39 +2,39 @@
 
 namespace
 {
-
-auto get_trace_logger_func() -> logger_func_t&
-{
-    static logger_func_t logger_func;
-    return logger_func;
-}
-
-auto get_info_logger_func() -> logger_func_t&
-{
-    static logger_func_t logger_func;
-    return logger_func;
-}
-
-auto get_error_logger_func() -> logger_func_t&
-{
-    static logger_func_t logger_func;
-    return logger_func;
-}
+logger_func_t trace_logger;
+logger_func_t info_logger;
+logger_func_t error_logger;
 }
 
 void set_trace_logger(const logger_func_t& f)
 {
-    get_trace_logger_func() = f;
+    trace_logger = f;
 }
 
 void set_info_logger(const logger_func_t& f)
 {
-    get_info_logger_func() = f;
+    info_logger = f;
 }
 
 void set_error_logger(const logger_func_t& f)
 {
-    get_error_logger_func() = f;
+    error_logger = f;
+}
+
+void set_trace_logger(logger_func_t&& f)
+{
+    trace_logger = std::move(f);
+}
+
+void set_info_logger(logger_func_t&& f)
+{
+    info_logger = std::move(f);
+}
+
+void set_error_logger(logger_func_t&& f)
+{
+    error_logger = std::move(f);
 }
 
 logger::logger(const logger_func_t& f)
@@ -44,23 +44,23 @@ logger::logger(const logger_func_t& f)
 
 logger::~logger()
 {
-    if(f_)
+    if(f_ && s_.rdbuf()->in_avail() > 0)
     {
-        f_(s_.str());
+        f_(std::move(s_));
     }
 }
 
 auto trace() -> logger
 {
-    return {get_trace_logger_func()};
+    return {trace_logger};
 }
 
 auto info() -> logger
 {
-    return {get_info_logger_func()};
+    return {info_logger};
 }
 
 auto error() -> logger
 {
-    return {get_error_logger_func()};
+    return {error_logger};
 }
