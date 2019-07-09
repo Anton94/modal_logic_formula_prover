@@ -162,25 +162,25 @@ void term::clear()
     hash_ = 0;
 }
 
-void term::get_variables(variables_set_t& out_variables) const
-{
-    if(is_binary_operaton())
-    {
-        assert(childs_.left && childs_.right);
-        childs_.left->get_variables(out_variables);
-        childs_.right->get_variables(out_variables);
-    }
-    else if(op_ == operation_t::star_)
-    {
-        assert(childs_.left);
-        childs_.left->get_variables(out_variables);
-    }
-    else
-    {
-        assert(op_ == operation_t::literal_);
-        out_variables.insert(formula_mgr_->get_literal(literal_id_));
-    }
-}
+//void term::get_variables(variables_set_t& out_variables) const
+//{
+//    if(is_binary_operaton())
+//    {
+//        assert(childs_.left && childs_.right);
+//        childs_.left->get_variables(out_variables);
+//        childs_.right->get_variables(out_variables);
+//    }
+//    else if(op_ == operation_t::star_)
+//    {
+//        assert(childs_.left);
+//        childs_.left->get_variables(out_variables);
+//    }
+//    else
+//    {
+//        assert(op_ == operation_t::literal_);
+//        out_variables.insert(formula_mgr_->get_literal(literal_id_));
+//    }
+//}
 
 auto term::evaluate(const variable_evaluations_t& variable_evaluations) const -> bool
 {

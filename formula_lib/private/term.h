@@ -25,7 +25,7 @@ public:
     auto get_hash() const -> std::size_t;
     void clear();
 
-    void get_variables(variables_set_t& out_variables) const;
+    // void get_variables(variables_set_t& out_variables) const;
     auto evaluate(const variable_evaluations_t& variable_evaluations) const -> bool;
 
     friend std::ostream& operator<<(std::ostream& out, const term& t);

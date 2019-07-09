@@ -112,11 +112,11 @@ auto formula_mgr::build(json& f) -> bool
         return false;
     }
 
-    literals_.reserve(variables_set.size());
+    variables_.reserve(variables_set.size());
     for(const auto& literal : variables_set)
     {
-        literal_to_id_[literal] = literals_.size();
-        literals_.emplace_back(literal);
+        literal_to_id_[literal] = variables_.size();
+        variables_.emplace_back(literal);
     }
 
     return change_literals_to_ids(f) && f_.build(f);
@@ -124,7 +124,7 @@ auto formula_mgr::build(json& f) -> bool
 
 void formula_mgr::get_variables(variables_set_t& out_variables) const
 {
-    return f_.get_variables(out_variables);
+    out_variables.insert(variables_.begin(), variables_.end());
 }
 
 auto formula_mgr::brute_force_evaluate() const -> bool
@@ -149,8 +149,8 @@ void formula_mgr::clear()
 
 auto formula_mgr::get_literal(literal_id_t id) const -> std::string
 {
-    assert(id < literals_.size());
-    return literals_[id];
+    assert(id < variables_.size());
+    return variables_[id];
 }
 
 auto formula_mgr::change_literals_to_ids(json& f) const -> bool
