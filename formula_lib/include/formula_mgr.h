@@ -39,6 +39,9 @@ private:
 
     using literal_id_t = size_t;
 
+    auto has_satisfiable_evaluation(const formula& f, variable_evaluations_bitset_t& evaluations,
+        variable_evaluations_bitset_t::iterator it) const -> bool;
+
     auto get_literal(literal_id_t id) const -> std::string;
     auto change_literals_to_ids(json& f) const -> bool;
 
@@ -46,7 +49,7 @@ private:
     literal_to_id_map_t literal_to_id_;
 
     using literals_t = std::vector<std::string>;
-    literals_t literals_;
+    literals_t variables_;
 
     formula f_;
 };

@@ -182,7 +182,7 @@ void term::clear()
 //    }
 //}
 
-auto term::evaluate(const variable_evaluations_t& variable_evaluations) const -> bool
+auto term::evaluate(const variable_evaluations_bitset_t& variable_evaluations) const -> bool
 {
     switch(op_)
     {
@@ -198,8 +198,8 @@ auto term::evaluate(const variable_evaluations_t& variable_evaluations) const ->
             assert(childs_.left);
             return !childs_.left->evaluate(variable_evaluations);
         case term::operation_t::literal_:
-            assert(variable_evaluations.find(get_literal()) != variable_evaluations.end());
-            return variable_evaluations.find(get_literal())->second; // returns the evaluation for the variable
+            assert(literal_id_ < variable_evaluations.size());
+            return variable_evaluations[literal_id_]; // returns the evaluation for the variable
         default:
             assert(false && "Unrecognized.");
             return false;

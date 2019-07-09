@@ -227,7 +227,7 @@ auto formula::get_operation_type() const -> operation_t
 //    }
 //}
 
-auto formula::evaluate(const variable_evaluations_t& variable_evaluations) const -> bool
+auto formula::evaluate(const variable_evaluations_bitset_t& variable_evaluations) const -> bool
 {
     switch(op_)
     {
