@@ -37,19 +37,19 @@ private:
     friend class term;
     friend std::ostream& operator<<(std::ostream& out, const formula_mgr& formulas);
 
-    using literal_id_t = size_t;
+    using variable_id_t = size_t;
 
     auto has_satisfiable_evaluation(const formula& f, variable_evaluations_bitset_t& evaluations,
         variable_evaluations_bitset_t::iterator it) const -> bool;
 
-    auto get_literal(literal_id_t id) const -> std::string;
-    auto change_literals_to_ids(json& f) const -> bool;
+    auto get_variable(variable_id_t id) const -> std::string;
+    auto change_variables_to_variable_ids(json& f) const -> bool;
 
-    using literal_to_id_map_t = std::unordered_map<std::string, literal_id_t>;
-    literal_to_id_map_t literal_to_id_;
+    using variable_to_id_map_t = std::unordered_map<std::string, variable_id_t>;
+    variable_to_id_map_t variable_to_id_;
 
-    using literals_t = std::vector<std::string>;
-    literals_t variables_;
+    using variables_t = std::vector<std::string>;
+    variables_t variables_;
 
     formula f_;
 };

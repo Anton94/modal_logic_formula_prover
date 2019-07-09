@@ -7,7 +7,7 @@ namespace
 
     using json = nlohmann::json;
 
-auto get_all_literals(const json& f, variables_set_t& variables) -> bool
+auto get_all_variables(const json& f, variables_set_t& variables) -> bool
 {
     if(!f.contains("name"))
     {
@@ -30,7 +30,7 @@ auto get_all_literals(const json& f, variables_set_t& variables) -> bool
 
     auto& value_field = f["value"];
     auto op = name_field.get<std::string>();
-    if(op == "string") // literal
+    if(op == "string") // variable
     {
         if(!value_field.is_string())
         {
@@ -43,11 +43,11 @@ auto get_all_literals(const json& f, variables_set_t& variables) -> bool
 
     if(value_field.is_object())
     {
-        return get_all_literals(value_field, variables);
+        return get_all_variables(value_field, variables);
     }
     if(value_field.is_array() && value_field.size() == 2)
     {
-        return get_all_literals(value_field[0], variables) && get_all_literals(value_field[1], variables);
+        return get_all_variables(value_field[0], variables) && get_all_variables(value_field[1], variables);
     }
     error()
         << "Json (sub)formula has 'value' field which is neither an object, nor an array of two objects:\n"
@@ -67,19 +67,20 @@ auto formula_mgr::build(json& f) -> bool
 
     // Will cash all variables and swap the string representations with id in the cache.
     variables_set_t variables_set;
-    if (!get_all_literals(f, variables_set))
+    if (!get_all_variables(f, variables_set))
     {
         return false;
     }
 
     variables_.reserve(variables_set.size());
-    for(const auto& literal : variables_set)
+    variable_to_id_.reserve(variables_set.size());
+    for(const auto& variable : variables_set)
     {
-        literal_to_id_[literal] = variables_.size();
-        variables_.emplace_back(literal);
+        variable_to_id_[variable] = variables_.size();
+        variables_.emplace_back(variable);
     }
 
-    return change_literals_to_ids(f) && f_.build(f);
+    return change_variables_to_variable_ids(f) && f_.build(f);
 }
 
 void formula_mgr::get_variables(variables_set_t& out_variables) const
@@ -99,13 +100,13 @@ void formula_mgr::clear()
     f_.clear();
 }
 
-auto formula_mgr::get_literal(literal_id_t id) const -> std::string
+auto formula_mgr::get_variable(variable_id_t id) const -> std::string
 {
     assert(id < variables_.size());
     return variables_[id];
 }
 
-auto formula_mgr::change_literals_to_ids(json& f) const -> bool
+auto formula_mgr::change_variables_to_variable_ids(json& f) const -> bool
 {
     if(!f.contains("name"))
     {
@@ -128,28 +129,28 @@ auto formula_mgr::change_literals_to_ids(json& f) const -> bool
 
     auto& value_field = f["value"];
     auto op = name_field.get<std::string>();
-    if(op == "string") // literal
+    if(op == "string") // variable
     {
         if(!value_field.is_string())
         {
             error() << "Json (sub)formula has 'value' field which is not a string:\n" << f.dump(4);
             return false;
         }
-        name_field = "literal_id";
+        name_field = "variable_id";
 
-        const auto literal_str = value_field.get<std::string>();
-        assert(literal_to_id_.find(literal_str) != literal_to_id_.end());
-        value_field = literal_to_id_.find(literal_str)->second;
+        const auto variable_str = value_field.get<std::string>();
+        assert(variable_to_id_.find(variable_str) != variable_to_id_.end());
+        value_field = variable_to_id_.find(variable_str)->second;
         return true;
     }
 
     if(value_field.is_object())
     {
-        return change_literals_to_ids(value_field);
+        return change_variables_to_variable_ids(value_field);
     }
     if(value_field.is_array() && value_field.size() == 2)
     {
-        return change_literals_to_ids(value_field[0]) && change_literals_to_ids(value_field[1]);
+        return change_variables_to_variable_ids(value_field[0]) && change_variables_to_variable_ids(value_field[1]);
     }
 
     error() << "Json (sub)formula has 'value' field which is neither an object, nor an array of two "

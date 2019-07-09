@@ -36,7 +36,7 @@ private:
         union_,
         intersaction_,
         star_,
-        literal_,
+        variable_,
 
         invalid_,
         // TODO: encode here DNF stuff
@@ -47,7 +47,7 @@ private:
     auto is_binary_operaton() const -> bool;
     void free();
 
-    auto get_literal() const -> std::string;
+    auto get_variable() const -> std::string;
 
     operation_t op_;
     formula_mgr* formula_mgr_;
@@ -60,7 +60,7 @@ private:
     union
     {
         childs childs_;
-        size_t literal_id_;
+        size_t variable_id_;
     };
 
     std::size_t hash_;

@@ -26,9 +26,9 @@ auto term::operator==(const term& rhs) const -> bool
         return false;
     }
 
-    if(op_ == operation_t::literal_)
+    if(op_ == operation_t::variable_)
     {
-        return literal_id_ == rhs.literal_id_;
+        return variable_id_ == rhs.variable_id_;
     }
 
     assert(childs_.left && rhs.childs_.left);
@@ -57,18 +57,18 @@ auto term::build(json& t) -> bool
     }
 
     auto op = name_field.get<std::string>();
-    if(op == "literal_id")
+    if(op == "variable_id")
     {
-        op_ = operation_t::literal_;
+        op_ = operation_t::variable_;
 
         auto& value_field = t["value"];
         if(!value_field.is_number_unsigned())
         {
             return false;
         }
-        literal_id_ = value_field.get<size_t>();
+        variable_id_ = value_field.get<size_t>();
 
-        hash_ = (literal_id_ & 0xFFFFFFFF) * 2654435761;
+        hash_ = (variable_id_ & 0xFFFFFFFF) * 2654435761;
     }
     else if(op == "Tand")
     {
@@ -177,8 +177,8 @@ void term::clear()
 //    }
 //    else
 //    {
-//        assert(op_ == operation_t::literal_);
-//        out_variables.insert(formula_mgr_->get_literal(literal_id_));
+//        assert(op_ == operation_t::variable_);
+//        out_variables.insert(formula_mgr_->get_variable(variable_id_));
 //    }
 //}
 
@@ -197,9 +197,9 @@ auto term::evaluate(const variable_evaluations_bitset_t& variable_evaluations) c
         case term::operation_t::star_:
             assert(childs_.left);
             return !childs_.left->evaluate(variable_evaluations);
-        case term::operation_t::literal_:
-            assert(literal_id_ < variable_evaluations.size());
-            return variable_evaluations[literal_id_]; // returns the evaluation for the variable
+        case term::operation_t::variable_:
+            assert(variable_id_ < variable_evaluations.size());
+            return variable_evaluations[variable_id_]; // returns the evaluation for the variable
         default:
             assert(false && "Unrecognized.");
             return false;
@@ -219,8 +219,8 @@ std::ostream& operator<<(std::ostream& out, const term& t)
         case term::operation_t::star_:
             out << "[" << *t.childs_.left << "]*";
             break;
-        case term::operation_t::literal_:
-            out << t.get_literal();
+        case term::operation_t::variable_:
+            out << t.get_variable();
             break;
         case term::operation_t::invalid_:
             out << "UNDEFINED";
@@ -234,15 +234,15 @@ std::ostream& operator<<(std::ostream& out, const term& t)
 
 void term::free()
 {
-    if (op_ != operation_t::literal_)
+    if (op_ != operation_t::variable_)
     {
         delete childs_.left;
         delete childs_.right;
     }
 }
 
-auto term::get_literal() const -> std::string
+auto term::get_variable() const -> std::string
 {
-    assert(op_ == operation_t::literal_);
-    return formula_mgr_->get_literal(literal_id_);
+    assert(op_ == operation_t::variable_);
+    return formula_mgr_->get_variable(variable_id_);
 }
