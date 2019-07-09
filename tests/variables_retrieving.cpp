@@ -5,12 +5,12 @@
 
 using json = nlohmann::json;
 
-auto variables_check = [](const json& formula_json, const variables_t& expected_variables) {
+auto variables_check = [](const json& formula_json, const variables_set_t& expected_variables) {
     auto copy_f = formula_json;
     formula_mgr f;
     CHECK(f.build(copy_f));
 
-    variables_t variables;
+    variables_set_t variables;
     f.get_variables(variables);
     CHECK(variables == expected_variables);
 };

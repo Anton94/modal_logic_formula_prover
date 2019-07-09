@@ -5,12 +5,14 @@
 #include <ostream>
 #include <unordered_set>
 
+class formula_mgr;
+
 class term
 {
     using json = nlohmann::json;
 
 public:
-    term();
+    term(formula_mgr* mgr);
     ~term();
     term(const term&) = delete;
     term& operator=(const term&) = delete;
@@ -23,7 +25,7 @@ public:
     auto get_hash() const -> std::size_t;
     void clear();
 
-    void get_variables(variables_t& out_variables) const;
+    void get_variables(variables_set_t& out_variables) const;
     auto evaluate(const variable_evaluations_t& variable_evaluations) const -> bool;
 
     friend std::ostream& operator<<(std::ostream& out, const term& t);
@@ -37,6 +39,7 @@ private:
         literal_,
 
         invalid_,
+        // TODO: encode here DNF stuff
     };
     using operation_t = operation_type;
 
@@ -44,14 +47,23 @@ private:
     auto is_binary_operaton() const -> bool;
     void free();
 
-    bool is_in_DNF_; // TODO: make DNF form, but only when needed
-    operation_t op_;
-    term* left_;
-    term* right_;
-    std::string variable_; // TODO: hide it, or move the variables and keep just references
-    std::size_t hash_;
+    auto get_literal() const -> std::string;
 
-    //    std::unordered_set<std::vector<bool>>* dnf_kmonoms_;
+    operation_t op_;
+    formula_mgr* formula_mgr_;
+
+    struct childs
+    {
+        term* left;
+        term* right;
+    };
+    union
+    {
+        childs childs_;
+        size_t literal_id_;
+    };
+
+    std::size_t hash_;
 };
 
 namespace std

@@ -4,11 +4,13 @@
 
 #include <cassert>
 
-formula::formula()
+formula::formula(formula_mgr* mgr)
     : op_(operation_t::invalid)
+    , formula_mgr_(mgr)
     , hash_(0ul)
     , child_f_({nullptr, nullptr})
 {
+    assert(formula_mgr_);
 }
 
 formula::~formula()
@@ -88,7 +90,7 @@ auto formula::build(json& f) -> bool
     {
         op_ = operation_t::negation;
 
-        child_f_.left = new(std::nothrow) formula();
+        child_f_.left = new(std::nothrow) formula(formula_mgr_);
         assert(child_f_.left);
 
         auto& value_field = f["value"];
@@ -142,8 +144,8 @@ auto formula::construct_binary_term(json& f, operation_t op) -> bool
     op_ = op;
     assert(is_term_operation());
 
-    child_t_.left = new(std::nothrow) term();
-    child_t_.right = new(std::nothrow) term();
+    child_t_.left = new(std::nothrow) term(formula_mgr_);
+    child_t_.right = new(std::nothrow) term(formula_mgr_);
     assert(child_t_.left && child_t_.right);
 
     // check the json for correct information
@@ -170,8 +172,8 @@ auto formula::construct_binary_formula(json& f, operation_t op) -> bool
     op_ = op;
     assert(op_ == operation_t::conjunction || op_ == operation_t::disjunction);
 
-    child_f_.left = new(std::nothrow) formula();
-    child_f_.right = new(std::nothrow) formula();
+    child_f_.left = new(std::nothrow) formula(formula_mgr_);
+    child_f_.right = new(std::nothrow) formula(formula_mgr_);
     assert(child_f_.left && child_f_.right);
 
     // check the json for correct information
@@ -203,7 +205,7 @@ auto formula::get_operation_type() const -> operation_t
     return op_;
 }
 
-void formula::get_variables(variables_t& out_variables) const
+void formula::get_variables(variables_set_t& out_variables) const
 {
     if(is_term_operation())
     {

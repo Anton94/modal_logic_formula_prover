@@ -7,6 +7,7 @@
 
 class tableau;
 class term;
+class formula_mgr;
 
 class formula
 {
@@ -25,7 +26,7 @@ public:
     };
     using operation_t = operation_type;
 
-    formula();
+    formula(formula_mgr* mgr);
     ~formula();
     formula(const formula&) = delete;
     formula& operator=(const formula&) = delete;
@@ -44,7 +45,7 @@ public:
     auto is_atomic() const -> bool;
     auto is_formula_operation() const -> bool;
 
-    void get_variables(variables_t& out_variables) const;
+    void get_variables(variables_set_t& out_variables) const;
     auto evaluate(const variable_evaluations_t& variable_evaluations) const -> bool;
 
     friend std::ostream& operator<<(std::ostream& out, const formula& f);
@@ -57,6 +58,7 @@ private:
     void free();
 
     operation_t op_;
+    formula_mgr* formula_mgr_;
     std::size_t hash_;
 
     struct child_formulas
