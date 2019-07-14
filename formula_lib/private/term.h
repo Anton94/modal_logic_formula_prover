@@ -28,6 +28,8 @@ public:
     // void get_variables(variables_set_t& out_variables) const;
     auto evaluate(const variable_evaluations_bitset_t& variable_evaluations) const -> bool;
 
+	void to_negative_form();
+
     friend std::ostream& operator<<(std::ostream& out, const term& t);
 
 private:
@@ -42,6 +44,10 @@ private:
         // TODO: encode here DNF stuff
     };
     using operation_t = operation_type;
+
+	term(operation_t operation, term* left = NULL, term* right = NULL);
+
+	void to_negative_form_recursive(term& root);
 
     auto construct_binary_operation(json& t, operation_t op) -> bool;
     auto is_binary_operaton() const -> bool;
