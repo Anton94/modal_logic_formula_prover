@@ -6,3 +6,8 @@ include_directories(${FORMULA_LIB_INCLUDE_DIR})
 
 add_executable(tests source.cpp satisfiability_tests.cpp variables_retrieving.cpp evaluation_tests.cpp)
 target_link_libraries(tests formula_lib)
+
+#list(APPEND ECM_ENABLE_SANITIZERS "thread")
+#list(APPEND ECM_ENABLE_SANITIZERS "memory") # memory is not allowed with address
+list(APPEND ECM_ENABLE_SANITIZERS "address;undefined;leak")
+include(ECMEnableSanitizers)
