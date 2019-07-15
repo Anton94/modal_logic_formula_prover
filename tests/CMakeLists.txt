@@ -4,6 +4,9 @@ add_subdirectory(../formula_lib formula_lib)
 
 include_directories(${FORMULA_LIB_INCLUDE_DIR})
 
+message ("Including '${FORMULA_LIB_PRIVATE_DIR}' in order to test it")
+include_directories(${FORMULA_LIB_PRIVATE_DIR})
+
 add_executable(tests source.cpp satisfiability_tests.cpp variables_retrieving.cpp evaluation_tests.cpp)
 target_link_libraries(tests formula_lib)
 
