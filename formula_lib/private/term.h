@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../private/types.h"
 #include "nlohmann_json/json.hpp"
-#include "types.h"
 #include <ostream>
 #include <unordered_set>
 

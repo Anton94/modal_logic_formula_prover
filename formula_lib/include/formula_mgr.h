@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../private/formula.h" // TODO: pimpl ideom
-#include "types.h"
+#include "../private/types.h"
 
 #include <ostream>
 #include <string>
