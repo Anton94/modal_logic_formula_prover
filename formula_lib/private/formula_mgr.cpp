@@ -1,11 +1,10 @@
 #include "formula_mgr.h"
 #include "logger.h"
 
-
 namespace
 {
 
-    using json = nlohmann::json;
+using json = nlohmann::json;
 
 auto get_all_variables(const json& f, variables_set_t& variables) -> bool
 {
@@ -63,11 +62,11 @@ formula_mgr::formula_mgr()
 
 auto formula_mgr::build(json& f) -> bool
 {
-    // TODO: clear first
+    clear();
 
-    // Will cash all variables and swap the string representations with id in the cache.
+    // Will cash all variables and swap the string representations with their id in the cache.
     variables_set_t variables_set;
-    if (!get_all_variables(f, variables_set))
+    if(!get_all_variables(f, variables_set))
     {
         return false;
     }
@@ -98,6 +97,8 @@ auto formula_mgr::brute_force_evaluate() const -> bool
 void formula_mgr::clear()
 {
     f_.clear();
+    variable_to_id_.clear();
+    variables_.clear();
 }
 
 auto formula_mgr::get_variable(variable_id_t id) const -> std::string
@@ -150,7 +151,8 @@ auto formula_mgr::change_variables_to_variable_ids(json& f) const -> bool
     }
     if(value_field.is_array() && value_field.size() == 2)
     {
-        return change_variables_to_variable_ids(value_field[0]) && change_variables_to_variable_ids(value_field[1]);
+        return change_variables_to_variable_ids(value_field[0]) &&
+               change_variables_to_variable_ids(value_field[1]);
     }
 
     error() << "Json (sub)formula has 'value' field which is neither an object, nor an array of two "
@@ -184,13 +186,13 @@ std::ostream& operator<<(std::ostream& out, const formula_mgr& f)
 *
 */
 auto formula_mgr::has_satisfiable_evaluation(const formula& f, variable_evaluations_bitset_t& evaluations,
-    variable_evaluations_bitset_t::iterator it) const -> bool
+                                             variable_evaluations_bitset_t::iterator it) const -> bool
 {
-    if (it == evaluations.end())
+    if(it == evaluations.end())
     {
         auto res = f.evaluate(evaluations);
         trace() << "Evaluation with:";
-        for (size_t i = 0, bound = variables_.size(); i < bound; ++i)
+        for(size_t i = 0, bound = variables_.size(); i < bound; ++i)
         {
             trace() << variables_[i] << " -> " << evaluations[i];
         }
@@ -202,7 +204,7 @@ auto formula_mgr::has_satisfiable_evaluation(const formula& f, variable_evaluati
     ++next;
 
     *it = false;
-    if (has_satisfiable_evaluation(f, evaluations, next))
+    if(has_satisfiable_evaluation(f, evaluations, next))
     {
         return true;
     }
