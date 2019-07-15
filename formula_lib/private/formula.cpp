@@ -258,6 +258,15 @@ auto formula::evaluate(const variable_evaluations_bitset_t& variable_evaluations
     }
 }
 
+void formula::nnf()
+{
+	if (is_atomic())
+	{
+		child_t_.left->nnf();
+		child_t_.right->nnf();
+	}
+}
+
 std::ostream& operator<<(std::ostream& out, const formula& f)
 {
     switch(f.op_)

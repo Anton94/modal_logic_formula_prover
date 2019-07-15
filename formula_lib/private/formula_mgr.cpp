@@ -101,6 +101,12 @@ void formula_mgr::clear()
     variables_.clear();
 }
 
+void formula_mgr::nnf()
+{
+	f_.nnf();
+	info() << "formula after nnf: " << f_;
+}
+
 auto formula_mgr::get_variable(variable_id_t id) const -> std::string
 {
     assert(id < variables_.size());

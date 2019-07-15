@@ -28,7 +28,7 @@ public:
     // void get_variables(variables_set_t& out_variables) const;
     auto evaluate(const variable_evaluations_bitset_t& variable_evaluations) const -> bool;
 
-    void to_negative_form();
+    void nnf();
 
     friend std::ostream& operator<<(std::ostream& out, const term& t);
 
@@ -47,7 +47,7 @@ private:
 
     term(operation_t operation, term* left = nullptr, term* right = nullptr);
 
-    void to_negative_form_recursive(term& root);
+    void to_nnf_recursive(term& root);
 
     auto construct_binary_operation(json& t, operation_t op) -> bool;
     auto is_binary_operaton() const -> bool;

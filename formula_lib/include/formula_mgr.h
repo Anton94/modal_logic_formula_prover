@@ -31,6 +31,8 @@ public:
 
     void clear();
 
+	void nnf();
+
 private:
     friend class tableau;
     friend class formula;

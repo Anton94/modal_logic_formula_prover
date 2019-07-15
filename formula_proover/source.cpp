@@ -58,6 +58,8 @@ int main(int argc, char* argv[])
         formula_mgr f;
         info() << "\t" << (f.build(formula_json) ? "success" : "failed") << " " << f;
 
+		//f.nnf();
+
         info() << "Getting the used variables...";
         variables_set_t variables;
         f.get_variables(variables);
