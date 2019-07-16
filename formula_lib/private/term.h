@@ -47,8 +47,6 @@ private:
 
     term(operation_t operation, term* left = nullptr, term* right = nullptr);
 
-    void to_negative_form_recursive(term& root);
-
     auto construct_binary_operation(json& t, operation_t op) -> bool;
     auto is_binary_operaton() const -> bool;
     void free();

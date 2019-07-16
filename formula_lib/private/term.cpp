@@ -213,64 +213,6 @@ auto term::evaluate(const variable_evaluations_bitset_t& variable_evaluations) c
     }
 }
 
-void term::to_negative_form()
-{
-    to_negative_form_recursive(*this);
-}
-
-void term::to_negative_form_recursive(term& root)
-{
-    if(root.op_ == operation_t::intersaction_ || root.op_ == operation_t::union_ ||
-       root.op_ == operation_t::star_)
-    {
-        to_negative_form_recursive(*root.childs_.left);
-        if(root.op_ != operation_t::star_)
-        {
-            to_negative_form_recursive(*root.childs_.right);
-        }
-    }
-    if(root.op_ == operation_t::star_)
-    {
-        if(root.childs_.left->op_ == operation_t::star_)
-        {
-            // double star. remove the nodes only.
-            term* temp = root.childs_.left;
-            root.op_ = root.childs_.left->childs_.left->op_;
-
-            root.childs_.left = root.childs_.left->childs_.left->childs_.left;
-            if(root.op_ != operation_t::star_)
-            {
-                root.childs_.right = root.childs_.left->childs_.left->childs_.right;
-            }
-
-            temp->childs_.left->childs_.left = nullptr;
-            temp->childs_.left->childs_.right = nullptr;
-            delete temp;
-            to_negative_form_recursive(root);
-        }
-        else if(root.childs_.left->op_ == operation_t::union_ ||
-                root.childs_.left->op_ == operation_t::intersaction_)
-        {
-            assert(root.childs_.left);
-
-            root.childs_.right = new term(operation_t::star_, root.childs_.left->childs_.right);
-            root.childs_.left->childs_.right = nullptr;
-
-            if(root.childs_.left->op_ == operation_t::intersaction_)
-            {
-                root.op_ = operation_t::union_;
-            }
-            else
-            {
-                assert(root.childs_.left->op_ == operation_t::union_);
-                root.op_ = operation_t::intersaction_;
-            }
-
-            root.childs_.left->op_ = operation_t::star_;
-        }
-    }
-}
-
 std::ostream& operator<<(std::ostream& out, const term& t)
 {
     switch(t.op_)
