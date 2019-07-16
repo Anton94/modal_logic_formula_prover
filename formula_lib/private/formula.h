@@ -50,8 +50,6 @@ public:
 
     friend std::ostream& operator<<(std::ostream& out, const formula& f);
 
-	void nnf();
-
 private:
     friend tableau;
 
