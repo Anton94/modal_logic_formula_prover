@@ -207,7 +207,7 @@ void term::clear()
 //    }
 //}
 
-auto term::evaluate(const variable_evaluations_bitset_t& variable_evaluations) const -> bool
+auto term::evaluate(const full_variables_evaluations_t& variable_evaluations) const -> bool
 {
     switch(op_)
     {

@@ -39,8 +39,8 @@ private:
 
     using variable_id_t = size_t;
 
-    auto has_satisfiable_evaluation(const formula& f, variable_evaluations_bitset_t& evaluations,
-                                    variable_evaluations_bitset_t::iterator it) const -> bool;
+    auto has_satisfiable_evaluation(const formula& f, full_variables_evaluations_t& evaluations,
+                                    full_variables_evaluations_t::iterator it) const -> bool;
 
     auto get_variable(variable_id_t id) const -> std::string;
     auto change_variables_to_variable_ids(json& f) const -> bool;

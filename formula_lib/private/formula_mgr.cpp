@@ -96,7 +96,7 @@ void formula_mgr::get_variables(variables_set_t& out_variables) const
 auto formula_mgr::brute_force_evaluate() const -> bool
 {
     info() << "Running brute force evalution checking of " << f_;
-    variable_evaluations_bitset_t evaluations(variables_.size(), false);
+    full_variables_evaluations_t evaluations(variables_.size(), false);
     return has_satisfiable_evaluation(f_, evaluations, evaluations.begin());
 }
 
@@ -197,8 +197,8 @@ std::ostream& operator<<(std::ostream& out, const formula_mgr& f)
 * to 1 and generate all combinations in the tail.
 *
 */
-auto formula_mgr::has_satisfiable_evaluation(const formula& f, variable_evaluations_bitset_t& evaluations,
-                                             variable_evaluations_bitset_t::iterator it) const -> bool
+auto formula_mgr::has_satisfiable_evaluation(const formula& f, full_variables_evaluations_t& evaluations,
+                                             full_variables_evaluations_t::iterator it) const -> bool
 {
     if(it == evaluations.end())
     {

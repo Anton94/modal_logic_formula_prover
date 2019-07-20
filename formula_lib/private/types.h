@@ -3,4 +3,4 @@
 #include "../include/types.h"
 #include <vector>
 
-using variable_evaluations_bitset_t = std::vector<bool>;
+using full_variables_evaluations_t = std::vector<bool>;
