@@ -16,6 +16,9 @@ class formula
 public:
     enum class operation_type : char
     {
+        constant_true,
+        constant_false,
+
         conjunction,
         disjunction,
         negation,
@@ -44,6 +47,7 @@ public:
     auto is_term_operation() const -> bool;
     auto is_atomic() const -> bool;
     auto is_formula_operation() const -> bool;
+    auto is_constant() const -> bool;
 
     // void get_variables(variables_set_t& out_variables) const;
     auto evaluate(const variable_evaluations_bitset_t& variable_evaluations) const -> bool;

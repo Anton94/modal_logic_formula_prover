@@ -35,6 +35,9 @@ public:
 private:
     enum class operation_type : char
     {
+        constant_true,
+        constant_false,
+
         union_,
         intersaction_,
         star_,
@@ -49,6 +52,7 @@ private:
 
     auto construct_binary_operation(json& t, operation_t op) -> bool;
     auto is_binary_operaton() const -> bool;
+    auto is_constant() const -> bool;
     void free();
 
     auto get_variable() const -> std::string;

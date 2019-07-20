@@ -21,14 +21,20 @@ auto get_all_variables(const json& f, variables_set_t& variables) -> bool
         return false;
     }
 
-    if(!f.contains("value"))
+    auto op = name_field.get<std::string>();
+    if (op == "constant_T" || op == "constant_F" ||
+        op == "constant_1" || op == "constant_0")
+    {
+        return true;
+    }
+
+    if (!f.contains("value"))
     {
         error() << "Json (sub)formula is missing a 'value' field:\n" << f.dump(4);
         return false;
     }
-
     auto& value_field = f["value"];
-    auto op = name_field.get<std::string>();
+
     if(op == "string") // variable
     {
         if(!value_field.is_string())
@@ -122,6 +128,13 @@ auto formula_mgr::change_variables_to_variable_ids(json& f) const -> bool
         return false;
     }
 
+    auto op = name_field.get<std::string>();
+    if (op == "constant_T" || op == "constant_F" ||
+        op == "constant_1" || op == "constant_0")
+    {
+        return true;
+    }
+
     if(!f.contains("value"))
     {
         error() << "Json (sub)formula is missing a 'value' field:\n" << f.dump(4);
@@ -129,7 +142,6 @@ auto formula_mgr::change_variables_to_variable_ids(json& f) const -> bool
     }
 
     auto& value_field = f["value"];
-    auto op = name_field.get<std::string>();
     if(op == "string") // variable
     {
         if(!value_field.is_string())

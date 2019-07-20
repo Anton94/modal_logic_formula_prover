@@ -33,6 +33,11 @@ auto term::operator==(const term& rhs) const -> bool
         return false;
     }
 
+    if (is_constant()) // note that the operations in the two objects are the same
+    {
+        return true;
+    }
+
     if(op_ == operation_t::variable_)
     {
         return variable_id_ == rhs.variable_id_;
@@ -64,7 +69,15 @@ auto term::build(json& t) -> bool
     }
 
     auto op = name_field.get<std::string>();
-    if(op == "variable_id")
+    if (op == "constant_1")
+    {
+        op_ = operation_t::constant_true;
+    }
+    else if (op == "constant_0")
+    {
+        op_ = operation_t::constant_false;
+    }
+    else if(op == "variable_id")
     {
         op_ = operation_t::variable_;
 
@@ -131,6 +144,11 @@ auto term::is_binary_operaton() const -> bool
     return op_ == operation_t::union_ || op_ == operation_t::intersaction_;
 }
 
+auto term::is_constant() const -> bool
+{
+    return op_ == operation_t::constant_true || op_ == operation_t::constant_false;
+}
+
 auto term::construct_binary_operation(json& t, operation_t op) -> bool
 {
     op_ = op;
@@ -193,6 +211,10 @@ auto term::evaluate(const variable_evaluations_bitset_t& variable_evaluations) c
 {
     switch(op_)
     {
+        case term::operation_t::constant_true:
+            return true;
+        case term::operation_t::constant_false:
+            return false;
         case term::operation_t::union_:
             assert(childs_.left && childs_.right);
             return childs_.left->evaluate(variable_evaluations) ||
@@ -217,6 +239,12 @@ std::ostream& operator<<(std::ostream& out, const term& t)
 {
     switch(t.op_)
     {
+        case term::operation_t::constant_true:
+            out << "1";
+            break;
+        case term::operation_t::constant_false:
+            out << "0";
+            break;
         case term::operation_t::union_:
             out << "[" << *t.childs_.left << " - " << *t.childs_.right << "]";
             break;
@@ -241,7 +269,7 @@ std::ostream& operator<<(std::ostream& out, const term& t)
 
 void term::free()
 {
-    if(op_ != operation_t::variable_)
+    if(op_ != operation_t::variable_ && !is_constant())
     {
         delete childs_.left;
         delete childs_.right;

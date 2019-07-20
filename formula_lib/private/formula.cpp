@@ -26,6 +26,11 @@ auto formula::operator==(const formula& rhs) const -> bool
         return false;
     }
 
+    if (is_constant()) // note that the operations in the two objects are the same
+    {
+        return true;
+    }
+
     assert(child_f_.left && rhs.child_f_.left);
     if(op_ == operation_t::negation)
     {
@@ -58,7 +63,15 @@ auto formula::build(json& f) -> bool
     }
 
     auto op = name_field.get<std::string>();
-    if(op == "conjunction")
+    if (op == "constant_T")
+    {
+        op_ = operation_t::constant_true;
+    }
+    else if (op == "constant_F")
+    {
+        op_ = operation_t::constant_false;
+    }
+    else if(op == "conjunction")
     {
         if(!construct_binary_formula(f, operation_t::conjunction))
         {
@@ -137,6 +150,11 @@ auto formula::is_atomic() const -> bool
 auto formula::is_formula_operation() const -> bool
 {
     return op_ == operation_t::conjunction || op_ == operation_t::disjunction || op_ == operation_t::negation;
+}
+
+auto formula::is_constant() const -> bool
+{
+    return op_ == operation_t::constant_true || op_ == operation_t::constant_false;
 }
 
 auto formula::construct_binary_term(json& f, operation_t op) -> bool
@@ -231,6 +249,10 @@ auto formula::evaluate(const variable_evaluations_bitset_t& variable_evaluations
 {
     switch(op_)
     {
+        case formula::operation_t::constant_true:
+            return true;
+        case formula::operation_t::constant_false:
+            return false;
         case formula::operation_t::conjunction:
             assert(child_f_.left && child_f_.right);
             return child_f_.left->evaluate(variable_evaluations) &&
@@ -262,6 +284,12 @@ std::ostream& operator<<(std::ostream& out, const formula& f)
 {
     switch(f.op_)
     {
+        case formula::operation_t::constant_true:
+            out << "T";
+            break;
+        case formula::operation_t::constant_false:
+            out << "F";
+            break;
         case formula::operation_t::conjunction:
             out << "(" << *f.child_f_.left << " & " << *f.child_f_.right << ")";
             break;
@@ -299,7 +327,7 @@ void formula::free()
         delete child_t_.left;
         delete child_t_.right;
     }
-    else
+    else if(is_formula_operation())
     {
         delete child_f_.left;
         delete child_f_.right;
