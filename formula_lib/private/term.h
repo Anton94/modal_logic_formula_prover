@@ -16,16 +16,18 @@ public:
     ~term();
     term(const term&) = delete;
     term& operator=(const term&) = delete;
-    term(term&&) noexcept = default;
-    term& operator=(term&&) noexcept = default;
+    term(term&&) = default;
+    term& operator=(term&&) = default;
 
     auto operator==(const term& rhs) const -> bool;
 
     auto build(json& t) -> bool;
+
     auto get_hash() const -> std::size_t;
+    auto get_variables() const -> const variables_mask_t&;
+
     void clear();
 
-    // void get_variables(variables_set_t& out_variables) const;
     auto evaluate(const full_variables_evaluations_t& variable_evaluations) const -> bool;
 
     void to_negative_form();
@@ -50,7 +52,9 @@ private:
 
     term(operation_t operation, term* left = nullptr, term* right = nullptr);
 
+    void construct_constant(operation_t op);
     auto construct_binary_operation(json& t, operation_t op) -> bool;
+
     auto is_binary_operaton() const -> bool;
     auto is_constant() const -> bool;
     void free();
@@ -59,6 +63,8 @@ private:
 
     operation_t op_;
     formula_mgr* formula_mgr_;
+
+    variables_mask_t variables_; // TODO: alternative is to calculate the used variables each time when we need them. would it be better?
 
     struct childs
     {

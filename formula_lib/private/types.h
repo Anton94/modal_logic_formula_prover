@@ -2,5 +2,11 @@
 
 #include "../include/types.h"
 #include <vector>
+#include "boost/dynamic_bitset.hpp"
 
 using full_variables_evaluations_t = std::vector<bool>;
+
+using variable_id_t = size_t;
+
+// a bit mask - set bit at position X indicates that the variable with id X participates in the container
+using variables_mask_t = boost::dynamic_bitset<>;

@@ -1,6 +1,8 @@
 #pragma once
 
-#include "../private/formula.h" // TODO: pimpl ideom
+// TODO: pimpl ideom. The impls will have in their public API the needed internals and no extra friends...
+
+#include "../private/formula.h"
 #include "../private/types.h"
 
 #include <ostream>
@@ -23,10 +25,12 @@ public:
     formula_mgr& operator=(formula_mgr&&) noexcept = default;
 
     auto build(json& f) -> bool;
-    void get_variables(variables_set_t& out_variables) const;
 
-    // Generates all sequences of 0/1 for to evaluate the variables and checks if the formula is satisfied
-    // O(2^n) where n is the number of variables
+    using variables_t = std::vector<std::string>;
+    auto get_variables() const -> const variables_t&;
+
+    // Generates all sequences of 0/1 to evaluate the variables and checks if the formula is satisfied
+    // O(2^n) where n is the number of different variables
     auto brute_force_evaluate() const -> bool;
 
     void clear();
@@ -37,8 +41,6 @@ private:
     friend class term;
     friend std::ostream& operator<<(std::ostream& out, const formula_mgr& formulas);
 
-    using variable_id_t = size_t;
-
     auto has_satisfiable_evaluation(const formula& f, full_variables_evaluations_t& evaluations,
                                     full_variables_evaluations_t::iterator it) const -> bool;
 
@@ -48,8 +50,9 @@ private:
     using variable_to_id_map_t = std::unordered_map<std::string, variable_id_t>;
     variable_to_id_map_t variable_to_id_;
 
-    using variables_t = std::vector<std::string>;
     variables_t variables_;
 
     formula f_;
 };
+
+std::ostream& operator<<(std::ostream& out, const formula_mgr::variables_t& variables);

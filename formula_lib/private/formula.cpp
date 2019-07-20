@@ -223,28 +223,6 @@ auto formula::get_operation_type() const -> operation_t
     return op_;
 }
 
-//void formula::get_variables(variables_set_t& out_variables) const
-//{
-//    if(is_term_operation())
-//    {
-//        assert(child_t_.left && child_t_.right);
-//        child_t_.left->get_variables(out_variables);
-//        child_t_.right->get_variables(out_variables);
-//    }
-//    else if(op_ == operation_t::negation)
-//    {
-//        assert(child_f_.left);
-//        child_f_.left->get_variables(out_variables);
-//    }
-//    else
-//    {
-//        assert(op_ == operation_t::conjunction || op_ == operation_t::disjunction);
-//        assert(child_f_.left && child_f_.right);
-//        child_f_.left->get_variables(out_variables);
-//        child_f_.right->get_variables(out_variables);
-//    }
-//}
-
 auto formula::evaluate(const full_variables_evaluations_t& variable_evaluations) const -> bool
 {
     switch(op_)

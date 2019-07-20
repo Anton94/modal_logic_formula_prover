@@ -88,9 +88,9 @@ auto formula_mgr::build(json& f) -> bool
     return change_variables_to_variable_ids(f) && f_.build(f);
 }
 
-void formula_mgr::get_variables(variables_set_t& out_variables) const
+auto formula_mgr::get_variables() const -> const variables_t&
 {
-    out_variables.insert(variables_.begin(), variables_.end());
+    return variables_;
 }
 
 auto formula_mgr::brute_force_evaluate() const -> bool
@@ -176,6 +176,16 @@ auto formula_mgr::change_variables_to_variable_ids(json& f) const -> bool
 std::ostream& operator<<(std::ostream& out, const formula_mgr& f)
 {
     out << f.f_;
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const formula_mgr::variables_t& variables)
+{
+    for (const auto variable : variables)
+    {
+        out << variable << " ";
+    }
+
     return out;
 }
 

@@ -71,11 +71,11 @@ auto term::build(json& t) -> bool
     auto op = name_field.get<std::string>();
     if (op == "constant_1")
     {
-        op_ = operation_t::constant_true;
+        construct_constant(operation_t::constant_true);
     }
     else if (op == "constant_0")
     {
-        op_ = operation_t::constant_false;
+        construct_constant(operation_t::constant_false);
     }
     else if(op == "variable_id")
     {
@@ -87,6 +87,10 @@ auto term::build(json& t) -> bool
             return false;
         }
         variable_id_ = value_field.get<size_t>();
+
+        assert(variable_id_ < formula_mgr_->variables_.size());
+        variables_.resize(formula_mgr_->variables_.size());
+        variables_.set(variable_id_);
 
         hash_ = (variable_id_ & 0xFFFFFFFF) * 2654435761;
     }
@@ -119,6 +123,8 @@ auto term::build(json& t) -> bool
         }
 
         hash_ = (childs_.left->get_hash() & 0xFFFFFFFF) * 2654435761;
+
+        variables_ = childs_.left->variables_;
     }
     else
     {
@@ -139,6 +145,11 @@ auto term::get_hash() const -> std::size_t
     return hash_;
 }
 
+auto term::get_variables() const -> const variables_mask_t&
+{
+    return variables_;
+}
+
 auto term::is_binary_operaton() const -> bool
 {
     return op_ == operation_t::union_ || op_ == operation_t::intersaction_;
@@ -147,6 +158,14 @@ auto term::is_binary_operaton() const -> bool
 auto term::is_constant() const -> bool
 {
     return op_ == operation_t::constant_true || op_ == operation_t::constant_false;
+}
+
+void term::construct_constant(operation_t op)
+{
+    op_ = op;
+    assert(is_constant());
+
+    variables_.resize(formula_mgr_->variables_.size());
 }
 
 auto term::construct_binary_operation(json& t, operation_t op) -> bool
@@ -176,6 +195,8 @@ auto term::construct_binary_operation(json& t, operation_t op) -> bool
     hash_ = ((childs_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
             ((childs_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
 
+    variables_ = childs_.left->variables_ | childs_.right->variables_;
+
     return true;
 }
 
@@ -186,26 +207,6 @@ void term::clear()
     childs_ = {nullptr, nullptr};
     hash_ = 0;
 }
-
-// void term::get_variables(variables_set_t& out_variables) const
-//{
-//    if(is_binary_operaton())
-//    {
-//        assert(childs_.left && childs_.right);
-//        childs_.left->get_variables(out_variables);
-//        childs_.right->get_variables(out_variables);
-//    }
-//    else if(op_ == operation_t::star_)
-//    {
-//        assert(childs_.left);
-//        childs_.left->get_variables(out_variables);
-//    }
-//    else
-//    {
-//        assert(op_ == operation_t::variable_);
-//        out_variables.insert(formula_mgr_->get_variable(variable_id_));
-//    }
-//}
 
 auto term::evaluate(const full_variables_evaluations_t& variable_evaluations) const -> bool
 {

@@ -59,8 +59,7 @@ int main(int argc, char* argv[])
         info() << "\t" << (f.build(formula_json) ? "success" : "failed") << " " << f;
 
         info() << "Getting the used variables...";
-        variables_set_t variables;
-        f.get_variables(variables);
+        const auto variables = f.get_variables();
         info() << "Variables: " << variables;
 
         tableau t;
