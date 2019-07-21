@@ -2,6 +2,8 @@
 
 #include "library.h"
 #include "nlohmann_json/json.hpp"
+#include <unordered_set>
+#include <string>
 
 using json = nlohmann::json;
 
@@ -10,12 +12,16 @@ auto variables_check = [](const json& formula_json, const variables_set_t& expec
     formula_mgr f;
     CHECK(f.build(copy_f));
 
-    variables_set_t variables;
-    f.get_variables(variables);
-    CHECK(variables == expected_variables);
+    info() << "Checking that " << f << " has the following variables: " << expected_variables;
+    const auto variables = f.get_variables();
+    CHECK(variables.size() == expected_variables.size());
+    for (const auto& variable : variables)
+    {
+        CHECK(expected_variables.find(variable) != expected_variables.end());
+    }
 };
 
-TEST_CASE("variables_check 1", "[variables_check]")
+TEST_CASE("variables_check 1", "[variables_check_formula_mgr]")
 {
     // C(a, b) | ~C(a,b)
     variables_check(
@@ -56,7 +62,7 @@ TEST_CASE("variables_check 1", "[variables_check]")
         {"a", "b"});
 }
 
-TEST_CASE("variables_check 2", "[variables_check]")
+TEST_CASE("variables_check 2", "[variables_check_formula_mgr]")
 {
     // C(a, a)
     variables_check(
@@ -76,7 +82,7 @@ TEST_CASE("variables_check 2", "[variables_check]")
         {"a"});
 }
 
-TEST_CASE("variables_check 2.1", "[variables_check]")
+TEST_CASE("variables_check 2.1", "[variables_check_formula_mgr]")
 {
     // C(axxa, axxa)
     variables_check(
@@ -96,7 +102,7 @@ TEST_CASE("variables_check 2.1", "[variables_check]")
         {"axxa"});
 }
 
-TEST_CASE("variables_check 2.2", "[variables_check]")
+TEST_CASE("variables_check 2.2", "[variables_check_formula_mgr]")
 {
     // <=(axxa, axxa)
     variables_check(
@@ -116,7 +122,7 @@ TEST_CASE("variables_check 2.2", "[variables_check]")
         {"axxa"});
 }
 
-TEST_CASE("variables_check 2.3", "[variables_check]")
+TEST_CASE("variables_check 2.3", "[variables_check_formula_mgr]")
 {
     // C(a, b)
     variables_check(
@@ -136,7 +142,7 @@ TEST_CASE("variables_check 2.3", "[variables_check]")
         {"a", "b"});
 }
 
-TEST_CASE("variables_check 3", "[variables_check]")
+TEST_CASE("variables_check 3", "[variables_check_formula_mgr]")
 {
     // C(a, b) & ~C(a,b)
     variables_check(
@@ -177,7 +183,7 @@ TEST_CASE("variables_check 3", "[variables_check]")
         {"a", "b"});
 }
 
-TEST_CASE("variables_check 4", "[variables_check]")
+TEST_CASE("variables_check 4", "[variables_check_formula_mgr]")
 {
     // (C(a, b) | <=(a, b)) | ~C(a,b)
     variables_check(
@@ -236,7 +242,7 @@ TEST_CASE("variables_check 4", "[variables_check]")
         {"a", "b"});
 }
 
-TEST_CASE("variables_check 5", "[variables_check]")
+TEST_CASE("variables_check 5", "[variables_check_formula_mgr]")
 {
     // (C(a, b) | <=(a, b)) | (~C(a,b) & <=(a,b))
     variables_check(
@@ -313,7 +319,7 @@ TEST_CASE("variables_check 5", "[variables_check]")
         {"a", "b"});
 }
 
-TEST_CASE("variables_check 6", "[variables_check]")
+TEST_CASE("variables_check 6", "[variables_check_formula_mgr]")
 {
     // C(a, b) & ~C(a, c)
     variables_check(
@@ -354,7 +360,7 @@ TEST_CASE("variables_check 6", "[variables_check]")
         {"a", "b", "c"});
 }
 
-TEST_CASE("variables_check 7", "[variables_check]")
+TEST_CASE("variables_check 7", "[variables_check_formula_mgr]")
 {
     // (C(a, b) | ~C(a, b)) & (C(a,b) | ~C(a,b))
     variables_check(
@@ -434,7 +440,7 @@ TEST_CASE("variables_check 7", "[variables_check]")
         {"a", "b"});
 }
 
-TEST_CASE("variables_check 8", "[variables_check]")
+TEST_CASE("variables_check 8", "[variables_check_formula_mgr]")
 {
     // (C(a, b) | ~C(a, b)) & (C(a,b) | ~C(a,c))
     variables_check(
@@ -514,7 +520,7 @@ TEST_CASE("variables_check 8", "[variables_check]")
         {"a", "b", "c"});
 }
 
-TEST_CASE("variables_check 9", "[variables_check]")
+TEST_CASE("variables_check 9", "[variables_check_formula_mgr]")
 {
     // C(a, *b) & ~C(a, b + h)
     variables_check(
@@ -567,7 +573,7 @@ TEST_CASE("variables_check 9", "[variables_check]")
         {"a", "b", "h"});
 }
 
-TEST_CASE("variables_check 10", "[variables_check]")
+TEST_CASE("variables_check 10", "[variables_check_formula_mgr]")
 {
     // C(a - c, (*b) + h) & ~C(a - c, (*b) + h)
     variables_check(
@@ -650,7 +656,7 @@ TEST_CASE("variables_check 10", "[variables_check]")
         {"a", "b", "c", "h"});
 }
 
-TEST_CASE("variables_check 11", "[variables_check]")
+TEST_CASE("variables_check 11", "[variables_check_formula_mgr]")
 {
     // (C(a, b) & (C(f, h) & C(j, k))) & ~((C(a, b) & C(f, h)) & C(j, k)){ "a", "b", "f", "h", "j", "k" }
     variables_check(
@@ -763,7 +769,7 @@ TEST_CASE("variables_check 11", "[variables_check]")
         {"a", "b", "f", "h", "j", "k"});
 }
 
-TEST_CASE("variables_check 12", "[variables_check]")
+TEST_CASE("variables_check 12", "[variables_check_formula_mgr]")
 {
     // (C(a, b) & (C(f, h) & C(j, k))) & ~((C(a, b) & C(f, h)) & C(j, Fxa))
     variables_check(
