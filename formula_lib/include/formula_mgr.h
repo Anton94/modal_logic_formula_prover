@@ -1,6 +1,6 @@
 #pragma once
 
-// TODO: pimpl ideom. The impls will have in their public API the needed internals and no extra friends...
+// TODO: pimpl ideom. will hide the private includes, etc.
 
 #include "../private/formula.h"
 #include "../private/types.h"
