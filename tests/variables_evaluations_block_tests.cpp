@@ -6,7 +6,7 @@
 TEST_CASE("evaluation block of empty mask of variables", "[variables_evaluations_block]")
 {
     variables_mask_t variables;
-    variables_evaluations_blok var_ev_block(variables);
+    variables_evaluations_block var_ev_block(variables);
 
     CHECK(var_ev_block.get_variables() == variables);
     CHECK(var_ev_block.get_set_variables_ids().empty());
@@ -17,7 +17,7 @@ TEST_CASE("evaluation block of empty mask of variables", "[variables_evaluations
 TEST_CASE("evaluation block of mask with no set variables", "[variables_evaluations_block]")
 {
     variables_mask_t variables(42, false);
-    variables_evaluations_blok var_ev_block(variables);
+    variables_evaluations_block var_ev_block(variables);
 
     CHECK(var_ev_block.get_variables() == variables);
     CHECK(var_ev_block.get_set_variables_ids().empty());
@@ -42,10 +42,10 @@ TEST_CASE("evaluation block of mask with one set variable", "[variables_evaluati
             const variable_id_t set_var_id = i;
             info() << "Set variable is at: " << set_var_id;
             variables.set(set_var_id);
-            variables_evaluations_blok var_ev_block(variables);
+            variables_evaluations_block var_ev_block(variables);
 
             CHECK(var_ev_block.get_variables() == variables);
-            CHECK(var_ev_block.get_set_variables_ids() == variables_evaluations_blok::set_variables_ids_t{ set_var_id });
+            CHECK(var_ev_block.get_set_variables_ids() == variables_evaluations_block::set_variables_ids_t{ set_var_id });
             CHECK(var_ev_block.get_evaluations().size() == variables.size());
             CHECK(var_ev_block.get_evaluations().count() == 0);
             CHECK(var_ev_block.generate_next_evaluation());
@@ -79,10 +79,10 @@ TEST_CASE("evaluation block of mask with two set variables", "[variables_evaluat
 
                 variables.set(first_var_id);
                 variables.set(second_var_id);
-                variables_evaluations_blok var_ev_block(variables);
+                variables_evaluations_block var_ev_block(variables);
 
                 CHECK(var_ev_block.get_variables() == variables);
-                CHECK(var_ev_block.get_set_variables_ids() == variables_evaluations_blok::set_variables_ids_t{ second_var_id, first_var_id });
+                CHECK(var_ev_block.get_set_variables_ids() == variables_evaluations_block::set_variables_ids_t{ second_var_id, first_var_id });
                 CHECK(var_ev_block.get_evaluations().size() == variables.size());
 
                 // ..0..0..
@@ -139,10 +139,10 @@ TEST_CASE("evaluation block of mask with three set variables", "[variables_evalu
                     variables.set(first_var_id);
                     variables.set(second_var_id);
                     variables.set(third_var_id);
-                    variables_evaluations_blok var_ev_block(variables);
+                    variables_evaluations_block var_ev_block(variables);
 
                     CHECK(var_ev_block.get_variables() == variables);
-                    CHECK(var_ev_block.get_set_variables_ids() == variables_evaluations_blok::set_variables_ids_t{ third_var_id, second_var_id, first_var_id });
+                    CHECK(var_ev_block.get_set_variables_ids() == variables_evaluations_block::set_variables_ids_t{ third_var_id, second_var_id, first_var_id });
                     CHECK(var_ev_block.get_evaluations().size() == variables.size());
 
                     // ..0..0..0..

@@ -1,6 +1,6 @@
 #include "variables_evaluations_block.h"
 
-variables_evaluations_blok::variables_evaluations_blok(const variables_mask_t& variables)
+variables_evaluations_block::variables_evaluations_block(const variables_mask_t& variables)
     : variables_(variables)
 {
     if (variables_.empty())
@@ -24,22 +24,22 @@ variables_evaluations_blok::variables_evaluations_blok(const variables_mask_t& v
     }
 }
 
-auto variables_evaluations_blok::get_variables() const -> const variables_mask_t&
+auto variables_evaluations_block::get_variables() const -> const variables_mask_t&
 {
     return variables_;
 }
 
-auto variables_evaluations_blok::get_set_variables_ids() const -> const set_variables_ids_t&
+auto variables_evaluations_block::get_set_variables_ids() const -> const set_variables_ids_t&
 {
     return set_variables_ids_;
 }
 
-auto variables_evaluations_blok::get_evaluations() const -> variables_evaluations_t
+auto variables_evaluations_block::get_evaluations() const -> variables_evaluations_t
 {
     return evaluations_;
 }
 
-auto variables_evaluations_blok::generate_next_evaluation() -> bool
+auto variables_evaluations_block::generate_next_evaluation() -> bool
 {
     if ((variables_ & evaluations_) == variables_)
     {

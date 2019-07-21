@@ -2,7 +2,7 @@
 
 #include "../private/types.h"
 
-class variables_evaluations_blok
+class variables_evaluations_block
 {
     /*
      * The idea is to keep the information of which variables are participating in that evaluation in a bitset, i.e. a mask.
@@ -12,12 +12,12 @@ class variables_evaluations_blok
      *
      */
 public:
-    variables_evaluations_blok(const variables_mask_t& variables);
+    variables_evaluations_block(const variables_mask_t& variables);
 
-    variables_evaluations_blok(const variables_evaluations_blok&) = delete;
-    variables_evaluations_blok& operator=(const variables_evaluations_blok&) = delete;
-    variables_evaluations_blok(variables_evaluations_blok&&) = default;
-    variables_evaluations_blok& operator=(variables_evaluations_blok&&) = default;
+    variables_evaluations_block(const variables_evaluations_block&) = delete;
+    variables_evaluations_block& operator=(const variables_evaluations_block&) = delete;
+    variables_evaluations_block(variables_evaluations_block&&) = default;
+    variables_evaluations_block& operator=(variables_evaluations_block&&) = default;
 
     auto get_variables() const -> const variables_mask_t&;
     auto get_evaluations() const -> variables_evaluations_t;
