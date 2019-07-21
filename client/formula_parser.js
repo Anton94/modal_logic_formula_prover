@@ -16,9 +16,9 @@ const Equ = createToken({ name: "Equ", pattern: /<->/ })
 const Neg = createToken({ name: "Neg", pattern: /~/ })
 
 // Term operations
-const TCon = createToken({ name: "TCon", pattern: /\+/ })
-const TDis = createToken({ name: "TDis", pattern: /-/ })
-const TStar = createToken({ name: "TStar", pattern: /\*/ })
+const TCon = createToken({ name: "TCon", pattern: /\*/ })
+const TDis = createToken({ name: "TDis", pattern: /\+/ })
+const TStar = createToken({ name: "TStar", pattern: /\-/ })
 
 const True = createToken({ name: "True", pattern: "T" })
 const False = createToken({ name: "False", pattern: "F" })
@@ -193,9 +193,9 @@ const symbol_to_explanation =  {
     "->": "implication",
     "<->": "equivalence",
     "~": "negation",
-    "+": "Tand",
-    "-": "Tor",
-    "*": "Tstar",
+    "*": "Tand",
+    "+": "Tor",
+    "-": "Tstar",
     "T": "true",
     "F": "false"
 }
@@ -208,12 +208,12 @@ function simplify(cst) {
         };
     } else if (cst.children.hasOwnProperty("star")) {
         var starValue = {
-            "name": symbol_to_explanation["*"],
+            "name": symbol_to_explanation["-"],
             "value": simplify(cst.children["lhs"][0])
         };
         for (var i = 1; i <cst.children["star"].length; ++i) {
             starValue = {
-                "name": symbol_to_explanation["*"],
+                "name": symbol_to_explanation["-"],
                 "value": starValue
             }
         }

@@ -222,13 +222,13 @@ std::ostream& operator<<(std::ostream& out, const term& t)
             out << "0";
             break;
         case term::operation_t::union_:
-            out << "[" << *t.get_left_child() << " - " << *t.get_right_child() << "]";
-            break;
-        case term::operation_t::intersaction_:
             out << "[" << *t.get_left_child() << " + " << *t.get_right_child() << "]";
             break;
+        case term::operation_t::intersaction_:
+            out << "[" << *t.get_left_child() << " * " << *t.get_right_child() << "]";
+            break;
         case term::operation_t::star_:
-            out << "[" << *t.get_left_child() << "]*";
+            out << "-" << *t.get_left_child();
             break;
         case term::operation_t::variable_:
             out << t.get_variable();
