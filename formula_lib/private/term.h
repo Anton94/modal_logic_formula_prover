@@ -30,8 +30,6 @@ public:
 
     auto evaluate(const full_variables_evaluations_t& variable_evaluations) const -> bool;
 
-    void to_negative_form();
-
     friend std::ostream& operator<<(std::ostream& out, const term& t);
 
 private:
@@ -49,8 +47,6 @@ private:
         // TODO: encode here DNF stuff
     };
     using operation_t = operation_type;
-
-    term(operation_t operation, term* left = nullptr, term* right = nullptr);
 
     void construct_constant(operation_t op);
     auto construct_binary_operation(json& t, operation_t op) -> bool;

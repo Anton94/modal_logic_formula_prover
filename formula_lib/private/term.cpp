@@ -13,13 +13,6 @@ term::term(formula_mgr* mgr)
     assert(formula_mgr_);
 }
 
-term::term(operation_t operation, term* left, term* right)
-    : op_(operation)
-    , childs_{left, right}
-    , hash_(0ul)
-{
-}
-
 term::~term()
 {
     free();
