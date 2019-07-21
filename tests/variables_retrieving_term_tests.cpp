@@ -48,7 +48,7 @@ void check_term_varibles_mask(const term& t, const formula_mgr& mgr, const varia
 
 }
 
-TEST_CASE("variables_check_term 0", "[variables_check_term]")
+TEST_CASE("complex term's variables", "[variables_check_term]")
 {
     // ((-a + b) * (c + -d)) + -(e * (f + g))
     json term_json =
@@ -186,7 +186,21 @@ TEST_CASE("variables_check_term 0", "[variables_check_term]")
     check_term_varibles_mask(*t_r_l_r_r, formula_mgr, { "g"});
 }
 
-TEST_CASE("variables_check_term 1", "[variables_check_term]")
+TEST_CASE("variables of term containing a constant", "[variables_check_term]")
+{
+    // 0
+    json term_json =
+        R"({
+         "name": "constant_0"
+      })"_json;
+    auto formula_mgr = create_atomic_formula_with_same_child_terms(term_json);
+    auto term = formula_mgr.get_internal_formula()->get_left_child_term();
+
+    CHECK(term->get_operation_type() == term::operation_t::constant_false);
+    check_term_varibles_mask(*term, formula_mgr, { });
+}
+
+TEST_CASE("variables of term containing a variable", "[variables_check_term]")
 {
     // a
     json term_json =
@@ -201,7 +215,7 @@ TEST_CASE("variables_check_term 1", "[variables_check_term]")
     check_term_varibles_mask(*term, formula_mgr, { "a" });
 }
 
-TEST_CASE("variables_check_term 2", "[variables_check_term]")
+TEST_CASE("variables of term containing unary star operation of variable", "[variables_check_term]")
 {
     // -a
     json term_json =
