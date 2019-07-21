@@ -14,8 +14,8 @@ class variables_evaluations_block
 public:
     variables_evaluations_block(const variables_mask_t& variables);
 
-    variables_evaluations_block(const variables_evaluations_block&) = delete;
-    variables_evaluations_block& operator=(const variables_evaluations_block&) = delete;
+    variables_evaluations_block(const variables_evaluations_block&) = default;
+    variables_evaluations_block& operator=(const variables_evaluations_block&) = default;
     variables_evaluations_block(variables_evaluations_block&&) = default;
     variables_evaluations_block& operator=(variables_evaluations_block&&) = default;
 
