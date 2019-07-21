@@ -18,8 +18,8 @@ public:
     formula_mgr();
     formula_mgr(const formula_mgr&) = delete;
     formula_mgr& operator=(const formula_mgr&) = delete;
-    formula_mgr(formula_mgr&&) = default;
-    formula_mgr& operator=(formula_mgr&&) noexcept = default;
+    formula_mgr(formula_mgr&& rhs);
+    formula_mgr& operator=(formula_mgr&& rhs);
 
     auto build(json& f) -> bool;
 
@@ -35,6 +35,7 @@ public:
     auto get_variable(variable_id_t id) const->std::string;
     auto get_internal_formula() const -> const formula*;
 private:
+    void move(formula_mgr&& rhs);
 
     auto has_satisfiable_evaluation(const formula& f, full_variables_evaluations_t& evaluations,
                                     full_variables_evaluations_t::iterator it) const -> bool;

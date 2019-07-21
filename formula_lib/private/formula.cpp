@@ -13,6 +13,20 @@ formula::formula(formula_mgr* mgr)
     assert(formula_mgr_);
 }
 
+formula::formula(formula&& rhs)
+{
+    move(std::move(rhs));
+}
+
+formula& formula::operator=(formula&& rhs)
+{
+    if (this != &rhs)
+    {
+        move(std::move(rhs));
+    }
+    return *this;
+}
+
 formula::~formula()
 {
     free();
@@ -222,6 +236,27 @@ auto formula::is_constant() const -> bool
     return op_ == operation_t::constant_true || op_ == operation_t::constant_false;
 }
 
+void formula::change_formula_mgr(formula_mgr* new_mgr)
+{
+    assert(new_mgr);
+    formula_mgr_ = new_mgr;
+
+    if (is_term_operation())
+    {
+        child_t_.left->change_formula_mgr(new_mgr);
+        child_t_.right->change_formula_mgr(new_mgr);
+    }
+    else if (op_ == operation_t::negation)
+    {
+        child_f_.left->change_formula_mgr(new_mgr);
+    }
+    else if (is_formula_operation())
+    {
+        child_f_.left->change_formula_mgr(new_mgr);
+        child_f_.right->change_formula_mgr(new_mgr);
+    }
+}
+
 std::ostream& operator<<(std::ostream& out, const formula& f)
 {
     switch(f.get_operation_type())
@@ -255,6 +290,25 @@ std::ostream& operator<<(std::ostream& out, const formula& f)
     }
 
     return out;
+}
+
+void formula::move(formula&& rhs)
+{
+    op_ = rhs.op_;
+    formula_mgr_ = rhs.formula_mgr_;
+    hash_ = rhs.hash_;
+
+    if (is_term_operation())
+    {
+        child_t_ = std::move(rhs.child_t_);
+    }
+    else if (is_formula_operation())
+    {
+        child_f_ = std::move(rhs.child_f_);
+    }
+
+    // invalidate the rhs in order to not touch/deletes the moved resources, e.g. the childs
+    rhs.op_ = operation_t::invalid;
 }
 
 auto formula::construct_binary_term(json& f, operation_t op) -> bool

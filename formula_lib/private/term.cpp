@@ -13,6 +13,20 @@ term::term(formula_mgr* mgr)
     assert(formula_mgr_);
 }
 
+term::term(term&& rhs)
+{
+    move(std::move(rhs));
+}
+
+term& term::operator=(term&& rhs)
+{
+    if (this != &rhs)
+    {
+        move(std::move(rhs));
+    }
+    return *this;
+}
+
 term::~term()
 {
     free();
@@ -211,6 +225,24 @@ auto term::is_constant() const -> bool
     return op_ == operation_t::constant_true || op_ == operation_t::constant_false;
 }
 
+void term::change_formula_mgr(formula_mgr* new_mgr)
+{
+    assert(new_mgr);
+    formula_mgr_ = new_mgr;
+
+    switch (get_operation_type())
+    {
+    case operation_t::union_:
+    case operation_t::intersaction_:
+        childs_.left->change_formula_mgr(new_mgr);
+        childs_.right->change_formula_mgr(new_mgr);
+        break;
+    case operation_t::star_:
+        childs_.left->change_formula_mgr(new_mgr);
+        break;
+    }
+}
+
 std::ostream& operator<<(std::ostream& out, const term& t)
 {
     switch(t.get_operation_type())
@@ -241,7 +273,30 @@ std::ostream& operator<<(std::ostream& out, const term& t)
     }
 
     return out;
-}void term::construct_constant(operation_t op)
+}
+
+void term::move(term&& rhs)
+{
+    op_ = rhs.op_;
+    formula_mgr_ = rhs.formula_mgr_;
+    variables_ = std::move(rhs.variables_);
+    
+    if (is_binary_operaton() || op_ == operation_t::star_)
+    {
+        childs_ = std::move(rhs.childs_);
+    }
+    else if (op_ == operation_t::variable_)
+    {
+        variable_id_ = rhs.variable_id_;
+    }
+
+    hash_ = rhs.hash_;
+
+    // invalidate the rhs in order to not touch/deletes the moved resources, e.g. the childs
+    rhs.op_ = operation_t::invalid_;
+}
+
+void term::construct_constant(operation_t op)
 {
     op_ = op;
     assert(is_constant());

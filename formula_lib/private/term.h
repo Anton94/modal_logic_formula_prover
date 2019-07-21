@@ -16,8 +16,8 @@ public:
     ~term();
     term(const term&) = delete;
     term& operator=(const term&) = delete;
-    term(term&&) = default;
-    term& operator=(term&&) = default;
+    term(term&& rhs);
+    term& operator=(term&& rhs);
 
     auto operator==(const term& rhs) const -> bool;
 
@@ -52,7 +52,10 @@ public:
     auto get_left_child() const -> const term*;
     auto get_right_child() const -> const term*;
 
+    void change_formula_mgr(formula_mgr* new_mgr);
 private:
+    void move(term&& rhs);
+
     void construct_constant(operation_t op);
     auto construct_binary_operation(json& t, operation_t op) -> bool;
 

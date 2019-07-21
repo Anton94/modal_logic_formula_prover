@@ -66,6 +66,21 @@ formula_mgr::formula_mgr()
 {
 }
 
+formula_mgr::formula_mgr(formula_mgr&& rhs)
+    : f_(this)
+{
+    move(std::move(rhs));
+}
+
+formula_mgr& formula_mgr::operator=(formula_mgr&& rhs)
+{
+    if (this != &rhs)
+    {
+        move(std::move(rhs));
+    }
+    return *this;
+}
+
 auto formula_mgr::build(json& f) -> bool
 {
     clear();
@@ -176,6 +191,15 @@ auto formula_mgr::change_variables_to_variable_ids(json& f) const -> bool
                "objects:\n"
             << f.dump(4);
     return false;
+}
+
+void formula_mgr::move(formula_mgr&& rhs)
+{
+    variable_to_id_ = std::move(rhs.variable_to_id_);
+    variables_ = std::move(rhs.variables_);
+    f_ = std::move(rhs.f_);
+
+    f_.change_formula_mgr(this);
 }
 
 /*

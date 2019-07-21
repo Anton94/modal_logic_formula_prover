@@ -5,7 +5,6 @@
 
 #include <ostream>
 
-class tableau;
 class term;
 class formula_mgr;
 
@@ -18,8 +17,8 @@ public:
     ~formula();
     formula(const formula&) = delete;
     formula& operator=(const formula&) = delete;
-    formula(formula&&) noexcept = default;
-    formula& operator=(formula&&) noexcept = default;
+    formula(formula&& rhs);
+    formula& operator=(formula&& rhs);
 
     auto operator==(const formula& rhs) const -> bool;
 
@@ -59,7 +58,11 @@ public:
     auto is_formula_operation() const -> bool;
     auto is_constant() const -> bool;
 
+    void change_formula_mgr(formula_mgr* new_mgr);
+
 private:
+    void move(formula&& rhs);
+
     auto construct_binary_term(json& f, operation_t op) -> bool;
     auto construct_binary_formula(json& f, operation_t op) -> bool;
     void free();
