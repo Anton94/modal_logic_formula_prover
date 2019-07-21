@@ -80,9 +80,10 @@ auto term::build(json& t) -> bool
             return false;
         }
         variable_id_ = value_field.get<size_t>();
+        const auto all_variables_count = formula_mgr_->get_variables().size();
 
-        assert(variable_id_ < formula_mgr_->variables_.size());
-        variables_.resize(formula_mgr_->variables_.size());
+        assert(variable_id_ < all_variables_count);
+        variables_.resize(all_variables_count);
         variables_.set(variable_id_);
 
         hash_ = (variable_id_ & 0xFFFFFFFF) * 2654435761;
@@ -133,14 +134,71 @@ auto term::build(json& t) -> bool
     return true;
 }
 
+auto term::evaluate(const full_variables_evaluations_t& variable_evaluations) const -> bool
+{
+    switch (op_)
+    {
+    case term::operation_t::constant_true:
+        return true;
+    case term::operation_t::constant_false:
+        return false;
+    case term::operation_t::union_:
+        assert(childs_.left && childs_.right);
+        return childs_.left->evaluate(variable_evaluations) ||
+            childs_.right->evaluate(variable_evaluations);
+    case term::operation_t::intersaction_:
+        assert(childs_.left && childs_.right);
+        return childs_.left->evaluate(variable_evaluations) &&
+            childs_.right->evaluate(variable_evaluations);
+    case term::operation_t::star_:
+        assert(childs_.left);
+        return !childs_.left->evaluate(variable_evaluations);
+    case term::operation_t::variable_:
+        assert(variable_id_ < variable_evaluations.size());
+        return variable_evaluations[variable_id_]; // returns the evaluation for the variable
+    default:
+        assert(false && "Unrecognized.");
+        return false;
+    }
+}
+
+void term::clear()
+{
+    free();
+    op_ = operation_t::invalid_;
+    childs_ = { nullptr, nullptr };
+    hash_ = 0;
+}
+
+auto term::get_operation_type() const-> operation_t
+{
+    return op_;
+}
+
 auto term::get_hash() const -> std::size_t
 {
     return hash_;
 }
 
+auto term::get_variable() const -> std::string
+{
+    assert(op_ == operation_t::variable_);
+    return formula_mgr_->get_variable(variable_id_);
+}
+
 auto term::get_variables() const -> const variables_mask_t&
 {
     return variables_;
+}
+
+auto term::get_left_child() const -> const term*
+{
+    return childs_.left;
+}
+
+auto term::get_right_child() const -> const term*
+{
+    return childs_.right;
 }
 
 auto term::is_binary_operaton() const -> bool
@@ -153,12 +211,42 @@ auto term::is_constant() const -> bool
     return op_ == operation_t::constant_true || op_ == operation_t::constant_false;
 }
 
-void term::construct_constant(operation_t op)
+std::ostream& operator<<(std::ostream& out, const term& t)
+{
+    switch(t.get_operation_type())
+    {
+        case term::operation_t::constant_true:
+            out << "1";
+            break;
+        case term::operation_t::constant_false:
+            out << "0";
+            break;
+        case term::operation_t::union_:
+            out << "[" << *t.get_left_child() << " - " << *t.get_right_child() << "]";
+            break;
+        case term::operation_t::intersaction_:
+            out << "[" << *t.get_left_child() << " + " << *t.get_right_child() << "]";
+            break;
+        case term::operation_t::star_:
+            out << "[" << *t.get_left_child() << "]*";
+            break;
+        case term::operation_t::variable_:
+            out << t.get_variable();
+            break;
+        case term::operation_t::invalid_:
+            out << "UNDEFINED";
+            break;
+        default:
+            assert(false && "Unrecognized.");
+    }
+
+    return out;
+}void term::construct_constant(operation_t op)
 {
     op_ = op;
     assert(is_constant());
 
-    variables_.resize(formula_mgr_->variables_.size());
+    variables_.resize(formula_mgr_->get_variables().size());
 }
 
 auto term::construct_binary_operation(json& t, operation_t op) -> bool
@@ -173,92 +261,24 @@ auto term::construct_binary_operation(json& t, operation_t op) -> bool
 
     // check the json for correct information
     auto& value_field = t["value"];
-    if(!value_field.is_array() || value_field.size() != 2)
+    if (!value_field.is_array() || value_field.size() != 2)
     {
         return false;
     }
 
     // recursive construction of the child terms
-    if(!childs_.left->build(value_field[0]) || !childs_.right->build(value_field[1]))
+    if (!childs_.left->build(value_field[0]) || !childs_.right->build(value_field[1]))
     {
         return false;
     }
 
     // add child's hashes
     hash_ = ((childs_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
-            ((childs_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
+        ((childs_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
 
     variables_ = childs_.left->variables_ | childs_.right->variables_;
 
     return true;
-}
-
-void term::clear()
-{
-    free();
-    op_ = operation_t::invalid_;
-    childs_ = {nullptr, nullptr};
-    hash_ = 0;
-}
-
-auto term::evaluate(const full_variables_evaluations_t& variable_evaluations) const -> bool
-{
-    switch(op_)
-    {
-        case term::operation_t::constant_true:
-            return true;
-        case term::operation_t::constant_false:
-            return false;
-        case term::operation_t::union_:
-            assert(childs_.left && childs_.right);
-            return childs_.left->evaluate(variable_evaluations) ||
-                   childs_.right->evaluate(variable_evaluations);
-        case term::operation_t::intersaction_:
-            assert(childs_.left && childs_.right);
-            return childs_.left->evaluate(variable_evaluations) &&
-                   childs_.right->evaluate(variable_evaluations);
-        case term::operation_t::star_:
-            assert(childs_.left);
-            return !childs_.left->evaluate(variable_evaluations);
-        case term::operation_t::variable_:
-            assert(variable_id_ < variable_evaluations.size());
-            return variable_evaluations[variable_id_]; // returns the evaluation for the variable
-        default:
-            assert(false && "Unrecognized.");
-            return false;
-    }
-}
-
-std::ostream& operator<<(std::ostream& out, const term& t)
-{
-    switch(t.op_)
-    {
-        case term::operation_t::constant_true:
-            out << "1";
-            break;
-        case term::operation_t::constant_false:
-            out << "0";
-            break;
-        case term::operation_t::union_:
-            out << "[" << *t.childs_.left << " - " << *t.childs_.right << "]";
-            break;
-        case term::operation_t::intersaction_:
-            out << "[" << *t.childs_.left << " + " << *t.childs_.right << "]";
-            break;
-        case term::operation_t::star_:
-            out << "[" << *t.childs_.left << "]*";
-            break;
-        case term::operation_t::variable_:
-            out << t.get_variable();
-            break;
-        case term::operation_t::invalid_:
-            out << "UNDEFINED";
-            break;
-        default:
-            assert(false && "Unrecognized.");
-    }
-
-    return out;
 }
 
 void term::free()
@@ -268,10 +288,4 @@ void term::free()
         delete childs_.left;
         delete childs_.right;
     }
-}
-
-auto term::get_variable() const -> std::string
-{
-    assert(op_ == operation_t::variable_);
-    return formula_mgr_->get_variable(variable_id_);
 }

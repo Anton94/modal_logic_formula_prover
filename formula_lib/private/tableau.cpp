@@ -7,7 +7,7 @@ auto tableau::is_satisfiable(const formula_mgr& f) -> bool
     clear();
 
     info() << "Running a satisfiability checking of " << f;
-    add_formula_to_T(&f.f_);
+    add_formula_to_T(f.get_internal_formula());
 
     return step();
 }
@@ -43,7 +43,7 @@ auto tableau::step() -> bool
 
         if(f->get_operation_type() == formula::operation_t::negation)
         {
-            auto not_negated_f = f->child_f_.left;
+            auto not_negated_f = f->get_left_child_formula();
             if(check_contradiction_in_T(not_negated_f))
             {
                 trace() << "Found a contradiction - " << *not_negated_f << " found in T formulas";
@@ -57,8 +57,8 @@ auto tableau::step() -> bool
 
         if(f->get_operation_type() == formula::operation_t::conjunction)
         {
-            auto left_f = f->child_f_.left;
-            auto right_f = f->child_f_.right;
+            auto left_f = f->get_left_child_formula();
+            auto right_f = f->get_right_child_formula();
 
             if(check_contradiction_in_F(left_f))
             {
@@ -86,8 +86,8 @@ auto tableau::step() -> bool
 
         assert(f->get_operation_type() == formula::operation_t::disjunction);
 
-        auto left_f = f->child_f_.left;
-        auto right_f = f->child_f_.right;
+        auto left_f = f->get_left_child_formula();
+        auto right_f = f->get_right_child_formula();
 
         trace() << "Will split to two subtrees: " << *left_f << " and " << *right_f;
 
@@ -127,7 +127,7 @@ auto tableau::step() -> bool
 
     if(f->get_operation_type() == formula::operation_t::negation)
     {
-        auto not_negated_f = f->child_f_.left;
+        auto not_negated_f = f->get_left_child_formula();
         if(check_contradiction_in_F(not_negated_f))
         {
             trace() << "Found a contradiction - " << *not_negated_f << " found in F formulas";
@@ -141,8 +141,8 @@ auto tableau::step() -> bool
 
     if(f->get_operation_type() == formula::operation_t::disjunction)
     {
-        auto left_f = f->child_f_.left;
-        auto right_f = f->child_f_.right;
+        auto left_f = f->get_left_child_formula();
+        auto right_f = f->get_right_child_formula();
 
         if(check_contradiction_in_T(left_f))
         {
@@ -168,8 +168,8 @@ auto tableau::step() -> bool
 
     assert(f->get_operation_type() == formula::operation_t::conjunction);
 
-    auto left_f = f->child_f_.left;
-    auto right_f = f->child_f_.right;
+    auto left_f = f->get_left_child_formula();
+    auto right_f = f->get_right_child_formula();
 
     trace() << "Will split to two subtrees: " << *left_f << " and " << *right_f;
 

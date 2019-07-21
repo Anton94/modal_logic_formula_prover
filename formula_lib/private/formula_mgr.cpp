@@ -88,11 +88,6 @@ auto formula_mgr::build(json& f) -> bool
     return change_variables_to_variable_ids(f) && f_.build(f);
 }
 
-auto formula_mgr::get_variables() const -> const variables_t&
-{
-    return variables_;
-}
-
 auto formula_mgr::brute_force_evaluate() const -> bool
 {
     info() << "Running brute force evalution checking of " << f_;
@@ -107,10 +102,20 @@ void formula_mgr::clear()
     variables_.clear();
 }
 
+auto formula_mgr::get_variables() const -> const variables_t&
+{
+    return variables_;
+}
+
 auto formula_mgr::get_variable(variable_id_t id) const -> std::string
 {
     assert(id < variables_.size());
     return variables_[id];
+}
+
+auto formula_mgr::get_internal_formula() const -> const formula*
+{
+    return &f_;
 }
 
 auto formula_mgr::change_variables_to_variable_ids(json& f) const -> bool
@@ -173,22 +178,6 @@ auto formula_mgr::change_variables_to_variable_ids(json& f) const -> bool
     return false;
 }
 
-std::ostream& operator<<(std::ostream& out, const formula_mgr& f)
-{
-    out << f.f_;
-    return out;
-}
-
-std::ostream& operator<<(std::ostream& out, const formula_mgr::variables_t& variables)
-{
-    for (const auto variable : variables)
-    {
-        out << variable << " ";
-    }
-
-    return out;
-}
-
 /*
 *
 * Think of the map of evaluations as an array of true(1) and false(0) values, e.g. [0, 0, 0].
@@ -233,4 +222,10 @@ auto formula_mgr::has_satisfiable_evaluation(const formula& f, full_variables_ev
 
     *it = true;
     return has_satisfiable_evaluation(f, evaluations, next);
+}
+
+std::ostream& operator<<(std::ostream& out, const formula_mgr& f)
+{
+    out << *f.get_internal_formula();
+    return out;
 }

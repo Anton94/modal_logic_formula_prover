@@ -14,6 +14,19 @@ class formula
     using json = nlohmann::json;
 
 public:
+    formula(formula_mgr* mgr);
+    ~formula();
+    formula(const formula&) = delete;
+    formula& operator=(const formula&) = delete;
+    formula(formula&&) noexcept = default;
+    formula& operator=(formula&&) noexcept = default;
+
+    auto operator==(const formula& rhs) const -> bool;
+
+    auto build(json& f) -> bool;
+    auto evaluate(const full_variables_evaluations_t& variable_evaluations) const -> bool;
+    void clear();
+
     enum class operation_type : char
     {
         constant_true,
@@ -29,33 +42,24 @@ public:
     };
     using operation_t = operation_type;
 
-    formula(formula_mgr* mgr);
-    ~formula();
-    formula(const formula&) = delete;
-    formula& operator=(const formula&) = delete;
-    formula(formula&&) noexcept = default;
-    formula& operator=(formula&&) noexcept = default;
-
-    auto operator==(const formula& rhs) const -> bool;
-
-    auto build(json& f) -> bool;
+    auto get_operation_type() const->operation_t;
     auto get_hash() const -> std::size_t;
 
-    auto get_operation_type() const -> operation_t;
-    void clear();
+    // The negation operation has only left child.
+    // Constants has no childs.
+    // UB when trying to get childs of incompatable types,
+    // e.g. it is formula operation and getting a child term.
+    auto get_left_child_formula() const -> const formula*;
+    auto get_right_child_formula() const -> const formula*;
+    auto get_left_child_term() const -> const term*;
+    auto get_right_child_term() const -> const term*;
 
     auto is_term_operation() const -> bool;
     auto is_atomic() const -> bool;
     auto is_formula_operation() const -> bool;
     auto is_constant() const -> bool;
 
-    auto evaluate(const full_variables_evaluations_t& variable_evaluations) const -> bool;
-
-    friend std::ostream& operator<<(std::ostream& out, const formula& f);
-
 private:
-    friend tableau;
-
     auto construct_binary_term(json& f, operation_t op) -> bool;
     auto construct_binary_formula(json& f, operation_t op) -> bool;
     void free();
@@ -80,6 +84,8 @@ private:
         child_terms child_t_;
     };
 };
+
+std::ostream& operator<<(std::ostream& out, const formula& f);
 
 namespace std
 {

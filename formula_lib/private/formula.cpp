@@ -129,12 +129,77 @@ auto formula::build(json& f) -> bool
     return true;
 }
 
+auto formula::evaluate(const full_variables_evaluations_t& variable_evaluations) const -> bool
+{
+    switch (op_)
+    {
+    case formula::operation_t::constant_true:
+        return true;
+    case formula::operation_t::constant_false:
+        return false;
+    case formula::operation_t::conjunction:
+        assert(child_f_.left && child_f_.right);
+        return child_f_.left->evaluate(variable_evaluations) &&
+            child_f_.right->evaluate(variable_evaluations);
+    case formula::operation_t::disjunction:
+        assert(child_f_.left && child_f_.right);
+        return child_f_.left->evaluate(variable_evaluations) ||
+            child_f_.right->evaluate(variable_evaluations);
+    case formula::operation_t::negation:
+        assert(child_f_.left);
+        return !child_f_.left->evaluate(variable_evaluations);
+    case formula::operation_t::le:
+        assert(child_t_.left && child_t_.right);
+        // <=(a, b) is satisfied if a & b* = 0, i.e. a == 0 or b* == 0 <-> a == 0 or b == 1
+        return !child_t_.left->evaluate(variable_evaluations) ||
+            child_t_.right->evaluate(variable_evaluations);
+    case formula::operation_t::c:
+        assert(child_t_.left && child_t_.right);
+        // C(a, b) is satisfied if a != 0 and b != 0
+        return child_t_.left->evaluate(variable_evaluations) &&
+            child_t_.right->evaluate(variable_evaluations);
+    default:
+        assert(false && "Unrecognized.");
+        return false;
+    }
+}
+
 void formula::clear()
 {
     free();
     op_ = operation_t::invalid;
     hash_ = 0;
     child_f_ = {nullptr, nullptr};
+}
+
+auto formula::get_operation_type() const -> operation_t
+{
+    return op_;
+}
+
+auto formula::get_hash() const -> std::size_t
+{
+    return hash_;
+}
+
+auto formula::get_left_child_formula() const -> const formula*
+{
+    return child_f_.left;
+}
+
+auto formula::get_right_child_formula() const -> const formula*
+{
+    return child_f_.right;
+}
+
+auto formula::get_left_child_term() const -> const term*
+{
+    return child_t_.left;
+}
+
+auto formula::get_right_child_term() const -> const term*
+{
+    return child_t_.right;
 }
 
 auto formula::is_term_operation() const -> bool
@@ -157,6 +222,41 @@ auto formula::is_constant() const -> bool
     return op_ == operation_t::constant_true || op_ == operation_t::constant_false;
 }
 
+std::ostream& operator<<(std::ostream& out, const formula& f)
+{
+    switch(f.get_operation_type())
+    {
+        case formula::operation_t::constant_true:
+            out << "T";
+            break;
+        case formula::operation_t::constant_false:
+            out << "F";
+            break;
+        case formula::operation_t::conjunction:
+            out << "(" << *f.get_left_child_formula() << " & " << *f.get_right_child_formula() << ")";
+            break;
+        case formula::operation_t::disjunction:
+            out << "(" << *f.get_left_child_formula() << " | " << *f.get_right_child_formula() << ")";
+            break;
+        case formula::operation_t::negation:
+            out << "~" << *f.get_left_child_formula();
+            break;
+        case formula::operation_t::le:
+            out << "<=(" << *f.get_left_child_term() << ", " << *f.get_right_child_term() << ")";
+            break;
+        case formula::operation_t::c:
+            out << "C(" << *f.get_left_child_term() << ", " << *f.get_right_child_term() << ")";
+            break;
+        case formula::operation_t::invalid:
+            out << "UNDEFINED";
+            break;
+        default:
+            assert(false && "Unrecognized.");
+    }
+
+    return out;
+}
+
 auto formula::construct_binary_term(json& f, operation_t op) -> bool
 {
     op_ = op;
@@ -168,20 +268,20 @@ auto formula::construct_binary_term(json& f, operation_t op) -> bool
 
     // check the json for correct information
     auto& value_field = f["value"];
-    if(!value_field.is_array() || value_field.size() != 2)
+    if (!value_field.is_array() || value_field.size() != 2)
     {
         return false;
     }
 
     // recursive construction of the child terms
-    if(!child_t_.left->build(value_field[0]) || !child_t_.right->build(value_field[1]))
+    if (!child_t_.left->build(value_field[0]) || !child_t_.right->build(value_field[1]))
     {
         return false;
     }
 
     // add child's hashes
     hash_ = ((child_t_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
-            ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
+        ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
     return true;
 }
 
@@ -196,101 +296,21 @@ auto formula::construct_binary_formula(json& f, operation_t op) -> bool
 
     // check the json for correct information
     auto& value_field = f["value"];
-    if(!value_field.is_array() || value_field.size() != 2)
+    if (!value_field.is_array() || value_field.size() != 2)
     {
         return false;
     }
 
     // recursive construction of the child terms
-    if(!child_f_.left->build(value_field[0]) || !child_f_.right->build(value_field[1]))
+    if (!child_f_.left->build(value_field[0]) || !child_f_.right->build(value_field[1]))
     {
         return false;
     }
 
     // add child's hashes
     hash_ = ((child_f_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
-            ((child_f_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
+        ((child_f_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
     return true;
-}
-
-auto formula::get_hash() const -> std::size_t
-{
-    return hash_;
-}
-
-auto formula::get_operation_type() const -> operation_t
-{
-    return op_;
-}
-
-auto formula::evaluate(const full_variables_evaluations_t& variable_evaluations) const -> bool
-{
-    switch(op_)
-    {
-        case formula::operation_t::constant_true:
-            return true;
-        case formula::operation_t::constant_false:
-            return false;
-        case formula::operation_t::conjunction:
-            assert(child_f_.left && child_f_.right);
-            return child_f_.left->evaluate(variable_evaluations) &&
-                   child_f_.right->evaluate(variable_evaluations);
-        case formula::operation_t::disjunction:
-            assert(child_f_.left && child_f_.right);
-            return child_f_.left->evaluate(variable_evaluations) ||
-                   child_f_.right->evaluate(variable_evaluations);
-        case formula::operation_t::negation:
-            assert(child_f_.left);
-            return !child_f_.left->evaluate(variable_evaluations);
-        case formula::operation_t::le:
-            assert(child_t_.left && child_t_.right);
-            // <=(a, b) is satisfied if a & b* = 0, i.e. a == 0 or b* == 0 <-> a == 0 or b == 1
-            return !child_t_.left->evaluate(variable_evaluations) ||
-                   child_t_.right->evaluate(variable_evaluations);
-        case formula::operation_t::c:
-            assert(child_t_.left && child_t_.right);
-            // C(a, b) is satisfied if a != 0 and b != 0
-            return child_t_.left->evaluate(variable_evaluations) &&
-                   child_t_.right->evaluate(variable_evaluations);
-        default:
-            assert(false && "Unrecognized.");
-            return false;
-    }
-}
-
-std::ostream& operator<<(std::ostream& out, const formula& f)
-{
-    switch(f.op_)
-    {
-        case formula::operation_t::constant_true:
-            out << "T";
-            break;
-        case formula::operation_t::constant_false:
-            out << "F";
-            break;
-        case formula::operation_t::conjunction:
-            out << "(" << *f.child_f_.left << " & " << *f.child_f_.right << ")";
-            break;
-        case formula::operation_t::disjunction:
-            out << "(" << *f.child_f_.left << " | " << *f.child_f_.right << ")";
-            break;
-        case formula::operation_t::negation:
-            out << "~" << *f.child_f_.left;
-            break;
-        case formula::operation_t::le:
-            out << "<=(" << *f.child_t_.left << ", " << *f.child_t_.right << ")";
-            break;
-        case formula::operation_t::c:
-            out << "C(" << *f.child_t_.left << ", " << *f.child_t_.right << ")";
-            break;
-        case formula::operation_t::invalid:
-            out << "UNDEFINED";
-            break;
-        default:
-            assert(false && "Unrecognized.");
-    }
-
-    return out;
 }
 
 void formula::free()
