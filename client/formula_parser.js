@@ -16,9 +16,9 @@ const Equ = createToken({ name: "Equ", pattern: /<->/ })
 const Neg = createToken({ name: "Neg", pattern: /~/ })
 
 // Term operations
-const TCon = createToken({ name: "TCon", pattern: /\*/ })
+const TCon = createToken({ name: "TCon", pattern: /\-/ })
 const TDis = createToken({ name: "TDis", pattern: /\+/ })
-const TStar = createToken({ name: "TStar", pattern: /\-/ })
+const TStar = createToken({ name: "TStar", pattern: /\*/ })
 
 const True = createToken({ name: "True", pattern: "T" })
 const False = createToken({ name: "False", pattern: "F" })
@@ -193,11 +193,12 @@ const symbol_to_explanation =  {
     "->": "implication",
     "<->": "equivalence",
     "~": "negation",
-    "*": "Tand",
+    "-": "Tand",
     "+": "Tor",
-    "-": "Tstar",
+    "*": "Tstar",
     "T": "true",
-    "F": "false"
+    "F": "false",
+    "string": "string"
 }
 
 function simplify(cst) {
@@ -208,12 +209,12 @@ function simplify(cst) {
         };
     } else if (cst.children.hasOwnProperty("star")) {
         var starValue = {
-            "name": symbol_to_explanation["-"],
+            "name": symbol_to_explanation["*"],
             "value": simplify(cst.children["lhs"][0])
         };
         for (var i = 1; i <cst.children["star"].length; ++i) {
             starValue = {
-                "name": symbol_to_explanation["-"],
+                "name": symbol_to_explanation["*"],
                 "value": starValue
             }
         }
@@ -261,6 +262,9 @@ function parse(formula) {
     const cst = parser.disjunction()
     document.getElementById("output").innerHTML = "";
 
+    console.log("Lex errors: " + lexResult.errors)
+    console.log("Parse errors: " + parser.errors)
+
     return {
         cst: cst,
         lexErrors: lexResult.errors,
@@ -268,11 +272,85 @@ function parse(formula) {
     }
 }
 
+const ONE_ARG_OPERATIONS = new Set([
+    symbol_to_explanation["~"],
+    symbol_to_explanation["*"]
+]);
+
+const TWO_ARG_OPERATIONS = new Set([
+    symbol_to_explanation["<="],
+    symbol_to_explanation["C"],
+]);
+
+const N_ARG_OPERATIONS = new Set([
+    symbol_to_explanation["-"],
+    symbol_to_explanation["+"],
+    symbol_to_explanation["|"],
+    symbol_to_explanation["&"],
+    symbol_to_explanation["->"],
+    symbol_to_explanation["<->"]
+])
+
+const ZERO_ARG_OPERATIONS = new Set([
+    symbol_to_explanation["T"],
+    symbol_to_explanation["F"],
+    symbol_to_explanation["string"]
+
+])
 
 function formula_to_json(formula) {
-    return simplify(parse(formula).cst);
+    simplified = simplify(parse(formula).cst);
+    //formula_traverse_top_to_bottom(simplified, new Set(["less"]), remove_equal_TDis_in_less);
+    formula_traverse_top_to_bottom(simplified, N_ARG_OPERATIONS, decompose_max_two_childs);
+    return simplified;
 }
- 
 
-// (<=((a-b)+c, (b-m+c))|C(a,b))&C(b,m)
+// Run the func for all objects which name comes up in the filter_names.
+function formula_traverse_top_to_bottom(node, filter_names, func) {
+    if (filter_names.has(node.name)) {
+        func(node);
+    }
+
+    if (ZERO_ARG_OPERATIONS.has(node.name)) {
+        return;
+    } else if (ONE_ARG_OPERATIONS.has(node.name)) {
+        formula_traverse_top_to_bottom(node.value, filter_names, func);
+    } else {
+        node.value.forEach((x) => {
+            formula_traverse_top_to_bottom(x, filter_names, func);
+        });
+    }
+} 
+
+function remove_equal_TDis_in_less(node) {
+
+}
+
+function decompose_max_two_childs(node) {
+    if (node.value.length < 3) {
+        return;
+    }
+    max_length = ( node.value.length % 2 ) ? node.value.length - 1 : node.value.length;
+    children = [];
+    for (i = 0; i < max_length; i += 2) {
+        children.push({
+            "name": node.name,
+            "value": [node.value[i], node.value[i + 1]]
+        });
+    }
+    node.value = children;
+    decompose_max_two_childs(node);
+}
+
+function decompose_implication(node) {
+
+}
+
+function decompose_equivalency(node) {
+
+}
+
+// (<=((a-b)+c, (b-m+c)) | C(a,b)) & C(b,m)
 // <=(a,b)<->C(a,b)-><=(m,b)
+
+// bug ! is front does not do nything
