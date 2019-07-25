@@ -193,9 +193,9 @@ const symbol_to_explanation =  {
     "->": "implication",
     "<->": "equivalence",
     "~": "negation",
-    "-": "Tand",
+    "*": "Tand",
     "+": "Tor",
-    "*": "Tstar",
+    "-": "Tstar",
     "T": "true",
     "F": "false",
     "string": "string"
@@ -209,12 +209,12 @@ function simplify(cst) {
         };
     } else if (cst.children.hasOwnProperty("star")) {
         var starValue = {
-            "name": symbol_to_explanation["*"],
+            "name": symbol_to_explanation["-"],
             "value": simplify(cst.children["lhs"][0])
         };
         for (var i = 1; i <cst.children["star"].length; ++i) {
             starValue = {
-                "name": symbol_to_explanation["*"],
+                "name": symbol_to_explanation["-"],
                 "value": starValue
             }
         }
@@ -274,7 +274,7 @@ function parse(formula) {
 
 const ONE_ARG_OPERATIONS = new Set([
     symbol_to_explanation["~"],
-    symbol_to_explanation["*"]
+    symbol_to_explanation["-"]
 ]);
 
 const TWO_ARG_OPERATIONS = new Set([
@@ -283,7 +283,7 @@ const TWO_ARG_OPERATIONS = new Set([
 ]);
 
 const N_ARG_OPERATIONS = new Set([
-    symbol_to_explanation["-"],
+    symbol_to_explanation["*"],
     symbol_to_explanation["+"],
     symbol_to_explanation["|"],
     symbol_to_explanation["&"],
@@ -301,7 +301,7 @@ const ZERO_ARG_OPERATIONS = new Set([
 function formula_to_json(formula) {
     simplified = simplify(parse(formula).cst);
     //formula_traverse_top_to_bottom(simplified, new Set(["less"]), remove_equal_TDis_in_less);
-    formula_traverse_top_to_bottom(simplified, N_ARG_OPERATIONS, decompose_max_two_childs);
+    //formula_traverse_top_to_bottom(simplified, N_ARG_OPERATIONS, decompose_max_two_childs);
     return simplified;
 }
 
