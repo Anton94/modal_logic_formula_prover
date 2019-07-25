@@ -1,6 +1,13 @@
 #include "variables_evaluations_block_stack.h"
 #include "logger.h"
 
+variables_evaluations_block_stack::variables_evaluations_block_stack(size_t block_size)
+    : block_size_(block_size)
+    , combined_variables_(block_size_, false)
+    , combined_evaluations_(block_size_, false)
+{
+}
+
 auto variables_evaluations_block_stack::top() const -> const variables_evaluations_block&
 {
     assert(!block_stack_.empty());
@@ -43,6 +50,11 @@ auto variables_evaluations_block_stack::get_combined_evaluations() const -> cons
 
 auto variables_evaluations_block_stack::generate_evaluation() -> bool
 {
+    if(empty())
+    {
+        return false;
+    }
+
     auto& top_block = block_stack_.top();
 
     if(!top_block.generate_next_evaluation())
@@ -86,7 +98,12 @@ void variables_evaluations_block_stack::update_combined_after_push()
         pop();
     }
 
-    // TODO: check what happens when the sizes are different
+    if(pushed_block.get_variables().size() != block_size_)
+    {
+        error() << "Adding a block with different size.";
+        pop();
+    }
+
     combined_variables_ |= pushed_block.get_variables();
     combined_evaluations_ |= pushed_block.get_evaluations();
 

@@ -12,10 +12,10 @@ class variables_evaluations_block_stack
     * evaluation/variables_mask of all of them.
     * The oprations of adding a new block(push), generating a new evalution of the top one, poping a block
     * should be constant.
-    *
+    * All blocks should have the same size specified in the ctor
     */
 public:
-    variables_evaluations_block_stack();
+    variables_evaluations_block_stack(size_t block_size);
 
     variables_evaluations_block_stack(const variables_evaluations_block_stack&) = delete;
     variables_evaluations_block_stack& operator=(const variables_evaluations_block_stack&) = delete;
@@ -38,6 +38,7 @@ private:
     void update_combined_after_push();
     void update_combined_before_pop();
 
+    size_t block_size_;
     std::stack<variables_evaluations_block> block_stack_;
 
     variables_mask_t combined_variables_;

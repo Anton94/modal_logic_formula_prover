@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
 {
     set_trace_logger([](std::stringstream&& s) { std::cout << s.rdbuf() << std::endl; });
     set_info_logger([](std::stringstream&& s) { std::cout << s.rdbuf() << std::endl; });
-    set_error_logger([](std::stringstream&& s) { std::cout << s.rdbuf() << std::endl; });
+    set_error_logger([](std::stringstream&& s) { std::cout << "ERROR: " << s.rdbuf() << std::endl; });
 
     error();
     try

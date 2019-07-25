@@ -24,6 +24,17 @@ variables_evaluations_block::variables_evaluations_block(const variables_mask_t&
     }
 }
 
+auto variables_evaluations_block::operator==(const variables_evaluations_block& rhs) const -> bool
+{
+    return variables_ == rhs.variables_ && evaluations_ == rhs.evaluations_ &&
+           set_variables_ids_ == rhs.set_variables_ids_;
+}
+
+auto variables_evaluations_block::operator!=(const variables_evaluations_block& rhs) const -> bool
+{
+    return !operator==(rhs);
+}
+
 auto variables_evaluations_block::get_variables() const -> const variables_mask_t&
 {
     return variables_;
