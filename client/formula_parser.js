@@ -302,6 +302,8 @@ function formula_to_json(formula) {
     simplified = simplify(parse(formula).cst);
     //formula_traverse_top_to_bottom(simplified, new Set(["less"]), remove_equal_TDis_in_less);
     formula_traverse_top_to_bottom(simplified, N_ARG_OPERATIONS, decompose_max_two_childs);
+    formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["<->"]]), decompose_equivalency);
+    formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["->"]]), decompose_implication);
     return simplified;
 }
 
@@ -323,7 +325,10 @@ function formula_traverse_top_to_bottom(node, filter_names, func) {
 } 
 
 function remove_equal_TDis_in_less(node) {
-
+    // remove problems in <= if 
+    // for example <=(a*b*c, a*-b)
+    // the resulting node should contain only
+    // <=(b*c, -b)
 }
 
 function decompose_max_two_childs(node) {
@@ -343,11 +348,34 @@ function decompose_max_two_childs(node) {
 }
 
 function decompose_implication(node) {
-
+    node.name = symbol_to_explanation["+"];
+    left_child = {
+        "name": symbol_to_explanation["-"],
+        "value": node.value[0]
+    }
+    node.value = [left_child, node.value[1]]
 }
 
 function decompose_equivalency(node) {
-
+    node.name = symbol_to_explanation["+"];
+    left_child = {
+        "name": symbol_to_explanation["*"],
+        "value": [node.value[0], node.value[1]]
+    }
+    right_child = {
+        "name": symbol_to_explanation["*"],
+        "value": [
+            {
+                "name": symbol_to_explanation["-"],
+                "value": node.value[0]
+            }, 
+            {
+                "name": symbol_to_explanation["-"],
+                "value": node.value[1]
+            }
+        ]
+    }
+    node.value = [left_child, right_child];
 }
 
 // (<=((a*b)+c, (b*m+c)) | C(a,b)) & C(b,m)
