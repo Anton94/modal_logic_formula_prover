@@ -16,9 +16,9 @@ const Equ = createToken({ name: "Equ", pattern: /<->/ })
 const Neg = createToken({ name: "Neg", pattern: /~/ })
 
 // Term operations
-const TCon = createToken({ name: "TCon", pattern: /\-/ })
+const TCon = createToken({ name: "TCon", pattern: /\*/ })
 const TDis = createToken({ name: "TDis", pattern: /\+/ })
-const TStar = createToken({ name: "TStar", pattern: /\*/ })
+const TStar = createToken({ name: "TStar", pattern: /\-/ })
 
 const True = createToken({ name: "True", pattern: "T" })
 const False = createToken({ name: "False", pattern: "F" })
@@ -301,7 +301,7 @@ const ZERO_ARG_OPERATIONS = new Set([
 function formula_to_json(formula) {
     simplified = simplify(parse(formula).cst);
     //formula_traverse_top_to_bottom(simplified, new Set(["less"]), remove_equal_TDis_in_less);
-    //formula_traverse_top_to_bottom(simplified, N_ARG_OPERATIONS, decompose_max_two_childs);
+    formula_traverse_top_to_bottom(simplified, N_ARG_OPERATIONS, decompose_max_two_childs);
     return simplified;
 }
 
@@ -350,7 +350,7 @@ function decompose_equivalency(node) {
 
 }
 
-// (<=((a-b)+c, (b-m+c)) | C(a,b)) & C(b,m)
+// (<=((a*b)+c, (b*m+c)) | C(a,b)) & C(b,m)
 // <=(a,b)<->C(a,b)-><=(m,b)
 
 // bug ! is front does not do nything
