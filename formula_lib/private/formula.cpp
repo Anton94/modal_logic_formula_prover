@@ -13,12 +13,12 @@ formula::formula(formula_mgr* mgr)
     assert(formula_mgr_);
 }
 
-formula::formula(formula&& rhs)
+formula::formula(formula&& rhs) noexcept
 {
     move(std::move(rhs));
 }
 
-formula& formula::operator=(formula&& rhs)
+formula& formula::operator=(formula&& rhs) noexcept
 {
     if (this != &rhs)
     {
@@ -292,7 +292,7 @@ std::ostream& operator<<(std::ostream& out, const formula& f)
     return out;
 }
 
-void formula::move(formula&& rhs)
+void formula::move(formula&& rhs) noexcept
 {
     op_ = rhs.op_;
     formula_mgr_ = rhs.formula_mgr_;
@@ -300,11 +300,11 @@ void formula::move(formula&& rhs)
 
     if (is_term_operation())
     {
-        child_t_ = std::move(rhs.child_t_);
+        child_t_ = rhs.child_t_;
     }
     else if (is_formula_operation())
     {
-        child_f_ = std::move(rhs.child_f_);
+        child_f_ = rhs.child_f_;
     }
 
     // invalidate the rhs in order to not touch/deletes the moved resources, e.g. the childs

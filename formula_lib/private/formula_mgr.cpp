@@ -66,13 +66,13 @@ formula_mgr::formula_mgr()
 {
 }
 
-formula_mgr::formula_mgr(formula_mgr&& rhs)
+formula_mgr::formula_mgr(formula_mgr&& rhs) noexcept
     : f_(this)
 {
     move(std::move(rhs));
 }
 
-formula_mgr& formula_mgr::operator=(formula_mgr&& rhs)
+formula_mgr& formula_mgr::operator=(formula_mgr&& rhs) noexcept
 {
     if (this != &rhs)
     {
@@ -193,7 +193,7 @@ auto formula_mgr::change_variables_to_variable_ids(json& f) const -> bool
     return false;
 }
 
-void formula_mgr::move(formula_mgr&& rhs)
+void formula_mgr::move(formula_mgr&& rhs) noexcept
 {
     variable_to_id_ = std::move(rhs.variable_to_id_);
     variables_ = std::move(rhs.variables_);

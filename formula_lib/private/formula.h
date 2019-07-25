@@ -17,8 +17,8 @@ public:
     ~formula();
     formula(const formula&) = delete;
     formula& operator=(const formula&) = delete;
-    formula(formula&& rhs);
-    formula& operator=(formula&& rhs);
+    formula(formula&& rhs) noexcept;
+    formula& operator=(formula&& rhs) noexcept;
 
     auto operator==(const formula& rhs) const -> bool;
 
@@ -61,7 +61,7 @@ public:
     void change_formula_mgr(formula_mgr* new_mgr);
 
 private:
-    void move(formula&& rhs);
+    void move(formula&& rhs) noexcept;
 
     auto construct_binary_term(json& f, operation_t op) -> bool;
     auto construct_binary_formula(json& f, operation_t op) -> bool;

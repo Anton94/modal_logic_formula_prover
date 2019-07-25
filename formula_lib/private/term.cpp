@@ -13,12 +13,12 @@ term::term(formula_mgr* mgr)
     assert(formula_mgr_);
 }
 
-term::term(term&& rhs)
+term::term(term&& rhs) noexcept
 {
     move(std::move(rhs));
 }
 
-term& term::operator=(term&& rhs)
+term& term::operator=(term&& rhs) noexcept
 {
     if (this != &rhs)
     {
@@ -240,6 +240,8 @@ void term::change_formula_mgr(formula_mgr* new_mgr)
     case operation_t::star_:
         childs_.left->change_formula_mgr(new_mgr);
         break;
+    default:
+        break;
     }
 }
 
@@ -275,7 +277,7 @@ std::ostream& operator<<(std::ostream& out, const term& t)
     return out;
 }
 
-void term::move(term&& rhs)
+void term::move(term&& rhs) noexcept
 {
     op_ = rhs.op_;
     formula_mgr_ = rhs.formula_mgr_;
@@ -283,7 +285,7 @@ void term::move(term&& rhs)
     
     if (is_binary_operaton() || op_ == operation_t::star_)
     {
-        childs_ = std::move(rhs.childs_);
+        childs_ = rhs.childs_;
     }
     else if (op_ == operation_t::variable_)
     {

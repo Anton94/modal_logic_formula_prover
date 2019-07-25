@@ -32,11 +32,11 @@ TEST_CASE("evaluation block of mask with no set variables", "[variables_evaluati
 
 TEST_CASE("evaluation block of mask with one set variable", "[variables_evaluations_block]")
 {
-    std::vector<int> variables_sizes = { 1, 2, 3, 8, 42 };
+    std::vector<size_t> variables_sizes = { 1, 2, 3, 8, 42 };
     for (const auto num_of_vars : variables_sizes)
     {
         info() << "Variables size: " << num_of_vars;
-        for (auto i = 0; i < num_of_vars; ++i)
+        for (size_t i = 0; i < num_of_vars; ++i)
         {
             variables_mask_t variables(num_of_vars, false);
             const variable_id_t set_var_id = i;
@@ -63,14 +63,14 @@ TEST_CASE("evaluation block of mask with one set variable", "[variables_evaluati
 
 TEST_CASE("evaluation block of mask with two set variables", "[variables_evaluations_block]")
 {
-    std::vector<int> variables_sizes = { 2, 3, 4, 8, 16, 42 };
+    std::vector<size_t> variables_sizes = { 2, 3, 4, 8, 16, 42 };
     for (const auto num_of_vars : variables_sizes)
     {
         info() << "Variables size: " << num_of_vars;
 
-        for (auto i = 0; i < num_of_vars; ++i)
+        for (size_t i = 0; i < num_of_vars; ++i)
         {
-            for (auto j = i + 1; j < num_of_vars; ++j)
+            for (size_t j = i + 1; j < num_of_vars; ++j)
             {
                 variables_mask_t variables(num_of_vars, false);
                 const variable_id_t first_var_id = i;
@@ -120,15 +120,15 @@ TEST_CASE("evaluation block of mask with two set variables", "[variables_evaluat
 
 TEST_CASE("evaluation block of mask with three set variables", "[variables_evaluations_block]")
 {
-    std::vector<int> variables_sizes = { 3, 4, 5, 10, 17 };
+    std::vector<size_t> variables_sizes = { 3, 4, 5, 10, 17 };
     for (const auto num_of_vars : variables_sizes)
     {
         info() << "Variables size: " << num_of_vars;
-        for (auto i = 0; i < num_of_vars; ++i)
+        for (size_t i = 0; i < num_of_vars; ++i)
         {
-            for (auto j = i + 1; j < num_of_vars; ++j)
+            for (size_t j = i + 1; j < num_of_vars; ++j)
             {
-                for (auto k = j + 1; k < num_of_vars; ++k)
+                for (size_t k = j + 1; k < num_of_vars; ++k)
                 {
                     variables_mask_t variables(num_of_vars, false);
                     const variable_id_t first_var_id = i;

@@ -21,7 +21,7 @@ formula_mgr create_atomic_formula_with_same_child_terms(const json& term)
     formula_mgr f;
     CHECK(f.build(formula));
 
-    return std::move(f);
+    return f;
 }
 
 void check_term_varibles_mask(const term& t, const formula_mgr& mgr, const variables_set_t& expected_variables)
@@ -29,10 +29,10 @@ void check_term_varibles_mask(const term& t, const formula_mgr& mgr, const varia
     info() << "Checking: " << t << " to have the following variables: " << expected_variables << "in it's bitset mask. "
         << "Mgr has the following variables: " << mgr.get_variables();
 
-    const auto term_vars_mask = t.get_variables();
+    const auto& term_vars_mask = t.get_variables();
     CHECK(term_vars_mask.count() == expected_variables.size());
 
-    for (auto i = 0; i < term_vars_mask.size(); ++i)
+    for (size_t i = 0; i < term_vars_mask.size(); ++i)
     {
         const auto var_name = mgr.get_variable(i);
         if (term_vars_mask[i])

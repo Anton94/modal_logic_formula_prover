@@ -44,7 +44,6 @@ auto variables_evaluations_block_stack::get_combined_evaluations() const -> cons
 auto variables_evaluations_block_stack::generate_evaluation() -> bool
 {
     auto& top_block = block_stack_.top();
-    const auto& old_top_block_evaluation = top_block.get_evaluations();
 
     if (!top_block.generate_next_evaluation())
     {
