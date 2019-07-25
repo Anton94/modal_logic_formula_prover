@@ -42,7 +42,7 @@ public:
 
     auto get_operation_type() const -> operation_t;
     auto get_hash() const -> std::size_t;
-    auto get_variable() const->std::string;
+    auto get_variable() const -> std::string;
     auto get_variables() const -> const variables_mask_t&;
 
     // The star operation has only left child
@@ -53,6 +53,7 @@ public:
     auto get_right_child() const -> const term*;
 
     void change_formula_mgr(formula_mgr* new_mgr);
+
 private:
     void move(term&& rhs) noexcept;
 
@@ -66,7 +67,8 @@ private:
     operation_t op_;
     formula_mgr* formula_mgr_;
 
-    variables_mask_t variables_; // TODO: alternative is to calculate the used variables each time when we need them. would it be better?
+    variables_mask_t variables_; // TODO: alternative is to calculate the used variables each time when we
+                                 // need them. would it be better?
 
     struct childs
     {

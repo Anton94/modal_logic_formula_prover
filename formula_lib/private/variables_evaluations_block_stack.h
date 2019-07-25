@@ -8,8 +8,10 @@
 class variables_evaluations_block_stack
 {
     /*
-    * The purpose of this stack is to hold many variables_evaluations_blocks and to provide a combined evaluation/variables_mask of all of them.
-    * The oprations of adding a new block(push), generating a new evalution of the top one, poping a block should be constant.
+    * The purpose of this stack is to hold many variables_evaluations_blocks and to provide a combined
+    * evaluation/variables_mask of all of them.
+    * The oprations of adding a new block(push), generating a new evalution of the top one, poping a block
+    * should be constant.
     *
     */
 public:
@@ -29,7 +31,7 @@ public:
     auto get_combined_variables() const -> const variables_mask_t&;
     auto get_combined_evaluations() const -> const variables_evaluations_t&;
 
-    // Tryis to generate a new evaluation of the top block.
+    // Tries to generate a new evaluation of the top block.
     auto generate_evaluation() -> bool;
 
 private:

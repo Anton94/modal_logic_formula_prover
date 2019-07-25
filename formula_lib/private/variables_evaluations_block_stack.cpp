@@ -45,7 +45,7 @@ auto variables_evaluations_block_stack::generate_evaluation() -> bool
 {
     auto& top_block = block_stack_.top();
 
-    if (!top_block.generate_next_evaluation())
+    if(!top_block.generate_next_evaluation())
     {
         return false;
     }
@@ -79,9 +79,10 @@ void variables_evaluations_block_stack::update_combined_after_push()
 {
     assert(!block_stack_.empty());
     const auto& pushed_block = block_stack_.top();
-    if ((combined_evaluations_ & pushed_block.get_variables()).any())
+    if((combined_evaluations_ & pushed_block.get_variables()).any())
     {
-        error() << "Adding variables evaluations block with set variable ids which are alredy there. Ambiguous.";
+        error()
+            << "Adding variables evaluations block with set variable ids which are alredy there. Ambiguous.";
         pop();
     }
 
@@ -96,8 +97,8 @@ void variables_evaluations_block_stack::update_combined_before_pop()
 {
     assert(!block_stack_.empty());
     const auto& block_to_pop = block_stack_.top();
-    
-    /* 
+
+    /*
         The idea:
             First: unset the bits from the block_to_pop's variables
             Then:  unset the 1s from block_to_pop's evaluation(which are also in the combined evaluation),

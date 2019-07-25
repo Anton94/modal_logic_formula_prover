@@ -20,7 +20,7 @@ formula::formula(formula&& rhs) noexcept
 
 formula& formula::operator=(formula&& rhs) noexcept
 {
-    if (this != &rhs)
+    if(this != &rhs)
     {
         move(std::move(rhs));
     }
@@ -40,7 +40,7 @@ auto formula::operator==(const formula& rhs) const -> bool
         return false;
     }
 
-    if (is_constant()) // note that the operations in the two objects are the same
+    if(is_constant()) // note that the operations in the two objects are the same
     {
         return true;
     }
@@ -77,11 +77,11 @@ auto formula::build(json& f) -> bool
     }
 
     auto op = name_field.get<std::string>();
-    if (op == "constant_T")
+    if(op == "constant_T")
     {
         op_ = operation_t::constant_true;
     }
-    else if (op == "constant_F")
+    else if(op == "constant_F")
     {
         op_ = operation_t::constant_false;
     }
@@ -145,36 +145,36 @@ auto formula::build(json& f) -> bool
 
 auto formula::evaluate(const full_variables_evaluations_t& variable_evaluations) const -> bool
 {
-    switch (op_)
+    switch(op_)
     {
-    case formula::operation_t::constant_true:
-        return true;
-    case formula::operation_t::constant_false:
-        return false;
-    case formula::operation_t::conjunction:
-        assert(child_f_.left && child_f_.right);
-        return child_f_.left->evaluate(variable_evaluations) &&
-            child_f_.right->evaluate(variable_evaluations);
-    case formula::operation_t::disjunction:
-        assert(child_f_.left && child_f_.right);
-        return child_f_.left->evaluate(variable_evaluations) ||
-            child_f_.right->evaluate(variable_evaluations);
-    case formula::operation_t::negation:
-        assert(child_f_.left);
-        return !child_f_.left->evaluate(variable_evaluations);
-    case formula::operation_t::le:
-        assert(child_t_.left && child_t_.right);
-        // <=(a, b) is satisfied if a & b* = 0, i.e. a == 0 or b* == 0 <-> a == 0 or b == 1
-        return !child_t_.left->evaluate(variable_evaluations) ||
-            child_t_.right->evaluate(variable_evaluations);
-    case formula::operation_t::c:
-        assert(child_t_.left && child_t_.right);
-        // C(a, b) is satisfied if a != 0 and b != 0
-        return child_t_.left->evaluate(variable_evaluations) &&
-            child_t_.right->evaluate(variable_evaluations);
-    default:
-        assert(false && "Unrecognized.");
-        return false;
+        case formula::operation_t::constant_true:
+            return true;
+        case formula::operation_t::constant_false:
+            return false;
+        case formula::operation_t::conjunction:
+            assert(child_f_.left && child_f_.right);
+            return child_f_.left->evaluate(variable_evaluations) &&
+                   child_f_.right->evaluate(variable_evaluations);
+        case formula::operation_t::disjunction:
+            assert(child_f_.left && child_f_.right);
+            return child_f_.left->evaluate(variable_evaluations) ||
+                   child_f_.right->evaluate(variable_evaluations);
+        case formula::operation_t::negation:
+            assert(child_f_.left);
+            return !child_f_.left->evaluate(variable_evaluations);
+        case formula::operation_t::le:
+            assert(child_t_.left && child_t_.right);
+            // <=(a, b) is satisfied if a & b* = 0, i.e. a == 0 or b* == 0 <-> a == 0 or b == 1
+            return !child_t_.left->evaluate(variable_evaluations) ||
+                   child_t_.right->evaluate(variable_evaluations);
+        case formula::operation_t::c:
+            assert(child_t_.left && child_t_.right);
+            // C(a, b) is satisfied if a != 0 and b != 0
+            return child_t_.left->evaluate(variable_evaluations) &&
+                   child_t_.right->evaluate(variable_evaluations);
+        default:
+            assert(false && "Unrecognized.");
+            return false;
     }
 }
 
@@ -241,16 +241,16 @@ void formula::change_formula_mgr(formula_mgr* new_mgr)
     assert(new_mgr);
     formula_mgr_ = new_mgr;
 
-    if (is_term_operation())
+    if(is_term_operation())
     {
         child_t_.left->change_formula_mgr(new_mgr);
         child_t_.right->change_formula_mgr(new_mgr);
     }
-    else if (op_ == operation_t::negation)
+    else if(op_ == operation_t::negation)
     {
         child_f_.left->change_formula_mgr(new_mgr);
     }
-    else if (is_formula_operation())
+    else if(is_formula_operation())
     {
         child_f_.left->change_formula_mgr(new_mgr);
         child_f_.right->change_formula_mgr(new_mgr);
@@ -298,11 +298,11 @@ void formula::move(formula&& rhs) noexcept
     formula_mgr_ = rhs.formula_mgr_;
     hash_ = rhs.hash_;
 
-    if (is_term_operation())
+    if(is_term_operation())
     {
         child_t_ = rhs.child_t_;
     }
-    else if (is_formula_operation())
+    else if(is_formula_operation())
     {
         child_f_ = rhs.child_f_;
     }
@@ -322,20 +322,20 @@ auto formula::construct_binary_term(json& f, operation_t op) -> bool
 
     // check the json for correct information
     auto& value_field = f["value"];
-    if (!value_field.is_array() || value_field.size() != 2)
+    if(!value_field.is_array() || value_field.size() != 2)
     {
         return false;
     }
 
     // recursive construction of the child terms
-    if (!child_t_.left->build(value_field[0]) || !child_t_.right->build(value_field[1]))
+    if(!child_t_.left->build(value_field[0]) || !child_t_.right->build(value_field[1]))
     {
         return false;
     }
 
     // add child's hashes
     hash_ = ((child_t_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
-        ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
+            ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
     return true;
 }
 
@@ -350,20 +350,20 @@ auto formula::construct_binary_formula(json& f, operation_t op) -> bool
 
     // check the json for correct information
     auto& value_field = f["value"];
-    if (!value_field.is_array() || value_field.size() != 2)
+    if(!value_field.is_array() || value_field.size() != 2)
     {
         return false;
     }
 
     // recursive construction of the child terms
-    if (!child_f_.left->build(value_field[0]) || !child_f_.right->build(value_field[1]))
+    if(!child_f_.left->build(value_field[0]) || !child_f_.right->build(value_field[1]))
     {
         return false;
     }
 
     // add child's hashes
     hash_ = ((child_f_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
-        ((child_f_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
+            ((child_f_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
     return true;
 }
 

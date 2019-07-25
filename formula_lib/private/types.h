@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../include/types.h"
-#include <vector>
 #include "boost/dynamic_bitset.hpp"
+#include <vector>
 
 using full_variables_evaluations_t = std::vector<bool>;
 

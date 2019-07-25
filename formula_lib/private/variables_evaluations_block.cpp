@@ -3,7 +3,7 @@
 variables_evaluations_block::variables_evaluations_block(const variables_mask_t& variables)
     : variables_(variables)
 {
-    if (variables_.empty())
+    if(variables_.empty())
     {
         return;
     }
@@ -15,9 +15,9 @@ variables_evaluations_block::variables_evaluations_block(const variables_mask_t&
     // write the ids of the set variables in the mask
     set_variables_ids_.reserve(variables_.count());
     auto i = number_of_variables;
-    while (i-- > 0)
+    while(i-- > 0)
     {
-        if (variables_[i])
+        if(variables_[i])
         {
             set_variables_ids_.push_back(i);
         }
@@ -41,7 +41,7 @@ auto variables_evaluations_block::get_evaluations() const -> variables_evaluatio
 
 auto variables_evaluations_block::generate_next_evaluation() -> bool
 {
-    if ((variables_ & evaluations_) == variables_)
+    if((variables_ & evaluations_) == variables_)
     {
         // If the evaluation for the variables is only 1s then we cannot generate a new one,
         // i.e. we have already generated all of them.
@@ -55,12 +55,13 @@ auto variables_evaluations_block::generate_next_evaluation() -> bool
      * Iterate all bits starting from the least significant. If there are N bits: i = 0...n-1
      *     - bit(i) == 1 => bit(i) = 0
      *     - bit(i) == 0 => bit(i) = 1 & stop
-     * In our case it is similar, we want to make the increment operation only on the set bits in the variables mask.
+     * In our case it is similar, we want to make the increment operation only on the set bits in the
+     * variables mask.
      * set_variables_ids_ has the ids of the set bits in the variables mask in reverce order
      */
-    for (const auto id : set_variables_ids_)
+    for(const auto id : set_variables_ids_)
     {
-        if (!evaluations_[id])
+        if(!evaluations_[id])
         {
             evaluations_.set(id);
             break;

@@ -41,7 +41,7 @@ public:
     };
     using operation_t = operation_type;
 
-    auto get_operation_type() const->operation_t;
+    auto get_operation_type() const -> operation_t;
     auto get_hash() const -> std::size_t;
 
     // The negation operation has only left child.
