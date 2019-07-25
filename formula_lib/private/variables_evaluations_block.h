@@ -21,6 +21,9 @@ public:
     variables_evaluations_block(variables_evaluations_block&&) = default;
     variables_evaluations_block& operator=(variables_evaluations_block&&) = default;
 
+    auto operator==(const variables_evaluations_block& rhs) const -> bool;
+    auto operator!=(const variables_evaluations_block& rhs) const -> bool;
+
     auto get_variables() const -> const variables_mask_t&;
     auto get_evaluations() const -> variables_evaluations_t;
 
