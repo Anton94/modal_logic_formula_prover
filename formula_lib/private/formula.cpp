@@ -52,9 +52,9 @@ auto formula::operator==(const formula& rhs) const -> bool
     }
 
     assert(child_f_.right && rhs.child_f_.right);
-    if(op_ == operation_t::le)
+    if(op_ == operation_t::eq_zero)
     {
-        return *child_t_.left == *rhs.child_t_.left && *child_t_.right == *rhs.child_t_.right;
+        return *child_t_.left == *rhs.child_t_.left;
     }
     if(op_ == operation_t::c)
     {
@@ -111,43 +111,26 @@ auto formula::build(json& f) -> bool
             return false;
         }
     }
-    else if(op == "less")
+    else if(op == "equal0")
     {
-        if(!construct_binary_term(f, operation_t::le))
+        if(!construct_eq_zero_atomic_formula(f))
         {
             return false;
         }
-
-        // add child's hashes
-        hash_ = ((child_t_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
-                ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
     }
     else if(op == "contact")
     {
-        if(!construct_binary_term(f, operation_t::c))
+        if(!construct_contact_atomic_formula(f))
         {
             return false;
         }
-
-        // add child's hashes and multiply be the same factor because the operation is commutative
-        hash_ = ((child_t_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
-                ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435761);
     }
     else if(op == "negation")
     {
-        op_ = operation_t::negation;
-
-        child_f_.left = new(std::nothrow) formula(formula_mgr_);
-        assert(child_f_.left);
-
-        auto& value_field = f["value"];
-
-        if(!value_field.is_object() || !child_f_.left->build(value_field))
+        if(!construct_negation_formula(f))
         {
             return false;
         }
-
-        hash_ = (child_f_.left->get_hash() & 0xFFFFFFFF) * 2654435761;
     }
     else
     {
@@ -182,11 +165,9 @@ auto formula::evaluate(const full_variables_evaluations_t& variable_evaluations)
         case formula::operation_t::negation:
             assert(child_f_.left);
             return !child_f_.left->evaluate(variable_evaluations);
-        case formula::operation_t::le:
-            assert(child_t_.left && child_t_.right);
-            // <=(a, b) is satisfied if a & b* = 0, i.e. a == 0 or b* == 0 <-> a == 0 or b == 1
-            return !child_t_.left->evaluate(variable_evaluations) ||
-                   child_t_.right->evaluate(variable_evaluations);
+        case formula::operation_t::eq_zero:
+            assert(child_t_.left);
+            return !child_t_.left->evaluate(variable_evaluations);
         case formula::operation_t::c:
             assert(child_t_.left && child_t_.right);
             // C(a, b) is satisfied if a != 0 and b != 0
@@ -238,7 +219,7 @@ auto formula::get_right_child_term() const -> const term*
 
 auto formula::is_term_operation() const -> bool
 {
-    return op_ == operation_t::le || op_ == operation_t::c;
+    return op_ == operation_t::eq_zero || op_ == operation_t::c;
 }
 
 auto formula::is_atomic() const -> bool
@@ -261,7 +242,11 @@ void formula::change_formula_mgr(formula_mgr* new_mgr)
     assert(new_mgr);
     formula_mgr_ = new_mgr;
 
-    if(is_term_operation())
+    if(op_ == operation_t::eq_zero)
+    {
+        child_t_.left->change_formula_mgr(new_mgr);
+    }
+    else if(op_ == operation_t::c)
     {
         child_t_.left->change_formula_mgr(new_mgr);
         child_t_.right->change_formula_mgr(new_mgr);
@@ -296,8 +281,8 @@ std::ostream& operator<<(std::ostream& out, const formula& f)
         case formula::operation_t::negation:
             out << "~" << *f.get_left_child_formula();
             break;
-        case formula::operation_t::le:
-            out << "<=(" << *f.get_left_child_term() << ", " << *f.get_right_child_term() << ")";
+        case formula::operation_t::eq_zero:
+            out << "(" << *f.get_left_child_term() << ") = 0";
             break;
         case formula::operation_t::c:
             out << "C(" << *f.get_left_child_term() << ", " << *f.get_right_child_term() << ")";
@@ -331,10 +316,28 @@ void formula::move(formula&& rhs) noexcept
     rhs.op_ = operation_t::invalid;
 }
 
-auto formula::construct_binary_term(json& f, operation_t op) -> bool
+auto formula::construct_eq_zero_atomic_formula(json& f) -> bool
 {
-    op_ = op;
-    assert(is_term_operation());
+    op_ = operation_t::eq_zero;
+
+    child_t_.left = new(std::nothrow) term(formula_mgr_);
+    assert(child_t_.left);
+
+    auto& value_field = f["value"];
+    if(!value_field.is_object() || !child_t_.left->build(value_field))
+    {
+        return false;
+    }
+
+    // add child's hashes
+    hash_ = ((child_t_.left->get_hash() & 0xFFFFFFFF) * 2654435761);
+
+    return true;
+}
+
+auto formula::construct_contact_atomic_formula(json& f) -> bool
+{
+    op_ = operation_t::c;
 
     child_t_.left = new(std::nothrow) term(formula_mgr_);
     child_t_.right = new(std::nothrow) term(formula_mgr_);
@@ -352,6 +355,28 @@ auto formula::construct_binary_term(json& f, operation_t op) -> bool
     {
         return false;
     }
+
+    // add child's hashes and multiply be the same factor because the operation is commutative
+    hash_ = ((child_t_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
+            ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435761);
+    return true;
+}
+
+auto formula::construct_negation_formula(json& f) -> bool
+{
+    op_ = operation_t::negation;
+
+    child_f_.left = new(std::nothrow) formula(formula_mgr_);
+    assert(child_f_.left);
+
+    auto& value_field = f["value"];
+
+    if(!value_field.is_object() || !child_f_.left->build(value_field))
+    {
+        return false;
+    }
+
+    hash_ = (child_f_.left->get_hash() & 0xFFFFFFFF) * 2654435761;
     return true;
 }
 
