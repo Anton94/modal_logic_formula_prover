@@ -279,6 +279,11 @@ const ONE_ARG_OPERATIONS = new Set([
     symbol_to_explanation["=0"]
 ]);
 
+const NEG_OPERATIONS = new Set([
+    symbol_to_explanation["~"],
+    symbol_to_explanation["-"]
+]);
+
 const TWO_ARG_OPERATIONS = new Set([
     symbol_to_explanation["<="],
     symbol_to_explanation["C"],
@@ -303,10 +308,10 @@ const ZERO_ARG_OPERATIONS = new Set([
 function formula_to_json(formula) {
     simplified = simplify(parse(formula).cst);
     //formula_traverse_top_to_bottom(simplified, new Set(["less"]), remove_equal_TDis_in_less);
-    formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["<="]]), decompose_less);
-    formula_traverse_top_to_bottom(simplified, N_ARG_OPERATIONS, decompose_max_two_childs);
-    formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["<->"]]), decompose_equivalency);
-    formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["->"]]), decompose_implication);
+    //formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["<="]]), decompose_less);
+    //formula_traverse_top_to_bottom(simplified, N_ARG_OPERATIONS, decompose_max_two_childs);
+    //formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["<->"]]), decompose_equivalency);
+    //formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["->"]]), decompose_implication);
     formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["~"], symbol_to_explanation["-"]]), remove_double_negations);
     return simplified;
 }
@@ -350,8 +355,10 @@ function decompose_less(node) {
 }
 
 function remove_double_negations(node) {
-    node.name = node.value.value.name;
-    node.value = node.value.value.value;
+    if (node.value.name != null && NEG_OPERATIONS.has(node.value.name)) {
+        node.name = node.value.value.name;
+        node.value = node.value.value.value;
+    }
 }
 
 function decompose_max_two_childs(node) {
