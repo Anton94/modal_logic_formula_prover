@@ -52,9 +52,16 @@ auto formula::operator==(const formula& rhs) const -> bool
     }
 
     assert(child_f_.right && rhs.child_f_.right);
-    if(is_term_operation())
+    if(op_ == operation_t::le)
     {
         return *child_t_.left == *rhs.child_t_.left && *child_t_.right == *rhs.child_t_.right;
+    }
+    if(op_ == operation_t::c)
+    {
+        // C is commutative, i.e. C(a,b) == C(b,a)
+        // C(a, b) == C(c, d) => (a == c && b == d) v (a == d && b == c)
+        return (*child_t_.left == *rhs.child_t_.left && *child_t_.right == *rhs.child_t_.right) ||
+               (*child_t_.left == *rhs.child_t_.right && *child_t_.right == *rhs.child_t_.left);
     }
 
     assert(is_formula_operation());
@@ -105,6 +112,10 @@ auto formula::build(json& f) -> bool
         {
             return false;
         }
+
+        // add child's hashes
+        hash_ = ((child_t_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
+                ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
     }
     else if(op == "contact")
     {
@@ -112,6 +123,10 @@ auto formula::build(json& f) -> bool
         {
             return false;
         }
+
+        // add child's hashes and multiply be the same factor because the operation is commutative
+        hash_ = ((child_t_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
+                ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435761);
     }
     else if(op == "negation")
     {
@@ -332,10 +347,6 @@ auto formula::construct_binary_term(json& f, operation_t op) -> bool
     {
         return false;
     }
-
-    // add child's hashes
-    hash_ = ((child_t_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
-            ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
     return true;
 }
 
