@@ -187,6 +187,7 @@ class JsonParser extends CstParser {
 
 const symbol_to_explanation =  {
     "<=": "less",
+    "=0": "equal0",
     "C": "contact",
     "|": "disjunction",
     "&": "conjunction",
@@ -274,7 +275,8 @@ function parse(formula) {
 
 const ONE_ARG_OPERATIONS = new Set([
     symbol_to_explanation["~"],
-    symbol_to_explanation["-"]
+    symbol_to_explanation["-"],
+    symbol_to_explanation["=0"]
 ]);
 
 const TWO_ARG_OPERATIONS = new Set([
@@ -301,6 +303,7 @@ const ZERO_ARG_OPERATIONS = new Set([
 function formula_to_json(formula) {
     simplified = simplify(parse(formula).cst);
     //formula_traverse_top_to_bottom(simplified, new Set(["less"]), remove_equal_TDis_in_less);
+    formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["<="]]), decompose_less);
     formula_traverse_top_to_bottom(simplified, N_ARG_OPERATIONS, decompose_max_two_childs);
     formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["<->"]]), decompose_equivalency);
     formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["->"]]), decompose_implication);
@@ -329,6 +332,20 @@ function remove_equal_TDis_in_less(node) {
     // for example <=(a*b*c, a*-b)
     // the resulting node should contain only
     // <=(b*c, -b)
+}
+
+function decompose_less(node) {
+    node.name = symbol_to_explanation["=0"];
+    node.value = {
+        "name": symbol_to_explanation["*"],
+        "value": [
+            node.value[0],
+            {
+                "name": symbol_to_explanation["-"],
+                "value": node.value[1]
+            }
+        ]
+    }
 }
 
 function decompose_max_two_childs(node) {
