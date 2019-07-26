@@ -68,6 +68,11 @@ auto formula::operator==(const formula& rhs) const -> bool
     return *child_f_.left == *rhs.child_f_.left && *child_f_.right == *rhs.child_f_.right;
 }
 
+auto formula::operator!=(const formula& rhs) const -> bool
+{
+    return !operator==(rhs);
+}
+
 auto formula::build(json& f) -> bool
 {
     clear();

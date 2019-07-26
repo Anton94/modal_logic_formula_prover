@@ -21,6 +21,7 @@ public:
     formula& operator=(formula&& rhs) noexcept;
 
     auto operator==(const formula& rhs) const -> bool;
+    auto operator!=(const formula& rhs) const -> bool;
 
     auto build(json& f) -> bool;
     auto evaluate(const full_variables_evaluations_t& variable_evaluations) const -> bool;

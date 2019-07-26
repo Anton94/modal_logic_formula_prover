@@ -60,6 +60,11 @@ auto term::operator==(const term& rhs) const -> bool
     return *childs_.left == *rhs.childs_.left && *childs_.right == *rhs.childs_.right;
 }
 
+auto term::operator!=(const term& rhs) const -> bool
+{
+    return !operator==(rhs);
+}
+
 auto term::build(json& t) -> bool
 {
     clear();

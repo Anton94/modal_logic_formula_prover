@@ -20,6 +20,7 @@ public:
     term& operator=(term&& rhs) noexcept;
 
     auto operator==(const term& rhs) const -> bool;
+    auto operator!=(const term& rhs) const -> bool;
 
     auto build(json& t) -> bool;
     auto evaluate(const full_variables_evaluations_t& variable_evaluations) const -> bool;
