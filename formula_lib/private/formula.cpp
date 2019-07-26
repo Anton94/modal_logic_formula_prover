@@ -22,6 +22,7 @@ formula& formula::operator=(formula&& rhs) noexcept
 {
     if(this != &rhs)
     {
+        free();
         move(std::move(rhs));
     }
     return *this;
