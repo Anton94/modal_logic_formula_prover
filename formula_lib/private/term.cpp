@@ -22,6 +22,7 @@ term& term::operator=(term&& rhs) noexcept
 {
     if(this != &rhs)
     {
+        free();
         move(std::move(rhs));
     }
     return *this;

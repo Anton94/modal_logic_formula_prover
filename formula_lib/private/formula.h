@@ -35,7 +35,7 @@ public:
         conjunction,
         disjunction,
         negation,
-        le,
+        eq_zero,
         c,
 
         invalid,
@@ -64,8 +64,11 @@ public:
 private:
     void move(formula&& rhs) noexcept;
 
-    auto construct_binary_term(json& f, operation_t op) -> bool;
+    auto construct_eq_zero_atomic_formula(json&) -> bool;
+    auto construct_contact_atomic_formula(json&) -> bool;
     auto construct_binary_formula(json& f, operation_t op) -> bool;
+    auto construct_negation_formula(json& f) -> bool;
+
     void free();
 
     operation_t op_;
