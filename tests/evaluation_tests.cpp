@@ -228,7 +228,8 @@ TEST_CASE("satisfiable evaluation with constant 1", "[brute force evaluation]")
                                 "value": "c"
                              },
                              {
-                                "name": "constant_0"
+                                "name": "string",
+                                "value": "0"
                              }
                           ]
                        }
@@ -236,15 +237,21 @@ TEST_CASE("satisfiable evaluation with constant 1", "[brute force evaluation]")
                  ]
               },
               {
-                 "name": "less",
-                 "value": [
-                    {
-                        "name": "constant_1"
-                    },
-                    {
-                       "name": "constant_0"
-                    }
-                 ]
+                 "name": "equal0",
+                 "value": {
+                    "name": "Tand",
+                    "value": [
+                       {
+                          "name": "constant_1"
+                       },
+                       {
+                          "name": "Tstar",
+                          "value": {
+                              "name": "constant_0"
+                          }
+                       }
+                    ]
+                 }
               }
            ]
         })"_json,
@@ -292,16 +299,22 @@ TEST_CASE("satisfiable evaluation with constant 2", "[brute force evaluation]")
                  ]
               },
               {
-                 "name": "less",
-                 "value": [
-                    {
-                       "name": "constant_1"
-                    },
-                    {
-                       "name": "string",
-                       "value": "a"
-                    }
-                 ]
+                 "name": "equal0",
+                 "value": {
+                    "name": "Tand",
+                    "value": [
+                       {
+                          "name": "constant_1"
+                       },
+                       {
+                          "name": "Tstar",
+                          "value": {
+                              "name": "string",
+                              "value": "a"
+                          }
+                       }
+                    ]
+                 }
               }
            ]
         })"_json,

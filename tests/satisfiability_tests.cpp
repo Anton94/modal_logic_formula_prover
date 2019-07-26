@@ -121,56 +121,62 @@ TEST_CASE("satisfiable 4", "[satisfiability]")
     // (C(a, b) | <=(a, b)) | ~C(a,b)
     is_satisfiable(
         R"({
-            "name": "disjunction",
-            "value": [
-               {
-                  "name": "disjunction",
-                  "value": [
-                     {
-                        "name": "contact",
-                        "value": [
-                           {
-                              "name": "string",
-                              "value": "a"
-                           },
-                           {
-                              "name": "string",
-                              "value": "b"
-                           }
-                        ]
-                     },
-                     {
-                        "name": "less",
-                        "value": [
-                           {
-                              "name": "string",
-                              "value": "a"
-                           },
-                           {
-                              "name": "string",
-                              "value": "b"
-                           }
-                        ]
-                     }
-                  ]
-               },
-               {
-                  "name": "negation",
-                  "value": {
-                     "name": "contact",
-                     "value": [
-                        {
-                           "name": "string",
-                           "value": "a"
-                        },
-                        {
-                           "name": "string",
-                           "value": "b"
-                        }
-                     ]
-                  }
-               }
-            ]
+           "name": "disjunction",
+           "value": [
+              {
+                 "name": "disjunction",
+                 "value": [
+                    {
+                       "name": "contact",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "a"
+                          },
+                          {
+                             "name": "string",
+                             "value": "b"
+                          }
+                       ]
+                    },
+                    {
+                       "name": "equal0",
+                       "value": {
+                          "name": "Tand",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "a"
+                             },
+                             {
+                                "name": "Tstar",
+                                "value": {
+                                   "name": "string",
+                                   "value": "b"
+                                }
+                             }
+                          ]
+                       }
+                    }
+                 ]
+              },
+              {
+                 "name": "negation",
+                 "value": {
+                    "name": "contact",
+                    "value": [
+                       {
+                          "name": "string",
+                          "value": "a"
+                       },
+                       {
+                          "name": "string",
+                          "value": "b"
+                       }
+                    ]
+                 }
+              }
+           ]
          })"_json,
         true);
 }
@@ -199,17 +205,23 @@ TEST_CASE("satisfiable 5", "[satisfiability]")
                         ]
                      },
                      {
-                        "name": "less",
-                        "value": [
-                           {
-                              "name": "string",
-                              "value": "a"
-                           },
-                           {
-                              "name": "string",
-                              "value": "b"
-                           }
-                        ]
+                        "name": "equal0",
+                        "value": {
+                           "name": "Tand",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "a"
+                              },
+                              {
+                                 "name": "Tstar",
+                                 "value": {
+                                    "name": "string",
+                                    "value": "b"
+                                 }
+                              }
+                           ]
+                        }
                      }
                   ]
                },
@@ -233,17 +245,23 @@ TEST_CASE("satisfiable 5", "[satisfiability]")
                         }
                      },
                      {
-                        "name": "less",
-                        "value": [
-                           {
-                              "name": "string",
-                              "value": "a"
-                           },
-                           {
-                              "name": "string",
-                              "value": "b"
-                           }
-                        ]
+                        "name": "equal0",
+                        "value": {
+                           "name": "Tand",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "a"
+                              },
+                              {
+                                 "name": "Tstar",
+                                 "value": {
+                                    "name": "string",
+                                    "value": "b"
+                                 }
+                              }
+                           ]
+                        }
                      }
                   ]
                }

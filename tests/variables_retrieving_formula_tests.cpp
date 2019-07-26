@@ -107,17 +107,23 @@ TEST_CASE("variables_check 2.2", "[variables_check_formula_mgr]")
     // <=(axxa, axxa)
     variables_check(
         R"({
-            "name": "less",
-            "value": [
-               {
-                  "name": "string",
-                  "value": "axxa"
-               },
-               {
-                  "name": "string",
-                  "value": "axxa"
-               }
-            ]
+            "name": "equal0",
+            "value": {
+               "name": "Tand",
+               "value": [
+                  {
+                     "name": "string",
+                     "value": "axxa"
+                  },
+                  {
+                     "name": "Tstar",
+                     "value": {
+                        "name": "string",
+                        "value": "axxa"
+                     }
+                  }
+               ]
+            }
         })"_json,
         {"axxa"});
 }
@@ -207,17 +213,23 @@ TEST_CASE("variables_check 4", "[variables_check_formula_mgr]")
                         ]
                      },
                      {
-                        "name": "less",
-                        "value": [
-                           {
-                              "name": "string",
-                              "value": "a"
-                           },
-                           {
-                              "name": "string",
-                              "value": "b"
-                           }
-                        ]
+                        "name": "equal0",
+                        "value": {
+                           "name": "Tand",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "a"
+                              },
+                              {
+                                 "name": "Tstar",
+                                 "value": {
+                                    "name": "string",
+                                    "value": "b"
+                                 }
+                              }
+                           ]
+                        }
                      }
                   ]
                },
@@ -266,17 +278,23 @@ TEST_CASE("variables_check 5", "[variables_check_formula_mgr]")
                         ]
                      },
                      {
-                        "name": "less",
-                        "value": [
-                           {
-                              "name": "string",
-                              "value": "a"
-                           },
-                           {
-                              "name": "string",
-                              "value": "b"
-                           }
-                        ]
+                        "name": "equal0",
+                        "value": {
+                           "name": "Tand",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "a"
+                              },
+                              {
+                                 "name": "Tstar",
+                                 "value": {
+                                    "name": "string",
+                                    "value": "b"
+                                 }
+                              }
+                           ]
+                        }
                      }
                   ]
                },
@@ -300,17 +318,23 @@ TEST_CASE("variables_check 5", "[variables_check_formula_mgr]")
                         }
                      },
                      {
-                        "name": "less",
-                        "value": [
-                           {
-                              "name": "string",
-                              "value": "a"
-                           },
-                           {
-                              "name": "string",
-                              "value": "b"
-                           }
-                        ]
+                        "name": "equal0",
+                        "value": {
+                           "name": "Tand",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "a"
+                              },
+                              {
+                                 "name": "Tstar",
+                                 "value": {
+                                    "name": "string",
+                                    "value": "b"
+                                 }
+                              }
+                           ]
+                        }
                      }
                   ]
                }
