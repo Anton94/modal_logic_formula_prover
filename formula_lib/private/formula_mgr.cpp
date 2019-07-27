@@ -22,7 +22,7 @@ auto get_all_variables(const json& f, variables_set_t& variables) -> bool
     }
 
     auto op = name_field.get<std::string>();
-    if(op == "constant_T" || op == "constant_F" || op == "constant_1" || op == "constant_0")
+    if(op == "T" || op == "F" || op == "1" || op == "0")
     {
         return true;
     }
@@ -148,7 +148,7 @@ auto formula_mgr::change_variables_to_variable_ids(json& f) const -> bool
     }
 
     auto op = name_field.get<std::string>();
-    if(op == "constant_T" || op == "constant_F" || op == "constant_1" || op == "constant_0")
+    if(op == "T" || op == "F" || op == "1" || op == "0")
     {
         return true;
     }

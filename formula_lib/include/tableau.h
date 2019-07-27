@@ -26,8 +26,8 @@ private:
     // Does a step of tableau method and returns whether there was a contradiction or not
     auto step() -> bool;
 
-    auto check_contradiction_in_T(const formula* f) const -> bool;
-    auto check_contradiction_in_F(const formula* f) const -> bool;
+    auto find_in_T(const formula* f) const -> bool;
+    auto find_in_F(const formula* f) const -> bool;
 
     void add_formula_to_T(const formula* f);
     void add_formula_to_F(const formula* f);

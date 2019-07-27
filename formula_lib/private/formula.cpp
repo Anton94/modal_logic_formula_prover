@@ -90,11 +90,11 @@ auto formula::build(json& f) -> bool
     }
 
     auto op = name_field.get<std::string>();
-    if(op == "constant_T")
+    if(op == "T")
     {
         op_ = operation_t::constant_true;
     }
-    else if(op == "constant_F")
+    else if(op == "F")
     {
         op_ = operation_t::constant_false;
     }

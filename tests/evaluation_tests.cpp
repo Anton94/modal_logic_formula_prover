@@ -361,7 +361,7 @@ TEST_CASE("satisfiable evaluation with constant 3", "[brute force evaluation]")
                  ]
               },
               {
-                 "name": "constant_T"
+                 "name": "T"
               }
            ]
         })"_json,
@@ -409,7 +409,7 @@ TEST_CASE("satisfiable evaluation with constant 4", "[brute force evaluation]")
                  ]
               },
               {
-                 "name": "constant_F"
+                 "name": "F"
               }
            ]
         })"_json,

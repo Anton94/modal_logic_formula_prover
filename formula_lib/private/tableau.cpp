@@ -8,7 +8,13 @@ auto tableau::is_satisfiable(const formula_mgr& f) -> bool
     clear();
 
     info() << "Running a satisfiability checking of " << f;
-    add_formula_to_T(f.get_internal_formula());
+
+    const auto internal_f = f.get_internal_formula();
+    if(internal_f->is_constant())
+    {
+        return internal_f->get_operation_type() == formula::operation_t::constant_true ? true : false;
+    }
+    add_formula_to_T(internal_f);
 
     return step();
 }
@@ -25,6 +31,8 @@ void tableau::clear()
 
 auto tableau::step() -> bool
 {
+    using op_t = formula::operation_t;
+
     trace() << "Making an algorithm step:";
     log_state();
 
@@ -44,10 +52,23 @@ auto tableau::step() -> bool
         trace() << "Process " << *f << " from T formulas";
         log_state();
 
-        if(f->get_operation_type() == formula::operation_t::negation)
+        const auto op = f->get_operation_type();
+        if(op == op_t::negation)
         {
+            // T(~X) -> F(X)
             auto not_negated_f = f->get_left_child_formula();
-            if(check_contradiction_in_T(not_negated_f))
+            if (not_negated_f->is_constant())
+            {
+                // F(T) is not satisfiable
+                if (not_negated_f->get_operation_type() == op_t::constant_true)
+                {
+                    trace() << "Found a contradiction - found " << *f << " constant in T formulas";
+                    return false;
+                }
+                return true;
+            }
+
+            if(find_in_T(not_negated_f))
             {
                 trace() << "Found a contradiction - " << *not_negated_f << " found in T formulas";
                 return false;
@@ -58,26 +79,40 @@ auto tableau::step() -> bool
             return res;
         }
 
-        if(f->get_operation_type() == formula::operation_t::conjunction)
+        if(op == op_t::conjunction)
         {
+            // T(X & Y) -> T(X) & T(Y)
             auto left_f = f->get_left_child_formula();
             auto right_f = f->get_right_child_formula();
 
-            if(check_contradiction_in_F(left_f))
+            const auto left_f_op = left_f->get_operation_type();
+            const auto right_f_op = right_f->get_operation_type();
+            // T(F) is not satisfiable
+            if (left_f_op == op_t::constant_false || right_f_op == op_t::constant_false)
             {
-                trace() << "Found a contradiction with left child " << *left_f
-                        << " which has been found in F";
+                trace() << "Found a contradiction - " << *f << " has a constant F as a child";
                 return false;
             }
-            add_formula_to_T(left_f);
 
-            if(check_contradiction_in_F(right_f))
+            auto process_T_conj_child = [&](const formula* child)
             {
-                trace() << "Found a contradiction with right child " << *right_f
+                if (child->is_constant())
+                {
+                    return true;
+                }
+                if (find_in_F(child))
+                {
+                    trace() << "Found a contradiction with child " << *child
                         << " which has been found in F";
+                    return false;
+                }
+                add_formula_to_T(child);
+                return true;
+            };
+            if (!process_T_conj_child(left_f) || !process_T_conj_child(right_f))
+            {
                 return false;
             }
-            add_formula_to_T(right_f);
 
             auto res = step();
 
@@ -87,14 +122,24 @@ auto tableau::step() -> bool
             return res;
         }
 
-        assert(f->get_operation_type() == formula::operation_t::disjunction);
+        assert(op == op_t::disjunction);
 
+        // T(X v Y) -> T(X) v T(Y)
         auto left_f = f->get_left_child_formula();
         auto right_f = f->get_right_child_formula();
 
         trace() << "Will split to two subtrees: " << *left_f << " and " << *right_f;
 
-        if(!check_contradiction_in_F(left_f))
+        const auto left_f_op = left_f->get_operation_type();
+        const auto right_f_op = right_f->get_operation_type();
+        // T(T) is satisfiable and we can skip the other branch
+        if (left_f_op == op_t::constant_true || right_f_op == op_t::constant_true)
+        {
+            return true;
+        }
+
+        // T(F) is not satisfiable
+        if(left_f_op != op_t::constant_false && !find_in_F(left_f))
         {
             add_formula_to_T(left_f);
 
@@ -107,7 +152,7 @@ auto tableau::step() -> bool
             remove_formula_from_T(left_f);
         }
 
-        if(!check_contradiction_in_F(right_f))
+        if(right_f_op != op_t::constant_false && !find_in_F(right_f))
         {
             add_formula_to_T(right_f);
             if(step())
@@ -128,10 +173,22 @@ auto tableau::step() -> bool
     trace() << "Process " << *f << " from F formulas";
     log_state();
 
-    if(f->get_operation_type() == formula::operation_t::negation)
+    const auto op = f->get_operation_type();
+    if(op == op_t::negation)
     {
+        // F(~X) -> T(X)
         auto not_negated_f = f->get_left_child_formula();
-        if(check_contradiction_in_F(not_negated_f))
+        if (not_negated_f->is_constant())
+        {
+            // T(F) is not satisfiable
+            if (not_negated_f->get_operation_type() == op_t::constant_false)
+            {
+                trace() << "Found a contradiction - found " << *f << " constant in F formulas";
+                return false;
+            }
+            return true;
+        }
+        if(find_in_F(not_negated_f))
         {
             trace() << "Found a contradiction - " << *not_negated_f << " found in F formulas";
             return false;
@@ -142,24 +199,39 @@ auto tableau::step() -> bool
         return res;
     }
 
-    if(f->get_operation_type() == formula::operation_t::disjunction)
+    if(op == op_t::disjunction)
     {
+        // F(X v Y) -> F(X) & F(Y)
         auto left_f = f->get_left_child_formula();
         auto right_f = f->get_right_child_formula();
 
-        if(check_contradiction_in_T(left_f))
+        const auto left_f_op = left_f->get_operation_type();
+        const auto right_f_op = right_f->get_operation_type();
+        // F(T) is not satisfiable
+        if (left_f_op == op_t::constant_true || right_f_op == op_t::constant_true)
         {
-            trace() << "Found a contradiction with right child " << *left_f << " which has been found in T";
+            trace() << "Found a contradiction - " << *f << " has a constant T as a child";
             return false;
         }
-        add_formula_to_F(left_f);
 
-        if(check_contradiction_in_T(right_f))
+        auto process_F_disj_child = [&](const formula* child)
         {
-            trace() << "Found a contradiction with right child " << *right_f << " which has been found in T";
+            if (child->is_atomic())
+            {
+                return true;
+            }
+            if (find_in_T(child))
+            {
+                trace() << "Found a contradiction with right child " << *child << " which has been found in T";
+                return false;
+            }
+            add_formula_to_F(child);
+            return true;
+        };
+        if (!process_F_disj_child(left_f) || process_F_disj_child(right_f))
+        {
             return false;
         }
-        add_formula_to_F(right_f);
 
         auto res = step();
 
@@ -169,15 +241,26 @@ auto tableau::step() -> bool
         return res;
     }
 
-    assert(f->get_operation_type() == formula::operation_t::conjunction);
+    assert(op == op_t::conjunction);
 
+    // F(X & Y) -> F(X) v F(Y)
     auto left_f = f->get_left_child_formula();
     auto right_f = f->get_right_child_formula();
 
     trace() << "Will split to two subtrees: " << *left_f << " and " << *right_f;
 
+    const auto left_f_op = left_f->get_operation_type();
+    const auto right_f_op = right_f->get_operation_type();
+
+    // F(F) is satisfiable and we can skip the other branch
+    if (left_f_op == op_t::constant_false || right_f_op == op_t::constant_false)
+    {
+        return true;
+    }
+
     // left branch of the path
-    if(!check_contradiction_in_T(left_f))
+    // F(T) is not satisfiable
+    if(left_f_op != op_t::constant_true && !find_in_T(left_f))
     {
         add_formula_to_F(left_f);
         if(step())
@@ -188,7 +271,7 @@ auto tableau::step() -> bool
         remove_formula_from_F(left_f);
     }
 
-    if(!check_contradiction_in_T(right_f))
+    if(right_f_op != op_t::constant_true && !find_in_T(right_f))
     {
         add_formula_to_F(right_f);
         if(step())
@@ -200,7 +283,7 @@ auto tableau::step() -> bool
     return false;
 }
 
-auto tableau::check_contradiction_in_T(const formula* f) const -> bool
+auto tableau::find_in_T(const formula* f) const -> bool
 {
     const auto op = f->get_operation_type();
     if (op == formula::operation_t::c)
@@ -217,7 +300,7 @@ auto tableau::check_contradiction_in_T(const formula* f) const -> bool
     return formulas_T_.find(f) != formulas_T_.end();
 }
 
-auto tableau::check_contradiction_in_F(const formula* f) const -> bool
+auto tableau::find_in_F(const formula* f) const -> bool
 {
     const auto op = f->get_operation_type();
     if (op == formula::operation_t::c)
@@ -248,11 +331,14 @@ void tableau::add_formula_to_T(const formula* f)
         trace() << "Adding " << *t << " to zero terms T because " << *f << " is eq_zero formula";
         zero_terms_T_.insert(t);
     }
-    else
+    else if(f->is_formula_operation())
     {
-        assert(f->is_formula_operation());
         trace() << "Adding " << *f << " to T formulas";
         formulas_T_.insert(f);
+    }
+    else
+    {
+        trace() << "Skipping adding constant formula " << *f << " to T formulas";
     }
 }
 
@@ -270,11 +356,14 @@ void tableau::add_formula_to_F(const formula* f)
         trace() << "Adding " << *t << " to zero terms F because " << *f << " is eq_zero formula";
         zero_terms_F_.insert(t);
     }
-    else
+    else if(f->is_formula_operation())
     {
-        assert(f->is_formula_operation());
         trace() << "Adding " << *f << " to F formulas";
         formulas_F_.insert(f);
+    }
+    else
+    {
+        trace() << "Skipping adding constant formula " << *f << " to F formulas";
     }
 }
 
@@ -292,11 +381,14 @@ void tableau::remove_formula_from_T(const formula* f)
         trace() << "Removing " << *t << " from zero terms T because " << *f << " is eq_zero formula";
         zero_terms_T_.erase(t);
     }
-    else
+    else if(f->is_formula_operation())
     {
-        assert(f->is_formula_operation());
         trace() << "Removing " << *f << " from T formulas";
         formulas_T_.erase(f);
+    }
+    else
+    {
+        trace() << "Skipping removing constant formula " << *f << " from T formulas";
     }
 }
 
@@ -314,11 +406,14 @@ void tableau::remove_formula_from_F(const formula* f)
         trace() << "Removing " << *t << " from zero terms because " << *f << " is eq_zero formula";
         zero_terms_F_.erase(t);
     }
-    else
+    else if(f->is_formula_operation())
     {
-        assert(f->is_formula_operation());
         trace() << "Removing " << *f << " from F formulas";
         formulas_F_.erase(f);
+    }
+    else
+    {
+        trace() << "Skipping removing constant formula " << *f << " from F formulas";
     }
 }
 
