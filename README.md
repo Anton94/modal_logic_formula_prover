@@ -5,6 +5,7 @@ TODO: Master degree project for prooving/disprooving formulas (space and probabi
 - [cpprestsdk](https://github.com/microsoft/cpprestsdk) for the web client
 - CMake
 - Cpp14
+- npm
 
 # Building
 For build system, we are using CMake.
@@ -19,6 +20,12 @@ The generated files are going to be in the `build` directory, where you can star
 # Sanitizers
 We are using [google's sanitizers](https://github.com/google/sanitizers) via CMake.
 Note that for memory sanitizer you will need e.g. llvm-symbolizer to see the sources & lines and not just the addresses.
+
+
+# JS Tests
+In the client project run:
+- npm install -g jasmine
+- jasmine
 
 # References
 
