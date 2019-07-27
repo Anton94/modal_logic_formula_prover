@@ -1,5 +1,8 @@
 // TODO
-module.exports = {formula_to_json};
+
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = {formula_to_json};
+}
 
 var Operations = {
     formula: {
@@ -11,15 +14,19 @@ var Operations = {
         IMPLICATION: "->",
         EQUIVALENCY: "<->",
         NEGATION: "~",
+        constant: {
+            TRUE: "T",
+            FALSE: "F"
+        }
     },
     term: {
         UNION: "+",
         INTERSECTION: "*",
-        STAR: "-"
-    },
-    constant: {
-        TRUE: "T",
-        FALSE: "F"
+        STAR: "-",
+        constant: {
+            TRUE: "1",
+            FALSE: "0"
+        }
     },
     help: {
         STRING: "string",
@@ -41,8 +48,10 @@ const symbol_to_explanation =  {
     "*": "Tand",
     "+": "Tor",
     "-": "Tstar",
-    "T": "true",
-    "F": "false",
+    "T": "T",
+    "F": "F",
+    "1": "1",
+    "0": "0",
     "string": "string"
 };
 
@@ -56,6 +65,13 @@ const NEG_OPERATIONS = new Set([
     symbol_to_explanation[Operations.formula.NEGATION],
     symbol_to_explanation[Operations.term.STAR]
 ]);
+
+const CONSTANT_OPERATIONS = new Set([
+    symbol_to_explanation[Operations.formula.constant.TRUE],
+    symbol_to_explanation[Operations.formula.constant.FALSE],
+    symbol_to_explanation[Operations.term.constant.TRUE],
+    symbol_to_explanation[Operations.term.constant.FALSE]
+])
 
 const TWO_ARG_OPERATIONS = new Set([
     symbol_to_explanation[Operations.formula.LESS],
@@ -72,8 +88,10 @@ const N_ARG_OPERATIONS = new Set([
 ])
 
 const ZERO_ARG_OPERATIONS = new Set([
-    symbol_to_explanation[Operations.constant.TRUE],
-    symbol_to_explanation[Operations.constant.FALSE],
+    symbol_to_explanation[Operations.formula.constant.TRUE],
+    symbol_to_explanation[Operations.formula.constant.FALSE],
+    symbol_to_explanation[Operations.term.constant.TRUE],
+    symbol_to_explanation[Operations.term.constant.FALSE],
     symbol_to_explanation[Operations.help.STRING]
 ])
 
@@ -94,13 +112,16 @@ const Imp = createToken({ name: "Imp", pattern: Operations.formula.IMPLICATION }
 const Equ = createToken({ name: "Equ", pattern: Operations.formula.EQUIVALENCY })
 const Neg = createToken({ name: "Neg", pattern: Operations.formula.NEGATION })
 
+const FormulaTrue = createToken({ name: "FormulaTrue", pattern: Operations.formula.constant.TRUE })
+const FormulaFalse = createToken({ name: "FormulaFalse", pattern: Operations.formula.constant.FALSE })
+
 // Term operations
 const TCon = createToken({ name: "TCon", pattern: Operations.term.INTERSECTION })
 const TDis = createToken({ name: "TDis", pattern: Operations.term.UNION })
 const TStar = createToken({ name: "TStar", pattern: Operations.term.STAR })
 
-const True = createToken({ name: "True", pattern: Operations.constant.TRUE })
-const False = createToken({ name: "False", pattern: Operations.constant.FALSE })
+const TermTrue = createToken({ name: "TermTrue", pattern: Operations.term.constant.TRUE })
+const TermFalse = createToken({ name: "TermFalse", pattern: Operations.term.constant.FALSE })
 const StringLiteral = createToken({
     name: "StringLiteral",
     pattern: /[a-z0-9]+/
@@ -129,6 +150,9 @@ const allTokens = [
     Equ,
     Neg,
 
+    FormulaTrue,
+    FormulaFalse,
+
 // term operation
     TCon,
     TDis,
@@ -137,10 +161,10 @@ const allTokens = [
     LParen,
     RParen,
 
-// atomic term
-    StringLiteral,
-    True,
-    False
+// atomic term,
+    TermTrue,
+    TermFalse,
+    StringLiteral
 ]
 
 const JsonLexer = new Lexer(allTokens)
@@ -188,7 +212,7 @@ class JsonParser extends CstParser {
 
         $.RULE("negation", () => {
             $.MANY(() => {
-                $.CONSUME(Neg, { LABEL: "neg" })
+                $.CONSUME(Neg, { LABEL: Operations.formula.NEGATION })
             })
             $.SUBRULE($.atomic_formula, { LABEL: "lhs" })
         })
@@ -198,6 +222,8 @@ class JsonParser extends CstParser {
                 {
                     ALT: () => $.SUBRULE($.parenthesis_formula, { LABEL: "lhs" })
                 },
+                { ALT: () => $.CONSUME(FormulaTrue, { LABEL: "constant" }) },
+                { ALT: () => $.CONSUME(FormulaFalse, { LABEL: "constant" }) },
                 { ALT: () => {
                         $.OR1([
                             { ALT: () => $.CONSUME(Less, { LABEL: "mid" }) },
@@ -238,7 +264,7 @@ class JsonParser extends CstParser {
 
         $.RULE("star", () => {
             $.MANY(() => {
-                $.CONSUME(TStar, { LABEL: "star" })
+                $.CONSUME(TStar, { LABEL: Operations.term.STAR })
             })
             $.SUBRULE($.atomic_term, { LABEL: "lhs" })
         })
@@ -247,8 +273,8 @@ class JsonParser extends CstParser {
         $.RULE("atomic_term", () => {
             $.OR([
                 { ALT: () => $.SUBRULE($.parenthesis_term, { LABEL: "lhs" }) },
-                { ALT: () => $.CONSUME(True, { LABEL: "lhs" }) },
-                { ALT: () => $.CONSUME(False, { LABEL: "lhs" }) },
+                { ALT: () => $.CONSUME(TermTrue, { LABEL: "constant" }) },
+                { ALT: () => $.CONSUME(TermFalse, { LABEL: "constant" }) },
                 { ALT: () => $.CONSUME(StringLiteral, { LABEL: "lhs" }) }
             ])
         })
@@ -267,33 +293,33 @@ class JsonParser extends CstParser {
 function simplify(cst) {
     if (!cst.hasOwnProperty("name")) {
         return { 
-            "name": "string", 
+            "name": Operations.help.STRING, 
             "value": cst.image
         };
-    } else if (cst.children.hasOwnProperty("star")) {
-        var starValue = {
-            "name": symbol_to_explanation["-"],
+    }
+
+    if (cst.children.hasOwnProperty("constant")) {
+        return {
+            "name": symbol_to_explanation[cst.children["constant"][0].image]
+        };
+    }
+
+    if (cst.children.hasOwnProperty(Operations.term.STAR) ||
+            cst.children.hasOwnProperty(Operations.formula.NEGATION)) {
+        var operation = cst.children.hasOwnProperty(Operations.term.STAR) 
+                            ? Operations.term.STAR 
+                            : Operations.formula.NEGATION;
+        var value = {
+            "name": symbol_to_explanation[operation],
             "value": simplify(cst.children["lhs"][0])
         };
-        for (var i = 1; i <cst.children["star"].length; ++i) {
-            starValue = {
-                "name": symbol_to_explanation["-"],
-                "value": starValue
+        for (var i = 1; i < cst.children[operation].length; ++i) {
+            value = {
+                "name": symbol_to_explanation[operation],
+                "value": value
             }
         }
-        return starValue;
-    } else if (cst.children.hasOwnProperty("neg")) {
-        var negValue = {
-            "name": symbol_to_explanation["~"], 
-            "value": simplify(cst.children["lhs"][0])
-        };
-        for (var i = 1; i < cst.children["neg"].length; ++i) {
-            negValue = {
-                "name": symbol_to_explanation["~"],
-                "value": negValue
-            }
-        }
-        return negValue;
+        return value;
     } else if (cst.children.hasOwnProperty("rhs")) {
         var children = [simplify(cst.children["lhs"][0])];
         cst.children["rhs"].forEach((x) => {
