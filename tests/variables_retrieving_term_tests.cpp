@@ -191,7 +191,7 @@ TEST_CASE("variables of term containing a constant", "[variables_check_term]")
     // 0
     json term_json =
         R"({
-         "name": "constant_0"
+         "name": "0"
       })"_json;
     auto formula_mgr = create_atomic_formula_with_same_child_terms(term_json);
     auto term = formula_mgr.get_internal_formula()->get_left_child_term();

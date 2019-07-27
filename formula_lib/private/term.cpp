@@ -82,11 +82,11 @@ auto term::build(json& t) -> bool
     }
 
     auto op = name_field.get<std::string>();
-    if(op == "constant_1")
+    if(op == "1")
     {
         construct_constant(operation_t::constant_true);
     }
-    else if(op == "constant_0")
+    else if(op == "0")
     {
         construct_constant(operation_t::constant_false);
     }

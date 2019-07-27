@@ -52,7 +52,7 @@ TEST_CASE("move assignment of formula_mgr", "[run_with_sanitizer]")
                                 "value": "c"
                              },
                              {
-                                "name": "constant_0"
+                                "name": "0"
                              }
                           ]
                        }
@@ -65,12 +65,12 @@ TEST_CASE("move assignment of formula_mgr", "[run_with_sanitizer]")
                     "name": "Tand",
                     "value": [
                        {
-                          "name": "constant_1"
+                          "name": "1"
                        },
                        {
                           "name": "Tstar",
                           "value": {
-                              "name": "constant_0"
+                              "name": "0"
                           }
                        }
                     ]

@@ -167,7 +167,7 @@ TEST_CASE("satisfiable evaluation with constant 0", "[brute force evaluation]")
                   "name": "contact",
                   "value": [
                      {
-                        "name": "constant_1"
+                        "name": "1"
                      },
                      {
                         "name": "string",
@@ -185,7 +185,7 @@ TEST_CASE("satisfiable evaluation with constant 0", "[brute force evaluation]")
                            "value": "a"
                         },
                         {
-                           "name": "constant_0"
+                           "name": "0"
                         }
                      ]
                   }
@@ -228,7 +228,7 @@ TEST_CASE("satisfiable evaluation with constant 1", "[brute force evaluation]")
                                 "value": "c"
                              },
                              {
-                                "name": "constant_0"
+                                "name": "0"
                              }
                           ]
                        }
@@ -241,12 +241,12 @@ TEST_CASE("satisfiable evaluation with constant 1", "[brute force evaluation]")
                     "name": "Tand",
                     "value": [
                        {
-                          "name": "constant_1"
+                          "name": "1"
                        },
                        {
                           "name": "Tstar",
                           "value": {
-                              "name": "constant_0"
+                              "name": "0"
                           }
                        }
                     ]
@@ -290,7 +290,7 @@ TEST_CASE("satisfiable evaluation with constant 2", "[brute force evaluation]")
                                 "value": "c"
                              },
                              {
-                                "name": "constant_1"
+                                "name": "1"
                              }
                           ]
                        }
@@ -303,7 +303,7 @@ TEST_CASE("satisfiable evaluation with constant 2", "[brute force evaluation]")
                     "name": "Tand",
                     "value": [
                        {
-                          "name": "constant_1"
+                          "name": "1"
                        },
                        {
                           "name": "Tstar",
@@ -353,7 +353,7 @@ TEST_CASE("satisfiable evaluation with constant 3", "[brute force evaluation]")
                                 "value": "c"
                              },
                              {
-                                "name": "constant_1"
+                                "name": "1"
                              }
                           ]
                        }
@@ -401,7 +401,7 @@ TEST_CASE("satisfiable evaluation with constant 4", "[brute force evaluation]")
                                 "value": "c"
                              },
                              {
-                                "name": "constant_1"
+                                "name": "1"
                              }
                           ]
                        }
@@ -449,7 +449,7 @@ TEST_CASE("satisfiable evaluation with constant 5", "[brute force evaluation]")
                                 "value": "c"
                              },
                              {
-                                "name": "constant_1"
+                                "name": "1"
                              }
                           ]
                        }
@@ -457,7 +457,7 @@ TEST_CASE("satisfiable evaluation with constant 5", "[brute force evaluation]")
                  ]
               },
               {
-                 "name": "constant_F"
+                 "name": "F"
               }
            ]
         })"_json,
@@ -478,7 +478,7 @@ TEST_CASE("satisfiable evaluation with constant 6", "[brute force evaluation]")
                        "name": "contact",
                        "value": [
                           {
-                               "name": "constant_0"
+                               "name": "0"
                           },
                           {
                              "name": "string",
@@ -496,7 +496,7 @@ TEST_CASE("satisfiable evaluation with constant 6", "[brute force evaluation]")
                                 "value": "c"
                              },
                              {
-                                "name": "constant_1"
+                                "name": "1"
                              }
                           ]
                        }
@@ -504,7 +504,7 @@ TEST_CASE("satisfiable evaluation with constant 6", "[brute force evaluation]")
                  ]
               },
               {
-                 "name": "constant_F"
+                 "name": "F"
               }
            ]
         })"_json,
@@ -525,7 +525,7 @@ TEST_CASE("satisfiable evaluation with constant 7", "[brute force evaluation]")
                        "name": "contact",
                        "value": [
                           {
-                             "name": "constant_0"
+                             "name": "0"
                           },
                           {
                              "name": "string",
@@ -543,7 +543,7 @@ TEST_CASE("satisfiable evaluation with constant 7", "[brute force evaluation]")
                                 "value": "c"
                              },
                              {
-                                "name": "constant_1"
+                                "name": "1"
                              }
                           ]
                        }
@@ -551,7 +551,7 @@ TEST_CASE("satisfiable evaluation with constant 7", "[brute force evaluation]")
                  ]
               },
               {
-                 "name": "constant_T"
+                 "name": "T"
               }
            ]
         })"_json,

@@ -388,12 +388,12 @@ TEST_CASE("constants", "[contact_commutativity]")
     // 0
     json a =
         R"({
-         "name": "constant_0"
+         "name": "0"
       })"_json;
     // 1
     json b =
         R"({
-         "name": "constant_1"
+         "name": "1"
       })"_json;
     check_equality_of_contacts_with_terms(a, b);
 }
@@ -476,7 +476,7 @@ TEST_CASE("negation of variable and negation of constant", "[contact_commutativi
         R"({
          "name": "Tstar",
          "value": {
-            "name": "constant_0"
+            "name": "0"
          }
       })"_json;
 
