@@ -1,4 +1,83 @@
 // TODO
+module.exports = {formula_to_json};
+
+var Operations = {
+    formula: {
+        LESS: "<=",
+        EQUAL_ZERO: "=0",
+        CONTACT: "C",
+        DISJUNCTION: "|",
+        CONJUNCTION: "&",
+        IMPLICATION: "->",
+        EQUIVALENCY: "<->",
+        NEGATION: "~",
+    },
+    term: {
+        UNION: "+",
+        INTERSECTION: "*",
+        STAR: "-"
+    },
+    constant: {
+        TRUE: "T",
+        FALSE: "F"
+    },
+    help: {
+        STRING: "string",
+        LPAREN: "(",
+        RPAREN: ")",
+        COMMA: ","
+    }
+};
+
+const symbol_to_explanation =  {
+    "<=": "less",
+    "=0": "equal0",
+    "C": "contact",
+    "|": "disjunction",
+    "&": "conjunction",
+    "->": "implication",
+    "<->": "equivalence",
+    "~": "negation",
+    "*": "Tand",
+    "+": "Tor",
+    "-": "Tstar",
+    "T": "true",
+    "F": "false",
+    "string": "string"
+};
+
+const ONE_ARG_OPERATIONS = new Set([
+    symbol_to_explanation[Operations.formula.NEGATION],
+    symbol_to_explanation[Operations.term.STAR],
+    symbol_to_explanation[Operations.formula.EQUAL_ZERO]
+]);
+
+const NEG_OPERATIONS = new Set([
+    symbol_to_explanation[Operations.formula.NEGATION],
+    symbol_to_explanation[Operations.term.STAR]
+]);
+
+const TWO_ARG_OPERATIONS = new Set([
+    symbol_to_explanation[Operations.formula.LESS],
+    symbol_to_explanation[Operations.formula.CONTACT]
+]);
+
+const N_ARG_OPERATIONS = new Set([
+    symbol_to_explanation[Operations.formula.CONJUNCTION],
+    symbol_to_explanation[Operations.formula.DISJUNCTION],
+    symbol_to_explanation[Operations.formula.IMPLICATION],
+    symbol_to_explanation[Operations.formula.EQUIVALENCY],
+    symbol_to_explanation[Operations.term.UNION],
+    symbol_to_explanation[Operations.term.INTERSECTION]
+])
+
+const ZERO_ARG_OPERATIONS = new Set([
+    symbol_to_explanation[Operations.constant.TRUE],
+    symbol_to_explanation[Operations.constant.FALSE],
+    symbol_to_explanation[Operations.help.STRING]
+])
+
+
 
 const createToken = chevrotain.createToken;
 const Lexer = chevrotain.Lexer;
@@ -6,29 +85,29 @@ const CstParser = chevrotain.CstParser;
 
 // ----------------- lexer -----------------
 
-const Less = createToken({ name: "Less", pattern: /<=/ })
-const Contact = createToken({ name: "Contact", pattern: /C/ })
+const Less = createToken({ name: "Less", pattern: Operations.formula.LESS })
+const Contact = createToken({ name: "Contact", pattern: Operations.formula.CONTACT })
 
-const Dis = createToken({ name: "Dis", pattern: /\|/ })
-const Con = createToken({ name: "Con", pattern: /&/ })
-const Imp = createToken({ name: "Imp", pattern: /->/ })
-const Equ = createToken({ name: "Equ", pattern: /<->/ })
-const Neg = createToken({ name: "Neg", pattern: /~/ })
+const Dis = createToken({ name: "Dis", pattern: Operations.formula.DISJUNCTION })
+const Con = createToken({ name: "Con", pattern: Operations.formula.CONJUNCTION })
+const Imp = createToken({ name: "Imp", pattern: Operations.formula.IMPLICATION })
+const Equ = createToken({ name: "Equ", pattern: Operations.formula.EQUIVALENCY })
+const Neg = createToken({ name: "Neg", pattern: Operations.formula.NEGATION })
 
 // Term operations
-const TCon = createToken({ name: "TCon", pattern: /\*/ })
-const TDis = createToken({ name: "TDis", pattern: /\+/ })
-const TStar = createToken({ name: "TStar", pattern: /\-/ })
+const TCon = createToken({ name: "TCon", pattern: Operations.term.INTERSECTION })
+const TDis = createToken({ name: "TDis", pattern: Operations.term.UNION })
+const TStar = createToken({ name: "TStar", pattern: Operations.term.STAR })
 
-const True = createToken({ name: "True", pattern: "T" })
-const False = createToken({ name: "False", pattern: "F" })
+const True = createToken({ name: "True", pattern: Operations.constant.TRUE })
+const False = createToken({ name: "False", pattern: Operations.constant.FALSE })
 const StringLiteral = createToken({
     name: "StringLiteral",
     pattern: /[a-z0-9]+/
 })
-const LParen = createToken({ name: "LParen", pattern: /\(/ })
-const RParen = createToken({ name: "RParen", pattern: /\)/ })
-const Comma = createToken({ name: "Comma", pattern: /,/ })
+const LParen = createToken({ name: "LParen", pattern: Operations.help.LPAREN })
+const RParen = createToken({ name: "RParen", pattern: Operations.help.RPAREN })
+const Comma = createToken({ name: "Comma", pattern: Operations.help.COMMA })
 const WhiteSpace = createToken({
     name: "WhiteSpace",
     pattern: /\s+/,
@@ -185,23 +264,6 @@ class JsonParser extends CstParser {
     }
 }
 
-const symbol_to_explanation =  {
-    "<=": "less",
-    "=0": "equal0",
-    "C": "contact",
-    "|": "disjunction",
-    "&": "conjunction",
-    "->": "implication",
-    "<->": "equivalence",
-    "~": "negation",
-    "*": "Tand",
-    "+": "Tor",
-    "-": "Tstar",
-    "T": "true",
-    "F": "false",
-    "string": "string"
-}
-
 function simplify(cst) {
     if (!cst.hasOwnProperty("name")) {
         return { 
@@ -260,8 +322,7 @@ function parse(formula) {
     // setting a new input will RESET the parser instance's state.
     parser.input = lexResult.tokens
     // any top level rule may be used as an entry point
-    const cst = parser.disjunction()
-    document.getElementById("output").innerHTML = "";
+    const cst = parser.disjunction();
 
     console.log("Lex errors: " + lexResult.errors)
     console.log("Parse errors: " + parser.errors)
@@ -273,47 +334,15 @@ function parse(formula) {
     }
 }
 
-const ONE_ARG_OPERATIONS = new Set([
-    symbol_to_explanation["~"],
-    symbol_to_explanation["-"],
-    symbol_to_explanation["=0"]
-]);
-
-const NEG_OPERATIONS = new Set([
-    symbol_to_explanation["~"],
-    symbol_to_explanation["-"]
-]);
-
-const TWO_ARG_OPERATIONS = new Set([
-    symbol_to_explanation["<="],
-    symbol_to_explanation["C"],
-]);
-
-const N_ARG_OPERATIONS = new Set([
-    symbol_to_explanation["*"],
-    symbol_to_explanation["+"],
-    symbol_to_explanation["|"],
-    symbol_to_explanation["&"],
-    symbol_to_explanation["->"],
-    symbol_to_explanation["<->"]
-])
-
-const ZERO_ARG_OPERATIONS = new Set([
-    symbol_to_explanation["T"],
-    symbol_to_explanation["F"],
-    symbol_to_explanation["string"]
-
-])
-
 function formula_to_json(formula) {
     simplified = simplify(parse(formula).cst);
     //formula_traverse_top_to_bottom(simplified, new Set(["less"]), remove_equal_TDis_in_less);
-    formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["<="]]), decompose_less);
+    formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation[Operations.formula.LESS]]), decompose_less);
     formula_traverse_top_to_bottom(simplified, N_ARG_OPERATIONS, decompose_max_two_childs);
-    formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["<->"]]), decompose_equivalency);
-    formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["->"]]), decompose_implication);
-    formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["~"], symbol_to_explanation["-"]]), remove_double_negations);
-    formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["C"]]), decompose_contant_on_Tdis);
+    formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation[Operations.formula.EQUIVALENCY]]), decompose_equivalency);
+    formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation[Operations.formula.IMPLICATION]]), decompose_implication);
+    formula_traverse_top_to_bottom(simplified, NEG_OPERATIONS, remove_double_negations);
+    formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation[Operations.formula.CONTACT]]), decompose_contant_on_Tdis);
     return simplified;
 }
 

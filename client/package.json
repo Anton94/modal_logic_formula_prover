@@ -1,0 +1,17 @@
+{
+  "name": "modal_logic_formula_prover",
+  "version": "1.0.0",
+  "description": "TODO Update this",
+  "main": "formula_parser.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jasmine": "^2.99.0"
+  },
+  "dependencies": {
+    "chevrotain": "^4.8.1"
+  }
+}
