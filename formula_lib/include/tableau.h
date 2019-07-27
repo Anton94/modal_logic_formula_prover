@@ -26,6 +26,13 @@ private:
     // Does a step of tableau method and returns whether there was a contradiction or not
     auto step() -> bool;
 
+    // TODO: implement the contact rule checking also when adding new =0 term
+
+    // T(C(a,b)) has broken contact rule if a = 0 | b = 0
+    auto has_broken_contact_rule_T(const formula* f) const -> bool;
+    // F(C(a,b)) has broken contact rule if a != 0 & b != 0
+    auto has_broken_contact_rule_F(const formula* f) const -> bool;
+
     auto find_in_T(const formula* f) const -> bool;
     auto find_in_F(const formula* f) const -> bool;
 

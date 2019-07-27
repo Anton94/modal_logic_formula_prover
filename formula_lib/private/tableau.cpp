@@ -73,6 +73,11 @@ auto tableau::step() -> bool
                 trace() << "Found a contradiction - " << *not_negated_f << " found in T formulas";
                 return false;
             }
+
+            if (has_broken_contact_rule_F(not_negated_f)) // T(~C(a,b)) -> F(C(a,b))
+            {
+                return false;
+            }
             add_formula_to_F(not_negated_f);
             auto res = step();
             remove_formula_from_F(not_negated_f);
@@ -106,10 +111,14 @@ auto tableau::step() -> bool
                         << " which has been found in F";
                     return false;
                 }
+                if (has_broken_contact_rule_T(child))
+                {
+                    return false;
+                }
                 add_formula_to_T(child);
                 return true;
             };
-            if (!process_T_conj_child(left_f) || !process_T_conj_child(right_f))
+            if (!process_T_conj_child(left_f) || !process_T_conj_child(right_f)) // TODO: what if right child fails, then I need to remove the left child from the formulas.. FIX IT
             {
                 return false;
             }
@@ -139,7 +148,7 @@ auto tableau::step() -> bool
         }
 
         // T(F) is not satisfiable
-        if(left_f_op != op_t::constant_false && !find_in_F(left_f))
+        if(left_f_op != op_t::constant_false && !find_in_F(left_f) && !has_broken_contact_rule_T(left_f))
         {
             add_formula_to_T(left_f);
 
@@ -152,7 +161,7 @@ auto tableau::step() -> bool
             remove_formula_from_T(left_f);
         }
 
-        if(right_f_op != op_t::constant_false && !find_in_F(right_f))
+        if(right_f_op != op_t::constant_false && !find_in_F(right_f) && !has_broken_contact_rule_T(right_f))
         {
             add_formula_to_T(right_f);
             if(step())
@@ -193,6 +202,11 @@ auto tableau::step() -> bool
             trace() << "Found a contradiction - " << *not_negated_f << " found in F formulas";
             return false;
         }
+
+        if (has_broken_contact_rule_T(not_negated_f)) // F(~C(a,b)) -> T(C(a,b))
+        {
+            return false;
+        }
         add_formula_to_T(not_negated_f);
         auto res = step();
         remove_formula_from_T(not_negated_f);
@@ -222,7 +236,12 @@ auto tableau::step() -> bool
             }
             if (find_in_T(child))
             {
-                trace() << "Found a contradiction with right child " << *child << " which has been found in T";
+                trace() << "Found a contradiction with child " << *child
+                    << " which has been found in T";
+                return false;
+            }
+            if (has_broken_contact_rule_F(child))
+            {
                 return false;
             }
             add_formula_to_F(child);
@@ -260,7 +279,7 @@ auto tableau::step() -> bool
 
     // left branch of the path
     // F(T) is not satisfiable
-    if(left_f_op != op_t::constant_true && !find_in_T(left_f))
+    if(left_f_op != op_t::constant_true && !find_in_T(left_f) && !has_broken_contact_rule_F(left_f))
     {
         add_formula_to_F(left_f);
         if(step())
@@ -271,7 +290,7 @@ auto tableau::step() -> bool
         remove_formula_from_F(left_f);
     }
 
-    if(right_f_op != op_t::constant_true && !find_in_T(right_f))
+    if(right_f_op != op_t::constant_true && !find_in_T(right_f) && !has_broken_contact_rule_F(right_f))
     {
         add_formula_to_F(right_f);
         if(step())
@@ -279,6 +298,41 @@ auto tableau::step() -> bool
             return true;
         }
         remove_formula_from_F(right_f);
+    }
+    return false;
+}
+
+auto tableau::has_broken_contact_rule_T(const formula* f) const -> bool
+{
+    if (f->get_operation_type() == formula::operation_t::c)
+    {
+        // T(C(a,b)) has broken contact rule if a = 0 | b = 0
+        const auto a = f->get_left_child_term();
+        const auto b = f->get_right_child_term();
+        if(zero_terms_T_.find(a) != zero_terms_T_.end() ||
+            zero_terms_T_.find(b) != zero_terms_T_.end())
+        {
+            trace() << "Found a contradiction with the contact rule - T(" << *f << ") has a zero term";
+            return true;
+        }
+    }
+
+    return false;
+}
+
+auto tableau::has_broken_contact_rule_F(const formula* f) const -> bool
+{
+    if (f->get_operation_type() == formula::operation_t::c)
+    {
+        // F(C(a,b)) has broken contact rule if a != 0 & b != 0
+        const auto a = f->get_left_child_term();
+        const auto b = f->get_right_child_term();
+        if (zero_terms_F_.find(a) != zero_terms_F_.end() &&
+            zero_terms_F_.find(b) != zero_terms_F_.end())
+        {
+            trace() << "Found a contradiction with the contact rule - F(" << *f << ") 's terms are not zero";
+            return true;
+        }
     }
     return false;
 }
