@@ -307,12 +307,13 @@ const ZERO_ARG_OPERATIONS = new Set([
 
 function formula_to_json(formula) {
     simplified = simplify(parse(formula).cst);
-    formula_traverse_top_to_bottom(simplified, new Set(["less"]), remove_equal_TDis_in_less);
+    //formula_traverse_top_to_bottom(simplified, new Set(["less"]), remove_equal_TDis_in_less);
     formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["<="]]), decompose_less);
     formula_traverse_top_to_bottom(simplified, N_ARG_OPERATIONS, decompose_max_two_childs);
     formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["<->"]]), decompose_equivalency);
     formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["->"]]), decompose_implication);
     formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["~"], symbol_to_explanation["-"]]), remove_double_negations);
+    formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation["C"]]), decompose_contant_on_Tdis);
     return simplified;
 }
 
@@ -340,17 +341,83 @@ function remove_equal_TDis_in_less(node) {
     // <=(b*c, -b)
 }
 
-function decompose_less(node) {
-    node.name = symbol_to_explanation["=0"];
-    node.value = {
-        "name": symbol_to_explanation["*"],
-        "value": [
-            node.value[0],
+function decompose_contant_on_Tdis(node) {
+    if (node.value[0].name == symbol_to_explanation["+"]) {
+        node.name = symbol_to_explanation["|"];
+        node.value = [
             {
-                "name": symbol_to_explanation["-"],
-                "value": node.value[1]
+                "name": symbol_to_explanation["C"],
+                "value": [
+                    node.value[0].value[0],
+                    node.value[1]
+                ]
+            },
+            {
+                "name": symbol_to_explanation["C"],
+                "value": [
+                    node.value[0].value[1],
+                    node.value[1]
+                ]
             }
-        ]
+        ];
+        decompose_contant_on_Tdis(node.value[0]);
+        decompose_contant_on_Tdis(node.value[1]);
+    } else if (node.value[1].name == symbol_to_explanation["+"]) {
+        node.name = symbol_to_explanation["|"];
+        node.value = [
+            {
+                "name": symbol_to_explanation["C"],
+                "value": [
+                    node.value[0],
+                    node.value[1].value[0]
+                ]
+            },
+            {
+                "name": symbol_to_explanation["C"],
+                "value": [
+                    node.value[0],
+                    node.value[1].value[1]
+                ]
+            }
+        ];
+        decompose_contant_on_Tdis(node.value[0]);
+        decompose_contant_on_Tdis(node.value[1]);
+    }
+}
+
+function decompose_less(node) {
+    if (node.value[0].name == symbol_to_explanation["+"]) {
+        node.name = symbol_to_explanation["&"];
+        node.value = [
+            {
+                "name": symbol_to_explanation["<="],
+                "value": [
+                    node.value[0].value[0],
+                    node.value[1]
+                ]
+            },
+            {
+                "name": symbol_to_explanation["<="],
+                "value": [
+                    node.value[0].value[1],
+                    node.value[1]
+                ]
+            }
+        ];
+        decompose_less(node.value[0]);
+        decompose_less(node.value[1]);
+    } else {
+        node.name = symbol_to_explanation["=0"];
+        node.value = {
+            "name": symbol_to_explanation["*"],
+            "value": [
+                node.value[0],
+                {
+                    "name": symbol_to_explanation["-"],
+                    "value": node.value[1]
+                }
+            ]
+        }
     }
 }
 
