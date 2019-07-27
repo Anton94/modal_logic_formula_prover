@@ -832,3 +832,421 @@ TEST_CASE("satisfiable 12", "[satisfiability]")
         })"_json,
         true);
 }
+
+TEST_CASE("satisfiable 13", "[satisfiability]")
+{
+    // <=(a,b) & <=(b,a)
+    is_satisfiable(
+        R"({
+           "name": "conjunction",
+           "value": [
+              {
+                 "name": "equal0",
+                 "value": {
+                    "name": "Tand",
+                    "value": [
+                       {
+                          "name": "string",
+                          "value": "a"
+                       },
+                       {
+                          "name": "Tstar",
+                          "value": {
+                             "name": "string",
+                             "value": "b"
+                          }
+                       }
+                    ]
+                 }
+              },
+              {
+                 "name": "equal0",
+                 "value": {
+                    "name": "Tand",
+                    "value": [
+                       {
+                          "name": "string",
+                          "value": "b"
+                       },
+                       {
+                          "name": "Tstar",
+                          "value": {
+                             "name": "string",
+                             "value": "a"
+                          }
+                       }
+                    ]
+                 }
+              }
+           ]
+        })"_json,
+        true);
+}
+
+TEST_CASE("satisfiable 14", "[satisfiability]")
+{
+    // <=(a,b) & ~(<=(b,a))
+    is_satisfiable(
+        R"({
+           "name": "conjunction",
+           "value": [
+              {
+                 "name": "equal0",
+                 "value": {
+                    "name": "Tand",
+                    "value": [
+                       {
+                          "name": "string",
+                          "value": "a"
+                       },
+                       {
+                          "name": "Tstar",
+                          "value": {
+                             "name": "string",
+                             "value": "b"
+                          }
+                       }
+                    ]
+                 }
+              },
+              {
+                 "name": "negation",
+                 "value": {
+                    "name": "equal0",
+                    "value": {
+                       "name": "Tand",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "b"
+                          },
+                          {
+                             "name": "Tstar",
+                             "value": {
+                                "name": "string",
+                                "value": "a"
+                             }
+                          }
+                       ]
+                    }
+                 }
+              }
+           ]
+        })"_json,
+        true);
+}
+
+TEST_CASE("satisfiable 15", "[satisfiability]")
+{
+    // <=(a,b) & ~(<=(a,b))
+    is_satisfiable(
+        R"({
+           "name": "conjunction",
+           "value": [
+              {
+                 "name": "equal0",
+                 "value": {
+                    "name": "Tand",
+                    "value": [
+                       {
+                          "name": "string",
+                          "value": "a"
+                       },
+                       {
+                          "name": "Tstar",
+                          "value": {
+                             "name": "string",
+                             "value": "b"
+                          }
+                       }
+                    ]
+                 }
+              },
+              {
+                 "name": "negation",
+                 "value": {
+                    "name": "equal0",
+                    "value": {
+                       "name": "Tand",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "a"
+                          },
+                          {
+                             "name": "Tstar",
+                             "value": {
+                                "name": "string",
+                                "value": "b"
+                             }
+                          }
+                       ]
+                    }
+                 }
+              }
+           ]
+        })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable 16", "[satisfiability]")
+{
+    // (<=(a,b) & (~(<=(b,a)))) | (<=(a,b))
+    is_satisfiable(
+        R"({
+           "name": "disjunction",
+           "value": [
+              {
+                 "name": "conjunction",
+                 "value": [
+                    {
+                       "name": "equal0",
+                       "value": {
+                          "name": "Tand",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "a"
+                             },
+                             {
+                                "name": "Tstar",
+                                "value": {
+                                   "name": "string",
+                                   "value": "b"
+                                }
+                             }
+                          ]
+                       }
+                    },
+                    {
+                       "name": "negation",
+                       "value": {
+                          "name": "equal0",
+                          "value": {
+                             "name": "Tand",
+                             "value": [
+                                {
+                                   "name": "string",
+                                   "value": "b"
+                                },
+                                {
+                                   "name": "Tstar",
+                                   "value": {
+                                      "name": "string",
+                                      "value": "a"
+                                   }
+                                }
+                             ]
+                          }
+                       }
+                    }
+                 ]
+              },
+              {
+                 "name": "equal0",
+                 "value": {
+                    "name": "Tand",
+                    "value": [
+                       {
+                          "name": "string",
+                          "value": "a"
+                       },
+                       {
+                          "name": "Tstar",
+                          "value": {
+                             "name": "string",
+                             "value": "b"
+                          }
+                       }
+                    ]
+                 }
+              }
+           ]
+        })"_json,
+        true);
+}
+
+TEST_CASE("satisfiable 17", "[satisfiability]")
+{
+    // (<=(a,b) & (~(<=(a,b)))) | (C(a,b) & (~C(a,b))))
+    is_satisfiable(
+        R"({
+           "name": "disjunction",
+           "value": [
+              {
+                 "name": "conjunction",
+                 "value": [
+                    {
+                       "name": "equal0",
+                       "value": {
+                          "name": "Tand",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "a"
+                             },
+                             {
+                                "name": "Tstar",
+                                "value": {
+                                   "name": "string",
+                                   "value": "b"
+                                }
+                             }
+                          ]
+                       }
+                    },
+                    {
+                       "name": "negation",
+                       "value": {
+                          "name": "equal0",
+                          "value": {
+                             "name": "Tand",
+                             "value": [
+                                {
+                                   "name": "string",
+                                   "value": "a"
+                                },
+                                {
+                                   "name": "Tstar",
+                                   "value": {
+                                      "name": "string",
+                                      "value": "b"
+                                   }
+                                }
+                             ]
+                          }
+                       }
+                    }
+                 ]
+              },
+              {
+                 "name": "conjunction",
+                 "value": [
+                    {
+                       "name": "contact",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "a"
+                          },
+                          {
+                             "name": "string",
+                             "value": "b"
+                          }
+                       ]
+                    },
+                    {
+                       "name": "negation",
+                       "value": {
+                          "name": "contact",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "a"
+                             },
+                             {
+                                "name": "string",
+                                "value": "b"
+                             }
+                          ]
+                       }
+                    }
+                 ]
+              }
+           ]
+        })"_json,
+        false);
+}
+
+
+TEST_CASE("satisfiable 18", "[satisfiability]")
+{
+    // (<=(a,b) & (~(<=(a,b)))) | (C(a,b) & (~C(b,b))))
+    is_satisfiable(
+        R"({
+           "name": "disjunction",
+           "value": [
+              {
+                 "name": "conjunction",
+                 "value": [
+                    {
+                       "name": "equal0",
+                       "value": {
+                          "name": "Tand",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "a"
+                             },
+                             {
+                                "name": "Tstar",
+                                "value": {
+                                   "name": "string",
+                                   "value": "b"
+                                }
+                             }
+                          ]
+                       }
+                    },
+                    {
+                       "name": "negation",
+                       "value": {
+                          "name": "equal0",
+                          "value": {
+                             "name": "Tand",
+                             "value": [
+                                {
+                                   "name": "string",
+                                   "value": "a"
+                                },
+                                {
+                                   "name": "Tstar",
+                                   "value": {
+                                      "name": "string",
+                                      "value": "b"
+                                   }
+                                }
+                             ]
+                          }
+                       }
+                    }
+                 ]
+              },
+              {
+                 "name": "conjunction",
+                 "value": [
+                    {
+                       "name": "contact",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "a"
+                          },
+                          {
+                             "name": "string",
+                             "value": "b"
+                          }
+                       ]
+                    },
+                    {
+                       "name": "negation",
+                       "value": {
+                          "name": "contact",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "b"
+                             },
+                             {
+                                "name": "string",
+                                "value": "b"
+                             }
+                          ]
+                       }
+                    }
+                 ]
+              }
+           ]
+        })"_json,
+        true);
+}
