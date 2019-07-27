@@ -52,8 +52,7 @@ TEST_CASE("move assignment of formula_mgr", "[run_with_sanitizer]")
                                 "value": "c"
                              },
                              {
-                                "name": "string",
-                                "value": "0"
+                                "name": "constant_0"
                              }
                           ]
                        }

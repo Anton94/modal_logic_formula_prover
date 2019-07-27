@@ -228,8 +228,7 @@ TEST_CASE("satisfiable evaluation with constant 1", "[brute force evaluation]")
                                 "value": "c"
                              },
                              {
-                                "name": "string",
-                                "value": "0"
+                                "name": "constant_0"
                              }
                           ]
                        }
