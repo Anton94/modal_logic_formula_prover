@@ -1158,7 +1158,6 @@ TEST_CASE("satisfiable 17", "[satisfiability]")
         false);
 }
 
-
 TEST_CASE("satisfiable 18", "[satisfiability]")
 {
     // (<=(a,b) & (~(<=(a,b)))) | (C(a,b) & (~C(b,b))))
@@ -1249,4 +1248,158 @@ TEST_CASE("satisfiable 18", "[satisfiability]")
            ]
         })"_json,
         true);
+}
+
+TEST_CASE("satisfiable with constants 1", "[satisfiability]")
+{
+    // T
+    is_satisfiable(
+        R"({
+            "name": "T"
+        })"_json,
+        true);
+}
+
+TEST_CASE("satisfiable with constants 2", "[satisfiability]")
+{
+    // F
+    is_satisfiable(
+        R"({
+            "name": "F"
+        })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable with constants 3", "[satisfiability]")
+{
+    // T & F
+    is_satisfiable(
+        R"({
+           "name": "conjunction",
+           "value": [
+              {
+                 "name": "T"
+              },
+              {
+                 "name": "F"
+              }
+           ]
+        })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable with constants 4", "[satisfiability]")
+{
+    // F & F
+    is_satisfiable(
+        R"({
+           "name": "conjunction",
+           "value": [
+              {
+                 "name": "F"
+              },
+              {
+                 "name": "F"
+              }
+           ]
+        })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable with constants 5", "[satisfiability]")
+{
+    // F | F
+    is_satisfiable(
+        R"({
+           "name": "disjunction",
+           "value": [
+              {
+                 "name": "F"
+              },
+              {
+                 "name": "F"
+              }
+           ]
+        })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable with constants 6", "[satisfiability]")
+{
+    // T | F
+    is_satisfiable(
+        R"({
+           "name": "disjunction",
+           "value": [
+              {
+                 "name": "T"
+              },
+              {
+                 "name": "F"
+              }
+           ]
+        })"_json,
+        true);
+}
+
+TEST_CASE("satisfiable with constants 7", "[satisfiability]")
+{
+    // C(a, *b) & T
+    is_satisfiable(
+        R"({
+           "name": "conjunction",
+           "value": [
+              {
+                 "name": "contact",
+                 "value": [
+                    {
+                       "name": "string",
+                       "value": "a"
+                    },
+                    {
+                       "name": "Tstar",
+                       "value": {
+                          "name": "string",
+                          "value": "b"
+                       }
+                    }
+                 ]
+              },
+              {
+                 "name": "T"
+              }
+           ]
+        })"_json,
+        true);
+}
+
+TEST_CASE("satisfiable with constants 8", "[satisfiability]")
+{
+    // C(a, *b) & F
+    is_satisfiable(
+        R"({
+           "name": "conjunction",
+           "value": [
+              {
+                 "name": "contact",
+                 "value": [
+                    {
+                       "name": "string",
+                       "value": "a"
+                    },
+                    {
+                       "name": "Tstar",
+                       "value": {
+                          "name": "string",
+                          "value": "b"
+                       }
+                    }
+                 ]
+              },
+              {
+                 "name": "F"
+              }
+           ]
+        })"_json,
+        false);
 }
