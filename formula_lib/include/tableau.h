@@ -6,6 +6,7 @@
 #include <unordered_set>
 
 class formula;
+class term;
 
 class tableau
 {
@@ -45,11 +46,26 @@ private:
         auto operator()(const formula* const& lhs, const formula* const& rhs) const -> bool;
     };
 
+    struct term_ptr_hasher
+    {
+        auto operator()(const term* const& t) const->std::size_t;
+    };
+
+    struct term_ptr_comparator
+    {
+        auto operator()(const term* const& lhs, const term* const& rhs) const -> bool;
+    };
+
     using formulas_t = std::unordered_set<const formula*, formula_ptr_hasher, formula_ptr_comparator>;
+    using terms_t = std::unordered_set<const term*, term_ptr_hasher, term_ptr_comparator>;
+
     formulas_t formulas_T_;
     formulas_t formulas_F_;
-    formulas_t atomic_formulas_T_;
-    formulas_t atomic_formulas_F_;
+    formulas_t contacts_T_;
+    formulas_t contacts_F_;
+    terms_t zero_terms_T_;
+    terms_t zero_terms_F_;
 
     friend std::ostream& operator<<(std::ostream& out, const tableau::formulas_t& formulas);
+    friend std::ostream& operator<<(std::ostream& out, const tableau::terms_t& formulas);
 };

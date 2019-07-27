@@ -1,5 +1,6 @@
 #include "tableau.h"
 #include "formula.h"
+#include "term.h"
 #include "logger.h"
 
 auto tableau::is_satisfiable(const formula_mgr& f) -> bool
@@ -16,8 +17,10 @@ void tableau::clear()
 {
     formulas_T_.clear();
     formulas_F_.clear();
-    atomic_formulas_T_.clear();
-    atomic_formulas_F_.clear();
+    contacts_T_.clear();
+    contacts_F_.clear();
+    zero_terms_T_.clear();
+    zero_terms_F_.clear();
 }
 
 auto tableau::step() -> bool
@@ -199,31 +202,55 @@ auto tableau::step() -> bool
 
 auto tableau::check_contradiction_in_T(const formula* f) const -> bool
 {
-    if(f->is_atomic())
+    const auto op = f->get_operation_type();
+    if (op == formula::operation_t::c)
     {
-        return atomic_formulas_T_.find(f) != atomic_formulas_T_.end();
+        return contacts_T_.find(f) != contacts_T_.end();
     }
+
+    if(op == formula::operation_t::eq_zero)
+    {
+        const auto t = f->get_left_child_term();
+        return zero_terms_T_.find(t) != zero_terms_T_.end();
+    }
+    assert(f->is_formula_operation());
     return formulas_T_.find(f) != formulas_T_.end();
 }
 
 auto tableau::check_contradiction_in_F(const formula* f) const -> bool
 {
-    if(f->is_atomic())
+    const auto op = f->get_operation_type();
+    if (op == formula::operation_t::c)
     {
-        return atomic_formulas_F_.find(f) != atomic_formulas_F_.end();
+        return contacts_F_.find(f) != contacts_F_.end();
     }
+
+    if (op == formula::operation_t::eq_zero)
+    {
+        const auto t = f->get_left_child_term();
+        return zero_terms_F_.find(t) != zero_terms_F_.end();
+    }
+    assert(f->is_formula_operation());
     return formulas_F_.find(f) != formulas_F_.end();
 }
 
 void tableau::add_formula_to_T(const formula* f)
 {
-    if(f->is_atomic())
+    const auto op = f->get_operation_type();
+    if (op == formula::operation_t::c)
     {
-        trace() << "Adding " << *f << " to T atomic formulas";
-        atomic_formulas_T_.insert(f);
+        trace() << "Adding " << *f << " to T contacts";
+        contacts_T_.insert(f);
+    }
+    else if (op == formula::operation_t::eq_zero)
+    {
+        const auto t = f->get_left_child_term();
+        trace() << "Adding " << *t << " to zero terms T because " << *f << " is eq_zero formula";
+        zero_terms_T_.insert(t);
     }
     else
     {
+        assert(f->is_formula_operation());
         trace() << "Adding " << *f << " to T formulas";
         formulas_T_.insert(f);
     }
@@ -231,13 +258,21 @@ void tableau::add_formula_to_T(const formula* f)
 
 void tableau::add_formula_to_F(const formula* f)
 {
-    if(f->is_atomic())
+    const auto op = f->get_operation_type();
+    if (op == formula::operation_t::c)
     {
-        trace() << "Adding " << *f << " to F atomic formulas";
-        atomic_formulas_F_.insert(f);
+        trace() << "Adding " << *f << " to F contacts";
+        contacts_F_.insert(f);
+    }
+    else if (op == formula::operation_t::eq_zero)
+    {
+        const auto t = f->get_left_child_term();
+        trace() << "Adding " << *t << " to zero terms F because " << *f << " is eq_zero formula";
+        zero_terms_F_.insert(t);
     }
     else
     {
+        assert(f->is_formula_operation());
         trace() << "Adding " << *f << " to F formulas";
         formulas_F_.insert(f);
     }
@@ -245,13 +280,21 @@ void tableau::add_formula_to_F(const formula* f)
 
 void tableau::remove_formula_from_T(const formula* f)
 {
-    if(f->is_atomic())
+    const auto op = f->get_operation_type();
+    if (op == formula::operation_t::c)
     {
-        trace() << "Removing " << *f << " from T atomic formulas";
-        atomic_formulas_T_.erase(f);
+        trace() << "Removing " << *f << " from T contacts";
+        contacts_T_.erase(f);
+    }
+    else if (op == formula::operation_t::eq_zero)
+    {
+        const auto t = f->get_left_child_term();
+        trace() << "Removing " << *t << " from zero terms T because " << *f << " is eq_zero formula";
+        zero_terms_T_.erase(t);
     }
     else
     {
+        assert(f->is_formula_operation());
         trace() << "Removing " << *f << " from T formulas";
         formulas_T_.erase(f);
     }
@@ -259,13 +302,21 @@ void tableau::remove_formula_from_T(const formula* f)
 
 void tableau::remove_formula_from_F(const formula* f)
 {
-    if(f->is_atomic())
+    const auto op = f->get_operation_type();
+    if (op == formula::operation_t::c)
     {
-        trace() << "Removing " << *f << " from F atomic formulas";
-        atomic_formulas_F_.erase(f);
+        trace() << "Removing " << *f << " from F contacts";
+        contacts_F_.erase(f);
+    }
+    else if (op == formula::operation_t::eq_zero)
+    {
+        const auto t = f->get_left_child_term();
+        trace() << "Removing " << *t << " from zero terms because " << *f << " is eq_zero formula";
+        zero_terms_F_.erase(t);
     }
     else
     {
+        assert(f->is_formula_operation());
         trace() << "Removing " << *f << " from F formulas";
         formulas_F_.erase(f);
     }
@@ -284,12 +335,27 @@ auto tableau::formula_ptr_comparator::operator()(const formula* const& lhs, cons
     return *lhs == *rhs;
 }
 
+auto tableau::term_ptr_hasher::operator()(const term* const& t) const -> std::size_t
+{
+    assert(t);
+    return t->get_hash();
+}
+
+auto tableau::term_ptr_comparator::operator()(const term* const& lhs, const term* const& rhs) const
+    -> bool
+{
+    assert(lhs && rhs);
+    return *lhs == *rhs;
+}
+
 void tableau::log_state() const
 {
-    trace() << "\tFormulas T: " << formulas_T_;
-    trace() << "\tFormulas F: " << formulas_F_;
-    trace() << "\tFormulas atomic T: " << atomic_formulas_T_;
-    trace() << "\tFormulas atomic F: " << atomic_formulas_F_;
+    trace() << "\t  Formulas T: " << formulas_T_;
+    trace() << "\t  Formulas F: " << formulas_F_;
+    trace() << "\t  Contacts T: " << contacts_T_;
+    trace() << "\t  Contacts F: " << contacts_F_;
+    trace() << "\tZero terms T: " << zero_terms_T_;
+    trace() << "\tZero terms F: " << zero_terms_F_;
 }
 
 std::ostream& operator<<(std::ostream& out, const tableau::formulas_t& formulas)
@@ -297,6 +363,16 @@ std::ostream& operator<<(std::ostream& out, const tableau::formulas_t& formulas)
     for(const auto f_ptr : formulas)
     {
         out << *f_ptr << " <" << f_ptr->get_hash() << "> ";
+    }
+
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const tableau::terms_t& terms)
+{
+    for (const auto t_ptr : terms)
+    {
+        out << *t_ptr << " <" << t_ptr->get_hash() << "> ";
     }
 
     return out;
