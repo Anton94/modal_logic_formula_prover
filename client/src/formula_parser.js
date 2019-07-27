@@ -1,9 +1,5 @@
 // TODO
 
-if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-    module.exports = {formula_to_json};
-}
-
 var Operations = {
     formula: {
         LESS: "<=",
@@ -528,6 +524,11 @@ function decompose_equivalency(node) {
         ]
     }
     node.value = [left_child, right_child];
+}
+
+
+if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+    module.exports = {formula_to_json};
 }
 
 // (<=((a*b)+c, (b*m+c)) | C(a,b)) & C(b,m)

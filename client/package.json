@@ -12,6 +12,7 @@
     "jasmine": "^2.99.0"
   },
   "dependencies": {
-    "chevrotain": "^4.8.1"
+    "chevrotain": "^4.8.1",
+    "underscore": "^1.9.1"
   }
 }
