@@ -256,6 +256,128 @@ mock_json_by_formula = {
 		   ] \
 		}'
 	),
+
+	"(C(a, b) | <=(a, b)) | (~C(a,b) & <=(a,b))": JSON.parse(
+		'{ \
+            "name": "disjunction", \
+            "value": [ \
+               { \
+                  "name": "disjunction", \
+                  "value": [ \
+                     { \
+                        "name": "contact", \
+                        "value": [ \
+                           { \
+                              "name": "string", \
+                              "value": "a" \
+                           }, \
+                           { \
+                              "name": "string", \
+                              "value": "b" \
+                           } \
+                        ] \
+                     }, \
+                     { \
+                        "name": "equal0", \
+                        "value": { \
+                           "name": "Tand", \
+                           "value": [ \
+                              { \
+                                 "name": "string", \
+                                 "value": "a" \
+                              }, \
+                              { \
+                                 "name": "Tstar", \
+                                 "value": { \
+                                    "name": "string", \
+                                    "value": "b" \
+                                 } \
+                              } \
+                           ] \
+                        } \
+                     } \
+                  ] \
+               }, \
+               { \
+                  "name": "conjunction", \
+                  "value": [ \
+                     { \
+                        "name": "negation", \
+                        "value": { \
+                           "name": "contact", \
+                           "value": [ \
+                              { \
+                                 "name": "string", \
+                                 "value": "a" \
+                              }, \
+                              { \
+                                 "name": "string", \
+                                 "value": "b" \
+                              } \
+                           ] \
+                        } \
+                     }, \
+                     { \
+                        "name": "equal0", \
+                        "value": { \
+                           "name": "Tand", \
+                           "value": [ \
+                              { \
+                                 "name": "string", \
+                                 "value": "a" \
+                              }, \
+                              { \
+                                 "name": "Tstar", \
+                                 "value": { \
+                                    "name": "string", \
+                                    "value": "b" \
+                                 } \
+                              } \
+                           ] \
+                        } \
+                     } \
+                  ] \
+               } \
+            ] \
+        }'
+    ),
+
+    "C(a, b) & ~C(a, c)": JSON.parse(
+    	'{ \
+            "name": "conjunction", \
+            "value": [ \
+               { \
+                  "name": "contact", \
+                  "value": [ \
+                     { \
+                        "name": "string", \
+                        "value": "a" \
+                     }, \
+                     { \
+                        "name": "string", \
+                        "value": "b" \
+                     } \
+                  ] \
+               }, \
+               { \
+                  "name": "negation", \
+                  "value": { \
+                     "name": "contact", \
+                     "value": [ \
+                        { \
+                           "name": "string", \
+                           "value": "a" \
+                        }, \
+                        { \
+                           "name": "string", \
+                           "value": "c" \
+                        } \
+                     ] \
+                  } \
+               } \
+            ] \
+        }'
+    )
 }
 
 module.exports = { mock_json_by_formula }
