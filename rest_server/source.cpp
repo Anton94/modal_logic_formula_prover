@@ -10,6 +10,8 @@
 #include <cpprest/http_client.h>
 #include <cpprest/filestream.h>
 
+#include "microservice_controller.h"
+
 using namespace utility;                    // Common utilities like string conversions
 using namespace web;                        // Common features like URIs.
 using namespace web::http;                  // Common HTTP functionality
@@ -17,6 +19,19 @@ using namespace web::http::client;          // HTTP client features
 using namespace concurrency::streams;       // Asynchronous streams
 
 using json = nlohmann::json;
+
+std::unique_ptr<microser
+
+void on_init(const string_t& address)
+{
+	// Build our listener's URI from the configured address and the hard coded path /foo/bar
+
+	uri_builder uri(address);
+	uri.append_path(U("foo/bar"));
+
+	auto addr = uri.to_uri().to_string();
+	g_http
+}
 
 int main(int argc, char* argv[])
 {
