@@ -2106,3 +2106,1051 @@ TEST_CASE("satisfiable with contact rule 8", "[satisfiability]")
         })"_json,
         false);
 }
+
+TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact", "[satisfiability]")
+{
+    // (<=(x,y) & <=(a,b)) & C(a * -b, z)
+    is_satisfiable(
+        R"({
+           "name": "conjunction",
+           "value": [
+              {
+                 "name": "conjunction",
+                 "value": [
+                    {
+                       "name": "equal0",
+                       "value": {
+                          "name": "Tand",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "x"
+                             },
+                             {
+                                "name": "Tstar",
+                                "value": {
+                                   "name": "string",
+                                   "value": "y"
+                                }
+                             }
+                          ]
+                       }
+                    },
+                    {
+                       "name": "equal0",
+                       "value": {
+                          "name": "Tand",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "a"
+                             },
+                             {
+                                "name": "Tstar",
+                                "value": {
+                                   "name": "string",
+                                   "value": "b"
+                                }
+                             }
+                          ]
+                       }
+                    }
+                 ]
+              },
+              {
+                 "name": "contact",
+                 "value": [
+                    {
+                       "name": "Tand",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "a"
+                          },
+                          {
+                             "name": "Tstar",
+                             "value": {
+                                "name": "string",
+                                "value": "b"
+                             }
+                          }
+                       ]
+                    },
+                    {
+                       "name": "string",
+                       "value": "z"
+                    }
+                 ]
+              }
+           ]
+        })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact 2", "[satisfiability]")
+{
+    // ((~<=(x,y) & <=(z, t)) & ~<=(a,b)) & C(a * -b, z * -t)
+    is_satisfiable(
+        R"({
+           "name": "conjunction",
+           "value": [
+              {
+                 "name": "conjunction",
+                 "value": [
+                    {
+                       "name": "conjunction",
+                       "value": [
+                          {
+                             "name": "negation",
+                             "value": {
+                                "name": "equal0",
+                                "value": {
+                                   "name": "Tand",
+                                   "value": [
+                                      {
+                                         "name": "string",
+                                         "value": "x"
+                                      },
+                                      {
+                                         "name": "Tstar",
+                                         "value": {
+                                            "name": "string",
+                                            "value": "y"
+                                         }
+                                      }
+                                   ]
+                                }
+                             }
+                          },
+                          {
+                             "name": "equal0",
+                             "value": {
+                                "name": "Tand",
+                                "value": [
+                                   {
+                                      "name": "string",
+                                      "value": "z"
+                                   },
+                                   {
+                                      "name": "Tstar",
+                                      "value": {
+                                         "name": "string",
+                                         "value": "t"
+                                      }
+                                   }
+                                ]
+                             }
+                          }
+                       ]
+                    },
+                    {
+                       "name": "negation",
+                       "value": {
+                          "name": "equal0",
+                          "value": {
+                             "name": "Tand",
+                             "value": [
+                                {
+                                   "name": "string",
+                                   "value": "a"
+                                },
+                                {
+                                   "name": "Tstar",
+                                   "value": {
+                                      "name": "string",
+                                      "value": "b"
+                                   }
+                                }
+                             ]
+                          }
+                       }
+                    }
+                 ]
+              },
+              {
+                 "name": "contact",
+                 "value": [
+                    {
+                       "name": "Tand",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "a"
+                          },
+                          {
+                             "name": "Tstar",
+                             "value": {
+                                "name": "string",
+                                "value": "b"
+                             }
+                          }
+                       ]
+                    },
+                    {
+                       "name": "Tand",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "z"
+                          },
+                          {
+                             "name": "Tstar",
+                             "value": {
+                                "name": "string",
+                                "value": "t"
+                             }
+                          }
+                       ]
+                    }
+                 ]
+              }
+           ]
+        })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact 3", "[satisfiability]")
+{
+    // ((~<=(x,y) & ~<=(z, t)) & ~<=(a,b)) & C(a * -b, z * -t)
+    is_satisfiable(
+        R"({
+           "name": "conjunction",
+           "value": [
+              {
+                 "name": "conjunction",
+                 "value": [
+                    {
+                       "name": "conjunction",
+                       "value": [
+                          {
+                             "name": "negation",
+                             "value": {
+                                "name": "equal0",
+                                "value": {
+                                   "name": "Tand",
+                                   "value": [
+                                      {
+                                         "name": "string",
+                                         "value": "x"
+                                      },
+                                      {
+                                         "name": "Tstar",
+                                         "value": {
+                                            "name": "string",
+                                            "value": "y"
+                                         }
+                                      }
+                                   ]
+                                }
+                             }
+                          },
+                          {
+                             "name": "negation",
+                             "value": {
+                                "name": "equal0",
+                                "value": {
+                                   "name": "Tand",
+                                   "value": [
+                                      {
+                                         "name": "string",
+                                         "value": "z"
+                                      },
+                                      {
+                                         "name": "Tstar",
+                                         "value": {
+                                            "name": "string",
+                                            "value": "t"
+                                         }
+                                      }
+                                   ]
+                                }
+                             }
+                          }
+                       ]
+                    },
+                    {
+                       "name": "negation",
+                       "value": {
+                          "name": "equal0",
+                          "value": {
+                             "name": "Tand",
+                             "value": [
+                                {
+                                   "name": "string",
+                                   "value": "a"
+                                },
+                                {
+                                   "name": "Tstar",
+                                   "value": {
+                                      "name": "string",
+                                      "value": "b"
+                                   }
+                                }
+                             ]
+                          }
+                       }
+                    }
+                 ]
+              },
+              {
+                 "name": "contact",
+                 "value": [
+                    {
+                       "name": "Tand",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "a"
+                          },
+                          {
+                             "name": "Tstar",
+                             "value": {
+                                "name": "string",
+                                "value": "b"
+                             }
+                          }
+                       ]
+                    },
+                    {
+                       "name": "Tand",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "z"
+                          },
+                          {
+                             "name": "Tstar",
+                             "value": {
+                                "name": "string",
+                                "value": "t"
+                             }
+                          }
+                       ]
+                    }
+                 ]
+              }
+           ]
+        })"_json,
+        true);
+}
+
+TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact 4", "[satisfiability]")
+{
+    // ~( ~((<=(x,y) & ~<=(z, t)) & ~<=(a,b)) | C(a * -b, z * -t) )
+    // should contradict with the rule:  a != 0 & b != 0 -> C(a,b)
+    is_satisfiable(
+        R"({
+            "name": "negation",
+            "value": {
+                "name": "disjunction",
+                "value": [
+                    {
+                    "name": "negation",
+                    "value": {
+                        "name": "conjunction",
+                        "value": [
+                            {
+                                "name": "conjunction",
+                                "value": [
+                                {
+                                    "name": "equal0",
+                                    "value": {
+                                        "name": "Tand",
+                                        "value": [
+                                            {
+                                            "name": "string",
+                                            "value": "x"
+                                            },
+                                            {
+                                            "name": "Tstar",
+                                            "value": {
+                                                "name": "string",
+                                                "value": "y"
+                                            }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "name": "negation",
+                                    "value": {
+                                        "name": "equal0",
+                                        "value": {
+                                            "name": "Tand",
+                                            "value": [
+                                            {
+                                                "name": "string",
+                                                "value": "z"
+                                            },
+                                            {
+                                                "name": "Tstar",
+                                                "value": {
+                                                    "name": "string",
+                                                    "value": "t"
+                                                }
+                                            }
+                                            ]
+                                        }
+                                    }
+                                }
+                                ]
+                            },
+                            {
+                                "name": "negation",
+                                "value": {
+                                "name": "equal0",
+                                "value": {
+                                    "name": "Tand",
+                                    "value": [
+                                        {
+                                            "name": "string",
+                                            "value": "a"
+                                        },
+                                        {
+                                            "name": "Tstar",
+                                            "value": {
+                                            "name": "string",
+                                            "value": "b"
+                                            }
+                                        }
+                                    ]
+                                }
+                                }
+                            }
+                        ]
+                    }
+                    },
+                    {
+                    "name": "contact",
+                    "value": [
+                        {
+                            "name": "Tand",
+                            "value": [
+                                {
+                                "name": "string",
+                                "value": "a"
+                                },
+                                {
+                                "name": "Tstar",
+                                "value": {
+                                    "name": "string",
+                                    "value": "b"
+                                }
+                                }
+                            ]
+                        },
+                        {
+                            "name": "Tand",
+                            "value": [
+                                {
+                                "name": "string",
+                                "value": "z"
+                                },
+                                {
+                                "name": "Tstar",
+                                "value": {
+                                    "name": "string",
+                                    "value": "t"
+                                }
+                                }
+                            ]
+                        }
+                    ]
+                    }
+                ]
+            }
+        })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact using same terms 1", "[satisfiability]")
+{
+    // C(a * -d, b * -c) & ( (C(a * -d, d) & <=(a,d)) | <=(b,c)))
+    is_satisfiable(
+        R"({
+           "name": "conjunction",
+           "value": [
+              {
+                 "name": "contact",
+                 "value": [
+                    {
+                       "name": "Tand",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "a"
+                          },
+                          {
+                             "name": "Tstar",
+                             "value": {
+                                "name": "string",
+                                "value": "d"
+                             }
+                          }
+                       ]
+                    },
+                    {
+                       "name": "Tand",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "b"
+                          },
+                          {
+                             "name": "Tstar",
+                             "value": {
+                                "name": "string",
+                                "value": "c"
+                             }
+                          }
+                       ]
+                    }
+                 ]
+              },
+              {
+                 "name": "disjunction",
+                 "value": [
+                    {
+                       "name": "conjunction",
+                       "value": [
+                          {
+                             "name": "contact",
+                             "value": [
+                                {
+                                   "name": "Tand",
+                                   "value": [
+                                      {
+                                         "name": "string",
+                                         "value": "a"
+                                      },
+                                      {
+                                         "name": "Tstar",
+                                         "value": {
+                                            "name": "string",
+                                            "value": "d"
+                                         }
+                                      }
+                                   ]
+                                },
+                                {
+                                   "name": "string",
+                                   "value": "d"
+                                }
+                             ]
+                          },
+                          {
+                             "name": "equal0",
+                             "value": {
+                                "name": "Tand",
+                                "value": [
+                                   {
+                                      "name": "string",
+                                      "value": "a"
+                                   },
+                                   {
+                                      "name": "Tstar",
+                                      "value": {
+                                         "name": "string",
+                                         "value": "d"
+                                      }
+                                   }
+                                ]
+                             }
+                          }
+                       ]
+                    },
+                    {
+                       "name": "equal0",
+                       "value": {
+                          "name": "Tand",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "b"
+                             },
+                             {
+                                "name": "Tstar",
+                                "value": {
+                                   "name": "string",
+                                   "value": "c"
+                                }
+                             }
+                          ]
+                       }
+                    }
+                 ]
+              }
+           ]
+        })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact using same terms 2", "[satisfiability]")
+{
+    // C(a * -d, b * -c) & ( (C(a * -d, d) & <=(a,d)) | <=(b,x)))
+    is_satisfiable(
+        R"({
+           "name": "conjunction",
+           "value": [
+              {
+                 "name": "contact",
+                 "value": [
+                    {
+                       "name": "Tand",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "a"
+                          },
+                          {
+                             "name": "Tstar",
+                             "value": {
+                                "name": "string",
+                                "value": "d"
+                             }
+                          }
+                       ]
+                    },
+                    {
+                       "name": "Tand",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "b"
+                          },
+                          {
+                             "name": "Tstar",
+                             "value": {
+                                "name": "string",
+                                "value": "c"
+                             }
+                          }
+                       ]
+                    }
+                 ]
+              },
+              {
+                 "name": "disjunction",
+                 "value": [
+                    {
+                       "name": "conjunction",
+                       "value": [
+                          {
+                             "name": "contact",
+                             "value": [
+                                {
+                                   "name": "Tand",
+                                   "value": [
+                                      {
+                                         "name": "string",
+                                         "value": "a"
+                                      },
+                                      {
+                                         "name": "Tstar",
+                                         "value": {
+                                            "name": "string",
+                                            "value": "d"
+                                         }
+                                      }
+                                   ]
+                                },
+                                {
+                                   "name": "string",
+                                   "value": "d"
+                                }
+                             ]
+                          },
+                          {
+                             "name": "equal0",
+                             "value": {
+                                "name": "Tand",
+                                "value": [
+                                   {
+                                      "name": "string",
+                                      "value": "a"
+                                   },
+                                   {
+                                      "name": "Tstar",
+                                      "value": {
+                                         "name": "string",
+                                         "value": "d"
+                                      }
+                                   }
+                                ]
+                             }
+                          }
+                       ]
+                    },
+                    {
+                       "name": "equal0",
+                       "value": {
+                          "name": "Tand",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "b"
+                             },
+                             {
+                                "name": "Tstar",
+                                "value": {
+                                   "name": "string",
+                                   "value": "x"
+                                }
+                             }
+                          ]
+                       }
+                    }
+                 ]
+              }
+           ]
+        })"_json,
+        true);
+}
+
+TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact using same terms 3", "[satisfiability]")
+{
+    // ~C(a * -d, b * -c) & ( (~C(a * -d, d * -c) & (~<=(a,d) & ~<=(d,c))) | (~<=(b,c) & ~<=(a,d)) )
+    is_satisfiable(
+        R"({
+           "name": "conjunction",
+           "value": [
+              {
+                 "name": "negation",
+                 "value": {
+                    "name": "contact",
+                    "value": [
+                       {
+                          "name": "Tand",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "a"
+                             },
+                             {
+                                "name": "Tstar",
+                                "value": {
+                                   "name": "string",
+                                   "value": "d"
+                                }
+                             }
+                          ]
+                       },
+                       {
+                          "name": "Tand",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "b"
+                             },
+                             {
+                                "name": "Tstar",
+                                "value": {
+                                   "name": "string",
+                                   "value": "c"
+                                }
+                             }
+                          ]
+                       }
+                    ]
+                 }
+              },
+              {
+                 "name": "disjunction",
+                 "value": [
+                    {
+                       "name": "conjunction",
+                       "value": [
+                          {
+                             "name": "negation",
+                             "value": {
+                                "name": "contact",
+                                "value": [
+                                   {
+                                      "name": "Tand",
+                                      "value": [
+                                         {
+                                            "name": "string",
+                                            "value": "a"
+                                         },
+                                         {
+                                            "name": "Tstar",
+                                            "value": {
+                                               "name": "string",
+                                               "value": "d"
+                                            }
+                                         }
+                                      ]
+                                   },
+                                   {
+                                      "name": "Tand",
+                                      "value": [
+                                         {
+                                            "name": "string",
+                                            "value": "d"
+                                         },
+                                         {
+                                            "name": "Tstar",
+                                            "value": {
+                                               "name": "string",
+                                               "value": "c"
+                                            }
+                                         }
+                                      ]
+                                   }
+                                ]
+                             }
+                          },
+                          {
+                             "name": "conjunction",
+                             "value": [
+                                {
+                                   "name": "negation",
+                                   "value": {
+                                      "name": "equal0",
+                                      "value": {
+                                         "name": "Tand",
+                                         "value": [
+                                            {
+                                               "name": "string",
+                                               "value": "a"
+                                            },
+                                            {
+                                               "name": "Tstar",
+                                               "value": {
+                                                  "name": "string",
+                                                  "value": "d"
+                                               }
+                                            }
+                                         ]
+                                      }
+                                   }
+                                },
+                                {
+                                   "name": "negation",
+                                   "value": {
+                                      "name": "equal0",
+                                      "value": {
+                                         "name": "Tand",
+                                         "value": [
+                                            {
+                                               "name": "string",
+                                               "value": "d"
+                                            },
+                                            {
+                                               "name": "Tstar",
+                                               "value": {
+                                                  "name": "string",
+                                                  "value": "c"
+                                               }
+                                            }
+                                         ]
+                                      }
+                                   }
+                                }
+                             ]
+                          }
+                       ]
+                    },
+                    {
+                       "name": "conjunction",
+                       "value": [
+                          {
+                             "name": "negation",
+                             "value": {
+                                "name": "equal0",
+                                "value": {
+                                   "name": "Tand",
+                                   "value": [
+                                      {
+                                         "name": "string",
+                                         "value": "b"
+                                      },
+                                      {
+                                         "name": "Tstar",
+                                         "value": {
+                                            "name": "string",
+                                            "value": "c"
+                                         }
+                                      }
+                                   ]
+                                }
+                             }
+                          },
+                          {
+                             "name": "negation",
+                             "value": {
+                                "name": "equal0",
+                                "value": {
+                                   "name": "Tand",
+                                   "value": [
+                                      {
+                                         "name": "string",
+                                         "value": "a"
+                                      },
+                                      {
+                                         "name": "Tstar",
+                                         "value": {
+                                            "name": "string",
+                                            "value": "d"
+                                         }
+                                      }
+                                   ]
+                                }
+                             }
+                          }
+                       ]
+                    }
+                 ]
+              }
+           ]
+        })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable with contact rule - adding non zero term and F contact with same left/right child 1", "[satisfiability]")
+{
+    // ~C(a * -d, a * -d) & ~<=(a,d)
+    is_satisfiable(
+        R"({
+           "name": "conjunction",
+           "value": [
+              {
+                 "name": "negation",
+                 "value": {
+                    "name": "contact",
+                    "value": [
+                       {
+                          "name": "Tand",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "a"
+                             },
+                             {
+                                "name": "Tstar",
+                                "value": {
+                                   "name": "string",
+                                   "value": "d"
+                                }
+                             }
+                          ]
+                       },
+                       {
+                          "name": "Tand",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "a"
+                             },
+                             {
+                                "name": "Tstar",
+                                "value": {
+                                   "name": "string",
+                                   "value": "d"
+                                }
+                             }
+                          ]
+                       }
+                    ]
+                 }
+              },
+              {
+                 "name": "negation",
+                 "value": {
+                    "name": "equal0",
+                    "value": {
+                       "name": "Tand",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "a"
+                          },
+                          {
+                             "name": "Tstar",
+                             "value": {
+                                "name": "string",
+                                "value": "d"
+                             }
+                          }
+                       ]
+                    }
+                 }
+              }
+           ]
+        })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable with contact rule - adding non zero term and F contact with same left/right child 2", "[satisfiability]")
+{
+    // ~<=(a,d) & ~C(a * -d, a * -d)
+    is_satisfiable(
+        R"({
+           "name": "conjunction",
+           "value": [
+              {
+                 "name": "negation",
+                 "value": {
+                    "name": "equal0",
+                    "value": {
+                       "name": "Tand",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "a"
+                          },
+                          {
+                             "name": "Tstar",
+                             "value": {
+                                "name": "string",
+                                "value": "d"
+                             }
+                          }
+                       ]
+                    }
+                 }
+              },
+              {
+                 "name": "negation",
+                 "value": {
+                    "name": "contact",
+                    "value": [
+                       {
+                          "name": "Tand",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "a"
+                             },
+                             {
+                                "name": "Tstar",
+                                "value": {
+                                   "name": "string",
+                                   "value": "d"
+                                }
+                             }
+                          ]
+                       },
+                       {
+                          "name": "Tand",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "a"
+                             },
+                             {
+                                "name": "Tstar",
+                                "value": {
+                                   "name": "string",
+                                   "value": "d"
+                                }
+                             }
+                          ]
+                       }
+                    ]
+                 }
+              }
+           ]
+        })"_json,
+        false);
+}
