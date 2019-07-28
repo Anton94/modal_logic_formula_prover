@@ -4,6 +4,7 @@
 
 #include <ostream>
 #include <unordered_set>
+#include <unordered_map>
 
 class formula;
 class term;
@@ -66,6 +67,21 @@ private:
     using formulas_t = std::unordered_set<const formula*, formula_ptr_hasher, formula_ptr_comparator>;
     using terms_t = std::unordered_set<const term*, term_ptr_hasher, term_ptr_comparator>;
 
+    using multiterms_t = std::unordered_multiset<const term*, term_ptr_hasher, term_ptr_comparator>;
+    using multiterm_to_formula_t = std::unordered_multimap<const term*, const formula*, term_ptr_hasher, term_ptr_comparator>;
+
+    // Removes only the key(*term) which has a matching address (pointer address)
+    void remove_term(multiterms_t& terms, const term* t);
+    // Removes the key - value pair (*t - *f) which has a matching addresses (pointer addresses)
+    void remove_term_to_formula(multiterm_to_formula_t& mapping, const term* t, const formula* f);
+
+    auto has_broken_contact_rule_new_non_zero_term(const term* t) const -> bool;
+
+    friend std::ostream& operator<<(std::ostream& out, const formulas_t& formulas);
+    friend std::ostream& operator<<(std::ostream& out, const terms_t& terms);
+    friend std::ostream& operator<<(std::ostream& out, const multiterms_t& terms);
+    friend std::ostream& operator<<(std::ostream& out, const multiterm_to_formula_t& mapping);
+
     formulas_t formulas_T_;
     formulas_t formulas_F_;
     formulas_t contacts_T_;
@@ -73,6 +89,10 @@ private:
     terms_t zero_terms_T_;
     terms_t zero_terms_F_;
 
-    friend std::ostream& operator<<(std::ostream& out, const tableau::formulas_t& formulas);
-    friend std::ostream& operator<<(std::ostream& out, const tableau::terms_t& formulas);
+    // keeps the terms of the T contacts(the contacts in @contacts_T_),
+    // i.e. for each T(C(a,b)) : a, b are in the collection
+    multiterms_t contact_T_terms_;
+    // maps the term and the F contact (the contacts in @contacts_F_) in which it belongs to,
+    // i.e. for each F(C(a,b)), let C(a,b)'s pointer is 'c': a -> c and b -> c are mappings in the collection
+    multiterm_to_formula_t terms_to_F_contacts_;
 };

@@ -46,17 +46,18 @@ auto formula::operator==(const formula& rhs) const -> bool
         return true;
     }
 
-    assert(child_f_.left && rhs.child_f_.left);
     if(op_ == operation_t::negation)
     {
+        assert(child_f_.left && rhs.child_f_.left);
         return *child_f_.left == *rhs.child_f_.left;
     }
 
-    assert(child_f_.right && rhs.child_f_.right);
+    assert(child_t_.left && rhs.child_t_.left);
     if(op_ == operation_t::eq_zero)
     {
         return *child_t_.left == *rhs.child_t_.left;
     }
+    assert(child_t_.right && rhs.child_t_.right);
     if(op_ == operation_t::c)
     {
         // C is commutative, i.e. C(a,b) == C(b,a)

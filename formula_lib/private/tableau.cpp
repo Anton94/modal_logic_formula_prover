@@ -74,7 +74,7 @@ auto tableau::step() -> bool
                 return false;
             }
 
-            if (has_broken_contact_rule_F(not_negated_f)) // T(~C(a,b)) -> F(C(a,b))
+            if (has_broken_contact_rule_F(not_negated_f))
             {
                 return false;
             }
@@ -89,9 +89,9 @@ auto tableau::step() -> bool
             // T(X & Y) -> T(X) & T(Y)
             auto left_f = f->get_left_child_formula();
             auto right_f = f->get_right_child_formula();
-
             const auto left_f_op = left_f->get_operation_type();
             const auto right_f_op = right_f->get_operation_type();
+
             // T(F) is not satisfiable
             if (left_f_op == op_t::constant_false || right_f_op == op_t::constant_false)
             {
@@ -230,7 +230,7 @@ auto tableau::step() -> bool
 
         auto process_F_disj_child = [&](const formula* child)
         {
-            if (child->is_atomic())
+            if (child->is_constant())
             {
                 return true;
             }
@@ -247,7 +247,7 @@ auto tableau::step() -> bool
             add_formula_to_F(child);
             return true;
         };
-        if (!process_F_disj_child(left_f) || process_F_disj_child(right_f))
+        if (!process_F_disj_child(left_f) || !process_F_disj_child(right_f))
         {
             return false;
         }
@@ -304,11 +304,13 @@ auto tableau::step() -> bool
 
 auto tableau::has_broken_contact_rule_T(const formula* f) const -> bool
 {
-    if (f->get_operation_type() == formula::operation_t::c)
+    const auto op = f->get_operation_type();
+    if (op == formula::operation_t::c)
     {
-        // T(C(a,b)) has broken contact rule if a = 0 | b = 0
         const auto a = f->get_left_child_term();
         const auto b = f->get_right_child_term();
+        // C(a,b) -> a != 0 & b != 0
+        // T(C(a,b)) has broken contact rule if a = 0 | b = 0
         if(zero_terms_T_.find(a) != zero_terms_T_.end() ||
             zero_terms_T_.find(b) != zero_terms_T_.end())
         {
@@ -316,14 +318,26 @@ auto tableau::has_broken_contact_rule_T(const formula* f) const -> bool
             return true;
         }
     }
-
+    else if(op == formula::operation_t::eq_zero)
+    {
+        const auto a = f->get_left_child_term();
+        // a = 0 -> ~C(a, X)
+        // a = 0 breaks the contact rule if there is T(C(x,y)) where x = a v y = a
+        if (contact_T_terms_.find(a) != contact_T_terms_.end())
+        {
+            trace() << "Found a contradiction with the contact rule - there is a contact with term " << *a;
+            return true;
+        }
+    }
     return false;
 }
 
 auto tableau::has_broken_contact_rule_F(const formula* f) const -> bool
 {
-    if (f->get_operation_type() == formula::operation_t::c)
+    const auto op = f->get_operation_type();
+    if (op == formula::operation_t::c)
     {
+        // C(a,b) -> a != 0 & b != 0
         // F(C(a,b)) has broken contact rule if a != 0 & b != 0
         const auto a = f->get_left_child_term();
         const auto b = f->get_right_child_term();
@@ -331,6 +345,14 @@ auto tableau::has_broken_contact_rule_F(const formula* f) const -> bool
             zero_terms_F_.find(b) != zero_terms_F_.end())
         {
             trace() << "Found a contradiction with the contact rule - F(" << *f << ") 's terms are not zero";
+            return true;
+        }
+    }
+    else if (op == formula::operation_t::eq_zero)
+    {
+        const auto t = f->get_left_child_term();
+        if (has_broken_contact_rule_new_non_zero_term(t))
+        {
             return true;
         }
     }
@@ -378,11 +400,18 @@ void tableau::add_formula_to_T(const formula* f)
     {
         trace() << "Adding " << *f << " to T contacts";
         contacts_T_.insert(f);
+
+        const auto l = f->get_left_child_term();
+        const auto r = f->get_right_child_term();
+        trace() << "Adding " << *l << " to the terms of T contacts";
+        contact_T_terms_.insert(l);
+        trace() << "Adding " << *r << " to the terms of T contacts";
+        contact_T_terms_.insert(r);
     }
     else if (op == formula::operation_t::eq_zero)
     {
         const auto t = f->get_left_child_term();
-        trace() << "Adding " << *t << " to zero terms T because " << *f << " is eq_zero formula";
+        trace() << "Adding " << *t << " to zero terms T";
         zero_terms_T_.insert(t);
     }
     else if(f->is_formula_operation())
@@ -403,11 +432,18 @@ void tableau::add_formula_to_F(const formula* f)
     {
         trace() << "Adding " << *f << " to F contacts";
         contacts_F_.insert(f);
+
+        const auto l = f->get_left_child_term();
+        const auto r = f->get_right_child_term();
+        trace() << "Adding " << *l << " to the terms -> F contacts mapping";
+        terms_to_F_contacts_.insert({ l, f });
+        trace() << "Adding " << *r << " to the terms -> F contacts mapping";
+        terms_to_F_contacts_.insert({ r, f });
     }
     else if (op == formula::operation_t::eq_zero)
     {
         const auto t = f->get_left_child_term();
-        trace() << "Adding " << *t << " to zero terms F because " << *f << " is eq_zero formula";
+        trace() << "Adding " << *t << " to zero terms F";
         zero_terms_F_.insert(t);
     }
     else if(f->is_formula_operation())
@@ -427,7 +463,13 @@ void tableau::remove_formula_from_T(const formula* f)
     if (op == formula::operation_t::c)
     {
         trace() << "Removing " << *f << " from T contacts";
-        contacts_T_.erase(f);
+
+        const auto l = f->get_left_child_term();
+        const auto r = f->get_right_child_term();
+        trace() << "Removing " << *l << " from the terms of T contacts";
+        remove_term(contact_T_terms_, l);
+        trace() << "Removing " << *r << " from the terms of T contacts";
+        remove_term(contact_T_terms_, r);
     }
     else if (op == formula::operation_t::eq_zero)
     {
@@ -437,8 +479,11 @@ void tableau::remove_formula_from_T(const formula* f)
     }
     else if(f->is_formula_operation())
     {
-        trace() << "Removing " << *f << " from T formulas";
-        formulas_T_.erase(f);
+        // f can be already extracted and processed in some child node
+        if(formulas_T_.erase(f))
+        {
+            trace() << "Removing " << *f << " from T formulas";
+        }
     }
     else
     {
@@ -452,7 +497,13 @@ void tableau::remove_formula_from_F(const formula* f)
     if (op == formula::operation_t::c)
     {
         trace() << "Removing " << *f << " from F contacts";
-        contacts_F_.erase(f);
+
+        const auto l = f->get_left_child_term();
+        const auto r = f->get_right_child_term();
+        trace() << "Removing " << *l << " from the terms -> F contacts mapping";
+        remove_term_to_formula(terms_to_F_contacts_, l, f);
+        trace() << "Removing " << *r << " from the terms -> F contacts mapping";
+        remove_term_to_formula(terms_to_F_contacts_, r, f);
     }
     else if (op == formula::operation_t::eq_zero)
     {
@@ -462,13 +513,104 @@ void tableau::remove_formula_from_F(const formula* f)
     }
     else if(f->is_formula_operation())
     {
-        trace() << "Removing " << *f << " from F formulas";
-        formulas_F_.erase(f);
+        // f can be already extracted and processed in some child node
+        if (formulas_F_.erase(f))
+        {
+            trace() << "Removing " << *f << " from F formulas";
+        }
     }
     else
     {
         trace() << "Skipping removing constant formula " << *f << " from F formulas";
     }
+}
+
+void tableau::log_state() const
+{
+    trace() << "           Formulas T: " << formulas_T_;
+    trace() << "           Formulas F: " << formulas_F_;
+    trace() << "           Contacts T: " << contacts_T_;
+    trace() << "           Contacts F: " << contacts_F_;
+    trace() << "         Zero terms T: " << zero_terms_T_;
+    trace() << "         Zero terms F: " << zero_terms_F_;
+    trace() << "     T contacts terms: " << contact_T_terms_;
+    trace() << "  terms to F contacts: " << terms_to_F_contacts_;
+}
+
+void tableau::remove_term(multiterms_t& terms, const term* t)
+{
+    auto iterpair = terms.equal_range(t);
+
+    for (auto it = iterpair.first, end = iterpair.second; it != end; ++it)
+    {
+        const auto found_t = *it;
+        if (found_t == t) // note that it compairs the pointers
+        {
+            terms.erase(it);
+            return;
+        }
+    }
+    error() << "Unable to locate " << *t << " in the terms: " << terms;
+    assert(false && "Unable to remove a term from mutitemrs");
+}
+
+void tableau::remove_term_to_formula(multiterm_to_formula_t& mapping, const term* t, const formula* f)
+{
+    auto iterpair = mapping.equal_range(t);
+
+    for (auto it = iterpair.first, end = iterpair.second; it != end; ++it)
+    {
+        const auto found_t = it->first;
+        const auto found_f = it->second;
+
+        if (found_t == t) // note that it compairs the pointers
+        {
+            assert(found_f == f);
+            (void)f;
+            mapping.erase(it);
+            return;
+        }
+    }
+    error() << "Unable to locate " << *t << " in the terms: " << mapping;
+    assert(false && "Unable to remove a term from mutitemr_to_formula");
+}
+
+auto tableau::has_broken_contact_rule_new_non_zero_term(const term* key_t) const -> bool
+{
+    // a != 0, X != 0 -> C(a, X)
+    // a != 0 breaks the contact rule if there is F(C(x,y)) where x/y = a & y/x != 0, i.e. x != 0 & y != 0
+
+    auto iterpair = terms_to_F_contacts_.equal_range(key_t);
+    for (auto it = iterpair.first, end = iterpair.second; it != end; ++it)
+    {
+        const auto t = it->first;
+        const auto f = it->second; // F(C(x,y)) : f is a pointer to some C(x,y)
+        assert(f->get_operation_type() == formula::operation_t::c);
+
+        const auto left_child = f->get_left_child_term();
+        const auto right_child = f->get_right_child_term();
+
+        assert(*left_child == *t || *right_child == *t);
+        // one of the childs is 't'
+        const auto other_child = *left_child == *t ? right_child : left_child;
+
+        // we know that 't' is a non-zero term.
+        // if both terms of 'f' are the same term 't'
+        // then the rule is broken
+        if (*left_child == *right_child)
+        {
+            trace() << "Found a contradiction with the contact rule - F(" << *f << ") 's terms are both not zero";
+            return true;
+        }
+        // now we have to check if the other child is also non-zero,
+        // then the rule will be broken
+        if (zero_terms_F_.find(other_child) != zero_terms_F_.end())
+        {
+            trace() << "Found a contradiction with the contact rule - F(" << *f << ") 's terms are both not zero";
+            return true;
+        }
+    }
+    return false;
 }
 
 auto tableau::formula_ptr_hasher::operator()(const formula* const& f) const -> std::size_t
@@ -478,7 +620,7 @@ auto tableau::formula_ptr_hasher::operator()(const formula* const& f) const -> s
 }
 
 auto tableau::formula_ptr_comparator::operator()(const formula* const& lhs, const formula* const& rhs) const
-    -> bool
+-> bool
 {
     assert(lhs && rhs);
     return *lhs == *rhs;
@@ -491,20 +633,10 @@ auto tableau::term_ptr_hasher::operator()(const term* const& t) const -> std::si
 }
 
 auto tableau::term_ptr_comparator::operator()(const term* const& lhs, const term* const& rhs) const
-    -> bool
+-> bool
 {
     assert(lhs && rhs);
     return *lhs == *rhs;
-}
-
-void tableau::log_state() const
-{
-    trace() << "\t  Formulas T: " << formulas_T_;
-    trace() << "\t  Formulas F: " << formulas_F_;
-    trace() << "\t  Contacts T: " << contacts_T_;
-    trace() << "\t  Contacts F: " << contacts_F_;
-    trace() << "\tZero terms T: " << zero_terms_T_;
-    trace() << "\tZero terms F: " << zero_terms_F_;
 }
 
 std::ostream& operator<<(std::ostream& out, const tableau::formulas_t& formulas)
@@ -522,6 +654,28 @@ std::ostream& operator<<(std::ostream& out, const tableau::terms_t& terms)
     for (const auto t_ptr : terms)
     {
         out << *t_ptr << " <" << t_ptr->get_hash() << "> ";
+    }
+
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const tableau::multiterms_t& terms)
+{
+    for (const auto t_ptr : terms)
+    {
+        out << *t_ptr << " <" << t_ptr->get_hash() << "> ";
+    }
+
+    return out;
+}
+
+std::ostream& operator<<(std::ostream& out, const tableau::multiterm_to_formula_t& mapping)
+{
+    for (const auto m : mapping)
+    {
+        const auto term = m.first;
+        const auto contact = m.second;
+        out << *term << " -> " << *contact << "\n";
     }
 
     return out;
