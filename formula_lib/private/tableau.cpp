@@ -118,8 +118,13 @@ auto tableau::step() -> bool
                 add_formula_to_T(child);
                 return true;
             };
-            if (!process_T_conj_child(left_f) || !process_T_conj_child(right_f)) // TODO: what if right child fails, then I need to remove the left child from the formulas.. FIX IT
+            if (!process_T_conj_child(left_f))
             {
+                return false;
+            }
+            if (!process_T_conj_child(right_f))
+            {
+                remove_formula_from_T(left_f);
                 return false;
             }
 
@@ -144,9 +149,11 @@ auto tableau::step() -> bool
         // T(T) is satisfiable and we can skip the other branch
         if (left_f_op == op_t::constant_true || right_f_op == op_t::constant_true)
         {
+            trace() << "One of the childs is constant true";
             return true;
         }
 
+        trace() << "Start of the left subtree" << *left_f;
         // T(F) is not satisfiable
         if(left_f_op != op_t::constant_false && !find_in_F(left_f) && !has_broken_contact_rule_T(left_f))
         {
@@ -161,6 +168,7 @@ auto tableau::step() -> bool
             remove_formula_from_T(left_f);
         }
 
+        trace() << "Start of the right subtree" << *right_f;
         if(right_f_op != op_t::constant_false && !find_in_F(right_f) && !has_broken_contact_rule_T(right_f))
         {
             add_formula_to_T(right_f);
@@ -247,8 +255,13 @@ auto tableau::step() -> bool
             add_formula_to_F(child);
             return true;
         };
-        if (!process_F_disj_child(left_f) || !process_F_disj_child(right_f))
+        if (!process_F_disj_child(left_f))
         {
+            return false;
+        }
+        if (!process_F_disj_child(right_f))
+        {
+            remove_formula_from_F(left_f);
             return false;
         }
 
@@ -274,8 +287,11 @@ auto tableau::step() -> bool
     // F(F) is satisfiable and we can skip the other branch
     if (left_f_op == op_t::constant_false || right_f_op == op_t::constant_false)
     {
+        trace() << "One of the childs is constant false";
         return true;
     }
+
+    trace() << "Start of the left subtree" << *left_f;
 
     // left branch of the path
     // F(T) is not satisfiable
@@ -290,6 +306,7 @@ auto tableau::step() -> bool
         remove_formula_from_F(left_f);
     }
 
+    trace() << "Start of the right subtree" << *right_f;
     if(right_f_op != op_t::constant_true && !find_in_T(right_f) && !has_broken_contact_rule_F(right_f))
     {
         add_formula_to_F(right_f);
