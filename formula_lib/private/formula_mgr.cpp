@@ -127,6 +127,16 @@ auto formula_mgr::get_variable(variable_id_t id) const -> std::string
     return variables_[id];
 }
 
+auto formula_mgr::get_variable(const std::string& name) const -> variable_id_t
+{
+    auto it = variable_to_id_.find(name);
+    if(it != variable_to_id_.end())
+    {
+        return it->second;
+    }
+    return variable_id_t(-1);
+}
+
 auto formula_mgr::get_internal_formula() const -> const formula*
 {
     return &f_;

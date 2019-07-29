@@ -45,6 +45,11 @@ auto variables_evaluations_block::get_set_variables_ids() const -> const set_var
     return set_variables_ids_;
 }
 
+auto variables_evaluations_block::get_evaluations() -> variables_evaluations_t&
+{
+    return evaluations_;
+}
+
 auto variables_evaluations_block::get_evaluations() const -> const variables_evaluations_t&
 {
     return evaluations_;
