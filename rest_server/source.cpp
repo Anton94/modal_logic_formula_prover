@@ -20,7 +20,7 @@ using namespace concurrency::streams;       // Asynchronous streams
 
 using json = nlohmann::json;
 
-std::unique_ptr<microser
+// std::unique_ptr<microser
 
 void on_init(const string_t& address)
 {
@@ -29,8 +29,8 @@ void on_init(const string_t& address)
 	uri_builder uri(address);
 	uri.append_path(U("foo/bar"));
 
-	auto addr = uri.to_uri().to_string();
-	g_http
+    auto addr = uri.to_uri().to_string();
+    // g_http
 }
 
 int main(int argc, char* argv[])
