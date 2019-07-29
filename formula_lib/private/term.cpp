@@ -84,11 +84,11 @@ auto term::build(json& t) -> bool
     auto op = name_field.get<std::string>();
     if(op == "1")
     {
-        construct_constant(operation_t::constant_true);
+        op_ = operation_t::constant_true;
     }
     else if(op == "0")
     {
-        construct_constant(operation_t::constant_false);
+        op_ = operation_t::constant_false;
     }
     else if(op == "variable_id")
     {
@@ -100,13 +100,6 @@ auto term::build(json& t) -> bool
             return false;
         }
         variable_id_ = value_field.get<size_t>();
-        const auto all_variables_count = formula_mgr_->get_variables().size();
-
-        assert(variable_id_ < all_variables_count);
-        variables_.resize(all_variables_count);
-        variables_.set(variable_id_);
-
-        hash_ = (variable_id_ & 0xFFFFFFFF) * 2654435761;
     }
     else if(op == "Tand")
     {
@@ -135,10 +128,6 @@ auto term::build(json& t) -> bool
         {
             return false;
         }
-
-        hash_ = (childs_.left->get_hash() & 0xFFFFFFFF) * 2654435761;
-
-        variables_ = childs_.left->variables_;
     }
     else
     {
@@ -146,9 +135,8 @@ auto term::build(json& t) -> bool
         return false;
     }
 
-    // add also the operation to the hash
-    const auto op_code = static_cast<unsigned>(op_) + 1;
-    hash_ += (op_code & 0xFFFFFFFF) * 2654435723;
+    construct_hash();
+    construct_variables();
 
     trace() << *this << " <" << hash_ << ">";
     return true;
@@ -158,27 +146,144 @@ auto term::evaluate(const full_variables_evaluations_t& variable_evaluations) co
 {
     switch(op_)
     {
-        case term::operation_t::constant_true:
+        case operation_t::constant_true:
             return true;
-        case term::operation_t::constant_false:
+        case operation_t::constant_false:
             return false;
-        case term::operation_t::union_:
+        case operation_t::union_:
             assert(childs_.left && childs_.right);
             return childs_.left->evaluate(variable_evaluations) ||
                    childs_.right->evaluate(variable_evaluations);
-        case term::operation_t::intersaction_:
+        case operation_t::intersaction_:
             assert(childs_.left && childs_.right);
             return childs_.left->evaluate(variable_evaluations) &&
                    childs_.right->evaluate(variable_evaluations);
-        case term::operation_t::star_:
+        case operation_t::star_:
             assert(childs_.left);
             return !childs_.left->evaluate(variable_evaluations);
-        case term::operation_t::variable_:
+        case operation_t::variable_:
             assert(variable_id_ < variable_evaluations.size());
             return variable_evaluations[variable_id_]; // returns the evaluation for the variable
         default:
             assert(false && "Unrecognized.");
             return false;
+    }
+}
+
+auto term::evaluate(const variables_evaluations_block& evaluation_block) const -> evaluation_result
+{
+    using res_type = evaluation_result::result_type;
+    switch(op_)
+    {
+        case operation_t::constant_true:
+            return {res_type::constant_true, nullptr};
+        case operation_t::constant_false:
+            return {res_type::constant_false, nullptr};
+        case operation_t::union_:
+        {
+            auto res_left = childs_.left->evaluate(evaluation_block);
+            if(res_left.is_constant_true())
+            {
+                return {res_type::constant_true, nullptr};
+            }
+
+            auto res_right = childs_.right->evaluate(evaluation_block);
+            if(res_right.is_constant_true())
+            {
+                res_left.free();
+                return {res_type::constant_true, nullptr};
+            }
+
+            if(res_left.is_constant_false() && res_right.is_constant_false())
+            {
+                return {res_type::constant_false, nullptr};
+            }
+
+            if(res_left.is_constant_false())
+            {
+                assert(res_right.type == res_type::term);
+                return {res_type::term, res_right.release()};
+            }
+            if(res_right.is_constant_false())
+            {
+                assert(res_left.type == res_type::term);
+                return {res_type::term, res_left.release()};
+            }
+
+            assert(res_left.type == res_type::term && res_right.type == res_type::term);
+
+            auto t = create_internal_node(op_, res_left.release(), res_right.release());
+            return {res_type::term, t};
+        }
+        case operation_t::intersaction_:
+        {
+            auto res_left = childs_.left->evaluate(evaluation_block);
+            if(res_left.is_constant_false())
+            {
+                return {res_type::constant_false, nullptr};
+            }
+
+            auto res_right = childs_.right->evaluate(evaluation_block);
+            if(res_right.is_constant_false())
+            {
+                res_left.free();
+                return {res_type::constant_false, nullptr};
+            }
+
+            if(res_left.is_constant_true() && res_right.is_constant_true())
+            {
+                return {res_type::constant_true, nullptr};
+            }
+
+            if(res_left.is_constant_true())
+            {
+                assert(res_right.type == res_type::term);
+                return {res_type::term, res_right.release()};
+            }
+            if(res_right.is_constant_true())
+            {
+                assert(res_left.type == res_type::term);
+                return {res_type::term, res_left.release()};
+            }
+
+            assert(res_left.type == res_type::term && res_right.type == res_type::term);
+
+            auto t = create_internal_node(op_, res_left.release(), res_right.release());
+            return {res_type::term, t};
+        }
+        case operation_t::star_:
+        {
+            auto res_child = childs_.left->evaluate(evaluation_block);
+            if(res_child.is_constant())
+            {
+                const auto negated_constant = res_child.type == res_type::constant_true
+                                                  ? res_type::constant_false
+                                                  : res_type::constant_true;
+                return {negated_constant, nullptr};
+            }
+            assert(res_child.type == res_type::term);
+
+            auto t = create_internal_node(op_, res_child.release());
+            return {res_type::term, t};
+        }
+        case operation_t::variable_:
+        {
+            const auto& block_variables = evaluation_block.get_variables();
+            assert(variable_id_ < block_variables.size());
+            if(block_variables[variable_id_]) // if the variable_id is participating in that block evaluation
+            {
+                const auto& block_evaluations = evaluation_block.get_evaluations();
+                const auto type =
+                    block_evaluations[variable_id_] ? res_type::constant_true : res_type::constant_false;
+                return {type, nullptr};
+            }
+
+            auto t = create_variable_node(variable_id_);
+            return {res_type::term, t};
+        }
+        default:
+            assert(false && "Unrecognized.");
+            return {res_type::none, nullptr};
     }
 }
 
@@ -304,14 +409,6 @@ void term::move(term&& rhs) noexcept
     rhs.op_ = operation_t::invalid_;
 }
 
-void term::construct_constant(operation_t op)
-{
-    op_ = op;
-    assert(is_constant());
-
-    variables_.resize(formula_mgr_->get_variables().size());
-}
-
 auto term::construct_binary_operation(json& t, operation_t op) -> bool
 {
     op_ = op;
@@ -335,13 +432,91 @@ auto term::construct_binary_operation(json& t, operation_t op) -> bool
         return false;
     }
 
-    // add child's hashes
-    hash_ = ((childs_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
-            ((childs_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
-
-    variables_ = childs_.left->variables_ | childs_.right->variables_;
-
     return true;
+}
+
+void term::construct_hash()
+{
+    switch(op_)
+    {
+        case operation_t::constant_true:
+        case operation_t::constant_false:
+            break;
+        case operation_t::union_:
+        case operation_t::intersaction_:
+            hash_ = ((childs_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
+                    ((childs_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
+            break;
+        case operation_t::star_:
+            hash_ = (childs_.left->get_hash() & 0xFFFFFFFF) * 2654435761;
+            break;
+        case operation_t::variable_:
+            hash_ = (variable_id_ & 0xFFFFFFFF) * 2654435761;
+            break;
+        default:
+            assert(false && "Unrecognized.");
+    }
+
+    // add also the operation to the hash
+    const auto op_code = static_cast<unsigned>(op_) + 1;
+    hash_ += (op_code & 0xFFFFFFFF) * 2654435723;
+}
+
+void term::construct_variables()
+{
+    switch(op_)
+    {
+        case operation_t::constant_true:
+        case operation_t::constant_false:
+            variables_.resize(formula_mgr_->get_variables().size());
+            break;
+        case operation_t::union_:
+        case operation_t::intersaction_:
+            variables_ = childs_.left->variables_ | childs_.right->variables_;
+            break;
+        case operation_t::star_:
+            variables_ = childs_.left->variables_;
+            break;
+        case operation_t::variable_:
+        {
+            const auto all_variables_count = formula_mgr_->get_variables().size();
+            assert(variable_id_ < all_variables_count);
+            variables_.resize(all_variables_count);
+            variables_.set(variable_id_);
+            break;
+        }
+        default:
+            assert(false && "Unrecognized.");
+    }
+}
+
+auto term::create_internal_node(operation_t op, term* left, term* right) const -> term*
+{
+    assert(op == operation_t::star_ || op == operation_t::union_ || op == operation_t::intersaction_);
+
+    auto t = new(std::nothrow) term(formula_mgr_);
+    assert(t);
+
+    t->op_ = op;
+    t->childs_.left = left;
+    t->childs_.right = right;
+    t->construct_hash();
+    t->construct_variables();
+
+    return t;
+}
+
+auto term::create_variable_node(size_t variable_id) const -> term*
+{
+    auto t = new(std::nothrow) term(formula_mgr_);
+    assert(t);
+
+    t->op_ = operation_t::variable_;
+    t->variable_id_ = variable_id;
+    t->construct_hash();
+    t->construct_variables();
+
+    return t;
 }
 
 void term::free()
@@ -351,4 +526,74 @@ void term::free()
         delete childs_.left;
         delete childs_.right;
     }
+}
+
+term::evaluation_result::evaluation_result(result_type res_type, term* t)
+    : type(res_type)
+    , t_(t)
+{
+}
+
+term::evaluation_result::evaluation_result(evaluation_result&& rhs) noexcept
+{
+    move(std::move(rhs));
+}
+
+term::evaluation_result& term::evaluation_result::operator=(evaluation_result&& rhs) noexcept
+{
+    if(this != &rhs)
+    {
+        free();
+        move(std::move(rhs));
+    }
+    return *this;
+}
+
+term::evaluation_result::~evaluation_result()
+{
+    if(t_)
+    {
+        const auto msg = "There is a term evaluation result with not freed term!!!";
+        error() << msg;
+        assert(false && msg);
+        delete t_;
+    }
+}
+
+term* term::evaluation_result::release()
+{
+    type = result_type::none;
+    auto t = t_;
+    t_ = nullptr;
+    return t;
+}
+
+void term::evaluation_result::free()
+{
+    delete t_;
+    t_ = nullptr;
+    type = result_type::none;
+}
+
+void term::evaluation_result::move(evaluation_result&& rhs) noexcept
+{
+    type = rhs.type;
+    t_ = rhs.t_;
+    rhs.type = result_type::none;
+    rhs.t_ = nullptr;
+}
+
+auto term::evaluation_result::is_constant() const -> bool
+{
+    return type == result_type::constant_true || type == result_type::constant_false;
+}
+
+auto term::evaluation_result::is_constant_true() const -> bool
+{
+    return type == result_type::constant_true;
+}
+
+auto term::evaluation_result::is_constant_false() const -> bool
+{
+    return type == result_type::constant_false;
 }

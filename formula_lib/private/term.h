@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../private/types.h"
 #include "nlohmann_json/json.hpp"
+#include "types.h"
+#include "variables_evaluations_block.h"
 #include <ostream>
 #include <unordered_set>
 
@@ -26,6 +27,39 @@ public:
     auto evaluate(const full_variables_evaluations_t& variable_evaluations) const -> bool;
     void clear();
 
+    struct evaluation_result
+    {
+        enum class result_type : char
+        {
+            none,
+            constant_true,
+            constant_false,
+            term,
+        };
+
+        evaluation_result(result_type res_type, term* t);
+        evaluation_result(const evaluation_result&) = delete;
+        evaluation_result& operator=(const evaluation_result&) = delete;
+        evaluation_result(evaluation_result&& rhs) noexcept;
+        evaluation_result& operator=(evaluation_result&& rhs) noexcept;
+        ~evaluation_result();
+
+        term* release();
+        void free();
+        auto is_constant() const -> bool;
+        auto is_constant_true() const -> bool;
+        auto is_constant_false() const -> bool;
+
+        result_type type{result_type::none};
+
+    private:
+        void move(evaluation_result&& rhs) noexcept;
+
+        term* t_{nullptr};
+    };
+
+    auto evaluate(const variables_evaluations_block& evaluation_block) const -> evaluation_result;
+
     enum class operation_type : char
     {
         constant_true,
@@ -37,7 +71,6 @@ public:
         variable_,
 
         invalid_,
-        // TODO: encode here DNF stuff
     };
     using operation_t = operation_type;
 
@@ -55,14 +88,26 @@ public:
 
     void change_formula_mgr(formula_mgr* new_mgr);
 
+    auto is_binary_operaton() const -> bool;
+    auto is_constant() const -> bool;
+
 private:
     void move(term&& rhs) noexcept;
 
-    void construct_constant(operation_t op);
     auto construct_binary_operation(json& t, operation_t op) -> bool;
 
-    auto is_binary_operaton() const -> bool;
-    auto is_constant() const -> bool;
+    // calculates and sets the hash depending on the @op_ and the child hashes (if any)
+    void construct_hash();
+    // calculates and sets the used variables mask depending on the @op_ and the child's variables (if any)
+    void construct_variables();
+
+    // creats a term internal node with the given childs(if any). allowed operations are star, union and intersection
+    // the user must free the created node!
+    auto create_internal_node(operation_t op, term* left = nullptr, term* right = nullptr) const -> term*;
+    // creats a term variable/leaf node
+    // the user must free the created node!
+    auto create_variable_node(size_t variable_id) const -> term*;
+
     void free();
 
     operation_t op_;
