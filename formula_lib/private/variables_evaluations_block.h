@@ -25,7 +25,7 @@ public:
     auto operator!=(const variables_evaluations_block& rhs) const -> bool;
 
     auto get_variables() const -> const variables_mask_t&;
-    auto get_evaluations() const -> variables_evaluations_t;
+    auto get_evaluations() const -> const variables_evaluations_t&;
 
     using set_variables_ids_t = std::vector<variable_id_t>;
     auto get_set_variables_ids() const -> const set_variables_ids_t&;
