@@ -1460,6 +1460,62 @@ TEST_CASE("satisfiable with contact rule 1", "[satisfiability]")
         false);
 }
 
+TEST_CASE("satisfiable with contact rule 1.5", "[satisfiability]")
+{
+    // C(a * (-b), c) & <=(a, b)
+    is_satisfiable(
+        R"({
+           "name": "conjunction",
+           "value": [
+                {
+                   "name": "contact",
+                   "value": [
+                      {
+                         "name": "Tand",
+                         "value": [
+                            {
+                               "name": "string",
+                               "value": "a"
+                            },
+                            {
+                               "name": "Tstar",
+                               "value": {
+                                  "name": "string",
+                                  "value": "b"
+                               }
+                            }
+                         ]
+                      },
+                      {
+                         "name": "string",
+                         "value": "c"
+                      }
+                   ]
+                },
+                {
+                   "name": "equal0",
+                   "value": {
+                      "name": "Tand",
+                      "value": [
+                         {
+                            "name": "string",
+                            "value": "a"
+                         },
+                         {
+                            "name": "Tstar",
+                            "value": {
+                               "name": "string",
+                               "value": "b"
+                            }
+                         }
+                      ]
+                   }
+                }
+           ]
+        })"_json,
+        false);
+}
+
 TEST_CASE("satisfiable with contact rule 2", "[satisfiability]")
 {
     // <=(a, c) & C(a * (-b), c)
@@ -1904,6 +1960,125 @@ TEST_CASE("satisfiable with contact rule 6", "[satisfiability]")
                  ]
               }
            ]
+        })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable with contact rule 6.1", "[satisfiability]")
+{
+    // ~(~<=(a, c) | ~<=(a,b)) & (C(a * (-c), d) | C(a * (-b), c))
+    is_satisfiable(
+        R"({
+            "name": "conjunction",
+            "value": [
+               {
+                  "name": "negation",
+                  "value": {
+                     "name": "disjunction",
+                     "value": [
+                        {
+                           "name": "negation",
+                           "value": {
+                              "name": "equal0",
+                              "value": {
+                                 "name": "Tand",
+                                 "value": [
+                                    {
+                                       "name": "string",
+                                       "value": "a"
+                                    },
+                                    {
+                                       "name": "Tstar",
+                                       "value": {
+                                          "name": "string",
+                                          "value": "c"
+                                       }
+                                    }
+                                 ]
+                              }
+                           }
+                        },
+                        {
+                           "name": "negation",
+                           "value": {
+                              "name": "equal0",
+                              "value": {
+                                 "name": "Tand",
+                                 "value": [
+                                    {
+                                       "name": "string",
+                                       "value": "a"
+                                    },
+                                    {
+                                       "name": "Tstar",
+                                       "value": {
+                                          "name": "string",
+                                          "value": "b"
+                                       }
+                                    }
+                                 ]
+                              }
+                           }
+                        }
+                     ]
+                  }
+               },
+               {
+                  "name": "disjunction",
+                  "value": [
+                     {
+                        "name": "contact",
+                        "value": [
+                           {
+                              "name": "Tand",
+                              "value": [
+                                 {
+                                    "name": "string",
+                                    "value": "a"
+                                 },
+                                 {
+                                    "name": "Tstar",
+                                    "value": {
+                                       "name": "string",
+                                       "value": "c"
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "name": "string",
+                              "value": "d"
+                           }
+                        ]
+                     },
+                     {
+                        "name": "contact",
+                        "value": [
+                           {
+                              "name": "Tand",
+                              "value": [
+                                 {
+                                    "name": "string",
+                                    "value": "a"
+                                 },
+                                 {
+                                    "name": "Tstar",
+                                    "value": {
+                                       "name": "string",
+                                       "value": "b"
+                                    }
+                                 }
+                              ]
+                           },
+                           {
+                              "name": "string",
+                              "value": "c"
+                           }
+                        ]
+                     }
+                  ]
+               }
+            ]
         })"_json,
         false);
 }
