@@ -1,7 +1,8 @@
 #include "tableau.h"
 #include "formula.h"
-#include "term.h"
 #include "logger.h"
+#include "term.h"
+#include "utils.h"
 
 auto tableau::is_satisfiable(const formula_mgr& f) -> bool
 {
@@ -47,10 +48,14 @@ auto tableau::step() -> bool
     {
         // choosing some formula to handle in this step. Here we can choose in a smarter way (TODO)
         auto f = *formulas_T_.begin();
-
         formulas_T_.erase(formulas_T_.begin());
-        trace() << "Process " << *f << " from T formulas";
+        trace() << "Processing " << *f << " from T formulas";
         log_state();
+
+        call_on_destroy insert_processed_f_back_before_exiting([&]() {
+            trace() << "Returning processed " << *f << " back to T formulas";
+            formulas_T_.insert(f);
+        });
 
         const auto op = f->get_operation_type();
         if(op == op_t::negation)
@@ -141,7 +146,6 @@ auto tableau::step() -> bool
         // T(X v Y) -> T(X) v T(Y)
         auto left_f = f->get_left_child_formula();
         auto right_f = f->get_right_child_formula();
-
         trace() << "Will split to two subtrees: " << *left_f << " and " << *right_f;
 
         const auto left_f_op = left_f->get_operation_type();
@@ -187,8 +191,13 @@ auto tableau::step() -> bool
     // choosing some formula to handle in this step. Here we can choose in a smarter way (TODO)
     auto f = *formulas_F_.begin();
     formulas_F_.erase(formulas_F_.begin());
-    trace() << "Process " << *f << " from F formulas";
+    trace() << "Processing " << *f << " from F formulas";
     log_state();
+
+    call_on_destroy insert_processed_f_back_before_exiting([&]() {
+        trace() << "Returning processed " << *f << " back to F formulas";
+        formulas_F_.insert(f);
+    });
 
     const auto op = f->get_operation_type();
     if(op == op_t::negation)
@@ -342,7 +351,7 @@ auto tableau::has_broken_contact_rule_T(const formula* f) const -> bool
         // a = 0 breaks the contact rule if there is T(C(x,y)) where x = a v y = a
         if (contact_T_terms_.find(a) != contact_T_terms_.end())
         {
-            trace() << "Found a contradiction with the contact rule - there is a contact with term " << *a;
+            trace() << "Found a contradiction with the contact rule - there is a contact with a zero term " << *a;
             return true;
         }
     }
