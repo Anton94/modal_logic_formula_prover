@@ -311,8 +311,7 @@ TEST_CASE("satisfiable 6", "[satisfiability]")
         true);
 }
 
-// TODO: enable when the bug with duplicating formulas is fixed
-TEST_CASE("satisfiable 7", "[!hide][satisfiability]")
+TEST_CASE("satisfiable 7", "[satisfiability]")
 {
     // (C(a, b) | ~C(a, b)) & (C(a,b) | ~C(a,b))
     is_satisfiable(
@@ -392,8 +391,7 @@ TEST_CASE("satisfiable 7", "[!hide][satisfiability]")
         true);
 }
 
-// TODO: enable when the bug with duplicating formulas is fixed
-TEST_CASE("satisfiable 8", "[!hide][satisfiability]")
+TEST_CASE("satisfiable 8", "[satisfiability]")
 {
     // (C(a, b) | ~C(a, b)) & (C(a,b) | ~C(a,c))
     is_satisfiable(
