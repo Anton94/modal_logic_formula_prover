@@ -58,6 +58,8 @@ public:
     auto is_atomic() const -> bool;
     auto is_formula_operation() const -> bool;
     auto is_constant() const -> bool;
+    auto is_constant_true() const -> bool;
+    auto is_constant_false() const -> bool;
 
     void change_formula_mgr(formula_mgr* new_mgr);
 

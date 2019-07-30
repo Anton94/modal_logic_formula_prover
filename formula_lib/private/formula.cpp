@@ -239,6 +239,16 @@ auto formula::is_constant() const -> bool
     return op_ == operation_t::constant_true || op_ == operation_t::constant_false;
 }
 
+auto formula::is_constant_true() const -> bool
+{
+    return op_ == operation_t::constant_true;
+}
+
+auto formula::is_constant_false() const -> bool
+{
+    return op_ == operation_t::constant_false;
+}
+
 void formula::change_formula_mgr(formula_mgr* new_mgr)
 {
     assert(new_mgr);
