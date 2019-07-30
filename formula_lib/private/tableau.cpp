@@ -28,6 +28,8 @@ void tableau::clear()
     contacts_F_.clear();
     zero_terms_T_.clear();
     zero_terms_F_.clear();
+    contact_T_terms_.clear();
+    terms_to_F_contacts_.clear();
 }
 
 auto tableau::step() -> bool
