@@ -44,6 +44,34 @@ private:
 
     void log_state() const;
 
+    struct T_conjuction_child
+    {
+        T_conjuction_child(tableau& t, const formula* f);
+
+        auto validate() const -> bool;
+        void add_to_T();
+        void remove_from_T();
+
+    private:
+        tableau& t_;
+        const formula* f_;
+        bool added_{};
+    };
+
+    struct F_disjunction_child
+    {
+        F_disjunction_child(tableau& t, const formula* f);
+
+        auto validate() const -> bool;
+        void add_to_F();
+        void remove_from_F();
+
+    private:
+        tableau& t_;
+        const formula* f_;
+        bool added_{};
+    };
+
     struct formula_ptr_hasher
     {
         auto operator()(const formula* const& f) const -> std::size_t;

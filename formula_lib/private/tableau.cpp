@@ -63,7 +63,7 @@ auto tableau::step() -> bool
         if(op == op_t::negation)
         {
             // T(~X) -> F(X)
-            auto not_negated_f = f->get_left_child_formula();
+            auto not_negated_f = f->get_left_child_formula(); // X
             if(not_negated_f->is_constant())
             {
                 // F(T) is not satisfiable
@@ -72,7 +72,7 @@ auto tableau::step() -> bool
                     trace() << "Found a contradiction - found " << *f << " constant in T formulas";
                     return false;
                 }
-                return true;
+                return true; // F(F) is satisfiable
             }
 
             if(find_in_T(not_negated_f))
@@ -85,6 +85,12 @@ auto tableau::step() -> bool
             {
                 return false;
             }
+
+            if(find_in_F(not_negated_f))
+            {
+                return step();
+            }
+
             add_formula_to_F(not_negated_f);
             auto res = step();
             remove_formula_from_F(not_negated_f);
@@ -94,47 +100,24 @@ auto tableau::step() -> bool
         if(op == op_t::conjunction)
         {
             // T(X & Y) -> T(X) & T(Y)
-            auto left_f = f->get_left_child_formula();
-            auto right_f = f->get_right_child_formula();
+            T_conjuction_child left(*this, f->get_left_child_formula());
+            T_conjuction_child right(*this, f->get_right_child_formula());
 
-            // T(F) is not satisfiable
-            if(left_f->is_constant_false() || right_f->is_constant_false())
+            if(!left.validate())
             {
-                trace() << "Found a contradiction - " << *f << " has a constant F as a child";
                 return false;
             }
+            left.add_to_T();
 
-            auto process_T_conj_child = [&](const formula* child) {
-                if(child->is_constant())
-                {
-                    return true;
-                }
-                if(find_in_F(child))
-                {
-                    trace() << "Found a contradiction with child " << *child << " which has been found in F";
-                    return false;
-                }
-                if(has_broken_contact_rule_T(child))
-                {
-                    return false;
-                }
-                add_formula_to_T(child);
-                return true;
-            };
-            if(!process_T_conj_child(left_f))
+            if(!right.validate())
             {
                 return false;
             }
-            if(!process_T_conj_child(right_f))
-            {
-                remove_formula_from_T(left_f);
-                return false;
-            }
+            right.add_to_T();
 
             auto res = step();
-
-            remove_formula_from_T(left_f);
-            remove_formula_from_T(right_f);
+            left.remove_from_T();
+            right.remove_from_T();
 
             return res;
         }
@@ -153,29 +136,31 @@ auto tableau::step() -> bool
             return true;
         }
 
-        auto res = false;
         auto process_T_disj_child = [&](const formula* child) {
             // T(F) is not satisfiable
             if(!child->is_constant_false() && !find_in_F(child) && !has_broken_contact_rule_T(child))
             {
+                if(find_in_T(child))
+                {
+                    return step();
+                }
+
                 add_formula_to_T(child);
-                res = step();
+                const auto res = step();
                 remove_formula_from_T(child);
+                return res;
             }
+            return false;
         };
 
         trace() << "Start of the left subtree: " << *left_f << " of " << *f;
-        process_T_disj_child(left_f);
-        if(res)
+        if(process_T_disj_child(left_f))
         {
-            // there was no contradiction in that path, so there is no need to continue with the right path
-            return true;
+            return true; // there was no contradiction in the left path, so there is no need to continue with the right path
         }
 
         trace() << "Start of the right subtree: " << *right_f << " of " << *f;
-        process_T_disj_child(right_f);
-
-        return res;
+        return process_T_disj_child(right_f);
     }
 
     // almost analogous but taking a formula from Fs
@@ -196,7 +181,7 @@ auto tableau::step() -> bool
     if(op == op_t::negation)
     {
         // F(~X) -> T(X)
-        auto not_negated_f = f->get_left_child_formula();
+        auto not_negated_f = f->get_left_child_formula(); // X
         if(not_negated_f->is_constant())
         {
             // T(F) is not satisfiable
@@ -205,7 +190,7 @@ auto tableau::step() -> bool
                 trace() << "Found a contradiction - found " << *f << " constant in F formulas";
                 return false;
             }
-            return true;
+            return true; // T(T) is satisfiable
         }
         if(find_in_F(not_negated_f))
         {
@@ -217,6 +202,12 @@ auto tableau::step() -> bool
         {
             return false;
         }
+
+        if(find_in_T(not_negated_f))
+        {
+            return step();
+        }
+
         add_formula_to_T(not_negated_f);
         auto res = step();
         remove_formula_from_T(not_negated_f);
@@ -226,47 +217,25 @@ auto tableau::step() -> bool
     if(op == op_t::disjunction)
     {
         // F(X v Y) -> F(X) & F(Y)
-        auto left_f = f->get_left_child_formula();
-        auto right_f = f->get_right_child_formula();
+        F_disjunction_child left(*this, f->get_left_child_formula());
+        F_disjunction_child right(*this, f->get_right_child_formula());
 
-        // F(T) is not satisfiable
-        if(left_f->is_constant_true() || right_f->is_constant_true())
+        if(!left.validate())
         {
-            trace() << "Found a contradiction - " << *f << " has a constant T as a child";
             return false;
         }
+        left.add_to_F();
 
-        auto process_F_disj_child = [&](const formula* child) {
-            if(child->is_constant())
-            {
-                return true;
-            }
-            if(find_in_T(child))
-            {
-                trace() << "Found a contradiction with child " << *child << " which has been found in T";
-                return false;
-            }
-            if(has_broken_contact_rule_F(child))
-            {
-                return false;
-            }
-            add_formula_to_F(child);
-            return true;
-        };
-        if(!process_F_disj_child(left_f))
+        if(!right.validate())
         {
             return false;
         }
-        if(!process_F_disj_child(right_f))
-        {
-            remove_formula_from_F(left_f);
-            return false;
-        }
+        right.add_to_F();
 
         auto res = step();
 
-        remove_formula_from_F(left_f);
-        remove_formula_from_F(right_f);
+        left.remove_from_F();
+        right.remove_from_F();
 
         return res;
     }
@@ -286,28 +255,31 @@ auto tableau::step() -> bool
         return true;
     }
 
-    auto res = false;
     auto process_F_conj_child = [&](const formula* child) {
         // F(T) is not satisfiable
         if(!child->is_constant_true() && !find_in_T(child) && !has_broken_contact_rule_F(child))
         {
+            if(find_in_F(child))
+            {
+                return step();
+            }
+
             add_formula_to_F(child);
-            res = step();
+            const auto res = step();
             remove_formula_from_F(child);
+            return res;
         }
+        return false;
     };
 
     trace() << "Start of the left subtree: " << *left_f << " of " << *f;
-    process_F_conj_child(left_f);
-    if(res)
+    if(process_F_conj_child(left_f))
     {
-        // there was no contradiction in that path, so there is no need to continue with the right path
-        return true;
+        return true; // there was no contradiction in left path, so there is no need to continue with the right path
     }
 
     trace() << "Start of the right subtree: " << *right_f << " of " << *f;
-    process_F_conj_child(right_f);
-    return res;
+    return process_F_conj_child(right_f);
 }
 
 auto tableau::has_broken_contact_rule_T(const formula* f) const -> bool
@@ -319,9 +291,17 @@ auto tableau::has_broken_contact_rule_T(const formula* f) const -> bool
         const auto b = f->get_right_child_term();
         // C(a,b) -> a != 0 & b != 0
         // T(C(a,b)) has broken contact rule if a = 0 | b = 0
-        if(zero_terms_T_.find(a) != zero_terms_T_.end() || zero_terms_T_.find(b) != zero_terms_T_.end())
+        auto check_for_zero_term_in_f = [&](const term* t)
         {
-            trace() << "Found a contradiction with the contact rule - T(" << *f << ") has a zero term";
+            if(zero_terms_T_.find(t) != zero_terms_T_.end())
+            {
+                trace() << "Found a contradiction with the contact rule - T(" << *f << ") has a zero term: " << *t;
+                return true;
+            }
+            return false;
+        };
+        if(check_for_zero_term_in_f(a) || check_for_zero_term_in_f(b))
+        {
             return true;
         }
     }
@@ -628,6 +608,97 @@ auto tableau::has_broken_contact_rule_new_non_zero_term(const term* key_t) const
         }
     }
     return false;
+}
+
+tableau::T_conjuction_child::T_conjuction_child(tableau& t, const formula* f)
+    : t_(t)
+    , f_(f)
+{
+    assert(f_);
+}
+
+auto tableau::T_conjuction_child::validate() const -> bool
+{
+    if(f_->is_constant_true()) // skip the T constant, T(T) is satisfiable
+    {
+        return true;
+    }
+    // T(F) is not satisfiable
+    if(f_->is_constant_false())
+    {
+        trace() << "Found a contradiction - cojnuction in T formulas has a constant F as a child";
+        return false;
+    }
+    if(t_.find_in_F(f_))
+    {
+        trace() << "Found a contradiction with child " << *f_ << " which has been found in F";
+        return false;
+    }
+
+    return !t_.has_broken_contact_rule_T(f_);
+}
+
+void tableau::T_conjuction_child::add_to_T()
+{
+    if(!f_->is_constant() && !t_.find_in_T(f_))
+    {
+        t_.add_formula_to_T(f_);
+        added_ = true;
+    }
+}
+
+void tableau::T_conjuction_child::remove_from_T()
+{
+    if(added_)
+    {
+        t_.remove_formula_from_T(f_);
+    }
+}
+
+
+tableau::F_disjunction_child::F_disjunction_child(tableau& t, const formula* f)
+    : t_(t)
+    , f_(f)
+{
+    assert(f_);
+}
+
+auto tableau::F_disjunction_child::validate() const -> bool
+{
+    if(f_->is_constant_false()) // skip the F constant, F(F) is satisfiable
+    {
+        return true;
+    }
+    // F(T) is not satisfiable
+    if(f_->is_constant_true())
+    {
+        trace() << "Found a contradiction - disjunction in F formulas has a constant T as a child";
+        return false;
+    }
+    if(t_.find_in_T(f_))
+    {
+        trace() << "Found a contradiction with child " << *f_ << " which has been found in T";
+        return false;
+    }
+
+    return !t_.has_broken_contact_rule_F(f_);
+}
+
+void tableau::F_disjunction_child::add_to_F()
+{
+    if(!f_->is_constant() && !t_.find_in_F(f_))
+    {
+        t_.add_formula_to_F(f_);
+        added_ = true;
+    }
+}
+
+void tableau::F_disjunction_child::remove_from_F()
+{
+    if(added_)
+    {
+        t_.remove_formula_from_F(f_);
+    }
 }
 
 auto tableau::formula_ptr_hasher::operator()(const formula* const& f) const -> std::size_t
