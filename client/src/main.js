@@ -356,6 +356,31 @@ function parse(formula) {
     }
 }
 
+/// END OF PARSER
+
+
+
+/// START OF HTTP SERVICE
+
+class http_service {
+    get(path) {
+        var IP_ADDRESS = "http://localhost:34567/foo/bar/";
+        $.ajax({
+         url: IP_ADDRESS + path,
+         data: {},
+         type: "GET",
+         beforeSend: function(xhr) {xhr.setRequestHeader('Access-Control-Allow-Origin', '*');},
+         success: function(data) { alert('Success!' + data); }
+      });
+    }
+}
+
+
+
+/// END OF HTTP SERVICE
+
+
+
 function formula_to_json(formula) {
     simplified = simplify(parse(formula).cst);
     //formula_traverse_top_to_bottom(simplified, new Set(["less"]), remove_equal_TDis_in_less);
@@ -365,6 +390,10 @@ function formula_to_json(formula) {
     formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation[Operations.formula.IMPLICATION]]), decompose_implication);
     formula_traverse_top_to_bottom(simplified, NEG_OPERATIONS, remove_double_negations);
     formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation[Operations.formula.CONTACT]]), decompose_contant_on_Tdis);
+
+
+    service = new http_service();
+    service.get("aa");
     return simplified;
 }
 
@@ -535,3 +564,13 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
 // <=(a,b)<->C(a,b)-><=(m,b)
 
 // bug ! is front does not do nything
+
+
+
+/// JavaScript 
+class HttpController {
+
+}
+
+
+

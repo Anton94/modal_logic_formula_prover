@@ -20,17 +20,27 @@ using namespace concurrency::streams;       // Asynchronous streams
 
 using json = nlohmann::json;
 
-// std::unique_ptr<microser
+std::unique_ptr<microservice_controller> g_http;
+
 
 void on_init(const string_t& address)
 {
 	// Build our listener's URI from the configured address and the hard coded path /foo/bar
 
 	uri_builder uri(address);
-	uri.append_path(U("foo/bar"));
 
-    auto addr = uri.to_uri().to_string();
-    // g_http
+	auto addr = uri.to_uri().to_string();
+	g_http = std::unique_ptr<microservice_controller>(new microservice_controller(addr));
+	g_http->open();
+
+	ucout << utility::string_t(U("Listening for requests at: ")) << addr << std::endl;
+
+	return;
+}
+
+void on_shutdown() {
+	g_http->close().wait();
+	return;
 }
 
 int main(int argc, char* argv[])
@@ -58,49 +68,17 @@ int main(int argc, char* argv[])
             return 0;
         }
 
+		utility::string_t port = U("34567");
+		utility::string_t address = U("http://localhost:");
+		address.append(port);
 
+		on_init(address);
+		std::cout << "Press Enter to exit:" << std::endl;
 
-        auto fileStream = std::make_shared<ostream>();
-
-        // Open stream to output file.
-        pplx::task<void> requestTask = fstream::open_ostream(U("results.html")).then([=](ostream outFile)
-        {
-            *fileStream = outFile;
-
-            // Create http_client to send the request.
-            http_client client(U("http://www.bing.com/"));
-
-            // Build request URI and start the request.
-            uri_builder builder(U("/search"));
-            builder.append_query(U("q"), U("cpprestsdk github"));
-            return client.request(methods::GET, builder.to_string());
-        })
-
-            // Handle response headers arriving.
-            .then([=](http_response response)
-        {
-            printf("Received response status code:%u\n", response.status_code());
-
-            // Write response body into the file.
-            return response.body().read_to_end(fileStream->streambuf());
-        })
-
-            // Close the file stream.
-            .then([=](size_t)
-        {
-            return fileStream->close();
-        });
-
-        // Wait for all the outstanding I/O to complete and handle any exceptions
-        try
-        {
-            requestTask.wait();
-        }
-        catch (const std::exception &e)
-        {
-            printf("Error exception:%s\n", e.what());
-        }
-
+		std::string line;
+		std::getline(std::cin, line);
+		
+		on_shutdown();
 
     }
     catch(const cxxopts::OptionException& e)
