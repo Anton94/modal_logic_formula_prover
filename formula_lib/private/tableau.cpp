@@ -497,7 +497,7 @@ void tableau::remove_formula_from_T(const formula* f)
     else if (op == formula::operation_t::eq_zero)
     {
         const auto t = f->get_left_child_term();
-        trace() << "Removing " << *t << " from zero terms T because " << *f << " is eq_zero formula";
+        trace() << "Removing " << *t << " from zero terms T";
         bool erased = zero_terms_T_.erase(t);
         assert(erased);
         (void) erased;
@@ -535,7 +535,7 @@ void tableau::remove_formula_from_F(const formula* f)
     else if (op == formula::operation_t::eq_zero)
     {
         const auto t = f->get_left_child_term();
-        trace() << "Removing " << *t << " from zero terms because " << *f << " is eq_zero formula";
+        trace() << "Removing " << *t << " from zero terms";
         bool erased = zero_terms_F_.erase(t);
         assert(erased);
         (void) erased;
