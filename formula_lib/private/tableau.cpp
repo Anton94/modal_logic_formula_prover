@@ -495,15 +495,16 @@ void tableau::remove_formula_from_T(const formula* f)
     {
         const auto t = f->get_left_child_term();
         trace() << "Removing " << *t << " from zero terms T because " << *f << " is eq_zero formula";
-        zero_terms_T_.erase(t);
+        bool erased = zero_terms_T_.erase(t);
+        assert(erased);
+        (void) erased;
     }
     else if(f->is_formula_operation())
     {
-        // f can be already extracted and processed in some child node
-        if(formulas_T_.erase(f))
-        {
-            trace() << "Removing " << *f << " from T formulas";
-        }
+        trace() << "Removing " << *f << " from T formulas";
+        bool erased = formulas_T_.erase(f);
+        assert(erased);
+        (void) erased;
     }
     else
     {
@@ -529,15 +530,16 @@ void tableau::remove_formula_from_F(const formula* f)
     {
         const auto t = f->get_left_child_term();
         trace() << "Removing " << *t << " from zero terms because " << *f << " is eq_zero formula";
-        zero_terms_F_.erase(t);
+        bool erased = zero_terms_F_.erase(t);
+        assert(erased);
+        (void) erased;
     }
     else if(f->is_formula_operation())
     {
-        // f can be already extracted and processed in some child node
-        if (formulas_F_.erase(f))
-        {
-            trace() << "Removing " << *f << " from F formulas";
-        }
+        trace() << "Removing " << *f << " from F formulas";
+        bool erased = formulas_F_.erase(f);
+        assert(erased);
+        (void) erased;
     }
     else
     {
