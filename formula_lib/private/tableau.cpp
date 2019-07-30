@@ -699,7 +699,7 @@ std::ostream& operator<<(std::ostream& out, const tableau::multiterms_t& terms)
 
 std::ostream& operator<<(std::ostream& out, const tableau::multiterm_to_formula_t& mapping)
 {
-    for (const auto m : mapping)
+    for (const auto& m : mapping)
     {
         const auto term = m.first;
         const auto contact = m.second;
