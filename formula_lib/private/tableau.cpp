@@ -483,6 +483,9 @@ void tableau::remove_formula_from_T(const formula* f)
     if (op == formula::operation_t::c)
     {
         trace() << "Removing " << *f << " from T contacts";
+        bool erased = contacts_T_.erase(f);
+        assert(erased);
+        (void) erased;
 
         const auto l = f->get_left_child_term();
         const auto r = f->get_right_child_term();
@@ -518,6 +521,9 @@ void tableau::remove_formula_from_F(const formula* f)
     if (op == formula::operation_t::c)
     {
         trace() << "Removing " << *f << " from F contacts";
+        bool erased = contacts_F_.erase(f);
+        assert(erased);
+        (void) erased;
 
         const auto l = f->get_left_child_term();
         const auto r = f->get_right_child_term();
