@@ -65,7 +65,7 @@ auto tableau::step() -> bool
             if(not_negated_f->is_constant())
             {
                 // F(T) is not satisfiable
-                if(not_negated_f->get_operation_type() == op_t::constant_true)
+                if(not_negated_f->is_constant_true())
                 {
                     trace() << "Found a contradiction - found " << *f << " constant in T formulas";
                     return false;
@@ -94,11 +94,9 @@ auto tableau::step() -> bool
             // T(X & Y) -> T(X) & T(Y)
             auto left_f = f->get_left_child_formula();
             auto right_f = f->get_right_child_formula();
-            const auto left_f_op = left_f->get_operation_type();
-            const auto right_f_op = right_f->get_operation_type();
 
             // T(F) is not satisfiable
-            if(left_f_op == op_t::constant_false || right_f_op == op_t::constant_false)
+            if(left_f->is_constant_false() || right_f->is_constant_false())
             {
                 trace() << "Found a contradiction - " << *f << " has a constant F as a child";
                 return false;
@@ -146,10 +144,8 @@ auto tableau::step() -> bool
         auto right_f = f->get_right_child_formula();
         trace() << "Will split to two subtrees: " << *left_f << " and " << *right_f;
 
-        const auto left_f_op = left_f->get_operation_type();
-        const auto right_f_op = right_f->get_operation_type();
         // T(T) is satisfiable and we can skip the other branch
-        if(left_f_op == op_t::constant_true || right_f_op == op_t::constant_true)
+        if(left_f->is_constant_true() || right_f->is_constant_true())
         {
             trace() << "One of the childs is constant true";
             return true;
@@ -158,8 +154,7 @@ auto tableau::step() -> bool
         auto res = false;
         auto process_T_disj_child = [&](const formula* child) {
             // T(F) is not satisfiable
-            if(child->get_operation_type() != op_t::constant_false && !find_in_F(child) &&
-               !has_broken_contact_rule_T(child))
+            if(!child->is_constant_false() && !find_in_F(child) && !has_broken_contact_rule_T(child))
             {
                 add_formula_to_T(child);
                 res = step();
@@ -203,7 +198,7 @@ auto tableau::step() -> bool
         if(not_negated_f->is_constant())
         {
             // T(F) is not satisfiable
-            if(not_negated_f->get_operation_type() == op_t::constant_false)
+            if(not_negated_f->is_constant_false())
             {
                 trace() << "Found a contradiction - found " << *f << " constant in F formulas";
                 return false;
@@ -232,10 +227,8 @@ auto tableau::step() -> bool
         auto left_f = f->get_left_child_formula();
         auto right_f = f->get_right_child_formula();
 
-        const auto left_f_op = left_f->get_operation_type();
-        const auto right_f_op = right_f->get_operation_type();
         // F(T) is not satisfiable
-        if(left_f_op == op_t::constant_true || right_f_op == op_t::constant_true)
+        if(left_f->is_constant_true() || right_f->is_constant_true())
         {
             trace() << "Found a contradiction - " << *f << " has a constant T as a child";
             return false;
@@ -284,11 +277,8 @@ auto tableau::step() -> bool
 
     trace() << "Will split to two subtrees: " << *left_f << " and " << *right_f;
 
-    const auto left_f_op = left_f->get_operation_type();
-    const auto right_f_op = right_f->get_operation_type();
-
     // F(F) is satisfiable and we can skip the other branch
-    if(left_f_op == op_t::constant_false || right_f_op == op_t::constant_false)
+    if(left_f->is_constant_false() || right_f->is_constant_false())
     {
         trace() << "One of the childs is constant false";
         return true;
@@ -297,8 +287,7 @@ auto tableau::step() -> bool
     auto res = false;
     auto process_F_conj_child = [&](const formula* child) {
         // F(T) is not satisfiable
-        if(child->get_operation_type() != op_t::constant_true && !find_in_T(child) &&
-           !has_broken_contact_rule_F(child))
+        if(!child->is_constant_true() && !find_in_T(child) && !has_broken_contact_rule_F(child))
         {
             add_formula_to_F(child);
             res = step();
