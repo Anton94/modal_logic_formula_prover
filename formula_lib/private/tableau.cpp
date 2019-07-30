@@ -157,32 +157,29 @@ auto tableau::step() -> bool
             return true;
         }
 
-        trace() << "Start of the left subtree" << *left_f;
-        // T(F) is not satisfiable
-        if(left_f_op != op_t::constant_false && !find_in_F(left_f) && !has_broken_contact_rule_T(left_f))
-        {
-            add_formula_to_T(left_f);
-
-            if(step())
+        auto res = false;
+        auto process_T_disj_child = [&](const formula* child) {
+            // T(F) is not satisfiable
+            if(child->get_operation_type() != op_t::constant_false && !find_in_F(child) && !has_broken_contact_rule_T(child))
             {
-                // there was no contradiction in that path, so there is no need to continue with the right
-                // path
-                return true;
+                add_formula_to_T(child);
+                res = step();
+                remove_formula_from_T(child);
             }
-            remove_formula_from_T(left_f);
+        };
+
+        trace() << "Start of the left subtree: " << *left_f << " of " << *f;
+        process_T_disj_child(left_f);
+        if(res)
+        {
+            // there was no contradiction in that path, so there is no need to continue with the right path
+            return true;
         }
 
-        trace() << "Start of the right subtree" << *right_f;
-        if(right_f_op != op_t::constant_false && !find_in_F(right_f) && !has_broken_contact_rule_T(right_f))
-        {
-            add_formula_to_T(right_f);
-            if(step())
-            {
-                return true;
-            }
-            remove_formula_from_T(right_f);
-        }
-        return false;
+        trace() << "Start of the right subtree: " << *right_f << " of " << *f;
+        process_T_disj_child(right_f);
+
+        return res;
     }
 
     // almost analogous but taking a formula from Fs
@@ -300,32 +297,29 @@ auto tableau::step() -> bool
         return true;
     }
 
-    trace() << "Start of the left subtree" << *left_f;
-
-    // left branch of the path
-    // F(T) is not satisfiable
-    if(left_f_op != op_t::constant_true && !find_in_T(left_f) && !has_broken_contact_rule_F(left_f))
+    auto res = false;
+    auto process_F_conj_child = [&](const formula* child)
     {
-        add_formula_to_F(left_f);
-        if(step())
+        // F(T) is not satisfiable
+        if(child->get_operation_type() != op_t::constant_true && !find_in_T(child) && !has_broken_contact_rule_F(child))
         {
-            // there was no contradiction in that path, so there is no need to continue with the right path
-            return true;
+            add_formula_to_F(child);
+            res = step();
+            remove_formula_from_F(child);
         }
-        remove_formula_from_F(left_f);
+    };
+
+    trace() << "Start of the left subtree: " << *left_f << " of " << *f;
+    process_F_conj_child(left_f);
+    if(res)
+    {
+        // there was no contradiction in that path, so there is no need to continue with the right path
+        return true;
     }
 
-    trace() << "Start of the right subtree" << *right_f;
-    if(right_f_op != op_t::constant_true && !find_in_T(right_f) && !has_broken_contact_rule_F(right_f))
-    {
-        add_formula_to_F(right_f);
-        if(step())
-        {
-            return true;
-        }
-        remove_formula_from_F(right_f);
-    }
-    return false;
+    trace() << "Start of the right subtree: " << *right_f << " of " << *f;
+    process_F_conj_child(right_f);
+    return res;
 }
 
 auto tableau::has_broken_contact_rule_T(const formula* f) const -> bool
