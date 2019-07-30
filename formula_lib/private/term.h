@@ -101,7 +101,8 @@ private:
     // calculates and sets the used variables mask depending on the @op_ and the child's variables (if any)
     void construct_variables();
 
-    // creats a term internal node with the given childs(if any). allowed operations are star, union and intersection
+    // creats a term internal node with the given childs(if any). allowed operations are star, union and
+    // intersection
     // the user must free the created node!
     auto create_internal_node(operation_t op, term* left = nullptr, term* right = nullptr) const -> term*;
     // creats a term variable/leaf node

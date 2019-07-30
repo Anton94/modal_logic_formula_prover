@@ -3,8 +3,8 @@
 #include "formula_mgr.h"
 
 #include <ostream>
-#include <unordered_set>
 #include <unordered_map>
+#include <unordered_set>
 
 class formula;
 class term;
@@ -56,7 +56,7 @@ private:
 
     struct term_ptr_hasher
     {
-        auto operator()(const term* const& t) const->std::size_t;
+        auto operator()(const term* const& t) const -> std::size_t;
     };
 
     struct term_ptr_comparator
@@ -68,7 +68,8 @@ private:
     using terms_t = std::unordered_set<const term*, term_ptr_hasher, term_ptr_comparator>;
 
     using multiterms_t = std::unordered_multiset<const term*, term_ptr_hasher, term_ptr_comparator>;
-    using multiterm_to_formula_t = std::unordered_multimap<const term*, const formula*, term_ptr_hasher, term_ptr_comparator>;
+    using multiterm_to_formula_t =
+        std::unordered_multimap<const term*, const formula*, term_ptr_hasher, term_ptr_comparator>;
 
     // Removes only the key(*term) which has a matching address (pointer address)
     void remove_term(multiterms_t& terms, const term* t);
