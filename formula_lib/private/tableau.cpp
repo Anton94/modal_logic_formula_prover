@@ -300,12 +300,10 @@ auto tableau::has_broken_contact_rule_T(const formula* f) const -> bool
             }
             return false;
         };
-        if(check_for_zero_term_in_f(a) || check_for_zero_term_in_f(b))
-        {
-            return true;
-        }
+        return check_for_zero_term_in_f(a) || check_for_zero_term_in_f(b);
     }
-    else if(op == formula::operation_t::eq_zero)
+
+    if(op == formula::operation_t::eq_zero)
     {
         const auto a = f->get_left_child_term();
         // a = 0 -> ~C(a, X)
@@ -338,11 +336,9 @@ auto tableau::has_broken_contact_rule_F(const formula* f) const -> bool
     else if(op == formula::operation_t::eq_zero)
     {
         const auto t = f->get_left_child_term();
-        if(has_broken_contact_rule_new_non_zero_term(t))
-        {
-            return true;
-        }
+        return has_broken_contact_rule_new_non_zero_term(t);
     }
+
     return false;
 }
 
