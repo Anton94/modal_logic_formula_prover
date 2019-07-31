@@ -36,8 +36,8 @@ void tableau::clear()
     contact_T_terms_.clear();
     terms_to_F_contacts_.clear();
 
-    decltype(variables_)().swap(variables_);
-    decltype(evaluations_)().swap(evaluations_);
+    variables_mask_t().swap(variables_);
+    variables_evaluations_t().swap(evaluations_);
 }
 
 auto tableau::satisfiable_step() -> bool
@@ -754,13 +754,13 @@ struct evaluation_block_state
         return op == type::zero_term_F;
     }
 
-    union it
-    {
-        formulas_t::iterator contacts_T;
-        formulas_t::iterator contacts_F;
-        terms_t::iterator zero_terms_T;
-        terms_t::iterator zero_terms_F;
-    } it{};
+    //union it
+    //{
+    //    formulas_t::iterator contacts_T;
+    //    formulas_t::iterator contacts_F;
+    //    terms_t::iterator zero_terms_T;
+    //    terms_t::iterator zero_terms_F;
+    //} it{};
     type op;
 
     evaluation_block_state() = default;
@@ -780,7 +780,7 @@ auto tableau::path_has_satisfiable_variable_evaluation() -> bool
 
     using state_t = evaluation_block_state::type;
 
-    evaluation_block_state state;
+//    evaluation_block_state state;
     if(!contacts_T_.empty())
     {
         // call function to construct it
