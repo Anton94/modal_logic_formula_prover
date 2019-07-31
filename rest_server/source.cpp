@@ -11,6 +11,7 @@
 #include <cpprest/filestream.h>
 
 #include "microservice_controller.h"
+#include <boost/filesystem.hpp>
 
 using namespace utility;                    // Common utilities like string conversions
 using namespace web;                        // Common features like URIs.
@@ -61,6 +62,9 @@ int main(int argc, char* argv[])
             ;
 
         auto result = options.parse(argc, argv);
+
+        // TODO: delete it, just for usage of the boost::filesystem and test of proper linking on other devices
+        trace() << "Using boost filesystem: " << boost::filesystem::basename("../res_server/source.cpp");
 
         if(result.count("help"))
         {
