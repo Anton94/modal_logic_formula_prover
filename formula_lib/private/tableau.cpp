@@ -3,6 +3,7 @@
 #include "logger.h"
 #include "term.h"
 #include "utils.h"
+#include "variables_evaluations_block_stack.h"
 
 auto tableau::is_satisfiable(const formula_mgr& f) -> bool
 {
@@ -17,6 +18,10 @@ auto tableau::is_satisfiable(const formula_mgr& f) -> bool
     }
     add_formula_to_T(internal_f);
 
+    const auto variables_count = f.get_variables().size();
+    variables_.resize(variables_count);
+    evaluations_.resize(variables_count);
+
     return satisfiable_step();
 }
 
@@ -30,6 +35,9 @@ void tableau::clear()
     zero_terms_F_.clear();
     contact_T_terms_.clear();
     terms_to_F_contacts_.clear();
+
+    decltype(variables_)().swap(variables_);
+    decltype(evaluations_)().swap(evaluations_);
 }
 
 auto tableau::satisfiable_step() -> bool
@@ -42,7 +50,7 @@ auto tableau::satisfiable_step() -> bool
     if(formulas_T_.empty() && formulas_F_.empty())
     {
         trace() << "There is no contradiciton in the path.";
-        return true;
+        return path_has_satisfiable_variable_evaluation();
     }
 
     if(!formulas_T_.empty())
@@ -155,7 +163,8 @@ auto tableau::satisfiable_step() -> bool
         trace() << "Start of the left subtree: " << *left_f << " of " << *f;
         if(process_T_disj_child(left_f))
         {
-            return true; // there was no contradiction in the left path, so there is no need to continue with the right path
+            return true; // there was no contradiction in the left path, so there is no need to continue with
+                         // the right path
         }
 
         trace() << "Start of the right subtree: " << *right_f << " of " << *f;
@@ -274,7 +283,8 @@ auto tableau::satisfiable_step() -> bool
     trace() << "Start of the left subtree: " << *left_f << " of " << *f;
     if(process_F_conj_child(left_f))
     {
-        return true; // there was no contradiction in left path, so there is no need to continue with the right path
+        return true; // there was no contradiction in left path, so there is no need to continue with the
+                     // right path
     }
 
     trace() << "Start of the right subtree: " << *right_f << " of " << *f;
@@ -290,11 +300,11 @@ auto tableau::has_broken_contact_rule_T(const formula* f) const -> bool
         const auto b = f->get_right_child_term();
         // C(a,b) -> a != 0 & b != 0
         // T(C(a,b)) has broken contact rule if a = 0 | b = 0
-        auto check_for_zero_term_in_f = [&](const term* t)
-        {
+        auto check_for_zero_term_in_f = [&](const term* t) {
             if(zero_terms_T_.find(t) != zero_terms_T_.end())
             {
-                trace() << "Found a contradiction with the contact rule - T(" << *f << ") has a zero term: " << *t;
+                trace() << "Found a contradiction with the contact rule - T(" << *f
+                        << ") has a zero term: " << *t;
                 return true;
             }
             return false;
@@ -650,7 +660,6 @@ void tableau::T_conjuction_child::remove_from_T()
     }
 }
 
-
 tableau::F_disjunction_child::F_disjunction_child(tableau& t, const formula* f)
     : t_(t)
     , f_(f)
@@ -694,4 +703,105 @@ void tableau::F_disjunction_child::remove_from_F()
     {
         t_.remove_formula_from_F(f_);
     }
+}
+
+namespace
+{
+
+struct evaluation_block_state
+{
+    enum class type : char
+    {
+        // C(e, f)
+        contact_T_common,             // common variables between e and f which are not in the accumulated
+        contact_T_left_without_right, // variables of e\f\acc, i.e. the variables in e which are not in f and
+                                      // in the accumulated
+        contact_T_right_without_left, // variables of f\e\acc, i.e. the variables in f which are not in e and
+                                      // in the accumulated
+
+        // ~C(e, f)
+        contact_F_left,  // variables of e which are not in the accumulated evaluation
+        contact_F_right, // variables of f which are not in the accumulated evaluation
+
+        // a = 0
+        zero_term_T, // variables of a which are not in the accumulated evaluation
+
+        // a != 0
+        zero_term_F, // variables of a which are not in the accumulated evaluation
+    };
+
+
+    auto is_op_contact_T() const -> bool
+    {
+        return op == type::contact_T_common ||
+               op == type::contact_T_left_without_right ||
+               op == type::contact_T_right_without_left;
+    }
+
+    auto is_op_contact_F() const -> bool
+    {
+        return op == type::contact_F_left ||
+               op == type::contact_F_right;
+    }
+
+    auto is_op_zero_term_T() const -> bool
+    {
+        return op == type::zero_term_T;
+    }
+
+    auto is_op_zero_term_F() const -> bool
+    {
+        return op == type::zero_term_F;
+    }
+
+    union it
+    {
+        formulas_t::iterator contacts_T;
+        formulas_t::iterator contacts_F;
+        terms_t::iterator zero_terms_T;
+        terms_t::iterator zero_terms_F;
+    } it{};
+    type op;
+
+    evaluation_block_state() = default;
+    evaluation_block_state(const evaluation_block_state&) = delete;
+    evaluation_block_state& operator=(const evaluation_block_state&) = delete;
+    evaluation_block_state(evaluation_block_state&&) noexcept;
+    evaluation_block_state& operator=(evaluation_block_state&&) noexcept;
+};
+}
+
+auto tableau::path_has_satisfiable_variable_evaluation() -> bool
+{
+    trace() << "Start looking for an satisfiable evaluation of the variables.";
+
+    variables_evaluations_block_stack stack_blocks(variables_.size());
+    std::stack<evaluation_block_state> stack_states;
+
+    using state_t = evaluation_block_state::type;
+
+    evaluation_block_state state;
+    if(!contacts_T_.empty())
+    {
+        // call function to construct it
+        // state.op = state_t::contact_T_common;
+        //state.it.contacts_T = contacts_T_.begin();
+    }
+    else if(!contacts_F_.empty())
+    {
+
+    }
+    else if(!zero_terms_T_.empty())
+    {
+
+    }
+    else if(!zero_terms_F_.empty())
+    {
+
+    }
+    else
+    {
+        assert(false && "Should not reach it!");
+    }
+    return true;
 }

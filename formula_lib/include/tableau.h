@@ -17,7 +17,7 @@ public:
     tableau(const tableau&) = delete;
     tableau& operator=(const tableau&) = delete;
     tableau(tableau&&) = default;
-    tableau& operator=(tableau&&) noexcept = default;
+    tableau& operator=(tableau&&) = default;
 
     // Checks if the formula is satisfiable or not
     auto is_satisfiable(const formula_mgr& f) -> bool;
@@ -78,6 +78,11 @@ private:
         bool added_{};
     };
 
+    // TODO: explain the algorithm
+    // Generates evaluations for the variables and checks if they satisfy the atomic operations.
+    auto path_has_satisfiable_variable_evaluation() -> bool;
+    auto satisfiable_evaluation_step() -> bool;
+
     formulas_t formulas_T_;
     formulas_t formulas_F_;
     formulas_t contacts_T_;
@@ -91,4 +96,7 @@ private:
     // maps the term and the F contact (the contacts in @contacts_F_) in which it belongs to,
     // i.e. for each F(C(a,b)), let C(a,b)'s pointer is 'c': a -> c and b -> c are mappings in the collection
     multiterm_to_formula_t terms_to_F_contacts_;
+
+    variables_mask_t variables_;
+    variables_evaluations_t evaluations_;
 };
