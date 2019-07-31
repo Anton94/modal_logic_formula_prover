@@ -12,12 +12,16 @@
 #include "cpprest/containerstream.h"
 #include "cpprest/filestream.h"
 
+//#include "formula_mgr.h"
+#include "nlohmann_json/json.hpp"
+
 //using namespace std;
 using namespace web;
 using namespace utility;
 using namespace http;
 using namespace web::http::experimental::listener;
 
+//using n_json = nlohmann::json;
 
 microservice_controller::microservice_controller(utility::string_t url) 
 	: m_listener(url)
@@ -66,8 +70,11 @@ void microservice_controller::handle_get(http_request message)
 			
 			concurrency::streams::fstream::open_istream(file_name_t, std::ios::in)
 				.then([=](concurrency::streams::istream is) {
-				message.reply(status_codes::OK, is, content_type).then([](pplx::task<void> t) { handle_error(t); });
-			})
+					message.reply(status_codes::OK, is, content_type)
+						.then([](pplx::task<void> t) { 
+							handle_error(t); 
+						});
+				})
 				.then([=](pplx::task<void> t) {
 				try
 				{
@@ -118,7 +125,20 @@ void microservice_controller::handle_get(http_request message)
 void microservice_controller::handle_post(http_request message)
 {
 	ucout << message.to_string() << std::endl;
-	message.reply(status_codes::OK);
+	message.content_ready()
+		.then([=](web::http::http_request request) {
+		request.extract_string(true).then([=](string_t res) {
+			ucout << web::uri().decode(res) << std::endl;
+			//n_json f_json = n_json::parse(utility::conversions::to_utf8string(web::uri().decode(res)));
+			//formula_mgr mgr();
+			
+			// run the satisfier here
+			message.reply(status_codes::OK, U("good"))
+				.then([](pplx::task<void> t) {
+				handle_error(t);
+			});
+		});
+	});
 }
 
 void microservice_controller::handle_put(http_request message)

@@ -363,15 +363,23 @@ function parse(formula) {
 /// START OF HTTP SERVICE
 
 class http_service {
-    get(path) {
-        var IP_ADDRESS = "http://localhost:34567/foo/bar/";
+    get(formula) {
+        var IP_ADDRESS = "http://localhost:34567/satisfy";
         $.ajax({
-         url: IP_ADDRESS + path,
-         data: {},
+         url: IP_ADDRESS,
+         data: {formula: formula},
          type: "GET",
          beforeSend: function(xhr) {xhr.setRequestHeader('Access-Control-Allow-Origin', '*');},
          success: function(data) { alert('Success!' + data); }
       });
+    }
+
+    post(formula) {
+        var IP_ADDRESS = "http://localhost:34567/satisfy";
+        $.post( IP_ADDRESS, { formula: formula })
+            .done(function( data ) {
+              console.log("good");//  alert( "Data Loaded: " + data );
+            });
     }
 }
 
@@ -393,7 +401,7 @@ function formula_to_json(formula) {
 
 
     service = new http_service();
-    service.get("aa");
+    service.post(JSON.stringify(simplified));
     return simplified;
 }
 
