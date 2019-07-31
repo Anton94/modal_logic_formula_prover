@@ -5,8 +5,7 @@ add_subdirectory(../formula_lib formula_lib)
 include_directories(${FORMULA_LIB_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-find_package(cpprestsdk REQUIRED NAMES cpprestsdk cpprest)
-#find_package(cpprestsdk NAMES cpprestsdk cpprest)
+find_package(cpprestsdk NAMES cpprestsdk cpprest)
 
 if (${cpprestsdk_FOUND})
     message(STATUS "Found cpprestsdk.")
