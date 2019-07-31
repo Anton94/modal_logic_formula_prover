@@ -12,7 +12,7 @@
 #include "cpprest/containerstream.h"
 #include "cpprest/filestream.h"
 
-//#include "formula_mgr.h"
+#include "library.h"
 #include "nlohmann_json/json.hpp"
 
 //using namespace std;
@@ -21,7 +21,7 @@ using namespace utility;
 using namespace http;
 using namespace web::http::experimental::listener;
 
-//using n_json = nlohmann::json;
+using n_json = nlohmann::json;
 
 microservice_controller::microservice_controller(utility::string_t url) 
 	: m_listener(url)
@@ -52,7 +52,7 @@ void handle_error(pplx::task<void>& t)
 
 void microservice_controller::handle_get(http_request message)
 {
-	std::string CLIENT = "C:\\Users\\ickob\\OneDrive\\Documents\\sources\\modal_logic_formula_proover\\modal_logic_formula_prover\\client";
+    std::string CLIENT = "C:\\Users\\ickob\\OneDrive\\Documents\\sources\\modal_logic_formula_proover\\modal_logic_formula_prover\\client";
 	utility::string_t x = message.absolute_uri().path();
 	if (strncmp(utility::conversions::to_utf8string(x).c_str(), "/img/", 4) == 0)
 	{
@@ -129,11 +129,17 @@ void microservice_controller::handle_post(http_request message)
 		.then([=](web::http::http_request request) {
 		request.extract_string(true).then([=](string_t res) {
 			ucout << web::uri().decode(res) << std::endl;
-			//n_json f_json = n_json::parse(utility::conversions::to_utf8string(web::uri().decode(res)));
-			//formula_mgr mgr();
-			
+			n_json f_json = n_json::parse(utility::conversions::to_utf8string(web::uri().decode(res)));
+			formula_mgr mgr;
+            mgr.build(f_json);
+            tableau t;
+            const auto is_satisfiable = t.is_satisfiable(mgr);
+            const string_t msg = string_t(U("Satisfiable? ")) +(is_satisfiable ? U("true") : U("false"));
+
+            ucout << msg << std::endl;
+
 			// run the satisfier here
-			message.reply(status_codes::OK, U("good"))
+			message.reply(status_codes::OK, msg)
 				.then([](pplx::task<void> t) {
 				handle_error(t);
 			});

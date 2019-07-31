@@ -376,9 +376,9 @@ class http_service {
 
     post(formula) {
         var IP_ADDRESS = "http://localhost:34567/satisfy";
-        $.post( IP_ADDRESS, { formula: formula })
+        $.post( IP_ADDRESS, formula )
             .done(function( data ) {
-              console.log("good");//  alert( "Data Loaded: " + data );
+              console.log(data);//  alert( "Data Loaded: " + data );
             });
     }
 }
