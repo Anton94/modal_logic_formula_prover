@@ -19,9 +19,9 @@ auto tableau::is_satisfiable(const formula_mgr& f) -> bool
     add_formula_to_T(internal_f);
 
     const auto variables_count = f.get_variables().size();
-    variables_.resize(variables_count);
-    evaluations_.resize(variables_count);
+    block_stack_ = variables_evaluations_block_stack(variables_count);
 
+    // TODO: accumulated evaluation block should be returned in some way
     return satisfiable_step();
 }
 
@@ -36,8 +36,7 @@ void tableau::clear()
     contact_T_terms_.clear();
     terms_to_F_contacts_.clear();
 
-    variables_mask_t().swap(variables_);
-    variables_evaluations_t().swap(evaluations_);
+    // TODO: block_stack_.clear();
 }
 
 auto tableau::satisfiable_step() -> bool
@@ -705,103 +704,321 @@ void tableau::F_disjunction_child::remove_from_F()
     }
 }
 
-namespace
-{
-
-struct evaluation_block_state
-{
-    enum class type : char
-    {
-        // C(e, f)
-        contact_T_common,             // common variables between e and f which are not in the accumulated
-        contact_T_left_without_right, // variables of e\f\acc, i.e. the variables in e which are not in f and
-                                      // in the accumulated
-        contact_T_right_without_left, // variables of f\e\acc, i.e. the variables in f which are not in e and
-                                      // in the accumulated
-
-        // ~C(e, f)
-        contact_F_left,  // variables of e which are not in the accumulated evaluation
-        contact_F_right, // variables of f which are not in the accumulated evaluation
-
-        // a = 0
-        zero_term_T, // variables of a which are not in the accumulated evaluation
-
-        // a != 0
-        zero_term_F, // variables of a which are not in the accumulated evaluation
-    };
-
-
-    auto is_op_contact_T() const -> bool
-    {
-        return op == type::contact_T_common ||
-               op == type::contact_T_left_without_right ||
-               op == type::contact_T_right_without_left;
-    }
-
-    auto is_op_contact_F() const -> bool
-    {
-        return op == type::contact_F_left ||
-               op == type::contact_F_right;
-    }
-
-    auto is_op_zero_term_T() const -> bool
-    {
-        return op == type::zero_term_T;
-    }
-
-    auto is_op_zero_term_F() const -> bool
-    {
-        return op == type::zero_term_F;
-    }
-
-    //union it
-    //{
-    //    formulas_t::iterator contacts_T;
-    //    formulas_t::iterator contacts_F;
-    //    terms_t::iterator zero_terms_T;
-    //    terms_t::iterator zero_terms_F;
-    //} it{};
-    type op;
-
-    evaluation_block_state() = default;
-    evaluation_block_state(const evaluation_block_state&) = delete;
-    evaluation_block_state& operator=(const evaluation_block_state&) = delete;
-    evaluation_block_state(evaluation_block_state&&) noexcept;
-    evaluation_block_state& operator=(evaluation_block_state&&) noexcept;
-};
-}
-
 auto tableau::path_has_satisfiable_variable_evaluation() -> bool
 {
     trace() << "Start looking for an satisfiable evaluation of the variables.";
 
-    variables_evaluations_block_stack stack_blocks(variables_.size());
-    std::stack<evaluation_block_state> stack_states;
+    return satisfiable_evaluation_step_contacts_T(contacts_T_.begin());
+}
 
-    using state_t = evaluation_block_state::type;
+auto tableau::satisfiable_evaluation_step_contacts_T(formulas_t::iterator contacts_T_it) -> bool
+{
+    if(contacts_T_it == contacts_T_.end()) // all atomic C(e,f) has been evaluated
+    {
+        return satisfiable_evaluation_step_contacts_F(contacts_F_.begin());
+    }
 
-//    evaluation_block_state state;
-    if(!contacts_T_.empty())
-    {
-        // call function to construct it
-        // state.op = state_t::contact_T_common;
-        //state.it.contacts_T = contacts_T_.begin();
-    }
-    else if(!contacts_F_.empty())
-    {
+    const auto c = *contacts_T_it;
+    auto left_eval_res = c->get_left_child_term()->evaluate(block_stack_.get_combined_block());
+    auto right_eval_res = c->get_right_child_term()->evaluate(block_stack_.get_combined_block());
 
-    }
-    else if(!zero_terms_T_.empty())
+    if(left_eval_res.is_constant_false() || right_eval_res.is_constant_false())
     {
+        left_eval_res.free();
+        right_eval_res.free();
+        return false;
+    }
 
-    }
-    else if(!zero_terms_F_.empty())
+    if(left_eval_res.is_constant_true() && right_eval_res.is_constant_true())
     {
+        return satisfiable_evaluation_step_contacts_T(++contacts_T_it);
+    }
 
-    }
-    else
+    if(left_eval_res.is_term() && right_eval_res.is_constant_true())
     {
-        assert(false && "Should not reach it!");
+        return satisfiable_evaluation_step_contacts_T_left(contacts_T_it, std::move(left_eval_res),
+                                                           std::move(right_eval_res));
     }
-    return true;
+
+    if(left_eval_res.is_constant_true() && right_eval_res.is_term())
+    {
+        const auto res = satisfiable_evaluation_step_contacts_T_right(contacts_T_it, right_eval_res);
+        right_eval_res.free();
+        return res;
+    }
+
+    assert(left_eval_res.is_term() && right_eval_res.is_term());
+
+    const auto& left_variables = left_eval_res.get()->get_variables();
+    const auto& right_variables = right_eval_res.get()->get_variables();
+    const auto common_variables = left_variables & right_variables;
+    if(common_variables.any())
+    {
+        return satisfiable_evaluation_step_contacts_T_common(contacts_T_it, std::move(left_eval_res),
+                                                             std::move(right_eval_res));
+    }
+
+    return satisfiable_evaluation_step_contacts_T_left(contacts_T_it, std::move(left_eval_res),
+                                                       std::move(right_eval_res));
+}
+
+auto tableau::satisfiable_evaluation_step_contacts_T_common(formulas_t::iterator contacts_T_it,
+                                                            term::evaluation_result&& left_eval_res,
+                                                            term::evaluation_result&& right_eval_res) -> bool
+{
+    assert(left_eval_res.is_term() && right_eval_res.is_term());
+
+    const std::unique_ptr<const term> left_evaluated_subterm(left_eval_res.release());
+    const std::unique_ptr<const term> right_evaluated_subterm(right_eval_res.release());
+    const auto common_variables =
+        left_evaluated_subterm->get_variables() & right_evaluated_subterm->get_variables();
+    assert(common_variables.any());
+
+    assert((common_variables & block_stack_.get_combined_variables()).none());
+    block_stack_.push(variables_evaluations_block(common_variables));
+
+    do
+    {
+        auto left_eval_subres = left_evaluated_subterm->evaluate(block_stack_.get_combined_block());
+        auto right_eval_subres = right_evaluated_subterm->evaluate(block_stack_.get_combined_block());
+
+        if(!left_eval_subres.is_constant_false() && !right_eval_subres.is_constant_false())
+        {
+            if(satisfiable_evaluation_step_contacts_T_left(contacts_T_it, std::move(left_eval_subres),
+                                                           std::move(right_eval_subres)))
+            {
+                return true;
+            }
+        }
+        else
+        {
+            left_eval_subres.free();
+            right_eval_subres.free();
+        }
+    } while(block_stack_.generate_evaluation());
+
+    block_stack_.pop();
+    return false;
+}
+
+auto tableau::satisfiable_evaluation_step_contacts_T_left(formulas_t::iterator contacts_T_it,
+                                                          term::evaluation_result&& left_eval_res,
+                                                          term::evaluation_result&& right_eval_res) -> bool
+{
+    assert(contacts_T_it != contacts_T_.end());
+    call_on_destroy free_right_eval_res_before_exiting([&]() { right_eval_res.free(); });
+
+    if(left_eval_res.is_constant_false())
+    {
+        return false;
+    }
+    if(left_eval_res.is_constant_true())
+    {
+        return satisfiable_evaluation_step_contacts_T_right(contacts_T_it, right_eval_res);
+    }
+
+    assert(left_eval_res.is_term());
+    const std::unique_ptr<const term> evaluated_subterm(left_eval_res.release());
+
+    assert((evaluated_subterm->get_variables() & block_stack_.get_combined_variables()).none());
+    block_stack_.push(variables_evaluations_block(evaluated_subterm->get_variables()));
+
+    auto contacts_T_it_next = contacts_T_it;
+    ++contacts_T_it_next;
+    do
+    {
+        const auto eval_res = evaluated_subterm->evaluate(block_stack_.get_combined_block());
+        assert(eval_res.is_constant());
+
+        if(eval_res.is_constant_true() &&
+           satisfiable_evaluation_step_contacts_T_right(
+               contacts_T_it, right_eval_res)) // TODO: if the right term has no valid evaluation, then the
+                                               // generation of evaluations for the left term will not lead to
+                                               // a new "global" evaluation!. add bool argument to indicate if
+                                               // it has produced own valid generation
+        {
+            return true;
+        }
+    } while(block_stack_.generate_evaluation());
+
+    block_stack_.pop();
+    return false;
+}
+
+auto tableau::satisfiable_evaluation_step_contacts_T_right(formulas_t::iterator contacts_T_it,
+                                                           const term::evaluation_result& eval_res) -> bool
+{
+    assert(contacts_T_it != contacts_T_.end());
+
+    if(eval_res.is_constant_false())
+    {
+        return false;
+    }
+    if(eval_res.is_constant_true())
+    {
+        return satisfiable_evaluation_step_contacts_T(++contacts_T_it);
+    }
+
+    assert(eval_res.is_term());
+    const auto evaluated_subterm = eval_res.get();
+
+    assert((evaluated_subterm->get_variables() & block_stack_.get_combined_variables()).none());
+    block_stack_.push(variables_evaluations_block(evaluated_subterm->get_variables()));
+
+    auto contacts_T_it_next = contacts_T_it;
+    ++contacts_T_it_next;
+    do
+    {
+        const auto eval_subres = evaluated_subterm->evaluate(block_stack_.get_combined_block());
+        assert(eval_subres.is_constant());
+
+        if(eval_subres.is_constant_true() && satisfiable_evaluation_step_contacts_T(contacts_T_it_next))
+        {
+            return true;
+        }
+    } while(block_stack_.generate_evaluation());
+
+    block_stack_.pop();
+    return false;
+}
+
+auto tableau::satisfiable_evaluation_step_contacts_F(formulas_t::iterator contacts_F_it) -> bool
+{
+    if(contacts_F_it == contacts_F_.end()) // all atomic ~C(e,f) has been evaluated
+    {
+        return satisfiable_evaluation_step_zero_terms_T(zero_terms_T_.begin());
+    }
+
+    const auto c = *contacts_F_it;
+    auto left_eval_res = c->get_left_child_term()->evaluate(block_stack_.get_combined_block());
+    auto right_eval_res = c->get_right_child_term()->evaluate(block_stack_.get_combined_block());
+    call_on_destroy free_evals_before_exiting([&]() {
+        left_eval_res.free();
+        right_eval_res.free();
+    });
+
+    if(left_eval_res.is_constant_false() && right_eval_res.is_constant_false())
+    {
+        return satisfiable_evaluation_step_contacts_F(++contacts_F_it);
+    }
+
+    if(left_eval_res.is_constant_true() && right_eval_res.is_constant_true())
+    {
+        return false;
+    }
+
+    // TODO: check if there is a case where there are going to be not evaluated variables which are needed
+
+    if(left_eval_res.is_constant_true() || right_eval_res.is_constant_true())
+    {
+        return satisfiable_evaluation_step_contacts_F(++contacts_F_it);
+    }
+
+    auto contacts_F_it_next = contacts_F_it;
+    ++contacts_F_it_next;
+
+    const auto step_child_term = [&](const term* t) {
+        assert((t->get_variables() & block_stack_.get_combined_variables()).none());
+        block_stack_.push(variables_evaluations_block(t->get_variables()));
+
+        do
+        {
+            const auto eval_subres = t->evaluate(block_stack_.get_combined_block());
+            assert(eval_subres.is_constant());
+
+            if(eval_subres.is_constant_false() && satisfiable_evaluation_step_contacts_F(contacts_F_it_next))
+            {
+                return true;
+            }
+        } while(block_stack_.generate_evaluation());
+
+        block_stack_.pop();
+        return false;
+    };
+
+    return (left_eval_res.is_term() && step_child_term(left_eval_res.get())) ||
+           (right_eval_res.is_term() && step_child_term(right_eval_res.get()));
+}
+
+auto tableau::satisfiable_evaluation_step_zero_terms_T(terms_t::iterator zero_terms_Т_it) -> bool
+{
+    if(zero_terms_Т_it == zero_terms_T_.end()) // all zero terms (a = 0) has been evaluated
+    {
+        return satisfiable_evaluation_step_zero_terms_F(zero_terms_F_.begin());
+    }
+
+    const auto t = *zero_terms_Т_it;
+    auto eval_res = t->evaluate(block_stack_.get_combined_block());
+    if(eval_res.is_constant_false())
+    {
+        return satisfiable_evaluation_step_zero_terms_T(++zero_terms_Т_it);
+    }
+    if(eval_res.is_constant_true())
+    {
+        return false;
+    }
+    assert(eval_res.is_term());
+    const std::unique_ptr<const term> evaluated_subterm(eval_res.release());
+
+    assert((evaluated_subterm->get_variables() & block_stack_.get_combined_variables()).none());
+    block_stack_.push(variables_evaluations_block(evaluated_subterm->get_variables()));
+
+    auto zero_terms_Т_it_next = zero_terms_Т_it;
+    ++zero_terms_Т_it_next;
+    do
+    {
+        const auto eval_res = evaluated_subterm->evaluate(block_stack_.get_combined_block());
+        assert(eval_res.is_constant());
+
+        if(eval_res.is_constant_false() && satisfiable_evaluation_step_zero_terms_T(zero_terms_Т_it_next))
+        {
+            return true;
+        }
+    } while(block_stack_.generate_evaluation());
+
+    block_stack_.pop();
+    return false;
+}
+
+auto tableau::satisfiable_evaluation_step_zero_terms_F(terms_t::iterator zero_terms_F_it) -> bool
+{
+    if(zero_terms_F_it == zero_terms_F_.end()) // all non-zero terms (a != 0) has been evaluated
+    {
+        return true;
+    }
+
+    // The goal is to evaluate the non-zero term to 1
+
+    const auto t = *zero_terms_F_it;
+    auto eval_res = t->evaluate(block_stack_.get_combined_block());
+    if(eval_res.is_constant_true())
+    {
+        return satisfiable_evaluation_step_zero_terms_F(++zero_terms_F_it);
+    }
+    if(eval_res.is_constant_false())
+    {
+        return false;
+    }
+
+    assert(eval_res.is_term());
+    const std::unique_ptr<const term> evaluated_subterm(eval_res.release());
+
+    assert((evaluated_subterm->get_variables() & block_stack_.get_combined_variables()).none());
+    block_stack_.push(variables_evaluations_block(evaluated_subterm->get_variables()));
+
+    auto zero_terms_F_it_next = zero_terms_F_it;
+    ++zero_terms_F_it_next;
+    do
+    {
+        const auto eval_res = evaluated_subterm->evaluate(block_stack_.get_combined_block());
+        assert(eval_res.is_constant());
+
+        if(eval_res.is_constant_true() && satisfiable_evaluation_step_zero_terms_F(zero_terms_F_it_next))
+        {
+            return true;
+        }
+    } while(block_stack_.generate_evaluation());
+
+    block_stack_.pop();
+    return false;
 }

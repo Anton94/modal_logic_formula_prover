@@ -1,6 +1,8 @@
 #pragma once
 
+#include "../private/term.h"
 #include "../private/types.h"
+#include "../private/variables_evaluations_block_stack.h"
 #include "formula_mgr.h"
 
 #include <ostream>
@@ -8,7 +10,6 @@
 #include <unordered_set>
 
 class formula;
-class term;
 
 class tableau
 {
@@ -83,6 +84,19 @@ private:
     auto path_has_satisfiable_variable_evaluation() -> bool;
     auto satisfiable_evaluation_step() -> bool;
 
+    auto satisfiable_evaluation_step_contacts_T(formulas_t::iterator contacts_T_it) -> bool;
+    auto satisfiable_evaluation_step_contacts_T_common(formulas_t::iterator contacts_T_it,
+                                                       term::evaluation_result&& left_eval_res,
+                                                       term::evaluation_result&& right_eval_res) -> bool;
+    auto satisfiable_evaluation_step_contacts_T_left(formulas_t::iterator contacts_T_it,
+                                                     term::evaluation_result&& left_eval_res,
+                                                     term::evaluation_result&& right_eval_res) -> bool;
+    auto satisfiable_evaluation_step_contacts_T_right(formulas_t::iterator contacts_T_it,
+                                                      const term::evaluation_result& eval_res) -> bool;
+    auto satisfiable_evaluation_step_contacts_F(formulas_t::iterator contacts_F_it) -> bool;
+    auto satisfiable_evaluation_step_zero_terms_T(terms_t::iterator zero_terms_Т_it) -> bool;
+    auto satisfiable_evaluation_step_zero_terms_F(terms_t::iterator zero_terms_F_it) -> bool;
+
     formulas_t formulas_T_;
     formulas_t formulas_F_;
     formulas_t contacts_T_;
@@ -97,6 +111,5 @@ private:
     // i.e. for each F(C(a,b)), let C(a,b)'s pointer is 'c': a -> c and b -> c are mappings in the collection
     multiterm_to_formula_t terms_to_F_contacts_;
 
-    variables_mask_t variables_;
-    variables_evaluations_t evaluations_;
+    variables_evaluations_block_stack block_stack_;
 };
