@@ -44,9 +44,11 @@ public:
         evaluation_result& operator=(evaluation_result&& rhs) noexcept;
         ~evaluation_result();
 
-        term* release();
+        auto release() -> term*;
+        auto get() const -> const term*;
         void free();
         auto is_constant() const -> bool;
+        auto is_term() const -> bool;
         auto is_constant_true() const -> bool;
         auto is_constant_false() const -> bool;
 

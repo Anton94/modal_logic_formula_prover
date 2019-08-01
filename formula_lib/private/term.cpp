@@ -560,12 +560,17 @@ term::evaluation_result::~evaluation_result()
     }
 }
 
-term* term::evaluation_result::release()
+auto term::evaluation_result::release() -> term*
 {
     type = result_type::none;
     auto t = t_;
     t_ = nullptr;
     return t;
+}
+
+auto term::evaluation_result::get() const -> const term*
+{
+    return t_;
 }
 
 void term::evaluation_result::free()
@@ -586,6 +591,11 @@ void term::evaluation_result::move(evaluation_result&& rhs) noexcept
 auto term::evaluation_result::is_constant() const -> bool
 {
     return type == result_type::constant_true || type == result_type::constant_false;
+}
+
+auto term::evaluation_result::is_term() const -> bool
+{
+    return type == result_type::term;
 }
 
 auto term::evaluation_result::is_constant_true() const -> bool
