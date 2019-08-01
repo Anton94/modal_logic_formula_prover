@@ -1,9 +1,17 @@
 #pragma once 
 
+#include "library.h"
+
+
+
 #include "cpprest/json.h"
 #include "cpprest/http_listener.h"
 #include "cpprest/uri.h"
 #include "cpprest/asyncrt_utils.h"
+#include <cpprest/http_client.h>
+#include "cpprest/containerstream.h"
+#include "cpprest/filestream.h"
+
 
 using namespace web;
 using namespace http;

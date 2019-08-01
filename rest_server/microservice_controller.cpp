@@ -4,16 +4,12 @@
 #include <fstream>
 #include <streambuf>
 #include <sstream>
-#include <boost/filesystem.hpp>
 
 //#include <windows.h>
 #include <string>
 #include <iostream>
 
-#include "cpprest/containerstream.h"
-#include "cpprest/filestream.h"
 
-#include "library.h"
 #include "nlohmann_json/json.hpp"
 
 //using namespace std;
