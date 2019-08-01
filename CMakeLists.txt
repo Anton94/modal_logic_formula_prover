@@ -22,3 +22,5 @@ add_subdirectory (formula_lib)
 add_subdirectory (formula_proover)
 add_subdirectory (rest_server)
 add_subdirectory (tests)
+
+file(COPY client/src DESTINATION client)

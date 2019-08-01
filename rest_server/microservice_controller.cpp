@@ -46,10 +46,19 @@ void handle_error(pplx::task<void>& t)
 	}
 }
 
+void PrintFullPath(char* partialPath)
+{
+	char full[_MAX_PATH];
+	if (_fullpath(full, partialPath, _MAX_PATH) != NULL)
+		printf("Full path is: %s\n", full);
+	else
+		printf("Invalid path\n");
+}
 
 void microservice_controller::handle_get(http_request message)
 {
-    std::string CLIENT = "C:\\Users\\ickob\\OneDrive\\Documents\\sources\\modal_logic_formula_proover\\modal_logic_formula_prover\\client";
+	ucout << message.to_string() << std::endl;
+    std::string CLIENT = "..\\client\\src";
 	utility::string_t x = message.absolute_uri().path();
 	if (strncmp(utility::conversions::to_utf8string(x).c_str(), "/img/", 4) == 0)
 	{
@@ -89,34 +98,35 @@ void microservice_controller::handle_get(http_request message)
 	}
 	else if (x == U("/index.html"))
 	{
-		std::ifstream t(CLIENT + "\\src\\index.html");
+		std::ifstream t(CLIENT + "\\resources\\index.html");
 		std::string str((std::istreambuf_iterator<char>(t)),
 			std::istreambuf_iterator<char>());
 
 		utility::string_t body = utility::conversions::to_string_t(str);
-        //message.reply(status_codes::OK, body, L"text/html");
+        message.reply(status_codes::OK, body, L"text/html");
 	}
 	else if (x == U("/main.js"))
 	{
-		std::ifstream t(CLIENT + "\\src\\main.js");
+		std::ifstream t(CLIENT + "\\resources\\main.js");
 		std::string str((std::istreambuf_iterator<char>(t)),
 			std::istreambuf_iterator<char>());
 
 		utility::string_t body = utility::conversions::to_string_t(str);
-        //message.reply(status_codes::OK, body, L"text/javascript");
+        message.reply(status_codes::OK, body, L"text/javascript");
 	}
 	else if (x == U("/chevrotain.js"))
 	{
-		std::ifstream t(CLIENT + "\\src\\chevrotain.js");
+		std::ifstream t(CLIENT + "\\resources\\chevrotain.js");
 		std::string str((std::istreambuf_iterator<char>(t)),
 			std::istreambuf_iterator<char>());
 
 		utility::string_t body = utility::conversions::to_string_t(str);
-        //message.reply(status_codes::OK, body, L"text/javascript");
+        message.reply(status_codes::OK, body, L"text/javascript");
 	}
-	
-	ucout << message.to_string() << std::endl;
-	message.reply(status_codes::OK);
+	else
+	{
+		message.reply(status_codes::OK);
+	}
 }
 
 void microservice_controller::handle_post(http_request message)
