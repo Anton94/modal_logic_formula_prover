@@ -40,6 +40,8 @@ public:
     auto get_variable(const std::string& name) const -> variable_id_t;
     auto get_internal_formula() const -> const formula*;
 
+    void print(std::ostream& out, const variables_evaluations_block& block) const;
+
 private:
     void move(formula_mgr&& rhs) noexcept;
 

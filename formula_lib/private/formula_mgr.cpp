@@ -163,6 +163,19 @@ auto formula_mgr::get_internal_formula() const -> const formula*
     return &f_;
 }
 
+void formula_mgr::print(std::ostream& out, const variables_evaluations_block& block) const
+{
+    const auto& variables = block.get_variables();
+    const auto& evaluations = block.get_evaluations();
+    for(size_t i = 0; i < variables.size(); ++i)
+    {
+        if(variables[i])
+        {
+            out << get_variable(i) << " : " << evaluations.test(i) << "\n";
+        }
+    }
+}
+
 auto formula_mgr::change_variables_to_variable_ids(json& f) const -> bool
 {
     if(!f.contains("name"))
