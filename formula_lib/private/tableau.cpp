@@ -944,18 +944,18 @@ auto tableau::satisfiable_evaluation_step_contacts_F(formulas_t::iterator contac
            (right_eval_res.is_term() && step_child_term(right_eval_res.get()));
 }
 
-auto tableau::satisfiable_evaluation_step_zero_terms_T(terms_t::iterator zero_terms_Т_it) -> bool
+auto tableau::satisfiable_evaluation_step_zero_terms_T(terms_t::iterator zero_terms_T_it) -> bool
 {
-    if(zero_terms_Т_it == zero_terms_T_.end()) // all zero terms (a = 0) has been evaluated
+    if(zero_terms_T_it == zero_terms_T_.end()) // all zero terms (a = 0) has been evaluated
     {
         return satisfiable_evaluation_step_zero_terms_F(zero_terms_F_.begin());
     }
 
-    const auto t = *zero_terms_Т_it;
+    const auto t = *zero_terms_T_it;
     auto eval_res = t->evaluate(block_stack_.get_combined_block());
     if(eval_res.is_constant_false())
     {
-        return satisfiable_evaluation_step_zero_terms_T(++zero_terms_Т_it);
+        return satisfiable_evaluation_step_zero_terms_T(++zero_terms_T_it);
     }
     if(eval_res.is_constant_true())
     {
@@ -967,14 +967,14 @@ auto tableau::satisfiable_evaluation_step_zero_terms_T(terms_t::iterator zero_te
     assert((evaluated_subterm->get_variables() & block_stack_.get_combined_variables()).none());
     block_stack_.push(variables_evaluations_block(evaluated_subterm->get_variables()));
 
-    auto zero_terms_Т_it_next = zero_terms_Т_it;
-    ++zero_terms_Т_it_next;
+    auto zero_terms_T_it_next = zero_terms_T_it;
+    ++zero_terms_T_it_next;
     do
     {
         const auto eval_res = evaluated_subterm->evaluate(block_stack_.get_combined_block());
         assert(eval_res.is_constant());
 
-        if(eval_res.is_constant_false() && satisfiable_evaluation_step_zero_terms_T(zero_terms_Т_it_next))
+        if(eval_res.is_constant_false() && satisfiable_evaluation_step_zero_terms_T(zero_terms_T_it_next))
         {
             return true;
         }

@@ -139,7 +139,7 @@ void microservice_controller::handle_post(http_request message)
             string_t msg = string_t(U("Satisfiable? ")) +(is_satisfiable ? U("true") : U("false"));
             std::stringstream out_evaluations_msg;
             out_evaluations_msg << "Evaluations: \n" << out_evaluations;
-            msg.append(U(out_evaluations_msg.str().c_str()));
+            msg.append(utility::conversions::to_string_t(out_evaluations_msg.str()));
 
             ucout << msg << std::endl;
 

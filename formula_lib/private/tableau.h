@@ -94,7 +94,7 @@ private:
     auto satisfiable_evaluation_step_contacts_T_right(formulas_t::iterator contacts_T_it,
                                                       const term::evaluation_result& eval_res) -> bool;
     auto satisfiable_evaluation_step_contacts_F(formulas_t::iterator contacts_F_it) -> bool;
-    auto satisfiable_evaluation_step_zero_terms_T(terms_t::iterator zero_terms_Т_it) -> bool;
+    auto satisfiable_evaluation_step_zero_terms_T(terms_t::iterator zero_terms_T_it) -> bool;
     auto satisfiable_evaluation_step_zero_terms_F(terms_t::iterator zero_terms_F_it) -> bool;
 
     formulas_t formulas_T_;
