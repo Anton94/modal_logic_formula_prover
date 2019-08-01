@@ -3,6 +3,7 @@
 // TODO: pimpl ideom. will hide the private includes, etc.
 
 #include "../private/formula.h"
+#include "../private/tableau.h"
 #include "../private/types.h"
 
 #include <ostream>
@@ -27,6 +28,9 @@ public:
     // O(2^n) where n is the number of different variables
     auto brute_force_evaluate() const -> bool;
 
+    // Checks if the formula is satisfiable or not
+    auto is_satisfiable(human_readable_variables_evaluations_t& out_evaluations) -> bool;
+
     void clear();
 
     auto get_variables() const -> const variables_t&;
@@ -48,6 +52,7 @@ private:
 
     variables_t variables_;
     formula f_;
+    tableau t_;
 };
 
 std::ostream& operator<<(std::ostream& out, const formula_mgr& formulas);

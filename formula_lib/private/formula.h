@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../private/types.h"
+#include "types.h"
 #include "nlohmann_json/json.hpp"
 
 #include <ostream>
@@ -53,6 +53,8 @@ public:
     auto get_right_child_formula() const -> const formula*;
     auto get_left_child_term() const -> const term*;
     auto get_right_child_term() const -> const term*;
+
+    auto get_mgr() const -> const formula_mgr*;
 
     auto is_term_operation() const -> bool;
     auto is_atomic() const -> bool;

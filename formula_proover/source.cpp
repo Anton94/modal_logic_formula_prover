@@ -7,7 +7,6 @@
 
 #include "formula_mgr.h"
 #include "logger.h"
-#include "tableau.h"
 
 using json = nlohmann::json;
 
@@ -62,8 +61,14 @@ int main(int argc, char* argv[])
         const auto variables = f.get_variables();
         info() << "Variables: " << variables;
 
-        tableau t;
-        info() << "The formula is " << (t.is_satisfiable(f) ? "" : "not ") << "satisfiable.";
+        human_readable_variables_evaluations_t out_evalutaions;
+        const auto res = f.is_satisfiable(out_evalutaions);
+        info() << "The formula is " << (res ? "" : "not ") << "satisfiable.";
+        if(res)
+        {
+            info() << "Variable evaluations:";
+            info() << out_evalutaions;
+        }
     }
     catch(const cxxopts::OptionException& e)
     {

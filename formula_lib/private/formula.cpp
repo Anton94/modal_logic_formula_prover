@@ -219,6 +219,11 @@ auto formula::get_right_child_term() const -> const term*
     return child_t_.right;
 }
 
+auto formula::get_mgr() const -> const formula_mgr*
+{
+    return formula_mgr_;
+}
+
 auto formula::is_term_operation() const -> bool
 {
     return op_ == operation_t::eq_zero || op_ == operation_t::c;

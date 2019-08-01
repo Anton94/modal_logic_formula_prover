@@ -1,28 +1,32 @@
 #include "tableau.h"
+#include "../include/formula_mgr.h"
 #include "formula.h"
 #include "logger.h"
 #include "term.h"
 #include "utils.h"
 #include "variables_evaluations_block_stack.h"
 
-auto tableau::is_satisfiable(const formula_mgr& f) -> bool
+auto tableau::is_satisfiable(const formula& f, variables_evaluations_block& out_evaluation_block) -> bool
 {
     clear();
 
     info() << "Running a satisfiability checking of " << f;
 
-    const auto internal_f = f.get_internal_formula();
-    if(internal_f->is_constant())
+    if(f.is_constant())
     {
-        return internal_f->get_operation_type() == formula::operation_t::constant_true ? true : false;
+        return f.get_operation_type() == formula::operation_t::constant_true ? true : false;
     }
-    add_formula_to_T(internal_f);
+    add_formula_to_T(&f);
 
-    const auto variables_count = f.get_variables().size();
+    const auto variables_count = f.get_mgr()->get_variables().size();
     block_stack_ = variables_evaluations_block_stack(variables_count);
 
-    // TODO: accumulated evaluation block should be returned in some way
-    return satisfiable_step();
+    if(satisfiable_step())
+    {
+        out_evaluation_block = block_stack_.get_combined_block();
+        return true;
+    }
+    return false;
 }
 
 void tableau::clear()

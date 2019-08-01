@@ -10,8 +10,8 @@ auto is_satisfiable = [](const json& formula_json, bool expected_result) {
     formula_mgr f;
     CHECK(f.build(copy_f));
 
-    tableau t;
-    CHECK(t.is_satisfiable(f) == expected_result);
+    human_readable_variables_evaluations_t out_evaluations;
+    CHECK(f.is_satisfiable(out_evaluations) == expected_result);
 };
 
 TEST_CASE("satisfiable 1", "[satisfiability]")

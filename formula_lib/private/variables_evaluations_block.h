@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../private/types.h"
+#include "types.h"
 
 class variables_evaluations_block
 {
@@ -34,7 +34,7 @@ public:
     auto generate_next_evaluation() -> bool;
 
 private:
-    const variables_mask_t variables_;
+    variables_mask_t variables_;
     variables_evaluations_t evaluations_;
 
     set_variables_ids_t set_variables_ids_; // for generating the next evaluations in order to make it

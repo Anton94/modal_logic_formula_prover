@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../private/term.h"
-#include "../private/types.h"
-#include "../private/variables_evaluations_block_stack.h"
-#include "formula_mgr.h"
+#include "formula.h"
+#include "term.h"
+#include "types.h"
+#include "variables_evaluations_block_stack.h"
 
 #include <ostream>
 #include <unordered_map>
@@ -21,7 +21,7 @@ public:
     tableau& operator=(tableau&&) = default;
 
     // Checks if the formula is satisfiable or not
-    auto is_satisfiable(const formula_mgr& f) -> bool;
+    auto is_satisfiable(const formula& f, variables_evaluations_block& out_evaluation_block) -> bool;
 
 private:
     void clear();

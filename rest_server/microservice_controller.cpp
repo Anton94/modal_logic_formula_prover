@@ -3,6 +3,7 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
+#include <sstream>
 #include <boost/filesystem.hpp>
 
 //#include <windows.h>
@@ -132,9 +133,13 @@ void microservice_controller::handle_post(http_request message)
 			n_json f_json = n_json::parse(utility::conversions::to_utf8string(web::uri().decode(res)));
 			formula_mgr mgr;
             mgr.build(f_json);
-            tableau t;
-            const auto is_satisfiable = t.is_satisfiable(mgr);
-            const string_t msg = string_t(U("Satisfiable? ")) +(is_satisfiable ? U("true") : U("false"));
+
+            human_readable_variables_evaluations_t out_evaluations;
+            const auto is_satisfiable = mgr.is_satisfiable(out_evaluations);
+            string_t msg = string_t(U("Satisfiable? ")) +(is_satisfiable ? U("true") : U("false"));
+            std::stringstream out_evaluations_msg;
+            out_evaluations_msg << "Evaluations: \n" << out_evaluations;
+            msg.append(U(out_evaluations_msg.str().c_str()));
 
             ucout << msg << std::endl;
 

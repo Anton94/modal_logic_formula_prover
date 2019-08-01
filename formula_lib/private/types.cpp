@@ -21,6 +21,15 @@ std::ostream& operator<<(std::ostream& out, const variables_t& variables)
     return out;
 }
 
+std::ostream& operator<<(std::ostream& out, const human_readable_variables_evaluations_t& variables_evaluations)
+{
+    for(const auto& variable_evaluation : variables_evaluations)
+    {
+        out << variable_evaluation.first << " : " << variable_evaluation.second << "\n";
+    }
+
+    return out;
+}
 auto formula_ptr_hasher::operator()(const formula* const& f) const -> std::size_t
 {
     assert(f);
