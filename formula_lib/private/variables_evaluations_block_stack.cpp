@@ -38,6 +38,14 @@ auto variables_evaluations_block_stack::empty() const -> bool
     return block_stack_.empty();
 }
 
+auto variables_evaluations_block_stack::get_combined_block() const -> variables_evaluations_block
+{
+    // TODO: do not create it each time!
+    variables_evaluations_block combined(combined_variables_);
+    combined.get_evaluations() = combined_evaluations_;
+    return combined;
+}
+
 auto variables_evaluations_block_stack::get_combined_variables() const -> const variables_mask_t&
 {
     return combined_variables_;

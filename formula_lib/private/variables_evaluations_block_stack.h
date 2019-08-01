@@ -15,7 +15,7 @@ class variables_evaluations_block_stack
     * All blocks should have the same size specified in the ctor
     */
 public:
-    variables_evaluations_block_stack(size_t block_size);
+    variables_evaluations_block_stack(size_t block_size = 0);
 
     variables_evaluations_block_stack(const variables_evaluations_block_stack&) = delete;
     variables_evaluations_block_stack& operator=(const variables_evaluations_block_stack&) = delete;
@@ -28,6 +28,7 @@ public:
     void pop();
     auto empty() const -> bool;
 
+    auto get_combined_block() const -> variables_evaluations_block;
     auto get_combined_variables() const -> const variables_mask_t&;
     auto get_combined_evaluations() const -> const variables_evaluations_t&;
 
