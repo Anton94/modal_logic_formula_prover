@@ -3,9 +3,9 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
-#include <filesystem>
+#include <boost/filesystem.hpp>
 
-#include <windows.h>
+//#include <windows.h>
 #include <string>
 #include <iostream>
 
@@ -97,7 +97,7 @@ void microservice_controller::handle_get(http_request message)
 			std::istreambuf_iterator<char>());
 
 		utility::string_t body = utility::conversions::to_string_t(str);
-		message.reply(status_codes::OK, body, L"text/html");
+        //message.reply(status_codes::OK, body, L"text/html");
 	}
 	else if (x == U("/main.js"))
 	{
@@ -106,7 +106,7 @@ void microservice_controller::handle_get(http_request message)
 			std::istreambuf_iterator<char>());
 
 		utility::string_t body = utility::conversions::to_string_t(str);
-		message.reply(status_codes::OK, body, L"text/javascript");
+        //message.reply(status_codes::OK, body, L"text/javascript");
 	}
 	else if (x == U("/chevrotain.js"))
 	{
@@ -115,7 +115,7 @@ void microservice_controller::handle_get(http_request message)
 			std::istreambuf_iterator<char>());
 
 		utility::string_t body = utility::conversions::to_string_t(str);
-		message.reply(status_codes::OK, body, L"text/javascript");
+        //message.reply(status_codes::OK, body, L"text/javascript");
 	}
 	
 	ucout << message.to_string() << std::endl;
