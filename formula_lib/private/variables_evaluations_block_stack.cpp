@@ -2,9 +2,8 @@
 #include "logger.h"
 
 variables_evaluations_block_stack::variables_evaluations_block_stack(size_t block_size)
-    : block_size_(block_size)
-    , combined_variables_(block_size_, false)
-    , combined_evaluations_(block_size_, false)
+    : combined_variables_(block_size, false)
+    , combined_evaluations_(block_size, false)
 {
 }
 
@@ -106,7 +105,7 @@ void variables_evaluations_block_stack::update_combined_after_push()
         pop();
     }
 
-    if(pushed_block.get_variables().size() != block_size_)
+    if(pushed_block.get_variables().size() != combined_variables_.size())
     {
         error() << "Adding a block with different size.";
         pop();

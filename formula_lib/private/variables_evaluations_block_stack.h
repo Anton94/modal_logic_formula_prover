@@ -39,7 +39,6 @@ private:
     void update_combined_after_push();
     void update_combined_before_pop();
 
-    size_t block_size_;
     std::stack<variables_evaluations_block> block_stack_;
 
     variables_mask_t combined_variables_;
