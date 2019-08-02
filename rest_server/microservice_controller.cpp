@@ -9,6 +9,9 @@
 #include <string>
 #include <iostream>
 
+#include <boost/filesystem.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "nlohmann_json/json.hpp"
 
@@ -29,11 +32,6 @@ microservice_controller::microservice_controller(utility::string_t url)
 	m_listener.support(methods::DEL, std::bind(&microservice_controller::handle_delete, this, std::placeholders::_1));
 }
 
-inline bool file_exists(const std::string& name) {
-	struct stat buffer;
-	return (stat(name.c_str(), &buffer) == 0);
-}
-
 void handle_error(pplx::task<void>& t)
 {
 	try
@@ -46,87 +44,60 @@ void handle_error(pplx::task<void>& t)
 	}
 }
 
-void PrintFullPath(char* partialPath)
-{
-//    char full[_MAX_PATH];
-//    if (_fullpath(full, partialPath, _MAX_PATH) != NULL)
-//		printf("Full path is: %s\n", full);
-//	else
-//		printf("Invalid path\n");
-}
-
 void microservice_controller::handle_get(http_request message)
 {
 	ucout << message.to_string() << std::endl;
-    std::string CLIENT = "..\\client\\src";
-	utility::string_t x = message.absolute_uri().path();
-	if (strncmp(utility::conversions::to_utf8string(x).c_str(), "/img/", 4) == 0)
-	{
-		std::string p = utility::conversions::to_utf8string(x);
-		std::replace(p.begin(), p.end(), '/', '\\');
-		std::string file_name = CLIENT + p;
-		if (file_exists(file_name))
-		{
-			std::ifstream t(file_name);
-			std::string str((std::istreambuf_iterator<char>(t)),
-				std::istreambuf_iterator<char>());
 
-			utility::string_t file_name_t = utility::conversions::to_string_t(file_name);
-			auto content_type = U("application/octet-stream");
-			
-			concurrency::streams::fstream::open_istream(file_name_t, std::ios::in)
-				.then([=](concurrency::streams::istream is) {
-					message.reply(status_codes::OK, is, content_type)
-						.then([](pplx::task<void> t) { 
-							handle_error(t); 
-						});
-				})
-				.then([=](pplx::task<void> t) {
-				try
-				{
-					t.get();
-				}
-				catch (...)
-				{
-					// opening the file (open_istream) failed.
-					// Reply with an error.
-					message.reply(status_codes::InternalError).then([](pplx::task<void> t) { handle_error(t); });
-				}
-			});
+	std::string message_path = utility::conversions::to_utf8string(message.absolute_uri().path());
+
+	if (boost::starts_with(message_path, "/rest"))
+	{
+		// for now we do not have any get get request
+		message.reply(status_codes::OK);
+		return;
+	}
+
+	std::string relative_file(CLIENT_DIR + message_path);
+	if (boost::filesystem::exists(relative_file))
+	{
+		auto content_type = U("application/octet-stream");
+		//boost::filesystem::path ext = file_path.extension;
+		auto x = boost::filesystem::extension(relative_file);
+		if (boost::filesystem::extension(relative_file).compare(".html") == 0)
+		{
+			content_type = U("text/html");
+		}
+		else if (boost::filesystem::extension(relative_file).compare(".js") == 0)
+		{
+			content_type = U("text/javascript");
 		}
 
-	}
-	else if (x == U("/index.html"))
-	{
-		std::ifstream t(CLIENT + "\\resources\\index.html");
-		std::string str((std::istreambuf_iterator<char>(t)),
-			std::istreambuf_iterator<char>());
+		utility::string_t file_name_t = utility::conversions::to_string_t(relative_file);
 
-        utility::string_t body = utility::conversions::to_string_t(str);
-        message.reply(status_codes::OK, body, U("text/html"));
-	}
-	else if (x == U("/main.js"))
-	{
-		std::ifstream t(CLIENT + "\\resources\\main.js");
-		std::string str((std::istreambuf_iterator<char>(t)),
-			std::istreambuf_iterator<char>());
+		concurrency::streams::fstream::open_istream(file_name_t, std::ios::in)
+			.then([=](concurrency::streams::istream is) {
+			message.reply(status_codes::OK, is, content_type)
+				.then([](pplx::task<void> t) {
+				handle_error(t);
+			});
+		})
+			.then([=](pplx::task<void> t) {
+			try
+			{
+				t.get();
+			}
+			catch (...)
+			{
+				// opening the file (open_istream) failed.
+				// Reply with an error.
+				message.reply(status_codes::InternalError).then([](pplx::task<void> t) { handle_error(t); });
+			}
+		});
 
-        utility::string_t body = utility::conversions::to_string_t(str);
-        message.reply(status_codes::OK, body, U("text/javascript"));
+		return;
 	}
-	else if (x == U("/chevrotain.js"))
-	{
-		std::ifstream t(CLIENT + "\\resources\\chevrotain.js");
-		std::string str((std::istreambuf_iterator<char>(t)),
-			std::istreambuf_iterator<char>());
 
-        utility::string_t body = utility::conversions::to_string_t(str);
-        message.reply(status_codes::OK, body, U("text/javascript"));
-	}
-	else
-	{
-		message.reply(status_codes::OK);
-	}
+	message.reply(status_codes::BadGateway);
 }
 
 void microservice_controller::handle_post(http_request message)

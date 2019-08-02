@@ -34,4 +34,7 @@ private:
 	void handle_delete(http_request message);
 
 	http_listener m_listener;
+
+	std::string CLIENT_DIR = "../client/src";
+	std::string CLIENT_RESOURCES_DIR = "../client/src/resources";
 };

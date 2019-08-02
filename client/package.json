@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "chevrotain": "^4.8.1",
+    "jquery": "^3.4.1",
     "underscore": "^1.9.1"
   }
 }
