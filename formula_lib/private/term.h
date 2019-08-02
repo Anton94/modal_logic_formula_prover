@@ -133,6 +133,7 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& out, const term& t);
+std::ostream& operator<<(std::ostream& out, const term::evaluation_result& res);
 
 namespace std
 {

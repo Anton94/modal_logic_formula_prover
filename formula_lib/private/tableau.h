@@ -10,6 +10,7 @@
 #include <unordered_set>
 
 class formula;
+class formula_mgr;
 
 class tableau
 {
@@ -96,6 +97,20 @@ private:
     auto satisfiable_evaluation_step_contacts_F(formulas_t::iterator contacts_F_it) -> bool;
     auto satisfiable_evaluation_step_zero_terms_T(terms_t::iterator zero_terms_T_it) -> bool;
     auto satisfiable_evaluation_step_zero_terms_F(terms_t::iterator zero_terms_F_it) -> bool;
+
+    void log(const variables_evaluations_block& block) const;
+
+    auto trace_get_top_block_variables() const -> std::string;
+
+    auto evaluate_with_combined(const term* t, const std::string& header_info = {}) -> term::evaluation_result;
+
+    void block_stack_push(const variables_evaluations_block& block, const std::string& header_info = {});
+    void block_stack_push(variables_evaluations_block&& block, const std::string& header_info = {});
+
+    void block_stack_pop(const std::string& header_info = {});
+    auto block_stack_generate(const std::string& header_info = {}) -> bool;
+
+    const formula_mgr* mgr_;
 
     formulas_t formulas_T_;
     formulas_t formulas_F_;

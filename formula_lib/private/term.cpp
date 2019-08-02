@@ -388,6 +388,25 @@ std::ostream& operator<<(std::ostream& out, const term& t)
     return out;
 }
 
+std::ostream& operator<<(std::ostream& out, const term::evaluation_result& res)
+{
+    if(res.is_constant_true())
+    {
+        out << "constant true";
+    }
+    else if(res.is_constant_false())
+    {
+
+        out << "constant false";
+    }
+    else
+    {
+        assert(res.is_term());
+        out << *res.get();
+    }
+    return out;
+}
+
 void term::move(term&& rhs) noexcept
 {
     op_ = rhs.op_;

@@ -171,7 +171,18 @@ void formula_mgr::print(std::ostream& out, const variables_evaluations_block& bl
     {
         if(variables[i])
         {
-            out << get_variable(i) << " : " << evaluations.test(i) << "\n";
+            out << "<" << get_variable(i) << " : " << evaluations.test(i) << "> ";
+        }
+    }
+}
+
+void formula_mgr::print(std::ostream& out, const variables_mask_t& variables_mask) const
+{
+    for(size_t i = 0; i < variables_mask.size(); ++i)
+    {
+        if(variables_mask[i])
+        {
+            out << get_variable(i) << " ";
         }
     }
 }

@@ -18,7 +18,8 @@ auto tableau::is_satisfiable(const formula& f, variables_evaluations_block& out_
     }
     add_formula_to_T(&f);
 
-    const auto variables_count = f.get_mgr()->get_variables().size();
+    mgr_ = f.get_mgr();
+    const auto variables_count = mgr_->get_variables().size();
     block_stack_ = variables_evaluations_block_stack(variables_count);
 
     if(satisfiable_step())
@@ -31,6 +32,7 @@ auto tableau::is_satisfiable(const formula& f, variables_evaluations_block& out_
 
 void tableau::clear()
 {
+    mgr_ = nullptr;
     formulas_T_.clear();
     formulas_F_.clear();
     contacts_T_.clear();
@@ -712,7 +714,15 @@ auto tableau::path_has_satisfiable_variable_evaluation() -> bool
 {
     trace() << "Start looking for an satisfiable evaluation of the variables.";
 
-    return satisfiable_evaluation_step_contacts_T(contacts_T_.begin());
+    if(satisfiable_evaluation_step_contacts_T(contacts_T_.begin()))
+    {
+        trace() << "Success, the evaluation is: ";
+        log(block_stack_.get_combined_block());
+        return true;
+    }
+
+    trace() << "Unable to find a suitable variable evaluation";
+    return false;
 }
 
 /*
@@ -725,13 +735,18 @@ auto tableau::satisfiable_evaluation_step_contacts_T(formulas_t::iterator contac
 {
     if(contacts_T_it == contacts_T_.end()) // all atomic C(e,f) has been evaluated -> e == 1 & f == 1
     {
+        trace() << "Evaluated all T contact atomic formulas";
         return satisfiable_evaluation_step_contacts_F(contacts_F_.begin());
     }
 
+    std::stringstream header_stream;
+    header_stream << "[CT][" << **contacts_T_it << "] ";
+    const auto header = header_stream.str();
+    trace() << header << "Starting";
 
     const auto c = *contacts_T_it;
-    auto left_eval_res = c->get_left_child_term()->evaluate(block_stack_.get_combined_block());
-    auto right_eval_res = c->get_right_child_term()->evaluate(block_stack_.get_combined_block());
+    auto left_eval_res = evaluate_with_combined(c->get_left_child_term(), header);
+    auto right_eval_res = evaluate_with_combined(c->get_right_child_term(), header);
     // e[combined] - [P0, P1, ... , Pn, Q0, Q1, ... , Qk] // e[combined] is the term which is produced by evaluating e with the bombined evaluation block
     // f[combined] - [P0, P1, ... , Pn, R0, R1, ... , Rk]
 
@@ -787,30 +802,38 @@ auto tableau::satisfiable_evaluation_step_contacts_T_common(formulas_t::iterator
         left_evaluated_subterm->get_variables() & right_evaluated_subterm->get_variables();
     assert(common_variables.any());
 
+    std::stringstream header_stream;
+    header_stream << "[CTC][" << *left_evaluated_subterm << " and " << *right_evaluated_subterm << "] ";
+    const auto header = header_stream.str();
+    trace() << header << "Making a block with the common variables";
+
     assert((common_variables & block_stack_.get_combined_variables()).none());
-    block_stack_.push(variables_evaluations_block(common_variables));
+    block_stack_push(variables_evaluations_block(common_variables), header);
 
     do
     {
-        auto left_eval_subres = left_evaluated_subterm->evaluate(block_stack_.get_combined_block());
-        auto right_eval_subres = right_evaluated_subterm->evaluate(block_stack_.get_combined_block());
+        auto left_eval_subres = evaluate_with_combined(left_evaluated_subterm.get(), header);
+        auto right_eval_subres = evaluate_with_combined(right_evaluated_subterm.get(), header);
 
         if(left_eval_subres.is_constant_false() || right_eval_subres.is_constant_false())
         {
+            trace() << header << "The evaluation was not successful, at least of of the evaluations is constant false";
             left_eval_subres.free();
             right_eval_subres.free();
         }
         else
         {
+            trace() << header << "The evaluation was successful, both evaluated terms are not constant false, continue";
             if (satisfiable_evaluation_step_contacts_T_left(contacts_T_it, std::move(left_eval_subres),
                 std::move(right_eval_subres)))
             {
                 return true;
             }
         }
-    } while(block_stack_.generate_evaluation());
+    } while(block_stack_generate(header));
 
-    block_stack_.pop();
+    trace() << "Unable to generate a successful evaluation for the common variables";
+    block_stack_pop(header);
     return false;
 }
 
@@ -821,12 +844,19 @@ auto tableau::satisfiable_evaluation_step_contacts_T_left(formulas_t::iterator c
     assert(contacts_T_it != contacts_T_.end());
     call_on_destroy free_right_eval_res_before_exiting([&]() { right_eval_res.free(); });
 
+    std::stringstream header_stream;
+    header_stream << "[CTL][" << left_eval_res << " of " << **contacts_T_it << "] ";
+    const auto header = header_stream.str();
+    trace() << header << "Starting";
+
     if(left_eval_res.is_constant_false())
     {
+        trace() << header << "Evaluated to constant false. Not able to continue, returning back";
         return false;
     }
     if(left_eval_res.is_constant_true())
     {
+        trace() << header << "Evaluated to constant true. continue";
         return satisfiable_evaluation_step_contacts_T_right(contacts_T_it, right_eval_res);
     }
 
@@ -834,13 +864,13 @@ auto tableau::satisfiable_evaluation_step_contacts_T_left(formulas_t::iterator c
     const std::unique_ptr<const term> evaluated_subterm(left_eval_res.release());
 
     assert((evaluated_subterm->get_variables() & block_stack_.get_combined_variables()).none());
-    block_stack_.push(variables_evaluations_block(evaluated_subterm->get_variables()));
+    block_stack_push(variables_evaluations_block(evaluated_subterm->get_variables()), header);
 
     auto contacts_T_it_next = contacts_T_it;
     ++contacts_T_it_next;
     do
     {
-        const auto eval_res = evaluated_subterm->evaluate(block_stack_.get_combined_block());
+        const auto eval_res = evaluate_with_combined(evaluated_subterm.get(), header);
         assert(eval_res.is_constant());
 
         if(eval_res.is_constant_true() &&
@@ -852,9 +882,10 @@ auto tableau::satisfiable_evaluation_step_contacts_T_left(formulas_t::iterator c
         {
             return true;
         }
-    } while(block_stack_.generate_evaluation());
+    } while(block_stack_generate(header));
 
-    block_stack_.pop();
+    trace() << header << "Unable to generate a successful evaluation, returning back";
+    block_stack_pop(header);
     return false;
 }
 
@@ -863,12 +894,19 @@ auto tableau::satisfiable_evaluation_step_contacts_T_right(formulas_t::iterator 
 {
     assert(contacts_T_it != contacts_T_.end());
 
+    std::stringstream header_stream;
+    header_stream << "[CTR][" << eval_res << " of " << **contacts_T_it << "] ";
+    const auto header = header_stream.str();
+    trace() << header << "Starting";
+
     if(eval_res.is_constant_false())
     {
+        trace() << header << "Evaluated to constant false. Not able to continue, returning back";
         return false;
     }
     if(eval_res.is_constant_true())
     {
+        trace() << header << "Evaluated to constant true. continue";
         return satisfiable_evaluation_step_contacts_T(++contacts_T_it);
     }
 
@@ -876,23 +914,24 @@ auto tableau::satisfiable_evaluation_step_contacts_T_right(formulas_t::iterator 
     const auto evaluated_subterm = eval_res.get();
 
     assert((evaluated_subterm->get_variables() & block_stack_.get_combined_variables()).none());
-    block_stack_.push(variables_evaluations_block(evaluated_subterm->get_variables()));
+    block_stack_push(variables_evaluations_block(evaluated_subterm->get_variables()), header);
 
     auto contacts_T_it_next = contacts_T_it;
     ++contacts_T_it_next;
 
     do
     {
-        const auto eval_subres = evaluated_subterm->evaluate(block_stack_.get_combined_block());
+        const auto eval_subres = evaluate_with_combined(evaluated_subterm, header);
         assert(eval_subres.is_constant());
 
         if(eval_subres.is_constant_true() && satisfiable_evaluation_step_contacts_T(contacts_T_it_next))
         {
             return true;
         }
-    } while(block_stack_.generate_evaluation());
+    } while(block_stack_generate(header));
 
-    block_stack_.pop();
+    trace() << header << "Unable to generate a successful evaluation, returning back";
+    block_stack_pop(header);
     return false;
 }
 
@@ -900,12 +939,18 @@ auto tableau::satisfiable_evaluation_step_contacts_F(formulas_t::iterator contac
 {
     if(contacts_F_it == contacts_F_.end()) // all atomic ~C(e,f) has been evaluated C(e,f) = 0 -> e == 0 | f == 0
     {
+        trace() << "Evaluated all F contact atomic formulas";
         return satisfiable_evaluation_step_zero_terms_T(zero_terms_T_.begin());
     }
 
+    std::stringstream header_stream;
+    header_stream << "[CF][~" << **contacts_F_it << "] ";
+    const auto header = header_stream.str();
+    trace() << header << "Starting";
+
     const auto c = *contacts_F_it;
-    auto left_eval_res = c->get_left_child_term()->evaluate(block_stack_.get_combined_block());
-    auto right_eval_res = c->get_right_child_term()->evaluate(block_stack_.get_combined_block());
+    auto left_eval_res = evaluate_with_combined(c->get_left_child_term(), header);
+    auto right_eval_res = evaluate_with_combined(c->get_right_child_term(), header);
     call_on_destroy free_evals_before_exiting([&]() {
         left_eval_res.free();
         right_eval_res.free();
@@ -913,11 +958,13 @@ auto tableau::satisfiable_evaluation_step_contacts_F(formulas_t::iterator contac
 
     if(left_eval_res.is_constant_false() || right_eval_res.is_constant_false())
     {
+        trace() << header << "Good, one of the terms is constant false. continue";
         return satisfiable_evaluation_step_contacts_F(++contacts_F_it);
     }
 
     if(left_eval_res.is_constant_true() && right_eval_res.is_constant_true())
     {
+        trace() << header << "Both terms evaluated to constant true. Not able to continue, returning back";
         return false;
     }
 
@@ -927,21 +974,27 @@ auto tableau::satisfiable_evaluation_step_contacts_F(formulas_t::iterator contac
     ++contacts_F_it_next;
 
     const auto step_child_term = [&](const term* t) {
+        std::stringstream child_header_stream;
+        child_header_stream << header << "[" << *t << "] ";
+        const auto child_header = child_header_stream.str();
+        trace() << child_header;
+
         assert((t->get_variables() & block_stack_.get_combined_variables()).none());
-        block_stack_.push(variables_evaluations_block(t->get_variables()));
+        block_stack_push(variables_evaluations_block(t->get_variables()), child_header);
 
         do
         {
-            const auto eval_subres = t->evaluate(block_stack_.get_combined_block());
+            const auto eval_subres = evaluate_with_combined(t, child_header);
             assert(eval_subres.is_constant());
 
             if(eval_subres.is_constant_false() && satisfiable_evaluation_step_contacts_F(contacts_F_it_next))
             {
                 return true;
             }
-        } while(block_stack_.generate_evaluation());
+        } while(block_stack_generate(child_header));
 
-        block_stack_.pop();
+        block_stack_pop(child_header);
+        trace() << header << "Unable to generate a successful evaluation, returning back";
         return false;
     };
 
@@ -953,39 +1006,48 @@ auto tableau::satisfiable_evaluation_step_zero_terms_T(terms_t::iterator zero_te
 {
     if(zero_terms_T_it == zero_terms_T_.end()) // all zero terms (a = 0) has been evaluated
     {
+        trace() << "Evaluated all zero terms";
         return satisfiable_evaluation_step_zero_terms_F(zero_terms_F_.begin());
     }
 
+    std::stringstream header_stream;
+    header_stream << "[ZT][" << **zero_terms_T_it << "] ";
+    const auto header = header_stream.str();
+    trace() << header << "Starting";
+
     const auto t = *zero_terms_T_it;
-    auto eval_res = t->evaluate(block_stack_.get_combined_block());
+    auto eval_res = evaluate_with_combined(t, header);
     if(eval_res.is_constant_false())
     {
+        trace() << header << "Evaluated to constant false. continue";
         return satisfiable_evaluation_step_zero_terms_T(++zero_terms_T_it); // (a v ( b & c) ) & x
     }
     if(eval_res.is_constant_true())
     {
+        trace() << header << "Evaluated to constant true. Not able to continue, returning back";
         return false;
     }
     assert(eval_res.is_term());
     const std::unique_ptr<const term> evaluated_subterm(eval_res.release());
 
     assert((evaluated_subterm->get_variables() & block_stack_.get_combined_variables()).none());
-    block_stack_.push(variables_evaluations_block(evaluated_subterm->get_variables()));
+    block_stack_push(variables_evaluations_block(evaluated_subterm->get_variables()), header);
 
     auto zero_terms_T_it_next = zero_terms_T_it;
     ++zero_terms_T_it_next;
     do
     {
-        const auto eval_res = evaluated_subterm->evaluate(block_stack_.get_combined_block());
+        const auto eval_res = evaluate_with_combined(evaluated_subterm.get(), header);
         assert(eval_res.is_constant());
 
         if(eval_res.is_constant_false() && satisfiable_evaluation_step_zero_terms_T(zero_terms_T_it_next))
         {
             return true;
         }
-    } while(block_stack_.generate_evaluation());
+    } while(block_stack_generate(header));
 
-    block_stack_.pop();
+    trace() << header << "Unable to generate a successful evaluation, returning back";
+    block_stack_pop(header);
     return false;
 }
 
@@ -993,19 +1055,27 @@ auto tableau::satisfiable_evaluation_step_zero_terms_F(terms_t::iterator zero_te
 {
     if(zero_terms_F_it == zero_terms_F_.end()) // all non-zero terms (b != 0) has been evaluated
     {
+        trace() << "Evaluated all non-zero terms";
         return true;
     }
 
     // The goal is to evaluate the non-zero term to 1
 
+    std::stringstream header_stream;
+    header_stream << "[ZF][" << **zero_terms_F_it << "] ";
+    const auto header = header_stream.str();
+    trace() << header << "Starting";
+
     const auto t = *zero_terms_F_it;
-    auto eval_res = t->evaluate(block_stack_.get_combined_block());
+    auto eval_res = evaluate_with_combined(t);
     if(eval_res.is_constant_true())
     {
+        trace() << header << "Evaluated to constant true. continue";
         return satisfiable_evaluation_step_zero_terms_F(++zero_terms_F_it);
     }
     if(eval_res.is_constant_false())
     {
+        trace() << header << "Evaluated to constant false. Not able to continue, returning back";
         return false;
     }
 
@@ -1013,21 +1083,88 @@ auto tableau::satisfiable_evaluation_step_zero_terms_F(terms_t::iterator zero_te
     const std::unique_ptr<const term> evaluated_subterm(eval_res.release());
 
     assert((evaluated_subterm->get_variables() & block_stack_.get_combined_variables()).none());
-    block_stack_.push(variables_evaluations_block(evaluated_subterm->get_variables()));
+    block_stack_push(variables_evaluations_block(evaluated_subterm->get_variables()), header);
 
     auto zero_terms_F_it_next = zero_terms_F_it;
     ++zero_terms_F_it_next;
     do
     {
-        const auto eval_res = evaluated_subterm->evaluate(block_stack_.get_combined_block());
+        const auto eval_res = evaluate_with_combined(evaluated_subterm.get(), header);
         assert(eval_res.is_constant());
 
         if(eval_res.is_constant_true() && satisfiable_evaluation_step_zero_terms_F(zero_terms_F_it_next))
         {
             return true;
         }
-    } while(block_stack_.generate_evaluation());
+    } while(block_stack_generate(header));
 
+    trace() << header << "Unable to generate a successful evaluation, returning back";
+    block_stack_pop(header);
+    return false;
+}
+
+void tableau::log(const variables_evaluations_block& block) const
+{
+    if (trace().is_enabled())
+    {
+        mgr_->print(trace().get_buff(), block);
+    }
+}
+
+auto tableau::trace_get_top_block_variables() const -> std::string
+{
+    if(trace().is_enabled())
+    {
+        std::stringstream top_block_vars;
+        mgr_->print(top_block_vars, block_stack_.top().get_variables());
+        return top_block_vars.str();
+    }
+    return "";
+}
+
+auto tableau::evaluate_with_combined(const term* t, const std::string& header_info) -> term::evaluation_result
+{
+    if(block_stack_.get_combined_block().get_variables().none())
+    {
+        return t->evaluate(block_stack_.get_combined_block()); // TODO: cleaver way..
+    }
+    trace() << header_info << "Evaluating " << *t << " with:";
+    log(block_stack_.get_combined_block());
+    auto res = t->evaluate(block_stack_.get_combined_block());
+    trace() << "    " << res;
+    return res;
+}
+
+void tableau::block_stack_push(const variables_evaluations_block& block, const std::string& header_info)
+{
+    block_stack_.push(block);
+    trace() << header_info << "Adding new evaluation block with variables: " << trace_get_top_block_variables();
+    //log(block_stack_.top());
+}
+
+void tableau::block_stack_push(variables_evaluations_block&& block, const std::string& header_info)
+{
+    block_stack_.push(block);
+    trace() << header_info << "Adding new evaluation block with variables: " << trace_get_top_block_variables();
+    //log(block_stack_.top());
+}
+
+void tableau::block_stack_pop(const std::string& header_info)
+{
+    trace() << header_info << "Removing evaluation block with variables: " << trace_get_top_block_variables();
+    //log(block_stack_.top());
     block_stack_.pop();
+}
+
+auto tableau::block_stack_generate(const std::string& header_info) -> bool
+{
+    trace() << header_info << "Trying to generate new evaluation for the top block with variables: " << trace_get_top_block_variables();
+    if(block_stack_.generate_evaluation())
+    {
+        log(block_stack_.top());
+        return true;
+    }
+
+    trace() << "    ... failed";
     return false;
 }

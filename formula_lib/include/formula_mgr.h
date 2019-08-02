@@ -41,6 +41,7 @@ public:
     auto get_internal_formula() const -> const formula*;
 
     void print(std::ostream& out, const variables_evaluations_block& block) const;
+    void print(std::ostream& out, const variables_mask_t& variables_mask) const;
 
 private:
     void move(formula_mgr&& rhs) noexcept;
