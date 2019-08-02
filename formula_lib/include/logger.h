@@ -22,6 +22,9 @@ public:
         return *this;
     }
 
+    auto get_buff() -> std::stringstream&;
+    auto is_enabled() const -> bool;
+
 private:
     const logger_func_t& f_;
     std::stringstream s_;

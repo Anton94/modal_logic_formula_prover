@@ -50,6 +50,16 @@ logger::~logger()
     }
 }
 
+auto logger::get_buff() -> std::stringstream&
+{
+    return s_;
+}
+
+auto logger::is_enabled() const -> bool
+{
+    return f_ != nullptr;
+}
+
 auto trace() -> logger
 {
     return {trace_logger};
