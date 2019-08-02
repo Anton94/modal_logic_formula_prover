@@ -1247,6 +1247,694 @@ TEST_CASE("satisfiable 18", "[satisfiability]")
               }
            ]
         })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable 18.1", "[satisfiability]")
+{
+    // (<=(a,b) & (~(<=(a,b)))) | (C(a,b) & (~C(-b,b))))
+    is_satisfiable(
+        R"({
+           "name": "disjunction",
+           "value": [
+              {
+                 "name": "conjunction",
+                 "value": [
+                    {
+                       "name": "equal0",
+                       "value": {
+                          "name": "Tand",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "a"
+                             },
+                             {
+                                "name": "Tstar",
+                                "value": {
+                                   "name": "string",
+                                   "value": "b"
+                                }
+                             }
+                          ]
+                       }
+                    },
+                    {
+                       "name": "negation",
+                       "value": {
+                          "name": "equal0",
+                          "value": {
+                             "name": "Tand",
+                             "value": [
+                                {
+                                   "name": "string",
+                                   "value": "a"
+                                },
+                                {
+                                   "name": "Tstar",
+                                   "value": {
+                                      "name": "string",
+                                      "value": "b"
+                                   }
+                                }
+                             ]
+                          }
+                       }
+                    }
+                 ]
+              },
+              {
+                 "name": "conjunction",
+                 "value": [
+                    {
+                       "name": "contact",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "a"
+                          },
+                          {
+                             "name": "string",
+                             "value": "b"
+                          }
+                       ]
+                    },
+                    {
+                       "name": "negation",
+                       "value": {
+                          "name": "contact",
+                          "value": [
+                             {
+                                "name": "Tstar",
+                                "value": {
+                                   "name": "string",
+                                   "value": "b"
+                                }
+                             },
+                             {
+                                "name": "string",
+                                "value": "b"
+                             }
+                          ]
+                       }
+                    }
+                 ]
+              }
+           ]
+        })"_json,
+        true);
+}
+
+TEST_CASE("satisfiable 18.2", "[satisfiability]")
+{
+    // (C(a,b) & ~C(b,b)) | (C(a,b) & ~C(-b,b))
+    is_satisfiable(
+        R"({
+            "name": "disjunction",
+            "value": [
+               {
+                  "name": "conjunction",
+                  "value": [
+                     {
+                        "name": "contact",
+                        "value": [
+                           {
+                              "name": "string",
+                              "value": "a"
+                           },
+                           {
+                              "name": "string",
+                              "value": "b"
+                           }
+                        ]
+                     },
+                     {
+                        "name": "negation",
+                        "value": {
+                           "name": "contact",
+                           "value": [
+                              {
+                                "name": "string",
+                                "value": "b"
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "b"
+                              }
+                           ]
+                        }
+                     }
+                  ]
+               },
+               {
+                  "name": "conjunction",
+                  "value": [
+                     {
+                        "name": "contact",
+                        "value": [
+                           {
+                              "name": "string",
+                              "value": "a"
+                           },
+                           {
+                              "name": "string",
+                              "value": "b"
+                           }
+                        ]
+                     },
+                     {
+                        "name": "negation",
+                        "value": {
+                           "name": "contact",
+                           "value": [
+                              {
+                                 "name": "Tstar",
+                                 "value": {
+                                    "name": "string",
+                                    "value": "b"
+                                 }
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "b"
+                              }
+                           ]
+                        }
+                     }
+                  ]
+               }
+            ]
+        })"_json,
+        true);
+}
+
+TEST_CASE("satisfiable 19", "[satisfiability]")
+{
+    // ~(C([x * -z], [b * -k]) | C([x * -z], c)) & (~C(-b,b) & (~<=(x, z) & ~<=(b, k)))
+    is_satisfiable(
+        R"({
+            "name": "conjunction",
+            "value": [
+               {
+                  "name": "negation",
+                  "value": {
+                     "name": "disjunction",
+                     "value": [
+                        {
+                           "name": "contact",
+                           "value": [
+                              {
+                                 "name": "Tand",
+                                 "value": [
+                                    {
+                                       "name": "string",
+                                       "value": "x"
+                                    },
+                                    {
+                                       "name": "Tstar",
+                                       "value": {
+                                          "name": "string",
+                                          "value": "z"
+                                       }
+                                    }
+                                 ]
+                              },
+                              {
+                                 "name": "Tand",
+                                 "value": [
+                                    {
+                                       "name": "string",
+                                       "value": "b"
+                                    },
+                                    {
+                                       "name": "Tstar",
+                                       "value": {
+                                          "name": "string",
+                                          "value": "k"
+                                       }
+                                    }
+                                 ]
+                              }
+                           ]
+                        },
+                        {
+                           "name": "contact",
+                           "value": [
+                              {
+                                 "name": "Tand",
+                                 "value": [
+                                    {
+                                       "name": "string",
+                                       "value": "x"
+                                    },
+                                    {
+                                       "name": "Tstar",
+                                       "value": {
+                                          "name": "string",
+                                          "value": "z"
+                                       }
+                                    }
+                                 ]
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "c"
+                              }
+                           ]
+                        }
+                     ]
+                  }
+               },
+               {
+                  "name": "conjunction",
+                  "value": [
+                     {
+                        "name": "negation",
+                        "value": {
+                           "name": "contact",
+                           "value": [
+                              {
+                                 "name": "Tstar",
+                                 "value": {
+                                    "name": "string",
+                                    "value": "b"
+                                 }
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "b"
+                              }
+                           ]
+                        }
+                     },
+                     {
+                        "name": "conjunction",
+                        "value": [
+                           {
+                              "name": "negation",
+                              "value": {
+                                 "name": "equal0",
+                                 "value": {
+                                    "name": "Tand",
+                                    "value": [
+                                       {
+                                          "name": "string",
+                                          "value": "x"
+                                       },
+                                       {
+                                          "name": "Tstar",
+                                          "value": {
+                                             "name": "string",
+                                             "value": "z"
+                                          }
+                                       }
+                                    ]
+                                 }
+                              }
+                           },
+                           {
+                              "name": "negation",
+                              "value": {
+                                 "name": "equal0",
+                                 "value": {
+                                    "name": "Tand",
+                                    "value": [
+                                       {
+                                          "name": "string",
+                                          "value": "b"
+                                       },
+                                       {
+                                          "name": "Tstar",
+                                          "value": {
+                                             "name": "string",
+                                             "value": "k"
+                                          }
+                                       }
+                                    ]
+                                 }
+                              }
+                           }
+                        ]
+                     }
+                  ]
+               }
+            ]
+        })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable evaluation of path 1", "[satisfiability]")
+{
+    // ~C(x * -z,b) & (~C(-b,b) & ~<=(x, z))
+    is_satisfiable(
+        R"({
+            "name": "conjunction",
+            "value": [
+               {
+                  "name": "negation",
+                  "value": {
+                     "name": "contact",
+                     "value": [
+                        {
+                           "name": "Tand",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "x"
+                              },
+                              {
+                                 "name": "Tstar",
+                                 "value": {
+                                    "name": "string",
+                                    "value": "z"
+                                 }
+                              }
+                           ]
+                        },
+                        {
+                           "name": "string",
+                           "value": "b"
+                        }
+                     ]
+                  }
+               },
+               {
+                  "name": "conjunction",
+                  "value": [
+                     {
+                        "name": "negation",
+                        "value": {
+                           "name": "contact",
+                           "value": [
+                              {
+                                 "name": "Tstar",
+                                 "value": {
+                                    "name": "string",
+                                    "value": "b"
+                                 }
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "b"
+                              }
+                           ]
+                        }
+                     },
+                     {
+                        "name": "negation",
+                        "value": {
+                           "name": "equal0",
+                           "value": {
+                              "name": "Tand",
+                              "value": [
+                                 {
+                                    "name": "string",
+                                    "value": "x"
+                                 },
+                                 {
+                                    "name": "Tstar",
+                                    "value": {
+                                       "name": "string",
+                                       "value": "z"
+                                    }
+                                 }
+                              ]
+                           }
+                        }
+                     }
+                  ]
+               }
+            ]
+        })"_json,
+        true);
+}
+
+TEST_CASE("satisfiable evaluation of path 2", "[satisfiability]")
+{
+    // ~C(x * -z, (b * -k) + c) & (~C(-b,b) & (~<=(x, z) & ~<=(b, k)))
+    is_satisfiable(
+        R"({
+            "name": "conjunction",
+            "value": [
+               {
+                  "name": "negation",
+                  "value": {
+                     "name": "contact",
+                     "value": [
+                        {
+                           "name": "Tand",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "x"
+                              },
+                              {
+                                 "name": "Tstar",
+                                 "value": {
+                                    "name": "string",
+                                    "value": "z"
+                                 }
+                              }
+                           ]
+                        },
+                        {
+                           "name": "Tor",
+                           "value": [
+                              {
+                                 "name": "Tand",
+                                 "value": [
+                                    {
+                                       "name": "string",
+                                       "value": "b"
+                                    },
+                                    {
+                                       "name": "Tstar",
+                                       "value": {
+                                          "name": "string",
+                                          "value": "k"
+                                       }
+                                    }
+                                 ]
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "c"
+                              }
+                           ]
+                        }
+                     ]
+                  }
+               },
+               {
+                  "name": "conjunction",
+                  "value": [
+                     {
+                        "name": "negation",
+                        "value": {
+                           "name": "contact",
+                           "value": [
+                              {
+                                 "name": "Tstar",
+                                 "value": {
+                                    "name": "string",
+                                    "value": "b"
+                                 }
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "b"
+                              }
+                           ]
+                        }
+                     },
+                     {
+                        "name": "conjunction",
+                        "value": [
+                           {
+                              "name": "negation",
+                              "value": {
+                                 "name": "equal0",
+                                 "value": {
+                                    "name": "Tand",
+                                    "value": [
+                                       {
+                                          "name": "string",
+                                          "value": "x"
+                                       },
+                                       {
+                                          "name": "Tstar",
+                                          "value": {
+                                             "name": "string",
+                                             "value": "z"
+                                          }
+                                       }
+                                    ]
+                                 }
+                              }
+                           },
+                           {
+                              "name": "negation",
+                              "value": {
+                                 "name": "equal0",
+                                 "value": {
+                                    "name": "Tand",
+                                    "value": [
+                                       {
+                                          "name": "string",
+                                          "value": "b"
+                                       },
+                                       {
+                                          "name": "Tstar",
+                                          "value": {
+                                             "name": "string",
+                                             "value": "k"
+                                          }
+                                       }
+                                    ]
+                                 }
+                              }
+                           }
+                        ]
+                     }
+                  ]
+               }
+            ]
+        })"_json,
+        false);
+}
+
+
+TEST_CASE("satisfiable evaluation of path 3", "[satisfiability]")
+{
+    // ~C(x * -z, (b * -k) * c) & (~C(-b,b) & (~<=(x, z) & ~<=(b, k)))
+    is_satisfiable(
+        R"({
+            "name": "conjunction",
+            "value": [
+               {
+                  "name": "negation",
+                  "value": {
+                     "name": "contact",
+                     "value": [
+                        {
+                           "name": "Tand",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "x"
+                              },
+                              {
+                                 "name": "Tstar",
+                                 "value": {
+                                    "name": "string",
+                                    "value": "z"
+                                 }
+                              }
+                           ]
+                        },
+                        {
+                           "name": "Tand",
+                           "value": [
+                              {
+                                 "name": "Tand",
+                                 "value": [
+                                    {
+                                       "name": "string",
+                                       "value": "b"
+                                    },
+                                    {
+                                       "name": "Tstar",
+                                       "value": {
+                                          "name": "string",
+                                          "value": "k"
+                                       }
+                                    }
+                                 ]
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "c"
+                              }
+                           ]
+                        }
+                     ]
+                  }
+               },
+               {
+                  "name": "conjunction",
+                  "value": [
+                     {
+                        "name": "negation",
+                        "value": {
+                           "name": "contact",
+                           "value": [
+                              {
+                                 "name": "Tstar",
+                                 "value": {
+                                    "name": "string",
+                                    "value": "b"
+                                 }
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "b"
+                              }
+                           ]
+                        }
+                     },
+                     {
+                        "name": "conjunction",
+                        "value": [
+                           {
+                              "name": "negation",
+                              "value": {
+                                 "name": "equal0",
+                                 "value": {
+                                    "name": "Tand",
+                                    "value": [
+                                       {
+                                          "name": "string",
+                                          "value": "x"
+                                       },
+                                       {
+                                          "name": "Tstar",
+                                          "value": {
+                                             "name": "string",
+                                             "value": "z"
+                                          }
+                                       }
+                                    ]
+                                 }
+                              }
+                           },
+                           {
+                              "name": "negation",
+                              "value": {
+                                 "name": "equal0",
+                                 "value": {
+                                    "name": "Tand",
+                                    "value": [
+                                       {
+                                          "name": "string",
+                                          "value": "b"
+                                       },
+                                       {
+                                          "name": "Tstar",
+                                          "value": {
+                                             "name": "string",
+                                             "value": "k"
+                                          }
+                                       }
+                                    ]
+                                 }
+                              }
+                           }
+                        ]
+                     }
+                  ]
+               }
+            ]
+        })"_json,
         true);
 }
 
@@ -2932,6 +3620,131 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
                                 {
                                    "name": "string",
                                    "value": "d"
+                                }
+                             ]
+                          },
+                          {
+                             "name": "equal0",
+                             "value": {
+                                "name": "Tand",
+                                "value": [
+                                   {
+                                      "name": "string",
+                                      "value": "a"
+                                   },
+                                   {
+                                      "name": "Tstar",
+                                      "value": {
+                                         "name": "string",
+                                         "value": "d"
+                                      }
+                                   }
+                                ]
+                             }
+                          }
+                       ]
+                    },
+                    {
+                       "name": "equal0",
+                       "value": {
+                          "name": "Tand",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "b"
+                             },
+                             {
+                                "name": "Tstar",
+                                "value": {
+                                   "name": "string",
+                                   "value": "x"
+                                }
+                             }
+                          ]
+                       }
+                    }
+                 ]
+              }
+           ]
+        })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact using same terms 2.1", "[satisfiability]")
+{
+    // C(a * -d, b * -c) & ( (C(a * -d, -d) & <=(a,d)) | <=(b,x)))
+    is_satisfiable(
+        R"({
+           "name": "conjunction",
+           "value": [
+              {
+                 "name": "contact",
+                 "value": [
+                    {
+                       "name": "Tand",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "a"
+                          },
+                          {
+                             "name": "Tstar",
+                             "value": {
+                                "name": "string",
+                                "value": "d"
+                             }
+                          }
+                       ]
+                    },
+                    {
+                       "name": "Tand",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "b"
+                          },
+                          {
+                             "name": "Tstar",
+                             "value": {
+                                "name": "string",
+                                "value": "c"
+                             }
+                          }
+                       ]
+                    }
+                 ]
+              },
+              {
+                 "name": "disjunction",
+                 "value": [
+                    {
+                       "name": "conjunction",
+                       "value": [
+                          {
+                             "name": "contact",
+                             "value": [
+                                {
+                                   "name": "Tand",
+                                   "value": [
+                                      {
+                                         "name": "string",
+                                         "value": "a"
+                                      },
+                                      {
+                                         "name": "Tstar",
+                                         "value": {
+                                            "name": "string",
+                                            "value": "d"
+                                         }
+                                      }
+                                   ]
+                                },
+                                {
+                                    "name": "Tstar",
+                                    "value": {
+                                       "name": "string",
+                                       "value": "d"
+                                    }
                                 }
                              ]
                           },
