@@ -715,16 +715,25 @@ auto tableau::path_has_satisfiable_variable_evaluation() -> bool
     return satisfiable_evaluation_step_contacts_T(contacts_T_.begin());
 }
 
+/*
+    C(e, f) & ~C(e,f) & a = 0 & b != 0 . Four type of collections
+
+
+*/
+
 auto tableau::satisfiable_evaluation_step_contacts_T(formulas_t::iterator contacts_T_it) -> bool
 {
-    if(contacts_T_it == contacts_T_.end()) // all atomic C(e,f) has been evaluated
+    if(contacts_T_it == contacts_T_.end()) // all atomic C(e,f) has been evaluated -> e == 1 & f == 1
     {
         return satisfiable_evaluation_step_contacts_F(contacts_F_.begin());
     }
 
+
     const auto c = *contacts_T_it;
     auto left_eval_res = c->get_left_child_term()->evaluate(block_stack_.get_combined_block());
     auto right_eval_res = c->get_right_child_term()->evaluate(block_stack_.get_combined_block());
+    // e[combined] - [P0, P1, ... , Pn, Q0, Q1, ... , Qk] // e[combined] is the term which is produced by evaluating e with the bombined evaluation block
+    // f[combined] - [P0, P1, ... , Pn, R0, R1, ... , Rk]
 
     if(left_eval_res.is_constant_false() || right_eval_res.is_constant_false())
     {
@@ -786,18 +795,18 @@ auto tableau::satisfiable_evaluation_step_contacts_T_common(formulas_t::iterator
         auto left_eval_subres = left_evaluated_subterm->evaluate(block_stack_.get_combined_block());
         auto right_eval_subres = right_evaluated_subterm->evaluate(block_stack_.get_combined_block());
 
-        if(!left_eval_subres.is_constant_false() && !right_eval_subres.is_constant_false())
-        {
-            if(satisfiable_evaluation_step_contacts_T_left(contacts_T_it, std::move(left_eval_subres),
-                                                           std::move(right_eval_subres)))
-            {
-                return true;
-            }
-        }
-        else
+        if(left_eval_subres.is_constant_false() || right_eval_subres.is_constant_false())
         {
             left_eval_subres.free();
             right_eval_subres.free();
+        }
+        else
+        {
+            if (satisfiable_evaluation_step_contacts_T_left(contacts_T_it, std::move(left_eval_subres),
+                std::move(right_eval_subres)))
+            {
+                return true;
+            }
         }
     } while(block_stack_.generate_evaluation());
 
@@ -871,6 +880,7 @@ auto tableau::satisfiable_evaluation_step_contacts_T_right(formulas_t::iterator 
 
     auto contacts_T_it_next = contacts_T_it;
     ++contacts_T_it_next;
+
     do
     {
         const auto eval_subres = evaluated_subterm->evaluate(block_stack_.get_combined_block());
@@ -888,7 +898,7 @@ auto tableau::satisfiable_evaluation_step_contacts_T_right(formulas_t::iterator 
 
 auto tableau::satisfiable_evaluation_step_contacts_F(formulas_t::iterator contacts_F_it) -> bool
 {
-    if(contacts_F_it == contacts_F_.end()) // all atomic ~C(e,f) has been evaluated
+    if(contacts_F_it == contacts_F_.end()) // all atomic ~C(e,f) has been evaluated C(e,f) = 0 -> e == 0 | f == 0
     {
         return satisfiable_evaluation_step_zero_terms_T(zero_terms_T_.begin());
     }
@@ -901,7 +911,7 @@ auto tableau::satisfiable_evaluation_step_contacts_F(formulas_t::iterator contac
         right_eval_res.free();
     });
 
-    if(left_eval_res.is_constant_false() && right_eval_res.is_constant_false())
+    if(left_eval_res.is_constant_false() || right_eval_res.is_constant_false())
     {
         return satisfiable_evaluation_step_contacts_F(++contacts_F_it);
     }
@@ -912,11 +922,6 @@ auto tableau::satisfiable_evaluation_step_contacts_F(formulas_t::iterator contac
     }
 
     // TODO: check if there is a case where there are going to be not evaluated variables which are needed
-
-    if(left_eval_res.is_constant_true() || right_eval_res.is_constant_true())
-    {
-        return satisfiable_evaluation_step_contacts_F(++contacts_F_it);
-    }
 
     auto contacts_F_it_next = contacts_F_it;
     ++contacts_F_it_next;
@@ -955,7 +960,7 @@ auto tableau::satisfiable_evaluation_step_zero_terms_T(terms_t::iterator zero_te
     auto eval_res = t->evaluate(block_stack_.get_combined_block());
     if(eval_res.is_constant_false())
     {
-        return satisfiable_evaluation_step_zero_terms_T(++zero_terms_T_it);
+        return satisfiable_evaluation_step_zero_terms_T(++zero_terms_T_it); // (a v ( b & c) ) & x
     }
     if(eval_res.is_constant_true())
     {
@@ -986,7 +991,7 @@ auto tableau::satisfiable_evaluation_step_zero_terms_T(terms_t::iterator zero_te
 
 auto tableau::satisfiable_evaluation_step_zero_terms_F(terms_t::iterator zero_terms_F_it) -> bool
 {
-    if(zero_terms_F_it == zero_terms_F_.end()) // all non-zero terms (a != 0) has been evaluated
+    if(zero_terms_F_it == zero_terms_F_.end()) // all non-zero terms (b != 0) has been evaluated
     {
         return true;
     }
