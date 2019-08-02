@@ -48,11 +48,11 @@ void handle_error(pplx::task<void>& t)
 
 void PrintFullPath(char* partialPath)
 {
-	char full[_MAX_PATH];
-	if (_fullpath(full, partialPath, _MAX_PATH) != NULL)
-		printf("Full path is: %s\n", full);
-	else
-		printf("Invalid path\n");
+//    char full[_MAX_PATH];
+//    if (_fullpath(full, partialPath, _MAX_PATH) != NULL)
+//		printf("Full path is: %s\n", full);
+//	else
+//		printf("Invalid path\n");
 }
 
 void microservice_controller::handle_get(http_request message)
@@ -102,8 +102,8 @@ void microservice_controller::handle_get(http_request message)
 		std::string str((std::istreambuf_iterator<char>(t)),
 			std::istreambuf_iterator<char>());
 
-		utility::string_t body = utility::conversions::to_string_t(str);
-        message.reply(status_codes::OK, body, L"text/html");
+        utility::string_t body = utility::conversions::to_string_t(str);
+        message.reply(status_codes::OK, body, U("text/html"));
 	}
 	else if (x == U("/main.js"))
 	{
@@ -111,8 +111,8 @@ void microservice_controller::handle_get(http_request message)
 		std::string str((std::istreambuf_iterator<char>(t)),
 			std::istreambuf_iterator<char>());
 
-		utility::string_t body = utility::conversions::to_string_t(str);
-        message.reply(status_codes::OK, body, L"text/javascript");
+        utility::string_t body = utility::conversions::to_string_t(str);
+        message.reply(status_codes::OK, body, U("text/javascript"));
 	}
 	else if (x == U("/chevrotain.js"))
 	{
@@ -120,8 +120,8 @@ void microservice_controller::handle_get(http_request message)
 		std::string str((std::istreambuf_iterator<char>(t)),
 			std::istreambuf_iterator<char>());
 
-		utility::string_t body = utility::conversions::to_string_t(str);
-        message.reply(status_codes::OK, body, L"text/javascript");
+        utility::string_t body = utility::conversions::to_string_t(str);
+        message.reply(status_codes::OK, body, U("text/javascript"));
 	}
 	else
 	{
