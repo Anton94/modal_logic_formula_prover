@@ -399,10 +399,13 @@ function formula_to_json(formula) {
     formula_traverse_top_to_bottom(simplified, NEG_OPERATIONS, remove_double_negations);
     formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation[Operations.formula.CONTACT]]), decompose_contant_on_Tdis);
 
-
-    service = new http_service();
-    service.post(JSON.stringify(simplified));
     return simplified;
+}
+
+function is_satisfied(formula) {
+    parsed_formula = formula_to_json;
+    service = new http_service();
+    service.post(JSON.stringify(parsed_formula));
 }
 
 // Run the func for all objects which name comes up in the filter_names.
@@ -565,20 +568,10 @@ function decompose_equivalency(node) {
 
 
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-    module.exports = {formula_to_json};
+    module.exports = {formula_to_json, is_satisfied};
 }
 
 // (<=((a*b)+c, (b*m+c)) | C(a,b)) & C(b,m)
 // <=(a,b)<->C(a,b)-><=(m,b)
 
 // bug ! is front does not do nything
-
-
-
-/// JavaScript 
-class HttpController {
-
-}
-
-
-

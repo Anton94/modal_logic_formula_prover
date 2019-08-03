@@ -1,7 +1,7 @@
 require('./spec_helper.js');
 
 describe("add suite", function () {
-	var parser = require('../src/resources/formula_parser.js');
+	var parser = require('../src/resources/main.js');
 	var formulas_map = require('./formulas_map.js');
 
     beforeEach(function () {
