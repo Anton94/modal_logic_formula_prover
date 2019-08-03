@@ -1,17 +1,10 @@
 ﻿#include "microservice_controller.h"
 
 #include <string>
-#include <fstream>
-#include <streambuf>
-#include <sstream>
-
-//#include <windows.h>
-#include <string>
 #include <iostream>
 
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/lexical_cast.hpp>
 
 #include "nlohmann_json/json.hpp"
 
@@ -61,13 +54,12 @@ void microservice_controller::handle_get(http_request message)
 	if (boost::filesystem::exists(relative_file))
 	{
 		auto content_type = U("application/octet-stream");
-		//boost::filesystem::path ext = file_path.extension;
-		auto x = boost::filesystem::extension(relative_file);
-		if (boost::filesystem::extension(relative_file).compare(".html") == 0)
+		auto ext = boost::filesystem::extension(relative_file);
+		if (ext.compare(".html") == 0)
 		{
 			content_type = U("text/html");
 		}
-		else if (boost::filesystem::extension(relative_file).compare(".js") == 0)
+		else if (ext.compare(".js") == 0)
 		{
 			content_type = U("text/javascript");
 		}
@@ -76,11 +68,11 @@ void microservice_controller::handle_get(http_request message)
 
 		concurrency::streams::fstream::open_istream(file_name_t, std::ios::in)
 			.then([=](concurrency::streams::istream is) {
-			message.reply(status_codes::OK, is, content_type)
-				.then([](pplx::task<void> t) {
-				handle_error(t);
-			});
-		})
+				message.reply(status_codes::OK, is, content_type)
+					.then([](pplx::task<void> t) {
+						handle_error(t);
+				});
+			})
 			.then([=](pplx::task<void> t) {
 			try
 			{
@@ -103,6 +95,7 @@ void microservice_controller::handle_get(http_request message)
 void microservice_controller::handle_post(http_request message)
 {
 	ucout << message.to_string() << std::endl;
+	// Assume that our application has only one POST request.
 	message.content_ready()
 		.then([=](web::http::http_request request) {
 		request.extract_string(true).then([=](string_t res) {
