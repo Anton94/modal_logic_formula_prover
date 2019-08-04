@@ -24,3 +24,5 @@ add_subdirectory (rest_server)
 add_subdirectory (tests)
 
 file(COPY client/src DESTINATION client)
+#NTODO: only copy these if in dev mode.
+file(COPY client/e2e/views DESTINATION client/src)

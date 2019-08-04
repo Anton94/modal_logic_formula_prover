@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!--script src="https://unpkg.com/chevrotain/lib/chevrotain.js"></script-->
+		<script src="../libs/chevrotain.js"></script>
+		<script src="../libs/jquery.min.js"></script>
+		<script src="../resources/main.js"></script>
+		<script>
+			function update_output(result) {
+				document.getElementById("output").innerHTML = result;
+			}
+			function prove(formula) {
+				is_satisfied(formula, update_output)
+					.done(function( data ) {
+	                	update_output(data);
+	            });
+				
+			}
+		</script>
+		<style>
+			code {
+				font-size: 15px;
+			}
+			label {
+				font-size: 15px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="formula_input">
+			<input id="formula_field"/>
+			<button id="proveBtn" onclick="prove(document.getElementById('formula_field').value)">Prove</button>
+			<button id="clearBtn" onclick="document.getElementById('formula_output').innerHTML = ''">Clear</button>
+		</div>
+		<div id="formula_output">
+			<pre id="output"></pre>
+		</div>
+	</body>
+</html>

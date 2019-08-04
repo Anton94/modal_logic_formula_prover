@@ -108,7 +108,7 @@ void microservice_controller::handle_post(http_request message)
             const auto is_satisfiable = mgr.is_satisfiable(out_evaluations);
             string_t msg = string_t(U("Satisfiable? ")) +(is_satisfiable ? U("true") : U("false"));
             std::stringstream out_evaluations_msg;
-            out_evaluations_msg << "Evaluations: \n" << out_evaluations;
+            out_evaluations_msg << std::endl << "Evaluations: \n" << out_evaluations;
             msg.append(utility::conversions::to_string_t(out_evaluations_msg.str()));
 
             ucout << msg << std::endl;
@@ -118,6 +118,18 @@ void microservice_controller::handle_post(http_request message)
 				.then([](pplx::task<void> t) {
 				handle_error(t);
 			});
+		})
+		.then([=](pplx::task<void> t) {
+			try
+			{
+				t.get();
+			}
+			catch (...)
+			{
+				// opening the file (open_istream) failed.
+				// Reply with an error.
+				message.reply(status_codes::InternalError).then([](pplx::task<void> t) { handle_error(t); });
+			}
 		});
 	});
 }

@@ -376,10 +376,7 @@ class http_service {
 
     post(formula) {
         var IP_ADDRESS = "http://localhost:34567/satisfy";
-        $.post( IP_ADDRESS, formula )
-            .done(function( data ) {
-              console.log(data);//  alert( "Data Loaded: " + data );
-            });
+        return $.post( IP_ADDRESS, formula );
     }
 }
 
@@ -403,9 +400,9 @@ function formula_to_json(formula) {
 }
 
 function is_satisfied(formula) {
-    parsed_formula = formula_to_json;
+    parsed_formula = formula_to_json(formula);
     service = new http_service();
-    service.post(JSON.stringify(parsed_formula));
+    return service.post(JSON.stringify(parsed_formula));
 }
 
 // Run the func for all objects which name comes up in the filter_names.

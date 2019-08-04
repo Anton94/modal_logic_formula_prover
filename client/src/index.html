@@ -7,7 +7,10 @@
 		<script src="./resources/main.js"></script>
 		<script>
 			function prove(formula) {
-				is_satisfied();
+				is_satisfied(formula)
+					.done(function( data ) {
+	                    console.log(data);//  alert( "Data Loaded: " + data );
+	            	});
 				document.getElementById("output").innerHTML = JSON.stringify(formula_to_json(formula), undefined, 3) + "\n\n";
 				document.getElementById("output").innerHTML += JSON.stringify(parse(formula).cst, undefined, 3);
 			}
@@ -24,7 +27,7 @@
 	<body>
 		<div id="formula_input">
 			<input id="formula_field"/>
-			<button id="proveBtn" onclick="prove(document.getElementById('formula').value)">Prove</button>
+			<button id="proveBtn" onclick="prove(document.getElementById('formula_field').value)">Prove</button>
 		</div>
 		<div id="formula_output">
 			<pre id="output"></pre>
