@@ -130,6 +130,49 @@ auto formula_mgr::is_satisfiable(variable_to_evaluation_map_t& out_evaluations) 
     return false;
 }
 
+auto formula_mgr::does_evaluates_to_true(const variable_to_evaluation_map_t& evaluations) -> bool
+{
+    variables_mask_t variables_mask(variables_.size());
+    for(const auto& variable_evaluation : evaluations)
+    {
+        const auto& name = variable_evaluation.first;
+        const auto it = variable_to_id_.find(name);
+        if(it == variable_to_id_.end())
+        {
+            error() << "The variable " << name << " is not used in the formula: " << f_;
+            return false;
+        }
+        const auto id = it->second;
+
+        variables_mask.set(id, true);
+    }
+
+    variables_evaluations_block evaluation_block(variables_mask);
+    auto& evaluation_block_evaluations = evaluation_block.get_evaluations();
+    for(const auto& variable_evaluation : evaluations)
+    {
+        const auto& name = variable_evaluation.first;
+        const auto& evaluation = variable_evaluation.second;
+        const auto it = variable_to_id_.find(name);
+        assert(it != variable_to_id_.end());
+        const auto id = it->second;
+
+        evaluation_block_evaluations.set(id, evaluation);
+    }
+
+    trace() << "Trying to evaluate " << f_ << " to constant true with:";
+    print(trace().get_buff(), evaluation_block);
+
+    if(f_.does_evaluate_to_true(evaluation_block))
+    {
+        trace() << "    ... success";
+        return true;
+    }
+
+    trace() << "    ... fail";
+    return false;
+}
+
 void formula_mgr::clear()
 {
     f_.clear();

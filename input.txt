@@ -1,0 +1,52 @@
+{
+    "name": "conjunction",
+    "value": [
+        {
+            "name": "disjunction",
+            "value": [
+                {
+                    "name": "less",
+                    "value": [
+                        {
+                            "name": "string",
+                            "value": "a"
+                        },
+                        {
+                            "name": "string",
+                            "value": "b"
+                        }
+                    ]
+                },
+                {
+                    "name": "negation",
+                    "value": {
+                        "name": "less",
+                        "value": [
+                            {
+                                "name": "string",
+                                "value": "a"
+                            },
+                            {
+                                "name": "string",
+                                "value": "b"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "name": "contact",
+            "value": [
+                {
+                    "name": "string",
+                    "value": "f"
+                },
+                {
+                    "name": "string",
+                    "value": "h"
+                }
+            ]
+        }
+    ]
+} 

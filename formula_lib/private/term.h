@@ -60,7 +60,7 @@ public:
         term* t_{nullptr};
     };
 
-    auto evaluate(const variables_evaluations_block& evaluation_block) const -> evaluation_result;
+    auto evaluate(const variables_evaluations_block& evaluation_block, bool skip_subterm_creation = false) const -> evaluation_result;
 
     enum class operation_type : char
     {
@@ -106,10 +106,10 @@ private:
     // creats a term internal node with the given childs(if any). allowed operations are star, union and
     // intersection
     // the user must free the created node!
-    auto create_internal_node(operation_t op, term* left = nullptr, term* right = nullptr) const -> term*;
+    auto create_internal_node(operation_t op, bool skip_subterm_creation, term* left = nullptr, term* right = nullptr) const -> term*;
     // creats a term variable/leaf node
     // the user must free the created node!
-    auto create_variable_node(size_t variable_id) const -> term*;
+    auto create_variable_node(size_t variable_id, bool skip_subterm_creation) const -> term*;
 
     void free();
 

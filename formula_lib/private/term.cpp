@@ -170,7 +170,7 @@ auto term::evaluate(const full_variables_evaluations_t& variable_evaluations) co
     }
 }
 
-auto term::evaluate(const variables_evaluations_block& evaluation_block) const -> evaluation_result
+auto term::evaluate(const variables_evaluations_block& evaluation_block, bool skip_subterm_creation) const -> evaluation_result
 {
     using res_type = evaluation_result::result_type;
     switch(op_)
@@ -181,13 +181,13 @@ auto term::evaluate(const variables_evaluations_block& evaluation_block) const -
             return {res_type::constant_false, nullptr};
         case operation_t::union_:
         {
-            auto res_left = childs_.left->evaluate(evaluation_block);
+            auto res_left = childs_.left->evaluate(evaluation_block, skip_subterm_creation);
             if(res_left.is_constant_true())
             {
                 return {res_type::constant_true, nullptr};
             }
 
-            auto res_right = childs_.right->evaluate(evaluation_block);
+            auto res_right = childs_.right->evaluate(evaluation_block, skip_subterm_creation);
             if(res_right.is_constant_true())
             {
                 res_left.free();
@@ -212,18 +212,18 @@ auto term::evaluate(const variables_evaluations_block& evaluation_block) const -
 
             assert(res_left.type == res_type::term && res_right.type == res_type::term);
 
-            auto t = create_internal_node(op_, res_left.release(), res_right.release());
+            auto t = create_internal_node(op_, skip_subterm_creation, res_left.release(), res_right.release());
             return {res_type::term, t};
         }
         case operation_t::intersaction_:
         {
-            auto res_left = childs_.left->evaluate(evaluation_block);
+            auto res_left = childs_.left->evaluate(evaluation_block, skip_subterm_creation);
             if(res_left.is_constant_false())
             {
                 return {res_type::constant_false, nullptr};
             }
 
-            auto res_right = childs_.right->evaluate(evaluation_block);
+            auto res_right = childs_.right->evaluate(evaluation_block, skip_subterm_creation);
             if(res_right.is_constant_false())
             {
                 res_left.free();
@@ -248,12 +248,12 @@ auto term::evaluate(const variables_evaluations_block& evaluation_block) const -
 
             assert(res_left.type == res_type::term && res_right.type == res_type::term);
 
-            auto t = create_internal_node(op_, res_left.release(), res_right.release());
+            auto t = create_internal_node(op_, skip_subterm_creation, res_left.release(), res_right.release());
             return {res_type::term, t};
         }
         case operation_t::star_:
         {
-            auto res_child = childs_.left->evaluate(evaluation_block);
+            auto res_child = childs_.left->evaluate(evaluation_block, skip_subterm_creation);
             if(res_child.is_constant())
             {
                 const auto negated_constant = res_child.type == res_type::constant_true
@@ -263,7 +263,7 @@ auto term::evaluate(const variables_evaluations_block& evaluation_block) const -
             }
             assert(res_child.type == res_type::term);
 
-            auto t = create_internal_node(op_, res_child.release());
+            auto t = create_internal_node(op_, skip_subterm_creation, res_child.release());
             return {res_type::term, t};
         }
         case operation_t::variable_:
@@ -278,7 +278,7 @@ auto term::evaluate(const variables_evaluations_block& evaluation_block) const -
                 return {type, nullptr};
             }
 
-            auto t = create_variable_node(variable_id_);
+            auto t = create_variable_node(variable_id_, skip_subterm_creation);
             return {res_type::term, t};
         }
         default:
@@ -509,9 +509,14 @@ void term::construct_variables()
     }
 }
 
-auto term::create_internal_node(operation_t op, term* left, term* right) const -> term*
+auto term::create_internal_node(operation_t op, bool skip_subterm_creation, term* left, term* right) const -> term*
 {
     assert(op == operation_t::star_ || op == operation_t::union_ || op == operation_t::intersaction_);
+
+    if(skip_subterm_creation)
+    {
+        return nullptr;
+    }
 
     auto t = new(std::nothrow) term(formula_mgr_);
     assert(t);
@@ -525,8 +530,13 @@ auto term::create_internal_node(operation_t op, term* left, term* right) const -
     return t;
 }
 
-auto term::create_variable_node(size_t variable_id) const -> term*
+auto term::create_variable_node(size_t variable_id, bool skip_subterm_creation) const -> term*
 {
+    if(skip_subterm_creation)
+    {
+        return nullptr;
+    }
+
     auto t = new(std::nothrow) term(formula_mgr_);
     assert(t);
 

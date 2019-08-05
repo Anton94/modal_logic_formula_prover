@@ -1,7 +1,8 @@
 #pragma once
 
-#include "types.h"
 #include "nlohmann_json/json.hpp"
+#include "types.h"
+#include "variables_evaluations_block.h"
 
 #include <ostream>
 
@@ -25,6 +26,11 @@ public:
 
     auto build(json& f) -> bool;
     auto evaluate(const full_variables_evaluations_t& variable_evaluations) const -> bool;
+
+    // given an evaluation of a subset of variables it checks if the formula is evaluated to constant true
+    // if it's evaluated to a subformula or constant false returns false
+    auto does_evaluate_to_true(const variables_evaluations_block& evaluation_block) const -> bool;
+
     void clear();
 
     enum class operation_type : char
