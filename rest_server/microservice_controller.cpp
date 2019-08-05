@@ -95,43 +95,88 @@ void microservice_controller::handle_get(http_request message)
 void microservice_controller::handle_post(http_request message)
 {
 	ucout << message.to_string() << std::endl;
-	// Assume that our application has only one POST request.
-	message.content_ready()
-		.then([=](web::http::http_request request) {
-		request.extract_string(true).then([=](string_t res) {
-			ucout << web::uri().decode(res) << std::endl;
-			n_json f_json = n_json::parse(utility::conversions::to_utf8string(web::uri().decode(res)));
-			formula_mgr mgr;
-            mgr.build(f_json);
+	
+	std::string message_path = utility::conversions::to_utf8string(message.absolute_uri().path());
 
-            human_readable_variables_evaluations_t out_evaluations;
-            const auto is_satisfiable = mgr.is_satisfiable(out_evaluations);
-            string_t msg = string_t(U("Satisfiable? ")) +(is_satisfiable ? U("true") : U("false"));
-            std::stringstream out_evaluations_msg;
-            out_evaluations_msg << std::endl << "Evaluations: \n" << out_evaluations;
-            msg.append(utility::conversions::to_string_t(out_evaluations_msg.str()));
+	if (boost::starts_with(message_path, "/satisfy"))
+	{
+		message.content_ready()
+			.then([=](web::http::http_request request) {
+			request.extract_string(true).then([=](string_t res) {
+				ucout << web::uri().decode(res) << std::endl;
+				n_json f_json = n_json::parse(utility::conversions::to_utf8string(web::uri().decode(res)));
+				formula_mgr mgr;
+				mgr.build(f_json);
 
-            ucout << msg << std::endl;
+				human_readable_variables_evaluations_t out_evaluations;
+				const auto is_satisfiable = mgr.is_satisfiable(out_evaluations);
+				string_t msg = string_t(U("Satisfiable? ")) + (is_satisfiable ? U("true") : U("false"));
+				std::stringstream out_evaluations_msg;
+				out_evaluations_msg << std::endl << "Evaluations: \n" << out_evaluations;
+				msg.append(utility::conversions::to_string_t(out_evaluations_msg.str()));
 
-			// run the satisfier here
-			message.reply(status_codes::OK, msg)
-				.then([](pplx::task<void> t) {
-				handle_error(t);
+				ucout << msg << std::endl;
+
+				// run the satisfier here
+				message.reply(status_codes::OK, msg)
+					.then([](pplx::task<void> t) {
+					handle_error(t);
+				});
+			})
+			.then([=](pplx::task<void> t) {
+				try
+				{
+					t.get();
+				}
+				catch (...)
+				{
+					// opening the file (open_istream) failed.
+					// Reply with an error.
+					message.reply(status_codes::InternalError).then([](pplx::task<void> t) { handle_error(t); });
+				}
 			});
-		})
-		.then([=](pplx::task<void> t) {
-			try
-			{
-				t.get();
-			}
-			catch (...)
-			{
-				// opening the file (open_istream) failed.
-				// Reply with an error.
-				message.reply(status_codes::InternalError).then([](pplx::task<void> t) { handle_error(t); });
-			}
 		});
-	});
+		return;
+	}
+
+	if (boost::starts_with(message_path, "/build_formula")) {
+		message.content_ready()
+			.then([=](web::http::http_request request) {
+			request.extract_string(true).then([=](string_t res) {
+				ucout << web::uri().decode(res) << std::endl;
+				n_json f_json = n_json::parse(utility::conversions::to_utf8string(web::uri().decode(res)));
+				formula_mgr mgr;
+				mgr.build(f_json);
+
+				std::stringstream built_formula;
+				built_formula << mgr;
+
+				string_t msg = utility::conversions::to_string_t(built_formula.str());
+
+				ucout << msg << std::endl;
+				// run the satisfier here
+				message.reply(status_codes::OK, msg)
+					.then([](pplx::task<void> t) {
+					handle_error(t);
+				});
+			})
+			.then([=](pplx::task<void> t) {
+				try
+				{
+					t.get();
+				}
+				catch (...)
+				{
+					// opening the file (open_istream) failed.
+					// Reply with an error.
+					message.reply(status_codes::InternalError).then([](pplx::task<void> t) { handle_error(t); });
+				}
+			});
+		});
+		return;
+	}
+
+	message.reply(status_codes::BadGateway);
 }
 
 void microservice_controller::handle_put(http_request message)
