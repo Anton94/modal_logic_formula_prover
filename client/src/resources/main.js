@@ -346,9 +346,6 @@ function parse(formula) {
     // any top level rule may be used as an entry point
     const cst = parser.disjunction();
 
-    console.log("Lex errors: " + lexResult.errors)
-    console.log("Parse errors: " + parser.errors)
-
     return {
         cst: cst,
         lexErrors: lexResult.errors,
@@ -387,6 +384,13 @@ class http_service {
 
 
 function formula_to_json(formula) {
+    parsed = parse(formula);
+    if ((parsed.lexErrors && parsed.lexErrors.length != 0) || 
+        (parsed.parseErrors && parsed.parseErrors.length != 0)) {
+        console.log("Lex errors: " + parsed.lexErrors);
+        console.log("Parse errors: " + parsed.parseErrors);
+        throw "The formula is not in the right format.";
+    }
     simplified = simplify(parse(formula).cst);
     //formula_traverse_top_to_bottom(simplified, new Set(["less"]), remove_equal_TDis_in_less);
     formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation[Operations.formula.LESS]]), decompose_less);

@@ -473,7 +473,7 @@ TEST_CASE("satisfiable 8", "[satisfiability]")
 
 TEST_CASE("satisfiable 9", "[satisfiability]")
 {
-    // C(a, *b) & ~C(a, b + h)
+    // C(a, -b) & ~C(a, b + h)
     is_satisfiable(
         R"({
            "name": "conjunction",
@@ -526,7 +526,7 @@ TEST_CASE("satisfiable 9", "[satisfiability]")
 
 TEST_CASE("satisfiable 10", "[satisfiability]")
 {
-    // C(a - c, (*b) + h) & ~C(a - c, (*b) + h)
+    // C(a * c, (-b) + h) & ~C(a * c, (-b) + h)
     is_satisfiable(
         R"({
            "name": "conjunction",
@@ -1068,7 +1068,7 @@ TEST_CASE("satisfiable 16", "[satisfiability]")
 
 TEST_CASE("satisfiable 17", "[satisfiability]")
 {
-    // (<=(a,b) & (~(<=(a,b)))) | (C(a,b) & (~C(a,b))))
+    // (<=(a,b) & (~(<=(a,b)))) | (C(a,b) & (~C(a,b)))
     is_satisfiable(
         R"({
            "name": "disjunction",
@@ -1252,7 +1252,7 @@ TEST_CASE("satisfiable 18", "[satisfiability]")
 
 TEST_CASE("satisfiable 18.1", "[satisfiability]")
 {
-    // (<=(a,b) & (~(<=(a,b)))) | (C(a,b) & (~C(-b,b))))
+    // (<=(a,b) & (~(<=(a,b)))) | (C(a,b) & (~C(-b,b)))
     is_satisfiable(
         R"({
            "name": "disjunction",
@@ -2063,7 +2063,7 @@ TEST_CASE("satisfiable with constants 7", "[satisfiability]")
 
 TEST_CASE("satisfiable with constants 8", "[satisfiability]")
 {
-    // C(a, *b) & F
+    // C(a, -b) & F
     is_satisfiable(
         R"({
            "name": "conjunction",
@@ -3428,7 +3428,7 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
 
 TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact using same terms 1", "[satisfiability]")
 {
-    // C(a * -d, b * -c) & ( (C(a * -d, d) & <=(a,d)) | <=(b,c)))
+    // C(a * -d, b * -c) & ( (C(a * -d, d) & <=(a,d)) | <=(b,c))
     is_satisfiable(
         R"({
            "name": "conjunction",
