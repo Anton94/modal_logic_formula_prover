@@ -21,7 +21,7 @@ std::ostream& operator<<(std::ostream& out, const variables_t& variables)
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const human_readable_variables_evaluations_t& variables_evaluations)
+std::ostream& operator<<(std::ostream& out, const variable_to_evaluation_map_t& variables_evaluations)
 {
     for(const auto& variable_evaluation : variables_evaluations)
     {

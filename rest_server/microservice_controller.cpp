@@ -108,7 +108,7 @@ void microservice_controller::handle_post(http_request message)
 				formula_mgr mgr;
 				mgr.build(f_json);
 
-				human_readable_variables_evaluations_t out_evaluations;
+            variable_to_evaluation_map_t out_evaluations;
 				const auto is_satisfiable = mgr.is_satisfiable(out_evaluations);
 				string_t msg = string_t(U("Satisfiable? ")) + (is_satisfiable ? U("true") : U("false"));
 				std::stringstream out_evaluations_msg;

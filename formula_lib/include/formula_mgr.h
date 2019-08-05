@@ -29,7 +29,7 @@ public:
     auto brute_force_evaluate() const -> bool;
 
     // Checks if the formula is satisfiable or not
-    auto is_satisfiable(human_readable_variables_evaluations_t& out_evaluations) -> bool;
+    auto is_satisfiable(variable_to_evaluation_map_t& out_evaluations) -> bool;
 
     void clear();
 

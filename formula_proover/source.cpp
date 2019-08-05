@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
         const auto variables = f.get_variables();
         info() << "Variables: " << variables;
 
-        human_readable_variables_evaluations_t out_evalutaions;
+        variable_to_evaluation_map_t out_evalutaions;
         const auto res = f.is_satisfiable(out_evalutaions);
         info() << "The formula is " << (res ? "" : "not ") << "satisfiable.";
         if(res)

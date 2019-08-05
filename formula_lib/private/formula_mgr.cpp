@@ -109,7 +109,7 @@ auto formula_mgr::brute_force_evaluate() const -> bool
     return has_satisfiable_evaluation(f_, evaluations, evaluations.begin());
 }
 
-auto formula_mgr::is_satisfiable(human_readable_variables_evaluations_t& out_evaluations) -> bool
+auto formula_mgr::is_satisfiable(variable_to_evaluation_map_t& out_evaluations) -> bool
 {
     variables_evaluations_block result_evaluation_block(variables_mask_t{});
     if(t_.is_satisfiable(f_, result_evaluation_block))

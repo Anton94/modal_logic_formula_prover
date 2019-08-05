@@ -10,7 +10,7 @@ auto is_satisfiable = [](const json& formula_json, bool expected_result) {
     formula_mgr f;
     CHECK(f.build(copy_f));
 
-    human_readable_variables_evaluations_t out_evaluations;
+    variable_to_evaluation_map_t out_evaluations;
     CHECK(f.is_satisfiable(out_evaluations) == expected_result);
 };
 
