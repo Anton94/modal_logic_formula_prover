@@ -6,13 +6,15 @@
 		<script src="../libs/jquery.min.js"></script>
 		<script src="../resources/main.js"></script>
 		<script>
-			function update_output(result) {
-				document.getElementById("output").innerHTML = result;
-			}
 			function prove(formula) {
-				is_satisfied(formula)
+				build_formula(formula)
 					.done(function( data ) {
-	                	update_output(data);
+						parsed = formula_to_json(formula);
+						if (json_to_formula(parsed).replace(/\s/g,'') === data.replace(/\s/g,'')) {
+							document.getElementById("output").innerHTML = "true";
+						} else {
+							document.getElementById("output").innerHTML = "false";
+						}
 	            });
 				
 			}

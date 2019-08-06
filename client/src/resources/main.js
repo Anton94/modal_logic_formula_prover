@@ -360,19 +360,14 @@ function parse(formula) {
 /// START OF HTTP SERVICE
 
 class http_service {
-    get(formula) {
+
+    is_satisfied(formula) {
         var IP_ADDRESS = "http://localhost:34567/satisfy";
-        $.ajax({
-         url: IP_ADDRESS,
-         data: {formula: formula},
-         type: "GET",
-         beforeSend: function(xhr) {xhr.setRequestHeader('Access-Control-Allow-Origin', '*');},
-         success: function(data) { alert('Success!' + data); }
-      });
+        return $.post( IP_ADDRESS, formula );
     }
 
-    post(formula) {
-        var IP_ADDRESS = "http://localhost:34567/satisfy";
+    build_formula(formula) {
+        var IP_ADDRESS = "http://localhost:34567/build_formula";
         return $.post( IP_ADDRESS, formula );
     }
 }
@@ -380,8 +375,41 @@ class http_service {
 
 
 /// END OF HTTP SERVICE
+function json_to_formula(obj) {
+    if (obj.name === "0" || obj.name === "1" || obj.name === "F" || obj.name === "T") {
+        return obj.name;
+    }
+    if (obj.name === "string") {
+        return obj.value;
+    }
+    if (obj.name === "Tstar") {
+        return "-" + json_to_formula(obj.value);
+    }
+    if (obj.name === "Tor") {
+        return "[" + json_to_formula(obj.value[0]) + "+" + json_to_formula(obj.value[1]) + "]";
+    }
+    if (obj.name === "Tand") {
+        return "[" + json_to_formula(obj.value[0]) + "*" + json_to_formula(obj.value[1]) + "]";
+    }
 
+    if (obj.name === "negation") {
+        return "~" + json_to_formula(obj.value);
+    }
+    if (obj.name === "disjunction") {
+        return "(" +json_to_formula(obj.value[0]) + "|" + json_to_formula(obj.value[1]) + ")";
+    }
+    if (obj.name === "conjunction") {
+        return "(" + json_to_formula(obj.value[0]) + "&" + json_to_formula(obj.value[1]) + ")";
+    }
 
+    if (obj.name === "contact") {
+        return "C(" + json_to_formula(obj.value[0]) + "," + json_to_formula(obj.value[1]) + ")";
+    }
+    if (obj.name === "equal0") {
+        return json_to_formula(obj.value) + "=0";
+    }
+    throw "THERE ARE NO MORE POSSIBLE conversions.";
+}
 
 function formula_to_json(formula) {
     parsed = parse(formula);
@@ -403,10 +431,16 @@ function formula_to_json(formula) {
     return simplified;
 }
 
+function build_formula(formula) {
+    parsed_formula = formula_to_json(formula);
+    service = new http_service();
+    return service.build_formula(JSON.stringify(parsed_formula));
+}
+
 function is_satisfied(formula) {
     parsed_formula = formula_to_json(formula);
     service = new http_service();
-    return service.post(JSON.stringify(parsed_formula));
+    return service.is_satisfied(JSON.stringify(parsed_formula));
 }
 
 // Run the func for all objects which name comes up in the filter_names.
@@ -532,34 +566,37 @@ function decompose_max_two_childs(node) {
             "value": [node.value[i], node.value[i + 1]]
         });
     }
+    if (max_length != node.value.length) {
+        children.push(node.value[max_length]);
+    }
     node.value = children;
     decompose_max_two_childs(node);
 }
 
 function decompose_implication(node) {
-    node.name = symbol_to_explanation["+"];
+    node.name = symbol_to_explanation["|"];
     left_child = {
-        "name": symbol_to_explanation["-"],
+        "name": symbol_to_explanation["~"],
         "value": node.value[0]
     }
     node.value = [left_child, node.value[1]]
 }
 
 function decompose_equivalency(node) {
-    node.name = symbol_to_explanation["+"];
+    node.name = symbol_to_explanation["|"];
     left_child = {
-        "name": symbol_to_explanation["*"],
+        "name": symbol_to_explanation["&"],
         "value": [node.value[0], node.value[1]]
     }
     right_child = {
-        "name": symbol_to_explanation["*"],
+        "name": symbol_to_explanation["&"],
         "value": [
             {
-                "name": symbol_to_explanation["-"],
+                "name": symbol_to_explanation["~"],
                 "value": node.value[0]
             }, 
             {
-                "name": symbol_to_explanation["-"],
+                "name": symbol_to_explanation["~"],
                 "value": node.value[1]
             }
         ]

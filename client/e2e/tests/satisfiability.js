@@ -1,21 +1,18 @@
-var log4js = require('log4js');
-
 describe('#is_satisfied', function() {
 
     beforeEach(function () {
     	browser.ignoreSynchronization = true;
 		browser.get('http://localhost:34567/views/satisfiability_test.html');
-		logger = log4js.getLogger();
     });
 
-    function is_satisfied(formula, expect=true) {
+    function is_satisfied(formula, expect=true, timeout=5000) {
     	//element(by.id("formula_field")).sendKeys(Key.chord(Key.CONTROL, 'a'));
     	element(by.id("formula_field")).clear().sendKeys(formula);
 		element(by.id("proveBtn")).click();
 
 		var until = protractor.ExpectedConditions;
 		// Waits for the element with id 'output' to contain the text 'neeeded'.
-		browser.wait(until.textToBePresentInElement($('#formula_output'), 'Satisfiable? ' + expect), 5000, "Wait timed out for: " + formula + " to be " + expect);
+		browser.wait(until.textToBePresentInElement($('#formula_output'), 'Satisfiable? ' + expect), timeout, "Wait timed out for: " + formula + " to be " + expect);
 
 		element(by.id("clearBtn")).click();
     }
@@ -73,5 +70,10 @@ describe('#is_satisfied', function() {
 		is_satisfied("~C(a * -d, b * -c) & ( (~C(a * -d, d * -c) & (~<=(a,d) & ~<=(d,c))) | (~<=(b,c) & ~<=(a,d)) )", false);
 		is_satisfied("~C(a * -d, a * -d) & ~<=(a,d)", false);
 		is_satisfied("~<=(a,d) & ~C(a * -d, a * -d)", false);
+	});
+
+	it(' THEN the formula:  is satisfied', function() {
+		is_satisfied("C(a,a) & C(d, d) & <=(a * d, b) & ~C(a,d) & ~<=(b, a)", true, 10000);
+		is_satisfied("C(a,a) & C(d, d) & <=(a * d, b) & ~C(a,d) & <=(b, a)", false, 10000);
 	});
 });
