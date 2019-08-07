@@ -1808,7 +1808,6 @@ TEST_CASE("satisfiable evaluation of path 2", "[satisfiability]")
         false);
 }
 
-
 TEST_CASE("satisfiable evaluation of path 3", "[satisfiability]")
 {
     // ~C(x * -z, (b * -k) * c) & (~C(-b,b) & (~<=(x, z) & ~<=(b, k)))
@@ -1941,6 +1940,249 @@ TEST_CASE("satisfiable evaluation of path 3", "[satisfiability]")
             ]
         })"_json,
         true);
+}
+
+TEST_CASE("satisfiable evaluation of path 4", "[satisfiability]")
+{
+    // (C(a,a) & C(d,d)) & ~C(a,d)
+    is_satisfiable(
+        R"({
+            "name": "conjunction",
+            "value": [
+               {
+                  "name": "conjunction",
+                  "value": [
+                     {
+                        "name": "contact",
+                        "value": [
+                           {
+                              "name": "string",
+                              "value": "a"
+                           },
+                           {
+                              "name": "string",
+                              "value": "a"
+                           }
+                        ]
+                     },
+                     {
+                        "name": "contact",
+                        "value": [
+                           {
+                              "name": "string",
+                              "value": "d"
+                           },
+                           {
+                              "name": "string",
+                              "value": "d"
+                           }
+                        ]
+                     }
+                  ]
+               },
+               {
+                  "name": "negation",
+                  "value": {
+                     "name": "contact",
+                     "value": [
+                        {
+                           "name": "string",
+                           "value": "a"
+                        },
+                        {
+                           "name": "string",
+                           "value": "d"
+                        }
+                     ]
+                  }
+               }
+            ]
+        })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable evaluation of path 5", "[satisfiability]")
+{
+    // ((C(a,a) & C(d,d)) & ~C(a,d)) & ((n * m) * -o = 0)
+    is_satisfiable(
+        R"({
+            "name": "conjunction",
+            "value": [
+               {
+                  "name": "conjunction",
+                  "value": [
+                     {
+                        "name": "conjunction",
+                        "value": [
+                           {
+                              "name": "contact",
+                              "value": [
+                                 {
+                                    "name": "string",
+                                    "value": "a"
+                                 },
+                                 {
+                                    "name": "string",
+                                    "value": "a"
+                                 }
+                              ]
+                           },
+                           {
+                              "name": "contact",
+                              "value": [
+                                 {
+                                    "name": "string",
+                                    "value": "d"
+                                 },
+                                 {
+                                    "name": "string",
+                                    "value": "d"
+                                 }
+                              ]
+                           }
+                        ]
+                     },
+                     {
+                        "name": "negation",
+                        "value": {
+                           "name": "contact",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "a"
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "d"
+                              }
+                           ]
+                        }
+                     }
+                  ]
+               },
+               {
+                  "name": "equal0",
+                  "value": {
+                     "name": "Tand",
+                     "value": [
+                        {
+                           "name": "Tand",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "n"
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "m"
+                              }
+                           ]
+                        },
+                        {
+                           "name": "Tstar",
+                           "value": {
+                              "name": "string",
+                              "value": "o"
+                           }
+                        }
+                     ]
+                  }
+               }
+            ]
+        })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable evaluation of path 6", "[satisfiability]")
+{
+    // (C(a,a) & C(d,d)) & (~C(a,d) & ((m*n)*-o = 0)
+    is_satisfiable(
+        R"({
+            "name": "conjunction",
+            "value": [
+               {
+                  "name": "conjunction",
+                  "value": [
+                     {
+                        "name": "contact",
+                        "value": [
+                           {
+                              "name": "string",
+                              "value": "a"
+                           },
+                           {
+                              "name": "string",
+                              "value": "a"
+                           }
+                        ]
+                     },
+                     {
+                        "name": "contact",
+                        "value": [
+                           {
+                              "name": "string",
+                              "value": "d"
+                           },
+                           {
+                              "name": "string",
+                              "value": "d"
+                           }
+                        ]
+                     }
+                  ]
+               },
+               {
+                  "name": "conjunction",
+                  "value": [
+                     {
+                        "name": "negation",
+                        "value": {
+                           "name": "contact",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "a"
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "d"
+                              }
+                           ]
+                        }
+                     },
+                     {
+                        "name": "equal0",
+                        "value": {
+                           "name": "Tand",
+                           "value": [
+                              {
+                                 "name": "Tand",
+                                 "value": [
+                                    {
+                                       "name": "string",
+                                       "value": "n"
+                                    },
+                                    {
+                                       "name": "string",
+                                       "value": "m"
+                                    }
+                                 ]
+                              },
+                              {
+                                 "name": "Tstar",
+                                 "value": {
+                                    "name": "string",
+                                    "value": "o"
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  ]
+               }
+            ]
+        })"_json,
+        false);
 }
 
 TEST_CASE("satisfiable with constants 1", "[satisfiability]")
