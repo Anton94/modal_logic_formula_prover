@@ -10,7 +10,7 @@
 				build_formula(formula)
 					.done(function( data ) {
 						parsed = formula_to_json(formula);
-						if (json_to_formula(parsed).replace(/\s/g,'') === data.replace(/\s/g,'')) {
+						if (json_to_formula(parsed.parsed_formula).replace(/\s/g,'') === data.replace(/\s/g,'')) {
 							document.getElementById("output").innerHTML = "true";
 						} else {
 							document.getElementById("output").innerHTML = "false";

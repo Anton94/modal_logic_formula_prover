@@ -22,7 +22,7 @@ describe("add suite", function () {
 
 		var allFormulas = Object.keys(formulas_map.mock_json_by_formula);
 		for(var i = 0; i < allFormulas.length; ++i) {
-  			expect(parser.formula_to_json(allFormulas[i]))
+  			expect(parser.formula_to_json(allFormulas[i]).parsed_formula)
   				.toDeepEqual(formulas_map.mock_json_by_formula[allFormulas[i]]);	
 		}
 	});

@@ -1,37 +1,16 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<link rel="shortcut icon" type="image/png" href="./img/home-icon.png"/>
-		<script src="./libs/chevrotain.js"></script>
-		<script src="./libs/jquery.min.js"></script>
-		<script src="./resources/main.js"></script>
+		<script src="https://unpkg.com/chevrotain/lib/chevrotain.js"></script>
+		<!--script src="https://unpkg.com/chevrotain/lib/chevrotain.min.js"></script-->
+		<script src="./formula_parser.js"></script>
 		<script>
 			function prove(formula) {
-				document.getElementById("is_satisfied_output").innerHTML = "";
-				document.getElementById("output").innerHTML = "";
-
-				parsed = is_satisfied(formula);
-				if (parsed.hasErrors) {					
-					errorMessage = "";
-					if (parsed.lexErrors.length > 0) {
-						errorMessage += "Lexer Errors: \n";
-						parsed.lexErrors.forEach(
-							function(error) { 
-								errorMessage += JSON.stringify(error, undefined, 3) + "\n";
-							});
-					} else if (parsed.parseErrors.length > 0) {
-						errorMessage += "Parser Errors: \n";
-						parsed.parseErrors.forEach(
-							function(error) { 
-								errorMessage += JSON.stringify(error, undefined, 3) + "\n";
-							});
-					}
-					document.getElementById("output").innerHTML = "Errors:\n\n" + errorMessage;
+				parsed = formula_to_json(formula);
+				if (parsed.hasErrors) {
+					document.getElementById("output").innerHTML = "erorr";
 				} else {
-					parsed.is_satisfied.done(function( data ) {
-		            	document.getElementById("is_satisfied_output").innerHTML = data;
-		            });
-					
+					document.getElementById("is_satisfied_output").innerHTML = parsed.is_satisfied;
 					document.getElementById("output").innerHTML = JSON.stringify(parsed.parsed_formula, undefined, 3) + "\n\n";
 					document.getElementById("output").innerHTML += JSON.stringify(parsed.cst, undefined, 3);
 				}

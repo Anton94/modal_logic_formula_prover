@@ -341,10 +341,13 @@ var res_par = JsonParser;
 
 function parse(formula) {
     const lexResult = JsonLexer.tokenize(formula)
-    // setting a new input will RESET the parser instance's state.
-    parser.input = lexResult.tokens
-    // any top level rule may be used as an entry point
-    const cst = parser.disjunction();
+    cst = null;
+    if (lexResult.errors.length == 0) {
+        // setting a new input will RESET the parser instance's state.
+        parser.input = lexResult.tokens
+        // any top level rule may be used as an entry point
+        cst = parser.disjunction();    
+    }
 
     return {
         cst: cst,
@@ -411,15 +414,17 @@ function json_to_formula(obj) {
     throw "THERE ARE NO MORE POSSIBLE conversions.";
 }
 
-function formula_to_json(formula) {
+function (formula) {
     parsed = parse(formula);
     if ((parsed.lexErrors && parsed.lexErrors.length != 0) || 
         (parsed.parseErrors && parsed.parseErrors.length != 0)) {
         console.log("Lex errors: " + parsed.lexErrors);
         console.log("Parse errors: " + parsed.parseErrors);
-        throw "The formula is not in the right format.";
+        parsed["hasErrors"] = true;
+        return parsed;
     }
-    simplified = simplify(parse(formula).cst);
+
+    simplified = simplify(parsed.cst);
     //formula_traverse_top_to_bottom(simplified, new Set(["less"]), remove_equal_TDis_in_less);
     formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation[Operations.formula.LESS]]), decompose_less);
     formula_traverse_top_to_bottom(simplified, N_ARG_OPERATIONS, decompose_max_two_childs);
@@ -428,19 +433,31 @@ function formula_to_json(formula) {
     formula_traverse_top_to_bottom(simplified, NEG_OPERATIONS, remove_double_negations);
     formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation[Operations.formula.CONTACT]]), decompose_contant_on_Tdis);
 
-    return simplified;
+    parsed["hasErrors"] = false;
+    parsed["parsed_formula"] = simplified;
+    return parsed;
 }
 
 function build_formula(formula) {
-    parsed_formula = formula_to_json(formula);
+    parsed = formula_to_json(formula);
+    if (parsed.hasErrors) {
+        return parsed;
+    }
     service = new http_service();
-    return service.build_formula(JSON.stringify(parsed_formula));
+
+    parsed["build_formula"] = service.build_formula(JSON.stringify(parsed_formula));
+    return parsed;
 }
 
 function is_satisfied(formula) {
-    parsed_formula = formula_to_json(formula);
+    parsed = formula_to_json(formula);
+    if (parsed.hasErrors) {
+        return parsed;
+    }
     service = new http_service();
-    return service.is_satisfied(JSON.stringify(parsed_formula));
+
+    parsed["is_satisfied"] = service.is_satisfied(JSON.stringify(parsed.parsed_formula));
+    return parsed;
 }
 
 // Run the func for all objects which name comes up in the filter_names.

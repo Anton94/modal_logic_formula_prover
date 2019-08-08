@@ -10,7 +10,7 @@
 				document.getElementById("output").innerHTML = result;
 			}
 			function prove(formula) {
-				is_satisfied(formula)
+				is_satisfied(formula).is_satisfied
 					.done(function( data ) {
 	                	update_output(data);
 	            });
