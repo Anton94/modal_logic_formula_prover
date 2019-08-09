@@ -1,0 +1,18 @@
+F = K
+F = L
+F = (F & F)
+F = (F | F)
+F = ~F
+F = t
+F = f
+K = C(T, T)
+L = <=(T, T)
+T = -T
+T = (T * T)
+T = (T + T)
+T = V
+V = 0
+V = 1
+V = a
+V = b
+V = c
