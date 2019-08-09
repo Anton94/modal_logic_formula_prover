@@ -389,10 +389,10 @@ function json_to_formula(obj) {
         return "-" + json_to_formula(obj.value);
     }
     if (obj.name === "Tor") {
-        return "[" + json_to_formula(obj.value[0]) + "+" + json_to_formula(obj.value[1]) + "]";
+        return "(" + json_to_formula(obj.value[0]) + "+" + json_to_formula(obj.value[1]) + ")";
     }
     if (obj.name === "Tand") {
-        return "[" + json_to_formula(obj.value[0]) + "*" + json_to_formula(obj.value[1]) + "]";
+        return "(" + json_to_formula(obj.value[0]) + "*" + json_to_formula(obj.value[1]) + ")";
     }
 
     if (obj.name === "negation") {
