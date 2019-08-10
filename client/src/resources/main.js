@@ -414,7 +414,7 @@ function json_to_formula(obj) {
     throw "THERE ARE NO MORE POSSIBLE conversions.";
 }
 
-function (formula) {
+function formula_to_json(formula) {
     parsed = parse(formula);
     if ((parsed.lexErrors && parsed.lexErrors.length != 0) || 
         (parsed.parseErrors && parsed.parseErrors.length != 0)) {
