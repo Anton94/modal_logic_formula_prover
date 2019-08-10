@@ -108,7 +108,7 @@ void microservice_controller::handle_post(http_request message)
 				formula_mgr mgr;
 				mgr.build(f_json);
 
-				 variable_to_evaluation_map_t out_evaluations;
+				variable_to_evaluation_map_t out_evaluations;
 				const auto is_satisfiable = mgr.is_satisfiable(out_evaluations);
 				string_t msg = string_t(U("Satisfiable? ")) + (is_satisfiable ? U("true") : U("false"));
 				std::stringstream out_evaluations_msg;
@@ -161,6 +161,109 @@ void microservice_controller::handle_post(http_request message)
 				});
 			})
 			.then([=](pplx::task<void> t) {
+				try
+				{
+					t.get();
+				}
+				catch (...)
+				{
+					// opening the file (open_istream) failed.
+					// Reply with an error.
+					message.reply(status_codes::InternalError).then([](pplx::task<void> t) { handle_error(t); });
+				}
+			});
+		});
+		return;
+	}
+
+	if (boost::starts_with(message_path, "/bruteforce_satisfy")) {
+		message.content_ready()
+			.then([=](web::http::http_request request) {
+			request.extract_string(true).then([=](string_t res) {
+				ucout << web::uri().decode(res) << std::endl;
+				n_json f_json = n_json::parse(utility::conversions::to_utf8string(web::uri().decode(res)));
+				formula_mgr mgr;
+				mgr.build(f_json);
+
+				std::stringstream built_formula;
+				built_formula << mgr;
+				// true false -> mgr.brute_force_evaluate();
+				string_t msg = utility::conversions::to_string_t(built_formula.str());
+
+				ucout << msg << std::endl;
+				// run the satisfier here
+				message.reply(status_codes::OK, msg)
+					.then([](pplx::task<void> t) {
+					handle_error(t);
+				});
+			})
+			.then([=](pplx::task<void> t) {
+				try
+				{
+					t.get();
+				}
+				catch (...)
+				{
+					// opening the file (open_istream) failed.
+					// Reply with an error.
+					message.reply(status_codes::InternalError).then([](pplx::task<void> t) { handle_error(t); });
+				}
+			});
+		});
+		return;
+	}
+
+	if (boost::starts_with(message_path, "/is_satisfied_certificate")) {
+		auto paths = http::uri::split_path(http::uri::decode(message.relative_uri().path()));
+		auto queries = http::uri::split_query(message.relative_uri().query());
+		auto run_bruteforce = queries.find(U("bruteforce"));
+		bool bruteforce_enabled = run_bruteforce != queries.end() && (run_bruteforce->second == U("true"));
+
+		message.content_ready()
+			.then([=](web::http::http_request request) {
+				request.extract_string(true).then([=](string_t res) {
+					ucout << web::uri().decode(res) << std::endl;
+					n_json f_json = n_json::parse(utility::conversions::to_utf8string(web::uri().decode(res)));
+					formula_mgr mgr;
+					mgr.build(f_json);
+
+					variable_to_evaluation_map_t out_evaluations;
+					const auto is_satisfiable = mgr.is_satisfiable(out_evaluations);
+					std::stringstream out_evaluations_msg;
+					out_evaluations_msg << std::endl << "Evaluations: \n" << out_evaluations;
+
+					bool true_certificate = false;
+					bool bruteforce_status = true;
+					if (is_satisfiable) {
+						true_certificate = mgr.does_evaluates_to_true(out_evaluations);
+						
+						if (bruteforce_enabled) {
+							if (!mgr.brute_force_evaluate()) {
+								bruteforce_status = false;
+							}
+						}
+					}
+
+					string_t msg = string_t(U("is_satisfiable: ")) + (is_satisfiable ? U("true") : U("false"));
+					msg.append(U("\n"));
+					msg.append(string_t(U("cert valid: ")) + (true_certificate ? U("true") : U("false")));
+					msg.append(U("\n")); 
+					if (bruteforce_enabled) {
+						msg.append(string_t(U("bruteforce: ")) + (bruteforce_status ? U("true") : U("false")));
+						msg.append(U("\n"));
+					}
+	
+					if (is_satisfiable && true_certificate && bruteforce_status) {
+						msg.append(string_t(U("Satisfiable? ")) + (bruteforce_status ? U("true") : U("false")));
+						msg.append(U("\n"));
+					}
+
+					message.reply(status_codes::OK, msg)
+						.then([](pplx::task<void> t) {
+						handle_error(t);
+					});
+				})
+				.then([=](pplx::task<void> t) {
 				try
 				{
 					t.get();

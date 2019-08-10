@@ -32,7 +32,7 @@ describe('#is_satisfied generated ', function() {
     function is_satisfied(formula, expect=true, timeout=5000) {
 		//element(by.id("formula_field")).sendKeys(Key.chord(Key.CONTROL, 'a'));
 		element(by.id("formula_field")).clear().sendKeys(formula);
-		element(by.id("proveBtn")).click();
+		element(by.id("checkAllBtn")).click();
 
 		var until = protractor.ExpectedConditions;
 		// Waits for the element with id 'output' to contain the text 'neeeded'.

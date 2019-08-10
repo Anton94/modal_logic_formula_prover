@@ -369,6 +369,14 @@ class http_service {
         return $.post( IP_ADDRESS, formula );
     }
 
+    is_satisfied_certificate_check(formula, params) {
+        var IP_ADDRESS = "http://localhost:34567/is_satisfied_certificate" 
+        if (params) {
+            IP_ADDRESS += "?" + params;
+        }
+        return $.post( IP_ADDRESS, formula );
+    }
+
     build_formula(formula) {
         var IP_ADDRESS = "http://localhost:34567/build_formula";
         return $.post( IP_ADDRESS, formula );
@@ -457,6 +465,28 @@ function is_satisfied(formula) {
     service = new http_service();
 
     parsed["is_satisfied"] = service.is_satisfied(JSON.stringify(parsed.parsed_formula));
+    return parsed;
+}
+
+function is_satisfied_certificate_check(formula) {
+    parsed = formula_to_json(formula);
+    if (parsed.hasErrors) {
+        return parsed;
+    }
+    service = new http_service();
+
+    parsed["is_satisfied"] = service.is_satisfied_certificate_check(JSON.stringify(parsed.parsed_formula));
+    return parsed;
+}
+
+function is_satisfied_check_all(formula) {
+    parsed = formula_to_json(formula);
+    if (parsed.hasErrors) {
+        return parsed;
+    }
+    service = new http_service();
+
+    parsed["is_satisfied"] = service.is_satisfied_certificate_check(JSON.stringify(parsed.parsed_formula), "bruteforce=true");
     return parsed;
 }
 

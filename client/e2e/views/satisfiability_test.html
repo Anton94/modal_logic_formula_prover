@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<!--script src="https://unpkg.com/chevrotain/lib/chevrotain.js"></script-->
 		<script src="../libs/chevrotain.js"></script>
 		<script src="../libs/jquery.min.js"></script>
 		<script src="../resources/main.js"></script>
@@ -13,8 +12,19 @@
 				is_satisfied(formula).is_satisfied
 					.done(function( data ) {
 	                	update_output(data);
-	            });
-				
+	            });	
+			}
+			function check_certificate_satisfiable(formula) {
+				is_satisfied_certificate_check(formula).is_satisfied
+					.done(function( data ) {
+	                	update_output(data);
+	            });	
+			}
+			function check_all(formula) {
+				is_satisfied_check_all(formula).is_satisfied
+					.done(function( data ) {
+	                	update_output(data);
+	            });	
 			}
 		</script>
 		<style>
@@ -30,6 +40,8 @@
 		<div id="formula_input">
 			<input id="formula_field"/>
 			<button id="proveBtn" onclick="prove(document.getElementById('formula_field').value)">Prove</button>
+			<button id="checkCertificateSatisfiableBtn" onclick="check_certificate_satisfiable(document.getElementById('formula_field').value)">Certificate Check</button>
+			<button id="checkAllBtn" onclick="check_all(document.getElementById('formula_field').value)">Certificate Check</button>
 			<button id="clearBtn" onclick="document.getElementById('formula_output').innerHTML = ''">Clear</button>
 		</div>
 		<div id="formula_output">
