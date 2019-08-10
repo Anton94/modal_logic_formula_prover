@@ -61,7 +61,7 @@ def generate_random_words(length, count, output_filename):
 
     out = open(output_filename,"w+")
 
-    print("Generating " + str(count) + " words with length up to " + str(length) + "...")
+    print("Generating " + str(count) + " random words with length up to " + str(length) + "...")
     while count > 0:
         worklist = [start_symbol]
         while worklist:
