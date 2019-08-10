@@ -1,18 +1,18 @@
-F = K
-F = L
+F 0.18 = K
+F 0.18 = L
 F = (F & F)
 F = (F | F)
 F = ~F
-F = t
-F = f
+F 0.02 = t
+F 0.02 = f
 K = C(T, T)
 L = <=(T, T)
 T = -T
 T = (T * T)
 T = (T + T)
-T = V
-V = 0
-V = 1
+T 0.55 = V
+V 0.02 = 0
+V 0.02 = 1
 V = a
 V = b
 V = c
