@@ -117,7 +117,7 @@ void microservice_controller::handle_post(http_request message)
             request.extract_string(true)
                 .then([=](string_t res) {
                     const auto f_str = utility::conversions::to_utf8string(web::uri().decode(res));
-                    ucout << f_str << std::endl;
+                    //ucout << f_str << std::endl;
                     n_json f_json = n_json::parse(f_str);
                     formula_mgr mgr;
                     mgr.build(f_json);
@@ -241,7 +241,7 @@ void microservice_controller::handle_post(http_request message)
             request.extract_string(true)
                 .then([=](string_t res) {
                     const auto f_str = utility::conversions::to_utf8string(web::uri().decode(res));
-                    ucout << f_str << std::endl;
+                    //ucout << f_str << std::endl;
 
                     n_json f_json = n_json::parse(f_str);
                     formula_mgr mgr;

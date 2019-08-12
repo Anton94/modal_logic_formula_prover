@@ -9,7 +9,8 @@ describe('#is_satisfied generated ', function() {
     });
 
     console.log("qweweqwe " + __dirname);
-    var file_content = fs.readFileSync(path.resolve(__dirname, '../build/out_cfg_language.txt'), 'utf-8');
+    var file_content = fs.readFileSync(path.resolve(__dirname, '../build/random.txt'), 'utf-8');
+    file_content += fs.readFileSync(path.resolve(__dirname, '../build/size10.txt'), 'utf-8');
     console.log(file_content);
     var lines = file_content.split(/\r?\n/);
 
