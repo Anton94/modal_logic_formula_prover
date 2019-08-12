@@ -236,14 +236,13 @@ void microservice_controller::handle_post(http_request message)
 					bool bruteforce_status = true;
 					if (is_satisfiable) {
 						true_certificate = mgr.does_evaluates_to_true(out_evaluations);
-						
-						if (bruteforce_enabled) {
-							if (!mgr.brute_force_evaluate()) {
-								bruteforce_status = false;
-							}
-						}
 					}
 
+					if (bruteforce_enabled) {
+						if (!mgr.brute_force_evaluate()) {
+							bruteforce_status = false;
+						}
+					}
 					string_t msg = string_t(U("is_satisfiable: ")) + (is_satisfiable ? U("true") : U("false"));
 					msg.append(U("\n"));
 					msg.append(string_t(U("cert valid: ")) + (true_certificate ? U("true") : U("false")));
@@ -253,11 +252,9 @@ void microservice_controller::handle_post(http_request message)
 						msg.append(U("\n"));
 					}
 	
-					if (is_satisfiable && true_certificate && bruteforce_status) {
-						msg.append(string_t(U("Satisfiable? ")) + (bruteforce_status ? U("true") : U("false")));
-						msg.append(U("\n"));
-					}
-
+					msg.append(string_t(U("Satisfiable? ")) + (is_satisfiable == true_certificate && true_certificate == bruteforce_status ? U("true") : U("false")));
+					msg.append(U("\n"));
+	
 					message.reply(status_codes::OK, msg)
 						.then([](pplx::task<void> t) {
 						handle_error(t);

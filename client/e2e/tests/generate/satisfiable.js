@@ -9,7 +9,7 @@ describe('#is_satisfied generated ', function() {
     });
 
     console.log("qweweqwe " + __dirname);
-    var file_content = fs.readFileSync(path.resolve(__dirname, '../build/example.txt'), 'utf-8');
+    var file_content = fs.readFileSync(path.resolve(__dirname, '../build/out_cfg_language.txt'), 'utf-8');
     console.log(file_content);
     var lines = file_content.split(/\r?\n/);
 
@@ -29,7 +29,7 @@ describe('#is_satisfied generated ', function() {
         return true;
     }
 
-    function is_satisfied(formula, expect=true, timeout=5000) {
+    function is_satisfied(formula, expect=true, timeout=10000) {
 		//element(by.id("formula_field")).sendKeys(Key.chord(Key.CONTROL, 'a'));
 		element(by.id("formula_field")).clear().sendKeys(formula);
 		element(by.id("checkAllBtn")).click();
