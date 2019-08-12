@@ -10,7 +10,8 @@ auto check_for_satisfiable_evaluation = [](const json& formula_json, bool expect
     formula_mgr f;
     CHECK(f.build(copy_f));
 
-    CHECK(f.brute_force_evaluate() == expected_result);
+    variable_to_evaluation_map_t out_evaluations;
+    CHECK(f.brute_force_evaluate(out_evaluations) == expected_result);
 };
 
 TEST_CASE("satisfiable evaluation 1", "[brute force evaluation]")

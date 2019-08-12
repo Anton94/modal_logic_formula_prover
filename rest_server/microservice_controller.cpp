@@ -266,7 +266,7 @@ void microservice_controller::handle_post(http_request message)
 
                     if(bruteforce_enabled)
                     {
-                        const auto bruteforce_status = mgr.brute_force_evaluate();
+                        const auto bruteforce_status = mgr.brute_force_evaluate(out_evaluations);
                         msg << "bruteforce: " << to_string(bruteforce_status) << "\n";
 
                         valid &= is_satisfiable == bruteforce_status;

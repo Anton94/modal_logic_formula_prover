@@ -1,5 +1,6 @@
 #include "formula_mgr.h"
 #include "logger.h"
+#include "utils.h"
 
 namespace
 {
@@ -104,11 +105,24 @@ auto formula_mgr::build(json& f) -> bool
     return change_variables_to_variable_ids(f) && f_.build(f);
 }
 
-auto formula_mgr::brute_force_evaluate() const -> bool
+auto formula_mgr::brute_force_evaluate(variable_to_evaluation_map_t& out_evaluations) const -> bool
 {
     info() << "Running brute force evalution checking of " << f_;
     full_variables_evaluations_t evaluations(variables_.size(), false);
-    return has_satisfiable_evaluation(f_, evaluations, evaluations.begin());
+    const auto res = has_satisfiable_evaluation(f_, evaluations, evaluations.begin());
+    info() << (res ? "Success" : "Failed") << ". "
+              "Generated " << to_int(evaluations) + 1 /* + 00...0 evaluation*/ << " evaluations.";
+    if(res)
+    {
+        out_evaluations.clear();
+        for(size_t i = 0; i < evaluations.size(); ++i)
+        {
+            out_evaluations.push_back({get_variable(i), evaluations[i]});\
+        }
+        info() << "Evaluations: " << out_evaluations;
+        return true;
+    }
+    return false;
 }
 
 auto formula_mgr::is_satisfiable(variable_to_evaluation_map_t& out_evaluations) -> bool
@@ -324,12 +338,12 @@ auto formula_mgr::has_satisfiable_evaluation(const formula& f, full_variables_ev
     if(it == evaluations.end())
     {
         auto res = f.evaluate(evaluations);
-        trace() << "Evaluation with:";
+        verbose() << "Evaluation with:";
         for(size_t i = 0, bound = variables_.size(); i < bound; ++i)
         {
-            trace() << variables_[i] << " -> " << evaluations[i];
+            verbose() << variables_[i] << " -> " << evaluations[i];
         }
-        trace() << "\t" << (res ? "succeeded" : "failed");
+        verbose() << "\t" << (res ? "succeeded" : "failed");
         return res;
     }
 

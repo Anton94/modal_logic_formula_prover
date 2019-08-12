@@ -26,7 +26,7 @@ public:
 
     // Generates all sequences of 0/1 to evaluate the variables and checks if the formula is satisfied
     // O(2^n) where n is the number of different variables
-    auto brute_force_evaluate() const -> bool;
+    auto brute_force_evaluate(variable_to_evaluation_map_t& out_evaluations) const -> bool;
 
     // Checks if the formula is satisfiable or not and if so it fills a subset of variables and their evaluations to the out_evaluations collection
     auto is_satisfiable(variable_to_evaluation_map_t& out_evaluations) -> bool;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <vector>
 
 class call_on_destroy
 {
@@ -16,3 +17,5 @@ public:
 private:
     std::function<void()> callback_;
 };
+
+uint64_t to_int(const std::vector<bool>& v);
