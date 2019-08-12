@@ -30,14 +30,17 @@ private:
     std::stringstream s_;
 };
 
+void set_verbose_logger(const logger_func_t& f);
 void set_trace_logger(const logger_func_t& f);
 void set_info_logger(const logger_func_t& f);
 void set_error_logger(const logger_func_t& f);
 
+void set_verbose_logger(logger_func_t&& f);
 void set_trace_logger(logger_func_t&& f);
 void set_info_logger(logger_func_t&& f);
 void set_error_logger(logger_func_t&& f);
 
+auto verbose() -> logger;
 auto trace() -> logger;
 auto info() -> logger;
 auto error() -> logger;
