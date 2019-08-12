@@ -68,7 +68,13 @@ int main(int argc, char* argv[])
         address.append(port);
 
         on_init(address);
-        std::cout << "Press Enter to exit:" << std::endl;
+        std::cout << "Press q to exit:" << std::endl;
+
+        char c;
+        do
+        {
+            std::cin >> c;
+        } while(std::cin.good() && c != 'q' && c != 'Q');
 
         std::string line;
         std::getline(std::cin, line);
