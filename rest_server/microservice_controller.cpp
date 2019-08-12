@@ -256,7 +256,7 @@ void microservice_controller::handle_post(http_request message)
 
                     if(is_satisfiable)
                     {
-                        msg << "Evaluations: " << out_evaluations << "\n";
+                        msg << "cleaver method evaluations: " << out_evaluations << "\n";
 
                         const auto true_certificate = mgr.does_evaluates_to_true(out_evaluations);
                         msg << "cert valid: " << to_string(true_certificate) << "\n";
@@ -267,7 +267,8 @@ void microservice_controller::handle_post(http_request message)
                     if(bruteforce_enabled)
                     {
                         const auto bruteforce_status = mgr.brute_force_evaluate(out_evaluations);
-                        msg << "bruteforce: " << to_string(bruteforce_status) << "\n";
+                        msg << "brute force: " << to_string(bruteforce_status) << "\n";
+                        msg << "brute force evaluations: " << out_evaluations << "\n";
 
                         valid &= is_satisfiable == bruteforce_status;
                     }
