@@ -230,50 +230,41 @@ void microservice_controller::handle_post(http_request message)
         message.content_ready().then([=](web::http::http_request request) {
             request.extract_string(true)
                 .then([=](string_t res) {
-                    ucout << web::uri().decode(res) << std::endl;
-                    n_json f_json =
-                        n_json::parse(utility::conversions::to_utf8string(web::uri().decode(res)));
+                    const auto f_str = utility::conversions::to_utf8string(web::uri().decode(res));
+                    ucout << f_str << std::endl;
+
+                    n_json f_json = n_json::parse(f_str);
                     formula_mgr mgr;
                     mgr.build(f_json);
 
+                    auto valid = true;
+
+                    std::stringstream msg;
                     variable_to_evaluation_map_t out_evaluations;
                     const auto is_satisfiable = mgr.is_satisfiable(out_evaluations);
-                    std::stringstream out_evaluations_msg;
-                    out_evaluations_msg << std::endl << "Evaluations: \n" << out_evaluations;
+                    msg << "is_satisfiable: " << (is_satisfiable ? "true" : "false") << "\n";
 
-                    bool true_certificate = false;
-                    bool bruteforce_status = true;
                     if(is_satisfiable)
                     {
-                        true_certificate = mgr.does_evaluates_to_true(out_evaluations);
+                        msg << "Evaluations: " << out_evaluations << "\n";
+
+                        const auto true_certificate = mgr.does_evaluates_to_true(out_evaluations);
+                        msg << "cert valid: " << (true_certificate ? "true" : "false") << "\n";
+
+                        valid &= true_certificate;
                     }
 
                     if(bruteforce_enabled)
                     {
-                        if(!mgr.brute_force_evaluate())
-                        {
-                            bruteforce_status = false;
-                        }
-                    }
-                    string_t msg =
-                        string_t(U("is_satisfiable: ")) + (is_satisfiable ? U("true") : U("false"));
-                    msg.append(U("\n"));
-                    msg.append(string_t(U("cert valid: ")) + (true_certificate ? U("true") : U("false")));
-                    msg.append(U("\n"));
-                    if(bruteforce_enabled)
-                    {
-                        msg.append(string_t(U("bruteforce: ")) +
-                                   (bruteforce_status ? U("true") : U("false")));
-                        msg.append(U("\n"));
+                        const auto bruteforce_status = mgr.brute_force_evaluate();
+                        msg << "bruteforce: " << (bruteforce_status ? "true" : "false") << "\n";
+
+                        valid &= is_satisfiable == bruteforce_status;
                     }
 
-                    msg.append(string_t(U("Satisfiable? ")) +
-                               (is_satisfiable == true_certificate && true_certificate == bruteforce_status
-                                    ? U("true")
-                                    : U("false")));
-                    msg.append(U("\n"));
-
-                    message.reply(status_codes::OK, msg).then([](pplx::task<void> t) { handle_error(t); });
+                    msg << "Satisfiable? " << (valid ? "true" : "false") << "\n";
+                    const auto msg_t = utility::conversions::to_string_t(msg.str());
+                    message.reply(status_codes::OK, msg_t).then([](pplx::task<void> t) { handle_error(t); });
                 })
                 .then([=](pplx::task<void> t) {
                     try

@@ -25,7 +25,7 @@ std::ostream& operator<<(std::ostream& out, const variable_to_evaluation_map_t& 
 {
     for(const auto& variable_evaluation : variables_evaluations)
     {
-        out << variable_evaluation.first << " : " << variable_evaluation.second << "\n";
+        out << "[" << variable_evaluation.first << " : " << variable_evaluation.second << "] ";
     }
 
     return out;
