@@ -38,10 +38,11 @@
 	</head>
 	<body>
 		<div id="formula_input">
-			<input id="formula_field"/>
+                        <input id="formula_field" style="width: 500px;"/>
+                        <br/>
 			<button id="proveBtn" onclick="prove(document.getElementById('formula_field').value)">Prove</button>
 			<button id="checkCertificateSatisfiableBtn" onclick="check_certificate_satisfiable(document.getElementById('formula_field').value)">Certificate Check</button>
-			<button id="checkAllBtn" onclick="check_all(document.getElementById('formula_field').value)">Certificate Check</button>
+                        <button id="checkAllBtn" onclick="check_all(document.getElementById('formula_field').value)">Certificate and bruteforce check</button>
                         <button id="clearBtn" onclick="document.getElementById('output').innerHTML = ''">Clear</button>
 		</div>
 		<div id="formula_output">
