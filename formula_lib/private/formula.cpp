@@ -144,7 +144,7 @@ auto formula::build(json& f) -> bool
     const auto op_code = static_cast<unsigned>(op_) + 1;
     hash_ += (op_code & 0xFFFFFFFF) * 2654435723;
 
-    trace() << *this << " <" << hash_ << ">";
+    verbose() << "[Building] " << *this << " <" << hash_ << ">";
     return true;
 }
 

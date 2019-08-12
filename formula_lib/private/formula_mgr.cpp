@@ -84,6 +84,8 @@ auto formula_mgr::build(json& f) -> bool
 {
     clear();
 
+    info() << "Start building \n" << f.dump(4) << "    ...";
+
     // Will cash all variables and swap the string representations with their id in the cache.
     variables_set_t variables_set;
     if(!get_all_variables(f, variables_set))

@@ -138,7 +138,7 @@ auto term::build(json& t) -> bool
     construct_hash();
     construct_variables();
 
-    trace() << *this << " <" << hash_ << ">";
+    verbose() << "[Building] " << *this << " <" << hash_ << ">";
     return true;
 }
 
