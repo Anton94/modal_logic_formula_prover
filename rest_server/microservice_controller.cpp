@@ -108,23 +108,25 @@ void microservice_controller::handle_post(http_request message)
         message.content_ready().then([=](web::http::http_request request) {
             request.extract_string(true)
                 .then([=](string_t res) {
-                    ucout << web::uri().decode(res) << std::endl;
-                    n_json f_json =
-                        n_json::parse(utility::conversions::to_utf8string(web::uri().decode(res)));
+                    const auto f_str = utility::conversions::to_utf8string(web::uri().decode(res));
+                    ucout << f_str << std::endl;
+                    n_json f_json = n_json::parse(f_str);
                     formula_mgr mgr;
                     mgr.build(f_json);
 
                     variable_to_evaluation_map_t out_evaluations;
                     const auto is_satisfiable = mgr.is_satisfiable(out_evaluations);
-                    string_t msg = string_t(U("Satisfiable? ")) + (is_satisfiable ? U("true") : U("false"));
-                    std::stringstream out_evaluations_msg;
-                    out_evaluations_msg << std::endl << "Evaluations: \n" << out_evaluations;
-                    msg.append(utility::conversions::to_string_t(out_evaluations_msg.str()));
 
-                    ucout << msg << std::endl;
+                    std::stringstream msg;
+                    msg << "Satisfiable? " << (is_satisfiable ? "true" : "false") << "\n";
+                    if(is_satisfiable)
+                    {
+                        msg << "Evaluations: " << out_evaluations << "\n";
+                    }
 
-                    // run the satisfier here
-                    message.reply(status_codes::OK, msg).then([](pplx::task<void> t) { handle_error(t); });
+                    const auto msg_t = utility::conversions::to_string_t(msg.str());
+                    ucout << msg_t << std::endl;
+                    message.reply(status_codes::OK, msg_t).then([](pplx::task<void> t) { handle_error(t); });
                 })
                 .then([=](pplx::task<void> t) {
                     try
