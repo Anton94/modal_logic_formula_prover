@@ -14,6 +14,14 @@ using namespace utility;
 using namespace http;
 using namespace web::http::experimental::listener;
 
+namespace
+{
+std::string to_string(bool b)
+{
+    return b ? "true" : "false";
+}
+}
+
 using n_json = nlohmann::json;
 
 microservice_controller::microservice_controller(utility::string_t url)
@@ -118,7 +126,7 @@ void microservice_controller::handle_post(http_request message)
                     const auto is_satisfiable = mgr.is_satisfiable(out_evaluations);
 
                     std::stringstream msg;
-                    msg << "Satisfiable? " << (is_satisfiable ? "true" : "false") << "\n";
+                    msg << "Satisfiable? " << to_string(is_satisfiable) << "\n";
                     if(is_satisfiable)
                     {
                         msg << "Evaluations: " << out_evaluations << "\n";
@@ -239,19 +247,19 @@ void microservice_controller::handle_post(http_request message)
                     formula_mgr mgr;
                     mgr.build(f_json);
 
-                    auto valid = true;
-
                     std::stringstream msg;
                     variable_to_evaluation_map_t out_evaluations;
                     const auto is_satisfiable = mgr.is_satisfiable(out_evaluations);
-                    msg << "is_satisfiable: " << (is_satisfiable ? "true" : "false") << "\n";
+                    msg << "is_satisfiable: " << to_string(is_satisfiable) << "\n";
+
+                    auto valid = true;
 
                     if(is_satisfiable)
                     {
                         msg << "Evaluations: " << out_evaluations << "\n";
 
                         const auto true_certificate = mgr.does_evaluates_to_true(out_evaluations);
-                        msg << "cert valid: " << (true_certificate ? "true" : "false") << "\n";
+                        msg << "cert valid: " << to_string(true_certificate) << "\n";
 
                         valid &= true_certificate;
                     }
@@ -259,12 +267,12 @@ void microservice_controller::handle_post(http_request message)
                     if(bruteforce_enabled)
                     {
                         const auto bruteforce_status = mgr.brute_force_evaluate();
-                        msg << "bruteforce: " << (bruteforce_status ? "true" : "false") << "\n";
+                        msg << "bruteforce: " << to_string(bruteforce_status) << "\n";
 
                         valid &= is_satisfiable == bruteforce_status;
                     }
 
-                    msg << "Satisfiable? " << (valid ? "true" : "false") << "\n";
+                    msg << "Satisfiable? " << to_string(valid) << "\n";
                     const auto msg_t = utility::conversions::to_string_t(msg.str());
                     message.reply(status_codes::OK, msg_t).then([](pplx::task<void> t) { handle_error(t); });
                 })
