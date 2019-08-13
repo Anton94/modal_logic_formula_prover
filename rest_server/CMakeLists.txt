@@ -16,3 +16,8 @@ if (${cpprestsdk_FOUND})
 else (${cpprestsdk_FOUND})
     message(STATUS "Could not locate cpprestsdk. Skipping rest_server project!")
 endif (${cpprestsdk_FOUND})
+
+#list(APPEND ECM_ENABLE_SANITIZERS "thread")
+#list(APPEND ECM_ENABLE_SANITIZERS "memory") # memory is not allowed with address
+list(APPEND ECM_ENABLE_SANITIZERS "address;undefined;leak")
+include(ECMEnableSanitizers)
