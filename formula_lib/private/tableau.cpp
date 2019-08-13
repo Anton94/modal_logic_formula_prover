@@ -123,6 +123,7 @@ auto tableau::satisfiable_step() -> bool
 
             if(!right.validate())
             {
+                left.remove_from_T();
                 return false;
             }
             right.add_to_T();
@@ -241,6 +242,7 @@ auto tableau::satisfiable_step() -> bool
 
         if(!right.validate())
         {
+            left.remove_from_F();
             return false;
         }
         right.add_to_F();

@@ -3797,7 +3797,7 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
 
 TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact using same terms 2", "[satisfiability]")
 {
-    // C(a * -d, b * -c) & ( (C(a * -d, d) & <=(a,d)) | <=(b,x)))
+    // C(a * -d, b * -c) & ((C(a * -d, d) & <=(a,d)) | <=(b,x))
     is_satisfiable(
         R"({
            "name": "conjunction",
@@ -3914,7 +3914,7 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
               }
            ]
         })"_json,
-        false);
+        true);
 }
 
 TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact using same terms 2.1", "[satisfiability]")
@@ -4578,4 +4578,102 @@ TEST_CASE("satisfiable evaluation of atomic formulas when there is a constant 4"
             ]
         })"_json,
         false);
+}
+
+TEST_CASE("satisfiable when F disjunction has contradicting right child 1", "[satisfiability]")
+{
+    // ~(C(a,b) | T) | C(a,b)
+    is_satisfiable(
+        R"({
+            "name": "disjunction",
+            "value": [
+               {
+                  "name": "negation",
+                  "value": {
+                     "name": "disjunction",
+                     "value": [
+                        {
+                           "name": "contact",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "a"
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "b"
+                              }
+                           ]
+                        },
+                        {
+                           "name": "T"
+                        }
+                     ]
+                  }
+               },
+               {
+                  "name": "contact",
+                  "value": [
+                     {
+                        "name": "string",
+                        "value": "a"
+                     },
+                     {
+                        "name": "string",
+                        "value": "b"
+                     }
+                  ]
+               }
+            ]
+        })"_json,
+        true);
+}
+
+TEST_CASE("satisfiable when T conjunction has contradicting right child 1", "[satisfiability]")
+{
+    // (C(a,b) & F) | ~C(a,b)
+    is_satisfiable(
+        R"({
+            "name": "disjunction",
+            "value": [
+               {
+                  "name": "conjunction",
+                  "value": [
+                     {
+                        "name": "contact",
+                        "value": [
+                           {
+                              "name": "string",
+                              "value": "a"
+                           },
+                           {
+                              "name": "string",
+                              "value": "b"
+                           }
+                        ]
+                     },
+                     {
+                        "name": "F"
+                     }
+                  ]
+               },
+               {
+                  "name": "negation",
+                  "value": {
+                     "name": "contact",
+                     "value": [
+                        {
+                           "name": "string",
+                           "value": "a"
+                        },
+                        {
+                           "name": "string",
+                           "value": "b"
+                        }
+                     ]
+                  }
+               }
+            ]
+        })"_json,
+        true);
 }
