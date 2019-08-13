@@ -84,7 +84,7 @@ auto tableau::satisfiable_step() -> bool
                     trace() << "Found a contradiction - found " << *f << " constant in T formulas";
                     return false;
                 }
-                return true; // F(F) is satisfiable
+                return satisfiable_step(); // F(F) is satisfiable, continue with the rest
             }
 
             if(find_in_T(not_negated_f))
@@ -145,7 +145,7 @@ auto tableau::satisfiable_step() -> bool
         if(left_f->is_constant_true() || right_f->is_constant_true())
         {
             trace() << "One of the childs is constant true";
-            return true;
+            return satisfiable_step();
         }
 
         auto process_T_disj_child = [&](const formula* child) {
@@ -203,7 +203,7 @@ auto tableau::satisfiable_step() -> bool
                 trace() << "Found a contradiction - found " << *f << " constant in F formulas";
                 return false;
             }
-            return true; // T(T) is satisfiable
+            return satisfiable_step(); // T(T) is satisfiable, continue with the rest
         }
         if(find_in_F(not_negated_f))
         {
@@ -265,7 +265,7 @@ auto tableau::satisfiable_step() -> bool
     if(left_f->is_constant_false() || right_f->is_constant_false())
     {
         trace() << "One of the childs is constant false";
-        return true;
+        return satisfiable_step();
     }
 
     auto process_F_conj_child = [&](const formula* child) {

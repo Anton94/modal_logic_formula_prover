@@ -4389,3 +4389,193 @@ TEST_CASE("satisfiable with contact rule - adding non zero term and F contact wi
         })"_json,
         false);
 }
+
+TEST_CASE("satisfiable evaluation of atomic formulas when there is a constant 1", "[satisfiability]")
+{
+    // C(a, -a) & ~(F)
+    is_satisfiable(
+        R"({
+            "name": "conjunction",
+            "value": [
+               {
+                  "name": "contact",
+                  "value": [
+                     {
+                        "name": "string",
+                        "value": "a"
+                     },
+                     {
+                        "name": "Tstar",
+                        "value": {
+                           "name": "string",
+                           "value": "a"
+                        }
+                     }
+                  ]
+               },
+               {
+                  "name": "negation",
+                  "value": {
+                     "name": "F"
+                  }
+               }
+            ]
+        })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable evaluation of atomic formulas when there is a constant 2", "[satisfiability]")
+{
+    // C(a, -a) & ~(C(e,f) & ~T)
+    is_satisfiable(
+        R"({
+            "name": "conjunction",
+            "value": [
+               {
+                  "name": "contact",
+                  "value": [
+                     {
+                        "name": "string",
+                        "value": "a"
+                     },
+                     {
+                        "name": "Tstar",
+                        "value": {
+                           "name": "string",
+                           "value": "a"
+                        }
+                     }
+                  ]
+               },
+               {
+                  "name": "negation",
+                  "value": {
+                     "name": "conjunction",
+                     "value": [
+                        {
+                           "name": "contact",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "e"
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "f"
+                              }
+                           ]
+                        },
+                        {
+                           "name": "negation",
+                           "value": {
+                              "name": "T"
+                           }
+                        }
+                     ]
+                  }
+               }
+            ]
+        })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable evaluation of atomic formulas when there is a constant 3", "[satisfiability]")
+{
+    // C(a, -a) & (C(f,g) | T)
+    is_satisfiable(
+        R"({
+            "name": "conjunction",
+            "value": [
+               {
+                  "name": "contact",
+                  "value": [
+                     {
+                        "name": "string",
+                        "value": "a"
+                     },
+                     {
+                        "name": "Tstar",
+                        "value": {
+                           "name": "string",
+                           "value": "a"
+                        }
+                     }
+                  ]
+               },
+               {
+                  "name": "disjunction",
+                  "value": [
+                     {
+                        "name": "contact",
+                        "value": [
+                           {
+                              "name": "string",
+                              "value": "f"
+                           },
+                           {
+                              "name": "string",
+                              "value": "g"
+                           }
+                        ]
+                     },
+                     {
+                        "name": "T"
+                     }
+                  ]
+               }
+            ]
+        })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable evaluation of atomic formulas when there is a constant 4", "[satisfiability]")
+{
+    // C(a, -a) & ~(C(f,g) & F)
+    is_satisfiable(
+        R"({
+            "name": "conjunction",
+            "value": [
+               {
+                  "name": "contact",
+                  "value": [
+                     {
+                        "name": "string",
+                        "value": "a"
+                     },
+                     {
+                        "name": "Tstar",
+                        "value": {
+                           "name": "string",
+                           "value": "a"
+                        }
+                     }
+                  ]
+               },
+               {
+                  "name": "negation",
+                  "value": {
+                     "name": "conjunction",
+                     "value": [
+                        {
+                           "name": "contact",
+                           "value": [
+                              {
+                                 "name": "string",
+                                 "value": "f"
+                              },
+                              {
+                                 "name": "string",
+                                 "value": "g"
+                              }
+                           ]
+                        },
+                        {
+                           "name": "F"
+                        }
+                     ]
+                  }
+               }
+            ]
+        })"_json,
+        false);
+}
