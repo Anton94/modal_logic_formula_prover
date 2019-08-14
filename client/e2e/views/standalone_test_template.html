@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="../libs/chevrotain.js"></script>
+		<script src="../libs/jquery.min.js"></script>
+		<script src="../resources/main.js"></script>
+		<style>
+			code {
+				font-size: 15px;
+			}
+			label {
+				font-size: 15px;
+			}
+		</style>
+	</head>
+	<body onload="run()">
+		<script>
+			var formulas = [
+				//FORMULAS
+			]
+			function update_output(result) {
+				document.getElementById("output").innerHTML += result;
+			}
+			function check_all(formula) {
+				is_satisfied_check_all(formula).is_satisfied
+					.done(function( data ) {
+	                	update_output(data);
+	            });	
+			}
+			function run() {
+				formulas.forEach((formula) => {
+					check_all(formula);
+				});
+			}
+		</script>
+		<div id="formula_output">
+			<pre id="output"></pre>
+		</div>
+	</body>
+</html>
