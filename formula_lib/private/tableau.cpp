@@ -10,8 +10,6 @@ auto tableau::is_satisfiable(const formula& f, variables_evaluations_block& out_
 {
     clear();
 
-    info() << "Running a satisfiability checking of " << f;
-
     if(f.is_constant())
     {
         return f.get_operation_type() == formula::operation_t::constant_true ? true : false;

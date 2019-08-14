@@ -110,9 +110,15 @@ auto formula_mgr::brute_force_evaluate(variable_to_evaluation_map_t& out_evaluat
 {
     info() << "Running brute force evalution checking of " << f_;
     full_variables_evaluations_t evaluations(variables_.size(), false);
-    const auto res = has_satisfiable_evaluation(f_, evaluations, evaluations.begin());
+
+    time_type elapsed_time;
+    const auto res = time_measured_call<bool>([&]() {
+        return has_satisfiable_evaluation(f_, evaluations, evaluations.begin());
+    }, elapsed_time);
+
     info() << (res ? "Success" : "Failed") << ". "
-              "Generated " << to_int(evaluations) + 1 /* + 00...0 evaluation*/ << " evaluations.";
+           << "Generated " << to_int(evaluations) + 1 /* + 00...0 evaluation*/ << " evaluations. "
+           << "Took " << elapsed_time.count() << "ms.";
     if(res)
     {
         out_evaluations.clear();
@@ -128,8 +134,17 @@ auto formula_mgr::brute_force_evaluate(variable_to_evaluation_map_t& out_evaluat
 
 auto formula_mgr::is_satisfiable(variable_to_evaluation_map_t& out_evaluations) -> bool
 {
+    info() << "Running satisfiability checking of " << f_ << "...";
     variables_evaluations_block result_evaluation_block(variables_mask_t{});
-    if(t_.is_satisfiable(f_, result_evaluation_block))
+
+    time_type elapsed_time;
+    const auto res = time_measured_call<bool>([&]() {
+        return t_.is_satisfiable(f_, result_evaluation_block);
+    }, elapsed_time);
+
+    info() << (res ? "Satisfiable" : "NOT Satisfiable") << ". "
+           << "Took " << elapsed_time.count() << "ms.";
+    if(res)
     {
         out_evaluations.clear();
         const auto& variables = result_evaluation_block.get_variables();
@@ -141,7 +156,7 @@ auto formula_mgr::is_satisfiable(variable_to_evaluation_map_t& out_evaluations) 
                 out_evaluations.push_back({get_variable(i), evaluations.test(i)});
             }
         }
-        trace() << "Evaluations: " << out_evaluations;
+        info() << "Evaluations: " << out_evaluations;
         return true;
     }
     return false;
