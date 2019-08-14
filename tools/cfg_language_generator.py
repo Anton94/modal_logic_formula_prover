@@ -26,6 +26,10 @@ def load_grammar(filename):
         # and K M L is right hand side of the rule
         rule_components = line.strip('\n').split(' ')
         lhs = rule_components[0]
+
+        if '#' in lhs: # Skip the comment lines
+            continue
+
         probability = None
         if rule_components[1] == '=':
             rhs = rule_components[2:]
@@ -143,6 +147,7 @@ if __name__ == "__main__":
     parser.add_option("-i", "--cfg_filename", dest="cfg_filename", type = "string",
                       help="File containing the context free grammar rules. "
                       "Only single letter non-terminals are supported at the moment. "
+                      "Use '#' at the beginning of a line to indicate that it's a comment and it will be ignored. "
                       "Example: (each rule on a separate line)" # TODO: print it on a separate lines
                       "    F = F & F"
                       "    F = x"
