@@ -111,15 +111,16 @@ auto formula_mgr::brute_force_evaluate(variable_to_evaluation_map_t& out_evaluat
     info() << "Running brute force evalution checking of " << f_;
     full_variables_evaluations_t evaluations(variables_.size(), false);
 
-    time_type elapsed_time;
-    const auto res = time_measured_call<bool>([&]() {
-        return has_satisfiable_evaluation(f_, evaluations, evaluations.begin());
-    }, elapsed_time);
+    bool found_satisfiable_evaluation{};
+    const auto elapsed_time = time_measured_call([&]() {
+        found_satisfiable_evaluation = has_satisfiable_evaluation(f_, evaluations, evaluations.begin());
+    });
 
-    info() << (res ? "Success" : "Failed") << ". "
+    info() << (found_satisfiable_evaluation ? "Success" : "Failed") << ". "
            << "Generated " << to_int(evaluations) + 1 /* + 00...0 evaluation*/ << " evaluations. "
            << "Took " << elapsed_time.count() << "ms.";
-    if(res)
+
+    if(found_satisfiable_evaluation)
     {
         out_evaluations.clear();
         for(size_t i = 0; i < evaluations.size(); ++i)
@@ -137,14 +138,14 @@ auto formula_mgr::is_satisfiable(variable_to_evaluation_map_t& out_evaluations) 
     info() << "Running satisfiability checking of " << f_ << "...";
     variables_evaluations_block result_evaluation_block(variables_mask_t{});
 
-    time_type elapsed_time;
-    const auto res = time_measured_call<bool>([&]() {
-        return t_.is_satisfiable(f_, result_evaluation_block);
-    }, elapsed_time);
+    bool is_f_satisfiable{};
+    const auto elapsed_time = time_measured_call([&]() {
+        is_f_satisfiable = t_.is_satisfiable(f_, result_evaluation_block);
+    });
 
-    info() << (res ? "Satisfiable" : "NOT Satisfiable") << ". "
+    info() << (is_f_satisfiable ? "Satisfiable" : "NOT Satisfiable") << ". "
            << "Took " << elapsed_time.count() << "ms.";
-    if(res)
+    if(is_f_satisfiable)
     {
         out_evaluations.clear();
         const auto& variables = result_evaluation_block.get_variables();
