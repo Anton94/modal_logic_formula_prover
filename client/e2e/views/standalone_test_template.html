@@ -15,7 +15,7 @@
 	</head>
 	<body onload="run()">
 		<script>
-			var formulas = [
+			var generated_formulas = [
 				//FORMULAS
 			]
 			function update_output(result) {
@@ -28,7 +28,7 @@
 	            });	
 			}
 			function run() {
-				formulas.forEach((formula) => {
+				generated_formulas.forEach((formula) => {
 					check_all(formula);
 				});
 			}

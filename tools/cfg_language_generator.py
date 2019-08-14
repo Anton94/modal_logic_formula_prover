@@ -118,9 +118,14 @@ def get_random_rule(rules):
     exit()
 
 def generate_random_words(length, count, output_filename):
+
     non_terminals = rules.keys()
 
     out = open(output_filename,"w+")
+    add_commas = False
+    if output_filename.endswith('.js'):
+        add_commas = True
+        out.write("generated_formulas = [\n")
 
     print("Generating " + str(count) + " random words with length up to " + str(length) + "...")
     while count > 0:
@@ -138,9 +143,18 @@ def generate_random_words(length, count, output_filename):
                         break
 
                 if not found_non_terminal:
-                    out.write(s + '\n')
+                    if add_commas:
+                       out.write('\t\'' + s + '\',\n')
+                    else:
+                        out.write(s + '\n')
                     count = count - 1
                     #print(s)
+
+    if add_commas:
+        out.write("];")
+
+    out.close()
+
 
 if __name__ == "__main__":
     parser = OptionParser()
