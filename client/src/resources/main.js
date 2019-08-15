@@ -451,7 +451,7 @@ function formula_to_json(formula) {
     formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation[Operations.formula.EQUIVALENCY]]), decompose_equivalency);
     formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation[Operations.formula.IMPLICATION]]), decompose_implication);
     formula_traverse_top_to_bottom(simplified, NEG_OPERATIONS, remove_double_negations);
-    formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation[Operations.formula.CONTACT]]), decompose_contant_on_Tdis);
+    formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation[Operations.formula.CONTACT]]), decompose_contact_on_Tdis);
 
     parsed["hasErrors"] = false;
     parsed["parsed_formula"] = simplified;
@@ -526,7 +526,7 @@ function remove_equal_TDis_in_less(node) {
     // <=(b*c, -b)
 }
 
-function decompose_contant_on_Tdis(node) {
+function decompose_contact_on_Tdis(node) {
     if (node.value[0].name == symbol_to_explanation["+"]) {
         node.name = symbol_to_explanation["|"];
         node.value = [
@@ -545,8 +545,8 @@ function decompose_contant_on_Tdis(node) {
                 ]
             }
         ];
-        decompose_contant_on_Tdis(node.value[0]);
-        decompose_contant_on_Tdis(node.value[1]);
+        decompose_contact_on_Tdis(node.value[0]);
+        decompose_contact_on_Tdis(node.value[1]);
     } else if (node.value[1].name == symbol_to_explanation["+"]) {
         node.name = symbol_to_explanation["|"];
         node.value = [
@@ -565,8 +565,8 @@ function decompose_contant_on_Tdis(node) {
                 ]
             }
         ];
-        decompose_contant_on_Tdis(node.value[0]);
-        decompose_contant_on_Tdis(node.value[1]);
+        decompose_contact_on_Tdis(node.value[0]);
+        decompose_contact_on_Tdis(node.value[1]);
     }
 }
 
