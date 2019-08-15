@@ -100,6 +100,7 @@ const CstParser = chevrotain.CstParser;
 // ----------------- lexer -----------------
 
 const Less = createToken({ name: "Less", pattern: Operations.formula.LESS })
+const EqualZero = createToken({ name: "EqualZero", pattern: Operations.formula.EQUAL_ZERO })
 const Contact = createToken({ name: "Contact", pattern: Operations.formula.CONTACT })
 
 const Dis = createToken({ name: "Dis", pattern: Operations.formula.DISJUNCTION })
@@ -137,6 +138,7 @@ const allTokens = [
 
 // atomic formula
     Less,
+    EqualZero,
     Contact,
 
 // formula operation
@@ -221,14 +223,19 @@ class JsonParser extends CstParser {
                 { ALT: () => $.CONSUME(FormulaTrue, { LABEL: "constant" }) },
                 { ALT: () => $.CONSUME(FormulaFalse, { LABEL: "constant" }) },
                 { ALT: () => {
+                        $.CONSUME(EqualZero, { LABEL: "mid" })
+                        $.SUBRULE1($.Tdisjunction, { LABEL: "lhs" })
+                    }
+                },
+                { ALT: () => {
                         $.OR1([
                             { ALT: () => $.CONSUME(Less, { LABEL: "mid" }) },
                             { ALT: () => $.CONSUME(Contact, { LABEL: "mid" }) }
                         ])
                         $.CONSUME(LParen)
-                        $.SUBRULE($.Tdisjunction, { LABEL: "lhs" })
+                        $.SUBRULE2($.Tdisjunction, { LABEL: "lhs" })
                         $.CONSUME(Comma)
-                        $.SUBRULE2($.Tdisjunction, { LABEL: "rhs" })
+                        $.SUBRULE3($.Tdisjunction, { LABEL: "rhs" })
                         $.CONSUME(RParen)
                     }
                 }
@@ -325,6 +332,11 @@ function simplify(cst) {
             "name": symbol_to_explanation[cst.children["mid"][0].image],
             "value": children
         };
+    } else if (cst.children.hasOwnProperty("mid")) {
+        return {
+            "name": symbol_to_explanation[cst.children["mid"][0].image],
+            "value": simplify(cst.children["lhs"][0])
+        }
     } else if (cst.children.hasOwnProperty("lhs")) {
         return simplify(cst.children["lhs"][0]);
     }
