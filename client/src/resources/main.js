@@ -91,6 +91,24 @@ const ZERO_ARG_OPERATIONS = new Set([
     symbol_to_explanation[Operations.help.STRING]
 ])
 
+const ALL_OPERATIONS = new Set([
+    symbol_to_explanation[Operations.formula.NEGATION],
+    symbol_to_explanation[Operations.formula.EQUAL_ZERO],
+    symbol_to_explanation[Operations.formula.LESS],
+    symbol_to_explanation[Operations.formula.CONTACT],
+    symbol_to_explanation[Operations.formula.CONJUNCTION],
+    symbol_to_explanation[Operations.formula.DISJUNCTION],
+    symbol_to_explanation[Operations.formula.IMPLICATION],
+    symbol_to_explanation[Operations.formula.EQUIVALENCY],
+    symbol_to_explanation[Operations.formula.constant.TRUE],
+    symbol_to_explanation[Operations.formula.constant.FALSE],
+    symbol_to_explanation[Operations.term.STAR],
+    symbol_to_explanation[Operations.term.UNION],
+    symbol_to_explanation[Operations.term.INTERSECTION],
+    symbol_to_explanation[Operations.term.constant.TRUE],
+    symbol_to_explanation[Operations.term.constant.FALSE],
+    symbol_to_explanation[Operations.help.STRING]
+])
 
 
 const createToken = chevrotain.createToken;
@@ -452,6 +470,7 @@ function formula_to_json(formula) {
     formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation[Operations.formula.IMPLICATION]]), decompose_implication);
     formula_traverse_top_to_bottom(simplified, NEG_OPERATIONS, remove_double_negations);
     formula_traverse_top_to_bottom(simplified, new Set([symbol_to_explanation[Operations.formula.CONTACT]]), decompose_contact_on_Tdis);
+    formula_traverse_top_to_bottom(simplified, ALL_OPERATIONS, calculate_constants);
 
     parsed["hasErrors"] = false;
     parsed["parsed_formula"] = simplified;
@@ -661,6 +680,83 @@ function decompose_equivalency(node) {
         ]
     }
     node.value = [left_child, right_child];
+}
+
+function constant_to_bool(constant) {
+    if (constant === "0")
+        return false;
+    if (constant === "1") 
+        return true;
+    if (constant === "F")
+        return false;
+    if (constant === "T")
+        return true;
+    throw "Constant can not be " + constant;
+}
+
+function bool_to_term(constant) {
+    return (constant) ? "1" : "0";
+}
+
+function bool_to_formula(constant) {
+    return (constant) ? "T" : "F";
+}
+
+function calculate_constants(node) {
+    function op(operation) {
+        functions = {
+            "Tstar": function(x) {
+                return bool_to_term(!constant_to_bool(x));
+            },
+            "Tor": function(x, y) {
+                return bool_to_term(constant_to_bool(x) | constant_to_bool(y));
+            },
+            "Tand": function(x, y) {
+                return bool_to_term(constant_to_bool(x) & constant_to_bool(y));
+            },
+            "Tstar": function(x) {
+                return bool_to_formula(!constant_to_bool(x));
+            },
+            "disjunction": function(x, y) {
+                return bool_to_term(constant_to_bool(x) | constant_to_bool(y));
+            },
+            "conjunction": function(x, y) {
+                return bool_to_term(constant_to_bool(x) & constant_to_bool(y));
+            },
+            "contact": function(x, y) {
+                return bool_to_term(constant_to_bool(x) & constant_to_bool(y));
+            },
+            "equal0": function(x) {
+                return bool_to_term(constant_to_bool(x) === false);
+            }
+        }
+        return functions[operation]
+    }
+    if (node.name === "0" || node.name === "1" || node.name === "F" || node.name === "T") {
+        return true;
+    }
+    if (node.name === "string") {
+        return false;
+    }
+    if (node.name === "Tstar" || node.name === "negation" || node.name === "equal0")  {
+        var result = calculate_constants(node.value);
+        if (result) {
+            node.name = op(node.name)(node.value);
+            delete node.value;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    var left = calculate_constants(node.value[0]);
+    var right = calculate_constants(node.value[1]);
+    if (left && right) {
+        node.name = op(node.name)(node.value[0].name, node.value[1].name)
+        delete node.value;
+        return true;
+    }
+    return false;
 }
 
 
