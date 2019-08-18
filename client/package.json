@@ -1,8 +1,8 @@
 {
   "name": "modal_logic_formula_prover",
   "version": "1.0.0",
-  "description": "TODO Update this",
-  "main": "formula_parser.js",
+  "description": "My webpack project",
+  "main": "./src/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "selenium_start": "webdriver-manager start",
@@ -10,22 +10,36 @@
     "selenium_stop": "webdriver-manager shutdown",
     "e2e_static": "protractor e2e/tests/static/conf.js",
     "e2e_generate": "bash ./scripts/generate_formulas.sh && protractor e2e/tests/generate/conf.js",
-    "e2e": "bash ./scripts/run-e2e-tests.sh"
+    "e2e": "bash ./scripts/run-e2e-tests.sh",
+    "build": "webpack",
+    "start": "webpack-dev-server"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "babel-loader": "^8.0.6",
+    "babel-plugin-syntax-dynamic-import": "^6.18.0",
+    "clean-webpack-plugin": "^3.0.0",
+    "css-loader": "^3.2.0",
+    "html-webpack-plugin": "^3.2.0",
     "jasmine": "^2.99.0",
     "jasmine-core": "^3.4.0",
     "karma": "^4.2.0",
     "karma-chrome-launcher": "^3.0.0",
     "karma-jasmine": "^2.0.1",
-    "protractor": "^5.4.2"
+    "protractor": "^5.4.2",
+    "style-loader": "^1.0.0",
+    "webpack": "^4.39.2",
+    "webpack-cli": "^3.3.7",
+    "webpack-dev-server": "^3.8.0"
   },
   "dependencies": {
     "chevrotain": "^4.8.1",
     "jquery": "^3.4.1",
     "jsdom": "^15.1.1",
+    "script-loader": "^0.7.2",
     "underscore": "^1.9.1",
     "xmlhttprequest": "^1.8.0"
   }

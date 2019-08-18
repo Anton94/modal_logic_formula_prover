@@ -2,15 +2,13 @@
 <html>
 	<head>
 		<link rel="shortcut icon" type="image/png" href="./img/home-icon.png"/>
-		<script src="./libs/chevrotain.js"></script>
-		<script src="./libs/jquery.min.js"></script>
-		<script src="./resources/main.js"></script>
+		<script src="./main.js"></script>
 		<script>
 			function prove(formula) {
 				document.getElementById("is_satisfied_output").innerHTML = "";
 				document.getElementById("output").innerHTML = "";
 
-				parsed = is_satisfied(formula);
+				parsed = mainObj.is_satisfied(formula);
 				if (parsed.hasErrors) {					
 					errorMessage = "";
 					if (parsed.lexErrors.length > 0) {

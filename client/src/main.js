@@ -1,5 +1,8 @@
 // TODO
 
+var chevrotain = require('chevrotain/lib/chevrotain');
+var $ = require('jquery/dist/jquery')
+
 var Operations = {
     formula: {
         LESS: "<=",
@@ -759,9 +762,12 @@ function calculate_constants(node) {
     return false;
 }
 
+function foo() {
+    console.log("Adasd");
+}
 
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-    module.exports = {formula_to_json, is_satisfied};
+    module.exports = {formula_to_json, is_satisfied, foo};
 }
 
 // (<=((a*b)+c, (b*m+c)) | C(a,b)) & C(b,m)
