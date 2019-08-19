@@ -10,12 +10,18 @@ export class formula {
         return this.ast_formula;
     }
 
-    ast_to_string() {
-        return JSON.stringify(this.ast_formula, undefined, 3);
+    ast_to_string(spaces) {
+        if (isNaN(spaces)) {
+            return JSON.stringify(this.ast_formula);
+        }
+        return JSON.stringify(this.ast_formula, undefined, spaces);
     }
 
-    cst_to_string() {
-        return JSON.stringify(this.cst_formula, undefined, 3);
+    cst_to_string(spaces) {
+        if (isNaN(spaces)) {
+            return JSON.stringify(this.cst_formula);
+        }
+        return JSON.stringify(this.cst_formula, undefined, spaces);
     }
 
     beautify() {

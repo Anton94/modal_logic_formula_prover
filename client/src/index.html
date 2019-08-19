@@ -30,8 +30,8 @@
 		            	document.getElementById("is_satisfied_output").innerHTML = data;
 		            });
 					
-					document.getElementById("output").innerHTML = parsed.parsed_formula.ast_to_string() + "\n\n";
-					document.getElementById("output").innerHTML += parsed.parsed_formula.cst_to_string();
+					document.getElementById("output").innerHTML = parsed.parsed_formula.ast_to_string(3) + "\n\n";
+					document.getElementById("output").innerHTML += parsed.parsed_formula.cst_to_string(3);
 				}
 
 			}
