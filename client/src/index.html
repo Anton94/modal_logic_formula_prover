@@ -30,8 +30,8 @@
 		            	document.getElementById("is_satisfied_output").innerHTML = data;
 		            });
 					
-					document.getElementById("output").innerHTML = JSON.stringify(parsed.parsed_formula, undefined, 3) + "\n\n";
-					document.getElementById("output").innerHTML += JSON.stringify(parsed.cst, undefined, 3);
+					document.getElementById("output").innerHTML = parsed.parsed_formula.ast_to_string() + "\n\n";
+					document.getElementById("output").innerHTML += parsed.parsed_formula.cst_to_string();
 				}
 
 			}
