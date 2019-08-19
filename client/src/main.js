@@ -1,6 +1,12 @@
 import { filter_manager } from './formula/filter/filter_manager';
 import { parse } from './formula/parser/parser';
 import { http_service } from './formula/http/http_service';
+import { HomeIcon } from './img/home-icon.png';
+import { AndIcon } from './img/and.png';
+import { BotIcon } from './img/bot.png';
+import { NotIcon } from './img/not.png';
+import { OrIcon } from './img/or.png';
+import { TopIcon } from './img/top.png';
 
 
 var service = new http_service();
