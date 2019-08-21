@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<script src="../libs/chevrotain.js"></script>
-		<script src="../libs/jquery.min.js"></script>
-		<script src="../resources/main.js"></script>
+		<script src="../main.js"></script>
 		<style>
 			code {
 				font-size: 15px;
@@ -22,7 +20,7 @@
 				document.getElementById("output").innerHTML += result;
 			}
 			function check_all(formula) {
-				is_satisfied_check_all(formula).is_satisfied
+				mainObj.is_satisfied_check_all(formula).is_satisfied
 					.done(function( data ) {
 	                	update_output(data);
 	            });	

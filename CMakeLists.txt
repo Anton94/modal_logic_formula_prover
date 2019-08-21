@@ -22,7 +22,5 @@ add_subdirectory (formula_lib)
 add_subdirectory (formula_proover)
 add_subdirectory (rest_server)
 add_subdirectory (tests)
+add_subdirectory (client)
 
-file(COPY client/src DESTINATION client)
-#NTODO: only copy these if in dev mode.
-file(COPY client/e2e/views DESTINATION client/src)
