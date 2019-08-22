@@ -1,15 +1,9 @@
 # 🚀 Welcome to your new awesome project!
 
-This project has been created using **webpack scaffold**, you can now run
+To build this app:
 
 ```
 npm run build
 ```
 
-or
-
-```
-yarn build
-```
-
-to bundle your application
+This will merge all files into one big main.js and will publish all files in a dist folder.
