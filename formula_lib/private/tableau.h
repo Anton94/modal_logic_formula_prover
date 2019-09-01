@@ -22,7 +22,7 @@ public:
     tableau& operator=(tableau&&) = default;
 
     // Checks if the formula is satisfiable or not
-    auto is_satisfiable(const formula& f, variables_evaluations_block& out_evaluation_block) -> bool;
+    auto is_satisfiable(const formula& f) -> bool;
 
 private:
     void clear();
@@ -83,32 +83,22 @@ private:
     // TODO: explain the algorithm
     // Generates evaluations for the variables and checks if they satisfy the atomic operations.
     auto path_has_satisfiable_variable_evaluation() -> bool;
-    auto satisfiable_evaluation_step() -> bool;
 
-    auto satisfiable_evaluation_step_contacts_T(formulas_t::iterator contacts_T_it) -> bool;
-    auto satisfiable_evaluation_step_contacts_T_common(formulas_t::iterator contacts_T_it,
-                                                       term::evaluation_result&& left_eval_res,
-                                                       term::evaluation_result&& right_eval_res) -> bool;
-    auto satisfiable_evaluation_step_contacts_T_left(formulas_t::iterator contacts_T_it,
-                                                     term::evaluation_result&& left_eval_res,
-                                                     term::evaluation_result&& right_eval_res) -> bool;
-    auto satisfiable_evaluation_step_contacts_T_right(formulas_t::iterator contacts_T_it,
-                                                      const term::evaluation_result& eval_res) -> bool;
-    auto satisfiable_evaluation_step_contacts_F(formulas_t::iterator contacts_F_it) -> bool;
-    auto satisfiable_evaluation_step_zero_terms_T(terms_t::iterator zero_terms_T_it) -> bool;
-    auto satisfiable_evaluation_step_zero_terms_F(terms_t::iterator zero_terms_F_it) -> bool;
+    void clear_satisfiable_variable_evaluation();
+    void cache_used_variables_in_contact_F_and_zero_terms();
+    auto construct_contact_term_evaluation(const term* t) -> bool;
+    auto construct_non_zero_term_evaluation(const term* t, variables_evaluations_block& out_evaluation) const -> bool;
 
-    void log(const variables_evaluations_block& block) const;
+    // Generates new evaluation until @t evalautes to constant true with it
+    auto generate_next_positive_evaluation(const term* t, variables_evaluations_block& evaluation) const -> bool;
 
-    auto trace_get_top_block_variables() const -> std::string;
+    // Each contact term & evaluation (t, ev) should satisfy the following rules for each atomic formula of the following types:
+    //  - ~C(d1, d2) implies that 'd1' evaluated with @ev should be zero OR 'd2' evaluated with @ev should be zero
+    //  - a = 0 implies that 'a' evaluated with @ev should be zero
+    auto is_contact_F_rule_satisfied(const variables_evaluations_block& evaluation) const -> bool;
+    auto is_zero_term_rule_satisfied(const variables_evaluations_block& evaluation) const -> bool;
 
-    auto evaluate_with_combined(const term* t, const std::string& header_info = {}) -> term::evaluation_result;
-
-    void block_stack_push(const variables_evaluations_block& block, const std::string& header_info = {});
-    void block_stack_push(variables_evaluations_block&& block, const std::string& header_info = {});
-
-    void block_stack_pop(const std::string& header_info = {});
-    auto block_stack_generate(const std::string& header_info = {}) -> bool;
+    auto has_satisfiable_contact_evaluation_for_non_zero_term(const term* t) const -> bool;
 
     const formula_mgr* mgr_;
 
@@ -126,5 +116,12 @@ private:
     // i.e. for each F(C(a,b)), let C(a,b)'s pointer is 'c': a -> c and b -> c are mappings in the collection
     multiterm_to_formula_t terms_to_F_contacts_;
 
-    variables_evaluations_block_stack block_stack_;
+    using term_to_evaluation_map_t =
+        std::unordered_map<const term*, variables_evaluations_block, term_ptr_hasher, term_ptr_comparator>;
+    std::ostream& print(std::ostream& out, const term_to_evaluation_map_t& term_to_evalation);
+
+    term_to_evaluation_map_t contact_T_terms_to_evaluation_;
+    term_to_evaluation_map_t zero_terms_F_to_evaluation_;
+
+    variables_mask_t variables_in_contact_F_and_zero_terms_;
 };

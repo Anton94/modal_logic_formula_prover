@@ -61,14 +61,8 @@ int main(int argc, char* argv[])
         const auto variables = f.get_variables();
         info() << "Variables: " << variables;
 
-        variable_to_evaluation_map_t out_evalutaions;
-        const auto res = f.is_satisfiable(out_evalutaions);
+        const auto res = f.is_satisfiable();
         info() << "The formula is " << (res ? "" : "not ") << "satisfiable.";
-        if(res)
-        {
-            info() << "Variable evaluations:";
-            info() << out_evalutaions;
-        }
     }
     catch(const cxxopts::OptionException& e)
     {

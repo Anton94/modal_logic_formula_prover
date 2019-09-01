@@ -122,15 +122,10 @@ void microservice_controller::handle_post(http_request message)
                     formula_mgr mgr;
                     mgr.build(f_json);
 
-                    variable_to_evaluation_map_t out_evaluations;
-                    const auto is_satisfiable = mgr.is_satisfiable(out_evaluations);
+                    const auto is_satisfiable = mgr.is_satisfiable();
 
                     std::stringstream msg;
                     msg << "Satisfiable? " << to_string(is_satisfiable) << "\n";
-                    if(is_satisfiable)
-                    {
-                        msg << "Evaluations: " << out_evaluations << "\n";
-                    }
 
                     const auto msg_t = utility::conversions::to_string_t(msg.str());
                     ucout << msg_t << std::endl;
@@ -249,19 +244,19 @@ void microservice_controller::handle_post(http_request message)
 
                     std::stringstream msg;
                     variable_to_evaluation_map_t out_evaluations;
-                    const auto is_satisfiable = mgr.is_satisfiable(out_evaluations);
+                    const auto is_satisfiable = mgr.is_satisfiable();
                     msg << "is_satisfiable: " << to_string(is_satisfiable) << "\n";
 
                     auto valid = true;
 
                     if(is_satisfiable)
                     {
-                        msg << "cleaver method evaluations: " << out_evaluations << "\n";
+                        /*msg << "cleaver method evaluations: " << out_evaluations << "\n";
 
                         const auto true_certificate = mgr.does_evaluates_to_true(out_evaluations);
                         msg << "cert valid: " << to_string(true_certificate) << "\n";
 
-                        valid &= true_certificate;
+                        valid &= true_certificate;*/
                     }
 
                     if(bruteforce_enabled)

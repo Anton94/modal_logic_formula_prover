@@ -133,78 +133,62 @@ auto formula_mgr::brute_force_evaluate(variable_to_evaluation_map_t& out_evaluat
     return false;
 }
 
-auto formula_mgr::is_satisfiable(variable_to_evaluation_map_t& out_evaluations) -> bool
+auto formula_mgr::is_satisfiable() -> bool
 {
     info() << "Running satisfiability checking of " << f_ << "...";
-    variables_evaluations_block result_evaluation_block(variables_mask_t{});
 
     bool is_f_satisfiable{};
     const auto elapsed_time = time_measured_call([&]() {
-        is_f_satisfiable = t_.is_satisfiable(f_, result_evaluation_block);
+        is_f_satisfiable = t_.is_satisfiable(f_);
     });
 
     info() << (is_f_satisfiable ? "Satisfiable" : "NOT Satisfiable") << ". "
            << "Took " << elapsed_time.count() << "ms.";
-    if(is_f_satisfiable)
-    {
-        out_evaluations.clear();
-        const auto& variables = result_evaluation_block.get_variables();
-        const auto& evaluations = result_evaluation_block.get_evaluations();
-        for(size_t i = 0; i < variables.size(); ++i)
-        {
-            if(variables[i])
-            {
-                out_evaluations.push_back({get_variable(i), evaluations.test(i)});
-            }
-        }
-        info() << "Evaluations: " << out_evaluations;
-        return true;
-    }
-    return false;
+    return is_f_satisfiable;
 }
 
-auto formula_mgr::does_evaluates_to_true(const variable_to_evaluation_map_t& evaluations) -> bool
-{
-    variables_mask_t variables_mask(variables_.size());
-    for(const auto& variable_evaluation : evaluations)
-    {
-        const auto& name = variable_evaluation.first;
-        const auto it = variable_to_id_.find(name);
-        if(it == variable_to_id_.end())
-        {
-            error() << "The variable " << name << " is not used in the formula: " << f_;
-            return false;
-        }
-        const auto id = it->second;
-
-        variables_mask.set(id, true);
-    }
-
-    variables_evaluations_block evaluation_block(variables_mask);
-    auto& evaluation_block_evaluations = evaluation_block.get_evaluations();
-    for(const auto& variable_evaluation : evaluations)
-    {
-        const auto& name = variable_evaluation.first;
-        const auto& evaluation = variable_evaluation.second;
-        const auto it = variable_to_id_.find(name);
-        assert(it != variable_to_id_.end());
-        const auto id = it->second;
-
-        evaluation_block_evaluations.set(id, evaluation);
-    }
-
-    trace() << "Trying to evaluate " << f_ << " to constant true with:";
-    print(trace().get_buff(), evaluation_block);
-
-    if(f_.does_evaluate_to_true(evaluation_block))
-    {
-        trace() << "    ... success";
-        return true;
-    }
-
-    trace() << "    ... fail";
-    return false;
-}
+//auto formula_mgr::does_evaluates_to_true(const variable_to_evaluation_map_t& evaluations) -> bool
+//{
+//    variables_mask_t variables_mask(variables_.size());
+//    for(const auto& variable_evaluation : evaluations)
+//    {
+//        const auto& name = variable_evaluation.first;
+//        const auto it = variable_to_id_.find(name);
+//        if(it == variable_to_id_.end())
+//        {
+//            error() << "The variable " << name << " is not used in the formula: " << f_;
+//            return false;
+//        }
+//        const auto id = it->second;
+//
+//        variables_mask.set(id, true);
+//    }
+//
+//    variables_evaluations_block evaluation_block(variables_mask);
+//    auto& evaluation_block_evaluations = evaluation_block.get_evaluations();
+//    for(const auto& variable_evaluation : evaluations)
+//    {
+//        const auto& name = variable_evaluation.first;
+//        const auto& evaluation = variable_evaluation.second;
+//        const auto it = variable_to_id_.find(name);
+//        assert(it != variable_to_id_.end());
+//        const auto id = it->second;
+//
+//        evaluation_block_evaluations.set(id, evaluation);
+//    }
+//
+//    trace() << "Trying to evaluate " << f_ << " to constant true with:";
+//    print(trace().get_buff(), evaluation_block);
+//
+//    if(f_.does_evaluate_to_true(evaluation_block))
+//    {
+//        trace() << "    ... success";
+//        return true;
+//    }
+//
+//    trace() << "    ... fail";
+//    return false;
+//}
 
 void formula_mgr::clear()
 {
@@ -239,7 +223,7 @@ auto formula_mgr::get_internal_formula() const -> const formula*
     return &f_;
 }
 
-void formula_mgr::print(std::ostream& out, const variables_evaluations_block& block) const
+auto formula_mgr::print(std::ostream& out, const variables_evaluations_block& block) const -> std::ostream&
 {
     const auto& variables = block.get_variables();
     const auto& evaluations = block.get_evaluations();
@@ -250,9 +234,10 @@ void formula_mgr::print(std::ostream& out, const variables_evaluations_block& bl
             out << "<" << get_variable(i) << " : " << evaluations.test(i) << "> ";
         }
     }
+    return out;
 }
 
-void formula_mgr::print(std::ostream& out, const variables_mask_t& variables_mask) const
+auto formula_mgr::print(std::ostream& out, const variables_mask_t& variables_mask) const -> std::ostream&
 {
     for(size_t i = 0; i < variables_mask.size(); ++i)
     {
@@ -261,6 +246,7 @@ void formula_mgr::print(std::ostream& out, const variables_mask_t& variables_mas
             out << get_variable(i) << " ";
         }
     }
+    return out;
 }
 
 auto formula_mgr::change_variables_to_variable_ids(json& f) const -> bool

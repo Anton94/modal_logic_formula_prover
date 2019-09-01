@@ -10,13 +10,12 @@ auto is_satisfiable = [](const json& formula_json, bool expected_result) {
     formula_mgr f;
     CHECK(f.build(copy_f));
 
-    variable_to_evaluation_map_t out_evaluations;
-    CHECK(f.is_satisfiable(out_evaluations) == expected_result);
+    CHECK(f.is_satisfiable() == expected_result);
 
-    if(expected_result)
-    {
-        CHECK(f.does_evaluates_to_true(out_evaluations));
-    }
+    //if(expected_result)
+    //{
+    //    CHECK(f.does_evaluates_to_true(out_evaluations));
+    //}
 };
 
 TEST_CASE("satisfiable 1", "[satisfiability]")
