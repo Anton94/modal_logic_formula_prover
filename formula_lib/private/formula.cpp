@@ -181,6 +181,52 @@ auto formula::evaluate(const full_variables_evaluations_t& variable_evaluations)
     }
 }
 
+auto formula::evaluate(relations_t& relations,
+	std::vector<variable_evaluation_set>& variables) const -> bool
+{
+	switch (op_)
+	{
+	case formula::operation_t::constant_true:
+		return true;
+	case formula::operation_t::constant_false:
+		return false;
+	case formula::operation_t::conjunction:
+		assert(child_f_.left && child_f_.right);
+		return child_f_.left->evaluate(relations, variables) &&
+			child_f_.right->evaluate(relations, variables);
+	case formula::operation_t::disjunction:
+		assert(child_f_.left && child_f_.right);
+		return child_f_.left->evaluate(relations, variables) ||
+			child_f_.right->evaluate(relations, variables);
+	case formula::operation_t::negation:
+		assert(child_f_.left);
+		return !child_f_.left->evaluate(relations, variables);
+	case formula::operation_t::eq_zero:
+		assert(child_t_.left);
+		return child_t_.left->evaluate(relations, variables).empty();
+	case formula::operation_t::c:
+	{
+		assert(child_t_.left && child_t_.right);
+		auto left = child_t_.left->evaluate(relations, variables);
+		auto right = child_t_.right->evaluate(relations, variables);
+		
+		for (auto i = left.begin(); i != left.end(); i++)
+		{
+			for (auto j = right.begin(); j != right.end(); j++) {
+				if (relations.find(std::pair<int, int>(*i, *j)) != relations.end())
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	default:
+		assert(false && "Unrecognized.");
+		return false;
+	}
+}
+
 auto formula::does_evaluate_to_true(const variables_evaluations_block& variable_evaluations) const -> bool
 {
     switch(op_)

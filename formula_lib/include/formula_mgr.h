@@ -28,7 +28,17 @@ public:
     // O(2^n) where n is the number of different variables
     auto brute_force_evaluate(variable_to_evaluation_map_t& out_evaluations) const -> bool;
 
-    // Checks if the formula is satisfiable or not
+	// This is the Native alghorithm which uses Sets for variables and Relations between their elements.
+	// Process:
+	//     For each possible Set of Relations
+	//	      generate all possible variables and verify if the formula is satisfiable
+	auto brute_force_evaluate_native(variable_to_sets_evaluation_map_t& out_evaluations) const -> bool;
+	auto foo(relations_t relations, variable_to_sets_evaluation_map_t& out_evaluations, int W, int start) const -> bool;
+	auto bar(relations_t relations, variable_to_sets_evaluation_map_t& out_evaluations, int W) const -> bool;
+	variables_evaluations_t* generate_next(variables_evaluations_t* current, int W) const;
+	std::vector<variable_evaluation_set> transform_to_sets(variables_evaluations_t* bin_representation, int W) const;
+
+	// Checks if the formula is satisfiable or not
     auto is_satisfiable() -> bool;
 
     // Checks if the formula evaluates to the constant true or not with the given subset of variable evaluations
@@ -62,3 +72,38 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& out, const formula_mgr& formulas);
+
+
+// Example of brute_force_evaluate_native
+// The W is chosen depending on the number of variables involved in the formula 
+// and probably the number of operations.
+// For example:
+// Let V = {a, b}, then we might choose W = {1, 2, 3}
+// Here the possible relations are { <1,2>, <2,3>, <1,3> }
+// meaning that we need to check for each subset of the above possible relations.
+// { }
+
+// { <1,2> }
+// { <1,3> }
+// { <2,3> }
+
+// { <1,2>, <1,3> }
+// { <1,2>, <2,3> }
+// { <1,3>, <2,3> }
+
+// { <1,2>, <1,3>, <2, 3> }
+
+// For each of the above possibilities 
+// we create all possible sets for the two variables
+// for example
+// a = {}, b = {}			- and check if satisfiable
+// a = {}, b = {1}			- and check if satisfiable
+// a = {}, b = {2}			- and check if satisfiable
+// a = {}, b = {3}			- and check if satisfiable
+// a = {}, b = {1,2}		- and check if satisfiable
+// a = {}, b = {1,3}		- and check if satisfiable
+// a = {}, b = {2,3}		- and check if satisfiable
+// a = {}, b = {1,2,3}		- and check if satisfiable
+// a = {1}, b = {}			- and check if satisfiable
+// a = {1}, b = {1}			- and check if satisfiable
+// ... and so on.

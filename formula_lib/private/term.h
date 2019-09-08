@@ -25,6 +25,9 @@ public:
 
     auto build(json& t) -> bool;
     auto evaluate(const full_variables_evaluations_t& variable_evaluations) const -> bool;
+	
+	auto evaluate(relations_t& relations, std::vector<variable_evaluation_set>& variables) const -> variable_evaluation_set;
+
     void clear();
 
     struct evaluation_result

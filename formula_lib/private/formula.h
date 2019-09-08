@@ -27,6 +27,8 @@ public:
     auto build(json& f) -> bool;
     auto evaluate(const full_variables_evaluations_t& variable_evaluations) const -> bool;
 
+	auto evaluate(relations_t& relations, std::vector<variable_evaluation_set>& variables) const -> bool;
+
     // given an evaluation of a subset of variables it checks if the formula is evaluated to constant true
     // if it's evaluated to a subformula or constant false returns false
     auto does_evaluate_to_true(const variables_evaluations_block& evaluation_block) const -> bool;

@@ -170,6 +170,80 @@ auto term::evaluate(const full_variables_evaluations_t& variable_evaluations) co
     }
 }
 
+auto term::evaluate(relations_t& relations,
+	std::vector<variable_evaluation_set>& variables) const -> variable_evaluation_set
+{
+	variable_evaluation_set whole_world;
+	for (int i = 0; i < variables[0].size(); ++i)
+	{
+		whole_world.insert(i);
+	}
+	switch (op_)
+	{
+	case operation_t::constant_true:
+	{
+		return whole_world;
+	}
+	case operation_t::constant_false:
+	{
+		variable_evaluation_set empty_set;
+		return empty_set;
+	}
+	case operation_t::union_:
+	{
+		assert(childs_.left && childs_.right);
+		auto left = childs_.left->evaluate(relations, variables);
+		auto right = childs_.right->evaluate(relations, variables);
+
+		variable_evaluation_set result(left);
+		for (auto i = right.begin(); i != right.end(); i++) 
+		{
+			result.insert(*i);
+		}
+
+		return result;
+	}
+	case operation_t::intersaction_:
+	{
+		assert(childs_.left && childs_.right);
+		auto left = childs_.left->evaluate(relations, variables);
+		auto right = childs_.right->evaluate(relations, variables);
+
+		variable_evaluation_set result;
+		for (auto i = left.begin(); i != left.end(); i++) {
+			if (right.find(*i) != right.end())
+			{
+				result.insert(*i);
+			}
+		}
+
+		return result;
+	}
+	case operation_t::star_:
+	{
+		assert(childs_.left);
+		auto left = childs_.left->evaluate(relations, variables);
+
+		variable_evaluation_set result;
+		for (auto i = whole_world.begin(); i != whole_world.end(); i++) {
+			if (left.find(*i) == left.end())
+			{
+				result.insert(*i);
+			}
+		}
+		return result;
+	}
+	case operation_t::variable_:
+	{
+		assert(variable_id_ < variables.size());
+		return variables[variable_id_]; // returns the evaluation for the variable
+	}
+	default:
+		assert(false && "Unrecognized.");
+		return variable_evaluation_set();
+	}
+}
+
 auto term::evaluate(const variables_evaluations_block& evaluation_block, bool skip_subterm_creation) const -> evaluation_result
 {
     using res_type = evaluation_result::result_type;

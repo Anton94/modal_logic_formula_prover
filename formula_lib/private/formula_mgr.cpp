@@ -133,6 +133,95 @@ auto formula_mgr::brute_force_evaluate(variable_to_evaluation_map_t& out_evaluat
     return false;
 }
 
+auto formula_mgr::brute_force_evaluate_native(variable_to_sets_evaluation_map_t& out_evaluations) const -> bool
+{
+	info() << "Running native brute force evalution checking of " << f_;
+	// W ? 
+	int W = 10;
+	relations_t xx;
+	return foo(xx, out_evaluations, W, 0);
+}
+
+auto formula_mgr::foo(relations_t relations, variable_to_sets_evaluation_map_t& out_evaluations, int W, int start) const -> bool
+{
+	// generate all possible sets for variables and check if satisfied.
+	if (bar(relations, out_evaluations, W)) 
+	{
+		return true;
+	}
+
+	for (int i = start; i < W - 1; ++i) 
+	{
+		for (int j = i + 1; j < W; ++j)
+		{
+			// generate new relation by adding one more element to it
+			relations_t new_relations(relations);
+			new_relations.insert(std::pair<int, int>(i, j));
+			if (foo(new_relations, out_evaluations, W, i)) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+auto formula_mgr::bar(relations_t relations, variable_to_sets_evaluation_map_t& out_evaluations, int W) const -> bool
+{
+	// while there is a new possible generation -> generate and verify if satisfied.
+	variables_evaluations_t* evals = NULL;
+
+	while (generate_next(evals, W)) 
+	{
+		auto variable_sets = transform_to_sets(evals, W);
+		if (f_.evaluate(relations, variable_sets))
+		{
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+variables_evaluations_t* formula_mgr::generate_next(variables_evaluations_t* current, int W) const
+{
+	if (current == NULL)
+	{
+		return new variables_evaluations_t(W * variables_.size() , false);
+	}
+
+	for (int i = 0; i < current->size(); ++i)
+	{
+		(*current)[i].flip();
+
+		if ((*current)[i])
+		{
+			return current;
+		}
+	}
+
+	return NULL;
+}
+
+std::vector<variable_evaluation_set> formula_mgr::transform_to_sets(variables_evaluations_t* bin_representation, int W) const 
+{
+	std::vector<variable_evaluation_set> result(variables_.size());
+
+	for (int i = 0; i < variables_.size(); ++i)
+	{
+		variable_evaluation_set variables;
+		for (int j = 0; j < W; ++j)
+		{
+			if ((*bin_representation)[i * variables_.size() + j])
+			{
+				variables.insert(j);
+			}
+		}
+		result.push_back(variables);
+	}
+
+	return result;
+}
+
 auto formula_mgr::is_satisfiable() -> bool
 {
     info() << "Running satisfiability checking of " << f_ << "...";
