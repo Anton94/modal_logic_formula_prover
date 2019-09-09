@@ -122,9 +122,14 @@ void microservice_controller::handle_post(http_request message)
                     formula_mgr mgr;
                     mgr.build(f_json);
 
+					variable_to_sets_evaluation_map_t out_evaluations;
+					bool isNativeSatisfied = mgr.brute_force_evaluate_native(out_evaluations);
+
                     const auto is_satisfiable = mgr.is_satisfiable();
 
                     std::stringstream msg;
+					msg << "Native? " << to_string(isNativeSatisfied) << "\n";
+					msg << out_evaluations << "\n";
                     msg << "Satisfiable? " << to_string(is_satisfiable) << "\n";
 
                     const auto msg_t = utility::conversions::to_string_t(msg.str());

@@ -137,7 +137,7 @@ auto formula_mgr::brute_force_evaluate_native(variable_to_sets_evaluation_map_t&
 {
 	info() << "Running native brute force evalution checking of " << f_;
 	// W ? 
-	int W = 10;
+	int W = 2;
 	relations_t xx;
 	return foo(xx, out_evaluations, W, 0);
 }
@@ -157,7 +157,8 @@ auto formula_mgr::foo(relations_t relations, variable_to_sets_evaluation_map_t& 
 			// generate new relation by adding one more element to it
 			relations_t new_relations(relations);
 			new_relations.insert(std::pair<int, int>(i, j));
-			if (foo(new_relations, out_evaluations, W, i)) {
+			int new_start = (j == W - 1) ? i + 1 : i;
+			if (foo(new_relations, out_evaluations, W, new_start)) {
 				return true;
 			}
 		}
@@ -170,11 +171,16 @@ auto formula_mgr::bar(relations_t relations, variable_to_sets_evaluation_map_t& 
 	// while there is a new possible generation -> generate and verify if satisfied.
 	variables_evaluations_t* evals = NULL;
 
-	while (generate_next(evals, W)) 
+	while ((evals = generate_next(evals, W)) != NULL)
 	{
 		auto variable_sets = transform_to_sets(evals, W);
 		if (f_.evaluate(relations, variable_sets))
 		{
+			// populate out_evaluations
+			for (int i = 0; i < variables_.size(); ++i)
+			{
+				out_evaluations.push_back(std::pair<std::string, variable_evaluation_set>(get_variable(i), variable_sets[i]));
+			}
 			return true;
 		}
 	}
@@ -186,7 +192,8 @@ variables_evaluations_t* formula_mgr::generate_next(variables_evaluations_t* cur
 {
 	if (current == NULL)
 	{
-		return new variables_evaluations_t(W * variables_.size() , false);
+		current = new variables_evaluations_t(W * variables_.size() , false);
+		return current;
 	}
 
 	for (int i = 0; i < current->size(); ++i)
@@ -204,14 +211,14 @@ variables_evaluations_t* formula_mgr::generate_next(variables_evaluations_t* cur
 
 std::vector<variable_evaluation_set> formula_mgr::transform_to_sets(variables_evaluations_t* bin_representation, int W) const 
 {
-	std::vector<variable_evaluation_set> result(variables_.size());
+	std::vector<variable_evaluation_set> result;
 
 	for (int i = 0; i < variables_.size(); ++i)
 	{
 		variable_evaluation_set variables;
 		for (int j = 0; j < W; ++j)
 		{
-			if ((*bin_representation)[i * variables_.size() + j])
+			if ((*bin_representation)[i * W + j])
 			{
 				variables.insert(j);
 			}

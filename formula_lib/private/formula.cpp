@@ -213,7 +213,9 @@ auto formula::evaluate(relations_t& relations,
 		for (auto i = left.begin(); i != left.end(); i++)
 		{
 			for (auto j = right.begin(); j != right.end(); j++) {
-				if (relations.find(std::pair<int, int>(*i, *j)) != relations.end())
+				if (*i == *j || // reflexivity of the contact
+					relations.find(std::pair<int, int>(*i, *j)) != relations.end() ||
+					relations.find(std::pair<int, int>(*j, *i)) != relations.end()) // symetry
 				{
 					return true;
 				}
