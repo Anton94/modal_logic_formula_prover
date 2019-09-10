@@ -174,7 +174,7 @@ auto term::evaluate(relations_t& relations,
 	std::vector<variable_evaluation_set>& variables) const -> variable_evaluation_set
 {
 	variable_evaluation_set whole_world;
-	for (int i = 0; i < variables[0].size(); ++i)
+		for (int i = 0; i < variables_.size(); ++i)
 	{
 		whole_world.insert(i);
 	}

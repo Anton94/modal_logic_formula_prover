@@ -33,8 +33,8 @@ public:
 	//     For each possible Set of Relations
 	//	      generate all possible variables and verify if the formula is satisfiable
 	auto brute_force_evaluate_native(variable_to_sets_evaluation_map_t& out_evaluations) const -> bool;
-	auto foo(relations_t relations, variable_to_sets_evaluation_map_t& out_evaluations, int W, int start) const -> bool;
-	auto bar(relations_t relations, variable_to_sets_evaluation_map_t& out_evaluations, int W) const -> bool;
+	auto native_bruteforce_recursive(relations_t relations, variable_to_sets_evaluation_map_t& out_evaluations, int W, int start, int end) const -> bool;
+	auto native_bruteforce_step(relations_t relations, variable_to_sets_evaluation_map_t& out_evaluations, int W) const -> bool;
 	variables_evaluations_t* generate_next(variables_evaluations_t* current, int W) const;
 	std::vector<variable_evaluation_set> transform_to_sets(variables_evaluations_t* bin_representation, int W) const;
 

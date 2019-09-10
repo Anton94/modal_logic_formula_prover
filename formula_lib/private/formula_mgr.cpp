@@ -137,28 +137,32 @@ auto formula_mgr::brute_force_evaluate_native(variable_to_sets_evaluation_map_t&
 {
 	info() << "Running native brute force evalution checking of " << f_;
 	// W ? 
-	int W = 2;
+	int W = variables_.size();
 	relations_t xx;
-	return foo(xx, out_evaluations, W, 0);
+	return native_bruteforce_recursive(xx, out_evaluations, W, 0, 1);
 }
 
-auto formula_mgr::foo(relations_t relations, variable_to_sets_evaluation_map_t& out_evaluations, int W, int start) const -> bool
+auto formula_mgr::native_bruteforce_recursive(relations_t relations, variable_to_sets_evaluation_map_t& out_evaluations, int W, int start, int end) const -> bool
 {
+	info() << "Evaluation with relations: " << relations;
 	// generate all possible sets for variables and check if satisfied.
-	if (bar(relations, out_evaluations, W)) 
+	if (native_bruteforce_step(relations, out_evaluations, W)) 
 	{
 		return true;
 	}
 
+	if (end == W) {
+		start++;
+		end = start + 1;
+	}
 	for (int i = start; i < W - 1; ++i) 
 	{
-		for (int j = i + 1; j < W; ++j)
+		for (int j = std::max(end, i + 1); j < W; ++j)
 		{
 			// generate new relation by adding one more element to it
 			relations_t new_relations(relations);
 			new_relations.insert(std::pair<int, int>(i, j));
-			int new_start = (j == W - 1) ? i + 1 : i;
-			if (foo(new_relations, out_evaluations, W, new_start)) {
+			if (native_bruteforce_recursive(new_relations, out_evaluations, W, i, j + 1)) {
 				return true;
 			}
 		}
@@ -166,13 +170,14 @@ auto formula_mgr::foo(relations_t relations, variable_to_sets_evaluation_map_t& 
 	return false;
 }
 
-auto formula_mgr::bar(relations_t relations, variable_to_sets_evaluation_map_t& out_evaluations, int W) const -> bool
+auto formula_mgr::native_bruteforce_step(relations_t relations, variable_to_sets_evaluation_map_t& out_evaluations, int W) const -> bool
 {
 	// while there is a new possible generation -> generate and verify if satisfied.
 	variables_evaluations_t* evals = NULL;
 
 	while ((evals = generate_next(evals, W)) != NULL)
 	{
+		//info() << "generated: " << *evals;
 		auto variable_sets = transform_to_sets(evals, W);
 		if (f_.evaluate(relations, variable_sets))
 		{
