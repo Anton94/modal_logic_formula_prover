@@ -22,11 +22,9 @@ auto tableau::is_satisfiable(const formula& f) -> bool
     if(satisfiable_step())
     {
         std::stringstream s;
-        s << "Contact terms and their evaluations:\n"; // TODO: instead of just terms print the contacts
-        print(s, contact_T_terms_to_evaluation_);
-        s << "Non-zero terms and their evaluations:\n";
-        print(s, zero_terms_F_to_evaluation_);
-        info() << "Model:\n" << s.str();
+        s << "Model points evluations:\n";
+
+        info() << "Model:\n" << s.str(); // TODO: print more info and run check with that model for the whole formula
         return true;
     }
     return false;
@@ -714,157 +712,69 @@ void tableau::F_disjunction_child::remove_from_F()
 
 auto tableau::path_has_satisfiable_variable_evaluation() -> bool
 {
-    clear_satisfiable_variable_evaluation();
     trace() << "Start looking for an satisfiable evaluation of the variables.";
+    model_.clear();
 
-    // Cache all used variables in the contact's terms and zero/non-zero terms
-    // in order to make evaluations for only those variables.
-    assert(mgr_);
-    variables_in_contact_F_and_zero_terms_ = variables_mask_t(mgr_->get_variables().size());
-    cache_used_variables_in_contact_F_and_zero_terms();
-
-    // Add all contact T terms and assign their first evaluation which will evaluate the them to constant true
-    for (const auto& c : contacts_T_)
-    {
-        if (!construct_contact_term_evaluation(c->get_left_child_term()) ||
-            !construct_contact_term_evaluation(c->get_right_child_term()))
-        {
-            return false;
-        }
-    }
-
-    // Create evaluations for the contact terms which satisfy the contact F and zero term rules
-    for (auto& term_eval : contact_T_terms_to_evaluation_)
-    {
-        const auto t = term_eval.first;
-        auto& evaluation = term_eval.second;
-		mgr_->print(info().get_buff(), evaluation);
-        while (!is_contact_F_rule_satisfied(evaluation) || !is_zero_term_rule_satisfied(evaluation))
-        {
-            if (!generate_next_positive_evaluation(t, evaluation)) // the generation can be done on the variables which are 
-            {
-                return false;
-            }
+    // TODO: Explain the algorithm in details
 			mgr_->print(info().get_buff(), evaluation);
-        }
+
+    // Cache all used variables in order to make evaluations for only them.
+    const auto used_variables = get_used_variables();
+
+    if (!model_.construct_model_points(contacts_T_, zero_terms_F_, used_variables, mgr_))
+    {
+        trace() << "Unable to construct the model points with binary var. evaluations which evaluates the contact & non-zero terms to 1";
+        return false;
     }
 
-    // For each non-zero term there should be at least one contact term's evaluation which makes it constant_true
-    // otherwise it tries to generate a new evaluation which evaluates the non-zero term to true and
-    // satisfied the contact F and zero term rules.
-    for (const auto& z : zero_terms_F_)
+    while (!is_zero_term_rule_satisfied() || !is_contact_F_rule_satisfied())
     {
-        if (has_satisfiable_contact_evaluation_for_non_zero_term(z))
+        if (!model_.generate_next_model_points_evaluation_combination())
         {
-            continue;
-        }
-
-        variables_evaluations_block evaluation(variables_mask_t(0)); // it will be overriten if succed
-        if (!construct_non_zero_term_evaluation(z, evaluation))
-        {
+            trace() << "Unable to generate a new combination of binary var. evaluations for the model points.";
             return false;
         }
-
-        while (!is_contact_F_rule_satisfied(evaluation) || !is_zero_term_rule_satisfied(evaluation))
-        {
-            if (!generate_next_positive_evaluation(z, evaluation))
-            {
-                return false;
-            }
-        }
-        zero_terms_F_to_evaluation_.insert({ z, std::move(evaluation) });
     }
 
     return true;
 }
 
-auto tableau::has_satisfiable_contact_evaluation_for_non_zero_term(const term* t) const -> bool
+auto tableau::get_used_variables() const -> variables_mask_t
 {
-    for (auto& term_eval : contact_T_terms_to_evaluation_)
+    assert(mgr_);
+    variables_mask_t used_variables(mgr_->get_variables().size());
+
+    for (const auto& c : contacts_T_)
     {
-        auto& evaluation = term_eval.second;
-        auto eval_res = t->evaluate(evaluation);
-        auto is_constant_true = eval_res.is_constant_true();
-        eval_res.free(); // there might be variables without evaluation in @t and to produce a subterm
-        if (is_constant_true)
-        {
-            return true;
-        }
+        used_variables |= c->get_left_child_term()->get_variables();
+        used_variables |= c->get_right_child_term()->get_variables();
     }
-    return false;
-}
-
-void tableau::clear_satisfiable_variable_evaluation()
-{
-    contact_T_terms_to_evaluation_.clear();
-    zero_terms_F_to_evaluation_.clear();
-    variables_in_contact_F_and_zero_terms_.clear();
-}
-
-void tableau::cache_used_variables_in_contact_F_and_zero_terms()
-{
     for (const auto& c : contacts_F_)
     {
-        variables_in_contact_F_and_zero_terms_ |= c->get_left_child_term()->get_variables();
-        variables_in_contact_F_and_zero_terms_ |= c->get_right_child_term()->get_variables();
+        used_variables |= c->get_left_child_term()->get_variables();
+        used_variables |= c->get_right_child_term()->get_variables();
     }
-    for (const auto& z : zero_terms_T_)
+    for (const auto& t : zero_terms_T_)
     {
-        variables_in_contact_F_and_zero_terms_ |= z->get_variables();
+        used_variables |= t->get_variables();
     }
-}
-
-auto tableau::construct_contact_term_evaluation(const term* t) -> bool
-{
-    const auto variables = variables_in_contact_F_and_zero_terms_ | t->get_variables();
-    auto it = contact_T_terms_to_evaluation_.insert({ t, variables_evaluations_block(variables) });
-	if (!it.second)
+    for (const auto& t : zero_terms_F_)
 	{
 		// the contact term is already in the collection, 
 		// so we do not need the same term again, the evaluation is sufficient for both terms
 		return true;
 	}
-    auto& evaluation = it.first->second;
-
-    // the evaluation of the term should be the constant true, i.e.
-    // for C(t, -/-) : the evaluation of 't' with the given @evaluation should be non-zero
-
-    return t->evaluate(evaluation).is_constant_true() ||
-        generate_next_positive_evaluation(t, evaluation);
-}
-
-auto tableau::construct_non_zero_term_evaluation(const term* t, variables_evaluations_block& out_evaluation) const -> bool
-{
-    const auto variables = variables_in_contact_F_and_zero_terms_ | t->get_variables();
-    out_evaluation = variables_evaluations_block(variables);
-
-    // the evaluation of the term should be the constant true, i.e.
-    // for t != 0 : the evaluation of 't' with the given @evaluation should be non-zero
-    return t->evaluate(out_evaluation).is_constant_true() ||
-        generate_next_positive_evaluation(t, out_evaluation);
-}
-
-auto tableau::generate_next_positive_evaluation(const term* t, variables_evaluations_block& evaluation) const -> bool
-{
-    do
     {
-        if (!evaluation.generate_next_evaluation())
-        {
-            trace() << "Unable to generate new evaluation for the term " << *t;
-            return false;
-        }
-    } while (!t->evaluate(evaluation).is_constant_true());
-    return true;
+        used_variables |= t->get_variables();
+    }
+    return used_variables;
 }
 
-auto tableau::is_contact_F_rule_satisfied(const variables_evaluations_block& evaluation) const -> bool
+auto tableau::is_contact_F_rule_satisfied() const -> bool
 {
-    for (const auto& c : contacts_F_)
+    for (const auto& neg_c : contacts_F_)
     {
-        // The @evaluation should evaluate at least one of the contact terms (left/right) to constant zero,
-        // i.e. both evaluations should NOT be non-zero
-        if (!c->get_left_child_term()->evaluate(evaluation).is_constant_false() &&
-            !c->get_right_child_term()->evaluate(evaluation).is_constant_false())
+        if (model_.is_in_contact(neg_c->get_left_child_term(), neg_c->get_right_child_term()))
         {
             return false;
         }
@@ -872,11 +782,14 @@ auto tableau::is_contact_F_rule_satisfied(const variables_evaluations_block& eva
     return true;
 }
 
-auto tableau::is_zero_term_rule_satisfied(const variables_evaluations_block& evaluation) const -> bool
+auto tableau::is_zero_term_rule_satisfied() const -> bool
 {
-    for (const auto& t : zero_terms_T_)
+    // The zero term, i.e. the <=(a,b) operation which is translated to (a * -b = 0),
+    // has the following semantic: <=(a,b) is satisfied iif v(a * -b) = empty_set which is a bitset of only zeros
+    // v(a * -b) = v(a) & v(-b) = v(a) & v(W\v(b)) = v(a) & ~v(b)
+    for (const auto& z : zero_terms_T_)
     {
-        if (!t->evaluate(evaluation).is_constant_false())
+        if (model_.is_not_empty_set(z))
         {
             return false;
         }
@@ -884,12 +797,12 @@ auto tableau::is_zero_term_rule_satisfied(const variables_evaluations_block& eva
     return true;
 }
 
-std::ostream& tableau::print(std::ostream& out, const tableau::term_to_evaluation_map_t& term_to_evalation)
+std::ostream& tableau::print(std::ostream& out, const model::model_points_t& model_points)
 {
-    for (const auto& term_eval : term_to_evalation)
+    for (const auto& term_eval : model_points)
     {
         out << *term_eval.first << " : ";
-        mgr_->print(out, term_eval.second);
+        mgr_->print(out, term_eval.evaluation);
     }
     return out;
 }

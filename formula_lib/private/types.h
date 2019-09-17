@@ -42,6 +42,10 @@ using multiterms_t = std::unordered_multiset<const term*, term_ptr_hasher, term_
 using multiterm_to_formula_t =
     std::unordered_multimap<const term*, const formula*, term_ptr_hasher, term_ptr_comparator>;
 
+using model_points_set_t = boost::dynamic_bitset<>;
+using variable_id_to_model_points_t = std::vector<model_points_set_t>;
+using model_points_sets_t = std::vector<model_points_set_t>;
+
 std::ostream& operator<<(std::ostream& out, const formulas_t& formulas);
 std::ostream& operator<<(std::ostream& out, const terms_t& terms);
 std::ostream& operator<<(std::ostream& out, const multiterms_t& terms);
