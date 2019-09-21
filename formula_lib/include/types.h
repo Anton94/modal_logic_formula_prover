@@ -19,6 +19,9 @@ std::ostream& operator<<(std::ostream& out, const variable_to_evaluation_map_t& 
 using variable_to_sets_evaluation_map_t = std::vector<std::pair<std::string, std::unordered_set<int>>>;
 std::ostream& operator<<(std::ostream& out, const variable_to_sets_evaluation_map_t& variables);
 
+using variable_to_bits_evaluation_map_t = std::vector<std::pair<std::string, std::vector<bool>>>;
+std::ostream& operator<<(std::ostream& out, const variable_to_bits_evaluation_map_t& variables);
+
 using variable_evaluation_set = std::unordered_set<int>;
 std::ostream& operator<<(std::ostream& out, const variable_evaluation_set& variables);
 

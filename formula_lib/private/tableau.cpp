@@ -738,13 +738,14 @@ auto tableau::path_has_satisfiable_variable_evaluation() -> bool
     {
         const auto t = term_eval.first;
         auto& evaluation = term_eval.second;
-
+		mgr_->print(info().get_buff(), evaluation);
         while (!is_contact_F_rule_satisfied(evaluation) || !is_zero_term_rule_satisfied(evaluation))
         {
             if (!generate_next_positive_evaluation(t, evaluation)) // the generation can be done on the variables which are 
             {
                 return false;
             }
+			mgr_->print(info().get_buff(), evaluation);
         }
     }
 
@@ -817,7 +818,12 @@ auto tableau::construct_contact_term_evaluation(const term* t) -> bool
 {
     const auto variables = variables_in_contact_F_and_zero_terms_ | t->get_variables();
     auto it = contact_T_terms_to_evaluation_.insert({ t, variables_evaluations_block(variables) });
-    assert(it.second);
+	if (!it.second)
+	{
+		// the contact term is already in the collection, 
+		// so we do not need the same term again, the evaluation is sufficient for both terms
+		return true;
+	}
     auto& evaluation = it.first->second;
 
     // the evaluation of the term should be the constant true, i.e.
@@ -882,7 +888,7 @@ std::ostream& tableau::print(std::ostream& out, const tableau::term_to_evaluatio
 {
     for (const auto& term_eval : term_to_evalation)
     {
-        out << term_eval.first << " : ";
+        out << *term_eval.first << " : ";
         mgr_->print(out, term_eval.second);
     }
     return out;

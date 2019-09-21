@@ -63,6 +63,20 @@ std::ostream& operator<<(std::ostream& out, const variable_to_sets_evaluation_ma
 	return out;
 }
 
+std::ostream& operator<<(std::ostream& out, const variable_to_bits_evaluation_map_t& variables_evaluations)
+{
+	for (const auto& variable_evaluation : variables_evaluations)
+	{
+		out << "[" << variable_evaluation.first << " : {";
+		for (const auto& el : variable_evaluation.second) {
+			out << el << ", ";
+		}
+		out << "} ] \n";
+	}
+
+	return out;
+}
+
 auto formula_ptr_hasher::operator()(const formula* const& f) const -> std::size_t
 {
     assert(f);

@@ -125,7 +125,7 @@ auto formula_mgr::brute_force_evaluate(variable_to_evaluation_map_t& out_evaluat
         out_evaluations.clear();
         for(size_t i = 0; i < evaluations.size(); ++i)
         {
-            out_evaluations.push_back({get_variable(i), evaluations[i]});\
+            out_evaluations.push_back({get_variable(i), evaluations[i]});
         }
         info() << "Evaluations: " << out_evaluations;
         return true;
@@ -232,6 +232,54 @@ std::vector<variable_evaluation_set> formula_mgr::transform_to_sets(variables_ev
 	}
 
 	return result;
+}
+
+std::vector<variables_evaluations_t>* formula_mgr::generate_next(std::vector<variables_evaluations_t>* current, int W) const
+{
+	for (int i = current->size() - 1; i >= 0; --i)
+	{
+		if ((generate_next(&((*current)[i]), W)) != NULL)
+		{
+			return current;
+		}
+	}
+	return NULL;
+}
+
+auto formula_mgr::brute_force_evaluate_with_points_count(variable_to_bits_evaluation_map_t& out_evaluations) const -> bool
+{
+	int R = f_.get_contacts_count();
+	int P = f_.get_zeroes_count();
+	int K = 2 * R + P;
+
+	std::vector<variables_evaluations_t>* evals = 
+		new std::vector<variables_evaluations_t>();
+
+	// populate 00..00 for every variable
+	for (int i = 0; i < variables_.size(); ++i)
+	{
+		evals->push_back(variables_evaluations_t(K, false));
+	}
+
+	do
+	{
+		if (f_.evaluate(evals, R, P))
+		{
+			out_evaluations.clear();
+			for (int i = 0; i < variables_.size(); ++i)
+			{
+				std::vector<bool> output_evaluation;
+				for (int j = 0; j < (*evals)[i].size(); ++j) 
+				{
+					output_evaluation.push_back((*evals)[i][j]);
+				}
+				out_evaluations.push_back({ get_variable(i), output_evaluation });
+			}
+			return true;
+		}
+	} while ((evals = generate_next(evals, K)) != NULL);
+
+	return false;
 }
 
 auto formula_mgr::is_satisfiable() -> bool

@@ -229,6 +229,108 @@ auto formula::evaluate(relations_t& relations,
 	}
 }
 
+auto formula::evaluate(std::vector<variables_evaluations_t>* evals, int R, int P) const -> bool
+{
+	switch (op_)
+	{
+	case formula::operation_t::constant_true:
+		return true;
+	case formula::operation_t::constant_false:
+		return false;
+	case formula::operation_t::conjunction:
+		assert(child_f_.left && child_f_.right);
+		return child_f_.left->evaluate(evals, R, P) &&
+			child_f_.right->evaluate(evals, R, P);
+	case formula::operation_t::disjunction:
+		assert(child_f_.left && child_f_.right);
+		return child_f_.left->evaluate(evals, R, P) ||
+			child_f_.right->evaluate(evals, R, P);
+	case formula::operation_t::negation:
+		assert(child_f_.left);
+		return !child_f_.left->evaluate(evals, R, P);
+	case formula::operation_t::eq_zero:
+		assert(child_t_.left);
+		return child_t_.left->evaluate(evals, 2 * R + P).none();
+	case formula::operation_t::c:
+	{
+		assert(child_t_.left && child_t_.right);
+		auto left = child_t_.left->evaluate(evals, 2 * R + P);
+		auto right = child_t_.right->evaluate(evals, 2 * R + P);
+
+		// all reflexive model points
+		if ((left & right).any()) {
+			return true;
+		}
+
+		// if there is a model point which connects left to the right
+		// in the contact points which are R.
+		for (int i = 0; i < 2 * R; i += 2)
+		{
+			if ((left[i] && right[i + 1]) 
+				|| (right[i] && left[i + 1]))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+	default:
+		assert(false && "Unrecognized.");
+		return false;
+	}
+}
+
+int formula::get_contacts_count() const
+{
+	switch (op_)
+	{
+	case formula::operation_t::constant_true:
+	case formula::operation_t::constant_false:
+	case formula::operation_t::eq_zero:
+		return 0;
+	case formula::operation_t::negation:
+		assert(child_f_.left);
+		return child_f_.left->get_contacts_count();
+	case formula::operation_t::conjunction:
+	case formula::operation_t::disjunction:
+		assert(child_f_.left);
+		assert(child_f_.right);
+		return child_f_.left->get_contacts_count()
+			+ child_f_.right->get_contacts_count();
+	case formula::operation_t::c:
+		return 1;
+	default:
+		assert(false && "Unrecognized.");
+		return 0;
+	}
+}
+
+int formula::get_zeroes_count() const
+{
+	switch (op_)
+	{
+	case formula::operation_t::constant_true:
+	case formula::operation_t::constant_false:
+	case formula::operation_t::c:
+		return 0;
+	case formula::operation_t::negation:
+		assert(child_f_.left);
+		return child_f_.left->get_zeroes_count();
+	case formula::operation_t::conjunction:
+	case formula::operation_t::disjunction:
+		assert(child_f_.left);
+		assert(child_f_.right);
+		return child_f_.left->get_zeroes_count()
+			+ child_f_.right->get_zeroes_count();
+	case formula::operation_t::eq_zero:
+		return 1;
+	default:
+		assert(false && "Unrecognized.");
+		return 0;
+	}
+}
+
 auto formula::does_evaluate_to_true(const variables_evaluations_block& variable_evaluations) const -> bool
 {
     switch(op_)
