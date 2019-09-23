@@ -170,6 +170,34 @@ auto term::evaluate(const full_variables_evaluations_t& variable_evaluations) co
     }
 }
 
+auto term::evaluate(const variable_id_to_model_points_t& variable_evaluations, const size_t elements_count) const -> model_points_set_t
+{
+    switch (op_)
+    {
+    case operation_t::constant_true:
+        return ~model_points_set_t(elements_count);
+    case operation_t::constant_false:
+        return model_points_set_t(elements_count);
+    case operation_t::union_:
+        assert(childs_.left && childs_.right);
+        return childs_.left->evaluate(variable_evaluations, elements_count) |
+            childs_.right->evaluate(variable_evaluations, elements_count);
+    case operation_t::intersaction_:
+        assert(childs_.left && childs_.right);
+        return childs_.left->evaluate(variable_evaluations, elements_count) &
+            childs_.right->evaluate(variable_evaluations, elements_count);
+    case operation_t::star_:
+        assert(childs_.left);
+        return ~childs_.left->evaluate(variable_evaluations, elements_count);
+    case operation_t::variable_:
+        assert(variable_id_ < variable_evaluations.size());
+        return variable_evaluations[variable_id_]; // returns the evaluation for the variable
+    default:
+        assert(false && "Unrecognized.");
+        return model_points_set_t(elements_count);
+    }
+}
+
 auto term::evaluate(relations_t& relations,
 	std::vector<variable_evaluation_set>& variables) const -> variable_evaluation_set
 {

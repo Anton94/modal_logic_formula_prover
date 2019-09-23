@@ -4,6 +4,7 @@
 #include "term.h"
 #include "types.h"
 #include "variables_evaluations_block_stack.h"
+#include "model.h"
 
 #include <ostream>
 #include <unordered_map>
@@ -84,21 +85,12 @@ private:
     // Generates evaluations for the variables and checks if they satisfy the atomic operations.
     auto path_has_satisfiable_variable_evaluation() -> bool;
 
-    void clear_satisfiable_variable_evaluation();
-    void cache_used_variables_in_contact_F_and_zero_terms();
-    auto construct_contact_term_evaluation(const term* t) -> bool;
-    auto construct_non_zero_term_evaluation(const term* t, variables_evaluations_block& out_evaluation) const -> bool;
+    auto get_used_variables() const -> variables_mask_t;
 
-    // Generates new evaluation until @t evalautes to constant true with it
-    auto generate_next_positive_evaluation(const term* t, variables_evaluations_block& evaluation) const -> bool;
+    auto is_contact_F_rule_satisfied() const -> bool;
+    auto is_zero_term_rule_satisfied() const -> bool;
 
-    // Each contact term & evaluation (t, ev) should satisfy the following rules for each atomic formula of the following types:
-    //  - ~C(d1, d2) implies that 'd1' evaluated with @ev should be zero OR 'd2' evaluated with @ev should be zero
-    //  - a = 0 implies that 'a' evaluated with @ev should be zero
-    auto is_contact_F_rule_satisfied(const variables_evaluations_block& evaluation) const -> bool;
-    auto is_zero_term_rule_satisfied(const variables_evaluations_block& evaluation) const -> bool;
-
-    auto has_satisfiable_contact_evaluation_for_non_zero_term(const term* t) const -> bool;
+    std::ostream& print(std::ostream& out, const model::model_points_t& model_points_);
 
     const formula_mgr* mgr_;
 
@@ -116,12 +108,5 @@ private:
     // i.e. for each F(C(a,b)), let C(a,b)'s pointer is 'c': a -> c and b -> c are mappings in the collection
     multiterm_to_formula_t terms_to_F_contacts_;
 
-    using term_to_evaluation_map_t =
-        std::unordered_map<const term*, variables_evaluations_block, term_ptr_hasher, term_ptr_comparator>;
-    std::ostream& print(std::ostream& out, const term_to_evaluation_map_t& term_to_evalation);
-
-    term_to_evaluation_map_t contact_T_terms_to_evaluation_;
-    term_to_evaluation_map_t zero_terms_F_to_evaluation_;
-
-    variables_mask_t variables_in_contact_F_and_zero_terms_;
+    model model_;
 };
