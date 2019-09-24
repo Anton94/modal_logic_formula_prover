@@ -1804,7 +1804,7 @@ TEST_CASE("satisfiable evaluation of path 2", "[satisfiability]")
                }
             ]
         })"_json,
-        false);
+        true);
 }
 
 TEST_CASE("satisfiable evaluation of path 3", "[satisfiability]")
@@ -1997,7 +1997,7 @@ TEST_CASE("satisfiable evaluation of path 4", "[satisfiability]")
                }
             ]
         })"_json,
-        false);
+        true);
 }
 
 TEST_CASE("satisfiable evaluation of path 5", "[satisfiability]")
@@ -2089,7 +2089,7 @@ TEST_CASE("satisfiable evaluation of path 5", "[satisfiability]")
                }
             ]
         })"_json,
-        false);
+        true);
 }
 
 TEST_CASE("satisfiable evaluation of path 6", "[satisfiability]")
@@ -2181,7 +2181,7 @@ TEST_CASE("satisfiable evaluation of path 6", "[satisfiability]")
                }
             ]
         })"_json,
-        false);
+        true);
 }
 
 TEST_CASE("satisfiable with constants 1", "[satisfiability]")
@@ -4420,7 +4420,7 @@ TEST_CASE("satisfiable evaluation of atomic formulas when there is a constant 1"
                }
             ]
         })"_json,
-        false);
+        true);
 }
 
 TEST_CASE("satisfiable evaluation of atomic formulas when there is a constant 2", "[satisfiability]")
@@ -4475,7 +4475,7 @@ TEST_CASE("satisfiable evaluation of atomic formulas when there is a constant 2"
                }
             ]
         })"_json,
-        false);
+        true);
 }
 
 TEST_CASE("satisfiable evaluation of atomic formulas when there is a constant 3", "[satisfiability]")
@@ -4524,7 +4524,7 @@ TEST_CASE("satisfiable evaluation of atomic formulas when there is a constant 3"
                }
             ]
         })"_json,
-        false);
+        true);
 }
 
 TEST_CASE("satisfiable evaluation of atomic formulas when there is a constant 4", "[satisfiability]")
@@ -4576,7 +4576,7 @@ TEST_CASE("satisfiable evaluation of atomic formulas when there is a constant 4"
                }
             ]
         })"_json,
-        false);
+        true);
 }
 
 TEST_CASE("satisfiable when F disjunction has contradicting right child 1", "[satisfiability]")
