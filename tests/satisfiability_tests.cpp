@@ -2094,6 +2094,154 @@ TEST_CASE("satisfiable evaluation of path 5", "[satisfiability]")
 
 TEST_CASE("satisfiable evaluation of path 6", "[satisfiability]")
 {
+    // C(a,b) & C(b,c) & <=(a,b) & ~C(a,c)
+    is_satisfiable(
+        R"({
+           "name": "conjunction",
+           "value": [
+              {
+                 "name": "conjunction",
+                 "value": [
+                    {
+                       "name": "contact",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "a"
+                          },
+                          {
+                             "name": "string",
+                             "value": "b"
+                          }
+                       ]
+                    },
+                    {
+                       "name": "contact",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "b"
+                          },
+                          {
+                             "name": "string",
+                             "value": "c"
+                          }
+                       ]
+                    }
+                 ]
+              },
+              {
+                 "name": "conjunction",
+                 "value": [
+                    {
+                       "name": "equal0",
+                       "value": {
+                          "name": "Tand",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "a"
+                             },
+                             {
+                                "name": "Tstar",
+                                "value": {
+                                   "name": "string",
+                                   "value": "b"
+                                }
+                             }
+                          ]
+                       }
+                    },
+                    {
+                       "name": "negation",
+                       "value": {
+                          "name": "contact",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "a"
+                             },
+                             {
+                                "name": "string",
+                                "value": "c"
+                             }
+                          ]
+                       }
+                    }
+                 ]
+              }
+           ]
+        })"_json,
+        true);
+}
+
+TEST_CASE("satisfiable evaluation of path 7", "[satisfiability]")
+{
+    // C(a,c) & <=(a,b) & ~C(b,c)
+    is_satisfiable(
+        R"({
+           "name": "conjunction",
+           "value": [
+              {
+                 "name": "conjunction",
+                 "value": [
+                    {
+                       "name": "contact",
+                       "value": [
+                          {
+                             "name": "string",
+                             "value": "a"
+                          },
+                          {
+                             "name": "string",
+                             "value": "c"
+                          }
+                       ]
+                    },
+                    {
+                       "name": "equal0",
+                       "value": {
+                          "name": "Tand",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "a"
+                             },
+                             {
+                                "name": "Tstar",
+                                "value": {
+                                   "name": "string",
+                                   "value": "b"
+                                }
+                             }
+                          ]
+                       }
+                    }
+                 ]
+              },
+              {
+                 "name": "negation",
+                 "value": {
+                    "name": "contact",
+                    "value": [
+                       {
+                          "name": "string",
+                          "value": "b"
+                       },
+                       {
+                          "name": "string",
+                          "value": "c"
+                       }
+                    ]
+                 }
+              }
+           ]
+        })"_json,
+        false);
+}
+
+TEST_CASE("satisfiable evaluation of path 8", "[satisfiability]")
+{
     // (C(a,a) & C(d,d)) & (~C(a,d) & ((m*n)*-o = 0)
     is_satisfiable(
         R"({
