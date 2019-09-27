@@ -61,7 +61,8 @@ int main(int argc, char* argv[])
         const auto variables = f.get_variables();
         info() << "Variables: " << variables;
 
-        const auto res = f.is_satisfiable();
+        model m;
+        const auto res = f.is_satisfiable(m);
         info() << "The formula is " << (res ? "" : "not ") << "satisfiable.";
     }
     catch(const cxxopts::OptionException& e)

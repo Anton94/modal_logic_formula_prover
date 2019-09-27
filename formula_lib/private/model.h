@@ -32,7 +32,9 @@ struct model
     auto is_not_in_contact(const term* a, const term* b) const -> bool;
     auto is_not_empty_set(const term* a) const -> bool;
 
-    auto get_model_points() const-> const model_points_t&;
+    auto get_model_points() const -> const model_points_t&;
+    auto get_variables_evaluations() const -> const variable_id_to_model_points_t&;
+    auto get_number_of_contacts() const -> size_t;
 
     void clear();
 
@@ -45,6 +47,8 @@ private:
     auto generate_next_positive_evaluation(const term* t, variables_evaluations_block& evaluation) const -> bool;
 
     void calculate_the_model_evaluation_of_each_variable();
+
+    friend std::ostream& operator<<(std::ostream& out, const model& m);
 
     const formula_mgr* mgr_{};
     variables_mask_t used_variables_{};

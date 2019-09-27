@@ -6,7 +6,7 @@
 #include "utils.h"
 #include "variables_evaluations_block_stack.h"
 
-auto tableau::is_satisfiable(const formula& f) -> bool
+auto tableau::is_satisfiable(const formula& f, model& out_model) -> bool
 {
     clear();
 
@@ -21,10 +21,8 @@ auto tableau::is_satisfiable(const formula& f) -> bool
 
     if(satisfiable_step())
     {
-        std::stringstream s;
-        s << "Model points evluations:\n";
-
-        info() << "Model:\n" << s.str(); // TODO: print more info and run check with that model for the whole formula
+        out_model = model_;
+        info() << "Model:\n" << out_model;
         return true;
     }
     return false;

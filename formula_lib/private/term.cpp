@@ -272,7 +272,7 @@ auto term::evaluate(relations_t& relations,
 	}
 }
 
-auto term::evaluate(std::vector<variables_evaluations_t>* evals, int K) const -> variables_evaluations_t
+auto term::evaluate(const std::vector<variables_evaluations_t>* evals, int K) const -> variables_evaluations_t
 {
 	variables_evaluations_t whole_world(K, true);
 	variables_evaluations_t empty_world(K, false);

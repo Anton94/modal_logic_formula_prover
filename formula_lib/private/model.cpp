@@ -101,6 +101,16 @@ auto model::get_model_points() const -> const model_points_t&
     return model_points_;
 }
 
+auto model::get_variables_evaluations() const -> const variable_id_to_model_points_t&
+{
+    return variable_ids_model_evaluations_;
+}
+
+auto model::get_number_of_contacts() const -> size_t
+{
+    return number_of_contacts_;
+}
+
 void model::clear()
 {
     used_variables_.clear();
@@ -188,4 +198,35 @@ void model::calculate_the_model_evaluation_of_each_variable()
             Pi = model_point_evaluation.find_next(Pi);
         }
     }
+}
+
+std::ostream& operator<<(std::ostream& out, const model& m)
+{
+    out << "Model points: \n";
+    for (size_t i = 0; i < m.model_points_.size(); ++i)
+    {
+        out << std::to_string(i) << " : ";
+        m.mgr_->print(out, m.model_points_[i].evaluation);
+    }
+
+    // TODO: contact connections print
+    out << "First " << m.number_of_contacts_ * 2 << " points are connected, i.e. 2k and 2k+1";
+
+    out << "Model evaluation of the variables";
+    for (size_t i = 0; i < m.variable_ids_model_evaluations_.size(); ++i)
+    {
+        const auto& variable_evaluation_bitset = m.variable_ids_model_evaluations_[i];
+
+        out << "v(" << m.mgr_->get_variable(i) << ") = { ";
+
+        auto model_point_id = variable_evaluation_bitset.find_first();
+        while (model_point_id != variables_evaluations_t::npos)
+        {
+            out << std::to_string(model_point_id) << ", ";
+            model_point_id = variable_evaluation_bitset.find_next(model_point_id);
+        }
+        out << "}";
+    }
+
+    return out;
 }

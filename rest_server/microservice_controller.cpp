@@ -125,7 +125,8 @@ void microservice_controller::handle_post(http_request message)
 					variable_to_bits_evaluation_map_t out_evaluations;
 					bool isNativeSatisfied = mgr.brute_force_evaluate_with_points_count(out_evaluations);
 
-                    const auto is_satisfiable = mgr.is_satisfiable();
+                    model m;
+                    const auto is_satisfiable = mgr.is_satisfiable(m);
 
                     std::stringstream msg;
 					msg << "Native? " << to_string(isNativeSatisfied) << "\n";
@@ -249,7 +250,8 @@ void microservice_controller::handle_post(http_request message)
 
                     std::stringstream msg;
                     variable_to_evaluation_map_t out_evaluations;
-                    const auto is_satisfiable = mgr.is_satisfiable();
+                    model m;
+                    const auto is_satisfiable = mgr.is_satisfiable(m);
                     msg << "is_satisfiable: " << to_string(is_satisfiable) << "\n";
 
                     auto valid = true;
@@ -266,7 +268,8 @@ void microservice_controller::handle_post(http_request message)
 
                     if(bruteforce_enabled)
                     {
-                        const auto bruteforce_status = mgr.brute_force_evaluate(out_evaluations);
+                        variable_to_bits_evaluation_map_t out_evals;
+                        const auto bruteforce_status = mgr.brute_force_evaluate_with_points_count(out_evals);
                         msg << "brute force: " << to_string(bruteforce_status) << "\n";
                         msg << "brute force evaluations: " << out_evaluations << "\n";
 

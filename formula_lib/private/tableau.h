@@ -23,7 +23,7 @@ public:
     tableau& operator=(tableau&&) = default;
 
     // Checks if the formula is satisfiable or not
-    auto is_satisfiable(const formula& f) -> bool;
+    auto is_satisfiable(const formula& f, model& out_model) -> bool;
 
 private:
     void clear();

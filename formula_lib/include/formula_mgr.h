@@ -45,7 +45,10 @@ public:
 	std::vector<variables_evaluations_t>* generate_next(std::vector<variables_evaluations_t>* current, int W) const;
 
 	// Checks if the formula is satisfiable or not
-    auto is_satisfiable() -> bool;
+    auto is_satisfiable(model& out_model) -> bool;
+
+    // Checks if the provided model satisfies the formula
+    auto is_model_satisfiable(const model& model) const -> bool;
 
     // Checks if the formula evaluates to the constant true or not with the given subset of variable evaluations
     //auto does_evaluates_to_true(const variable_to_evaluation_map_t& evaluations) -> bool;

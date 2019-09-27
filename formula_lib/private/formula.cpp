@@ -229,7 +229,7 @@ auto formula::evaluate(relations_t& relations,
 	}
 }
 
-auto formula::evaluate(std::vector<variables_evaluations_t>* evals, int R, int P) const -> bool
+auto formula::evaluate(const std::vector<variables_evaluations_t>* evals, int R, int P) const -> bool
 {
 	switch (op_)
 	{

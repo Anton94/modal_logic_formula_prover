@@ -28,7 +28,7 @@ public:
     auto evaluate(const full_variables_evaluations_t& variable_evaluations) const -> bool;
 
 	auto evaluate(relations_t& relations, std::vector<variable_evaluation_set>& variables) const -> bool;
-	auto evaluate(std::vector<variables_evaluations_t>* evals, int R, int P) const -> bool;
+	auto evaluate(const std::vector<variables_evaluations_t>* evals, int R, int P) const -> bool;
 	int get_contacts_count() const;
 	int get_zeroes_count() const;
 
