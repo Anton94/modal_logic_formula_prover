@@ -24,10 +24,6 @@ public:
 
     auto build(json& f) -> bool;
 
-    // Generates all sequences of 0/1 to evaluate the variables and checks if the formula is satisfied
-    // O(2^n) where n is the number of different variables
-    auto brute_force_evaluate(variable_to_evaluation_map_t& out_evaluations) const -> bool;
-
 	// This is the Native alghorithm which uses Sets for variables and Relations between their elements.
 	// Process:
 	//     For each possible Set of Relations
