@@ -5,7 +5,7 @@
 
 using json = nlohmann::json;
 
-auto is_satisfiable = [](const json& formula_json, bool expected_result) {
+auto is_satisfiable = [](const json& formula_json, bool expected_result, bool run_bruteforce = true) {
     auto copy_f = formula_json;
     formula_mgr f;
     CHECK(f.build(copy_f));
@@ -18,8 +18,11 @@ auto is_satisfiable = [](const json& formula_json, bool expected_result) {
         CHECK(f.is_model_satisfiable(m));
     }
 
-    //variable_to_bits_evaluation_map_t model;
-    //CHECK(f.brute_force_evaluate_with_points_count(model) == expected_result);
+    if (run_bruteforce)
+    {
+        variable_to_bits_evaluation_map_t model;
+        CHECK(f.brute_force_evaluate_with_points_count(model) == expected_result);
+    }
 };
 
 TEST_CASE("satisfiable 1", "[satisfiability]")
@@ -1230,6 +1233,7 @@ TEST_CASE("satisfiable 11", "[satisfiability]")
               }
            ]
         })"_json,
+        false,
         false);
 }
 
@@ -1343,7 +1347,8 @@ TEST_CASE("satisfiable 12", "[satisfiability]")
               }
            ]
         })"_json,
-        true);
+        true,
+        false);
 }
 
 TEST_CASE("satisfiable 13", "[satisfiability]")
@@ -2093,6 +2098,7 @@ TEST_CASE("satisfiable 19", "[satisfiability]")
                }
             ]
         })"_json,
+        false,
         false);
 }
 
@@ -2313,7 +2319,8 @@ TEST_CASE("satisfiable evaluation of path 2", "[satisfiability]")
                }
             ]
         })"_json,
-        true);
+        true,
+        false);
 }
 
 TEST_CASE("satisfiable evaluation of path 3", "[satisfiability]")
@@ -2447,7 +2454,8 @@ TEST_CASE("satisfiable evaluation of path 3", "[satisfiability]")
                }
             ]
         })"_json,
-        true);
+        true,
+        false);
 }
 
 TEST_CASE("satisfiable evaluation of path 4", "[satisfiability]")
@@ -2598,7 +2606,8 @@ TEST_CASE("satisfiable evaluation of path 5", "[satisfiability]")
                }
             ]
         })"_json,
-        true);
+        true,
+        false);
 }
 
 TEST_CASE("satisfiable evaluation of path 6", "[satisfiability]")
@@ -2838,7 +2847,8 @@ TEST_CASE("satisfiable evaluation of path 8", "[satisfiability]")
                }
             ]
         })"_json,
-        true);
+        true,
+        false);
 }
 
 TEST_CASE("satisfiable with constants 1", "[satisfiability]")
@@ -3552,6 +3562,7 @@ TEST_CASE("satisfiable with contact rule 6", "[satisfiability]")
               }
            ]
         })"_json,
+        false,
         false);
 }
 
@@ -3671,6 +3682,7 @@ TEST_CASE("satisfiable with contact rule 6.1", "[satisfiability]")
                }
             ]
         })"_json,
+        false,
         false);
 }
 
@@ -3950,6 +3962,7 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
               }
            ]
         })"_json,
+        false,
         false);
 }
 
@@ -4072,6 +4085,7 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
               }
            ]
         })"_json,
+        false,
         false);
 }
 
@@ -4197,7 +4211,8 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
               }
            ]
         })"_json,
-        true);
+        true,
+        false);
 }
 
 TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact 4", "[satisfiability]")
@@ -4326,6 +4341,7 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
                 ]
             }
         })"_json,
+        false,
         false);
 }
 
@@ -4448,6 +4464,7 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
               }
            ]
         })"_json,
+        false,
         false);
 }
 
@@ -4570,7 +4587,8 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
               }
            ]
         })"_json,
-        true);
+        true,
+        false);
 }
 
 TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact using same terms 2.1", "[satisfiability]")
@@ -4695,7 +4713,8 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
               }
            ]
         })"_json,
-        true);
+        true,
+        false);
 }
 
 TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact using same terms 3", "[satisfiability]")
@@ -4895,6 +4914,7 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
               }
            ]
         })"_json,
+        false,
         false);
 }
 
