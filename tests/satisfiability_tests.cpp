@@ -2098,7 +2098,7 @@ TEST_CASE("satisfiable 19", "[satisfiability]")
                }
             ]
         })"_json,
-        false,
+        true,
         false);
 }
 
@@ -3882,7 +3882,7 @@ TEST_CASE("satisfiable with contact rule 8", "[satisfiability]")
               }
            ]
         })"_json,
-        false);
+        true);
 }
 
 TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact", "[satisfiability]")
@@ -4218,7 +4218,6 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
 TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact 4", "[satisfiability]")
 {
     // ~( ~((<=(x,y) & ~<=(z, t)) & ~<=(a,b)) | C(a * -b, z * -t) )
-    // should contradict with the rule:  a != 0 & b != 0 -> C(a,b)
     is_satisfiable(
         R"({
             "name": "negation",
@@ -4341,7 +4340,7 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
                 ]
             }
         })"_json,
-        false,
+        true,
         false);
 }
 
@@ -4914,7 +4913,7 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
               }
            ]
         })"_json,
-        false,
+        true,
         false);
 }
 
