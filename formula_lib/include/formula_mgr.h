@@ -24,17 +24,6 @@ public:
 
     auto build(json& f) -> bool;
 
-	// This is the Native alghorithm which uses Sets for variables and Relations between their elements.
-	// Process:
-	//     For each possible Set of Relations
-	//	      generate all possible variables and verify if the formula is satisfiable
-	// Complexity O(2^2n)
-	auto brute_force_evaluate_native(variable_to_sets_evaluation_map_t& out_evaluations) const -> bool;
-	auto native_bruteforce_recursive(relations_t relations, variable_to_sets_evaluation_map_t& out_evaluations, int W, int start, int end) const -> bool;
-	auto native_bruteforce_step(relations_t relations, variable_to_sets_evaluation_map_t& out_evaluations, int W) const -> bool;
-	variables_evaluations_t* generate_next(variables_evaluations_t* current, int W) const;
-	std::vector<variable_evaluation_set> transform_to_sets(variables_evaluations_t* bin_representation, int W) const;
-
 	// Bruteforce algorithm without the knowledge of relations
 	// Process: 
 	//		Go through the formula and calculate:
@@ -42,7 +31,8 @@ public:
 	//			- P - number of subsets in the formula
 	//		For all possible variablses verify if the formula is satisfiable.
 	auto brute_force_evaluate_with_points_count(variable_to_bits_evaluation_map_t& out_evaluations) const -> bool;
-	std::vector<variables_evaluations_t>* generate_next(std::vector<variables_evaluations_t>* current, int W) const;
+    auto generate_next(variables_evaluations_t& current) const -> bool;
+	auto generate_next(std::vector<variables_evaluations_t>& current) const -> bool;
 
 	// Checks if the formula is satisfiable or not
     auto is_satisfiable(model& out_model) -> bool;

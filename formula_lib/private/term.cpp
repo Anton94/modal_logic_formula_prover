@@ -272,54 +272,6 @@ auto term::evaluate(relations_t& relations,
 	}
 }
 
-auto term::evaluate(const std::vector<variables_evaluations_t>* evals, int K) const -> variables_evaluations_t
-{
-	variables_evaluations_t whole_world(K, true);
-	variables_evaluations_t empty_world(K, false);
-	switch (op_)
-	{
-	case operation_t::constant_true:
-	{
-		return whole_world;
-	}
-	case operation_t::constant_false:
-	{
-		return empty_world;
-	}
-	case operation_t::union_:
-	{
-		assert(childs_.left && childs_.right);
-		auto left = childs_.left->evaluate(evals, K);
-		auto right = childs_.right->evaluate(evals, K);
-
-		return left | right;
-	}
-	case operation_t::intersaction_:
-	{
-		assert(childs_.left && childs_.right);
-		auto left = childs_.left->evaluate(evals, K);
-		auto right = childs_.right->evaluate(evals, K);
-
-		return left & right;
-	}
-	case operation_t::star_:
-	{
-		assert(childs_.left);
-		auto left = childs_.left->evaluate(evals, K);
-
-		return ~left;
-	}
-	case operation_t::variable_:
-	{
-		assert(variable_id_ < evals->size());
-		return (*evals)[variable_id_]; // returns the evaluation for the variable
-	}
-	default:
-		assert(false && "Unrecognized.");
-		return empty_world;
-	}
-}
-
 auto term::evaluate(const variables_evaluations_block& evaluation_block, bool skip_subterm_creation) const -> evaluation_result
 {
     using res_type = evaluation_result::result_type;

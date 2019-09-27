@@ -28,8 +28,7 @@ public:
 
     auto evaluate(const variable_id_to_model_points_t& variable_evaluations, const size_t elements_count) const -> model_points_set_t;
 
-	auto evaluate(relations_t& relations, std::vector<variable_evaluation_set>& variables) const->variable_evaluation_set;
-	auto evaluate(const std::vector<variables_evaluations_t>* evals, int K) const -> variables_evaluations_t;
+    auto evaluate(relations_t& relations, std::vector<variable_evaluation_set>& variables) const-> variable_evaluation_set;
 
     void clear();
 

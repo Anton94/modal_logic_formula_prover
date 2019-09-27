@@ -9,6 +9,34 @@ class formula;
 
 struct model
 {
+    /*
+        Les't have 3 contacts and 1 non-zero term in the following formula:
+
+        C(a,b) & C(c,d) & C(e,f) & g != 0 & x = 0 & ~C(y,z)
+
+        The model is the following:
+
+        (xxx...x) (a) O--------------1 (b) (xxx...x)
+        (xxx...x) (c) 2--------------3 (d) (xxx...x)
+        (xxx...x) (e) 4--------------5 (f) (xxx...x)
+        (xxx...x) (g) 6
+
+        Note that the zero terms and negation of C are not interested to us because they does not require existence.
+
+        where (xxx...x) is a bitset, e.g. (010...1) which gives 0/1 evaluation for the variables in the formula, so its size is the number of different variables in the formula
+        i = 0...6 are the model points (reflexive), the contact points are connected (-------) (also symetric)
+
+        Model evaluation 'v' which for a given term returns a subset of the model points.
+        :
+         - v(p) = { i | (i) (xxx...x)[p] == 1, i.e. in point 'i' the evaluation of the variable 'p' is 1 }, where 'p' is a variable(an id)
+         - v(a * b) = v(a) & v(b)
+         - v(a + b) = v(a) | v(b)
+         - v(-a) = ~v(a)
+
+        Depending on the generation policy, we might want to generate a new evaluation for the point which evaluates the corresponding
+        contact term to the constant true (in order that point to be in the model evaluation of that term, i.e. v(a) = { i | i is a contact point }
+
+    */
     struct term_evaluation_t
     {
         const term* t;

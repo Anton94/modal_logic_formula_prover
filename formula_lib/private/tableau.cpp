@@ -356,7 +356,7 @@ auto tableau::has_broken_contact_rule_F(const formula* f) const -> bool
 
 auto tableau::has_broken_contact_rule_new_non_zero_term(const term* key_t) const -> bool
 {
-    // a != 0, X != 0 -> C(a, X)
+    // a != 0, X != 0 -> C(a, X) // TODO: reversed?
     // a != 0 breaks the contact rule if there is F(C(x,y)) where x/y = a & y/x != 0, i.e. x != 0 & y != 0
 
     auto iterpair = terms_to_F_contacts_.equal_range(key_t);

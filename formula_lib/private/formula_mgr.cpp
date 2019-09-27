@@ -106,117 +106,31 @@ auto formula_mgr::build(json& f) -> bool
     return change_variables_to_variable_ids(f) && f_.build(f);
 }
 
-auto formula_mgr::brute_force_evaluate_native(variable_to_sets_evaluation_map_t& out_evaluations) const -> bool
+auto formula_mgr::generate_next(variables_evaluations_t& current) const -> bool
 {
-	info() << "Running native brute force evalution checking of " << f_;
-	// W ? 
-	int W = variables_.size();
-	relations_t xx;
-	return native_bruteforce_recursive(xx, out_evaluations, W, 0, 1);
-}
-
-auto formula_mgr::native_bruteforce_recursive(relations_t relations, variable_to_sets_evaluation_map_t& out_evaluations, int W, int start, int end) const -> bool
-{
-	info() << "Evaluation with relations: " << relations;
-	// generate all possible sets for variables and check if satisfied.
-	if (native_bruteforce_step(relations, out_evaluations, W)) 
+	for (int i = 0; i < current.size(); ++i)
 	{
-		return true;
-	}
+		current[i].flip();
 
-	if (end == W) {
-		start++;
-		end = start + 1;
-	}
-	for (int i = start; i < W - 1; ++i) 
-	{
-		for (int j = std::max(end, i + 1); j < W; ++j)
+		if (current[i])
 		{
-			// generate new relation by adding one more element to it
-			relations_t new_relations(relations);
-			new_relations.insert(std::pair<int, int>(i, j));
-			if (native_bruteforce_recursive(new_relations, out_evaluations, W, i, j + 1)) {
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-auto formula_mgr::native_bruteforce_step(relations_t relations, variable_to_sets_evaluation_map_t& out_evaluations, int W) const -> bool
-{
-	// while there is a new possible generation -> generate and verify if satisfied.
-	variables_evaluations_t* evals = NULL;
-
-	while ((evals = generate_next(evals, W)) != NULL)
-	{
-		//info() << "generated: " << *evals;
-		auto variable_sets = transform_to_sets(evals, W);
-		if (f_.evaluate(relations, variable_sets))
-		{
-			// populate out_evaluations
-			for (int i = 0; i < variables_.size(); ++i)
-			{
-				out_evaluations.push_back(std::pair<std::string, variable_evaluation_set>(get_variable(i), variable_sets[i]));
-			}
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
-variables_evaluations_t* formula_mgr::generate_next(variables_evaluations_t* current, int W) const
+auto formula_mgr::generate_next(std::vector<variables_evaluations_t>& current) const -> bool
 {
-	if (current == NULL)
+	for (int i = current.size() - 1; i >= 0; --i)
 	{
-		current = new variables_evaluations_t(W * variables_.size() , false);
-		return current;
-	}
-
-	for (int i = 0; i < current->size(); ++i)
-	{
-		(*current)[i].flip();
-
-		if ((*current)[i])
+		if (generate_next((current[i])))
 		{
-			return current;
+			return true;
 		}
 	}
-
-	return NULL;
-}
-
-std::vector<variable_evaluation_set> formula_mgr::transform_to_sets(variables_evaluations_t* bin_representation, int W) const 
-{
-	std::vector<variable_evaluation_set> result;
-
-	for (int i = 0; i < variables_.size(); ++i)
-	{
-		variable_evaluation_set variables;
-		for (int j = 0; j < W; ++j)
-		{
-			if ((*bin_representation)[i * W + j])
-			{
-				variables.insert(j);
-			}
-		}
-		result.push_back(variables);
-	}
-
-	return result;
-}
-
-std::vector<variables_evaluations_t>* formula_mgr::generate_next(std::vector<variables_evaluations_t>* current, int W) const
-{
-	for (int i = current->size() - 1; i >= 0; --i)
-	{
-		if ((generate_next(&((*current)[i]), W)) != NULL)
-		{
-			return current;
-		}
-	}
-	return NULL;
+	return false;
 }
 
 auto formula_mgr::brute_force_evaluate_with_points_count(variable_to_bits_evaluation_map_t& out_evaluations) const -> bool
@@ -225,14 +139,8 @@ auto formula_mgr::brute_force_evaluate_with_points_count(variable_to_bits_evalua
 	int P = f_.get_zeroes_count();
 	int K = 2 * R + P;
 
-	std::vector<variables_evaluations_t>* evals = 
-		new std::vector<variables_evaluations_t>();
-
-	// populate 00..00 for every variable
-	for (int i = 0; i < variables_.size(); ++i)
-	{
-		evals->push_back(variables_evaluations_t(K, false));
-	}
+    // populate 00..00 for every variable
+    std::vector<variables_evaluations_t> evals(variables_.size(), variables_evaluations_t(K, false));
 
 	do
 	{
@@ -242,15 +150,15 @@ auto formula_mgr::brute_force_evaluate_with_points_count(variable_to_bits_evalua
 			for (int i = 0; i < variables_.size(); ++i)
 			{
 				std::vector<bool> output_evaluation;
-				for (int j = 0; j < (*evals)[i].size(); ++j) 
+				for (int j = 0; j < evals[i].size(); ++j) 
 				{
-					output_evaluation.push_back((*evals)[i][j]);
+					output_evaluation.push_back(evals[i][j]);
 				}
 				out_evaluations.push_back({ get_variable(i), output_evaluation });
 			}
 			return true;
 		}
-	} while ((evals = generate_next(evals, K)) != NULL);
+	} while (generate_next(evals));
 
 	return false;
 }
@@ -283,7 +191,7 @@ auto formula_mgr::is_model_satisfiable(const model& model) const -> bool
     const auto number_of_contacts = model.get_number_of_contacts();
     const auto number_of_non_zeros = model.get_model_points().size() - number_of_contacts * 2; // the contact points are twice as many as the contacts and the lefover is from the non-zero points
 
-    return f_.evaluate(&model_variable_evaluations, number_of_contacts, number_of_non_zeros);
+    return f_.evaluate(model_variable_evaluations, number_of_contacts, number_of_non_zeros);
 }
 
 void formula_mgr::clear()

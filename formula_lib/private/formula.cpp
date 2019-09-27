@@ -229,7 +229,7 @@ auto formula::evaluate(relations_t& relations,
 	}
 }
 
-auto formula::evaluate(const std::vector<variables_evaluations_t>* evals, int R, int P) const -> bool
+auto formula::evaluate(const std::vector<variables_evaluations_t>& evals, int R, int P) const -> bool
 {
 	switch (op_)
 	{
@@ -329,39 +329,6 @@ int formula::get_zeroes_count() const
 		assert(false && "Unrecognized.");
 		return 0;
 	}
-}
-
-auto formula::does_evaluate_to_true(const variables_evaluations_block& variable_evaluations) const -> bool
-{
-    switch(op_)
-    {
-        case formula::operation_t::constant_true:
-            return true;
-        case formula::operation_t::constant_false:
-            return false;
-        case formula::operation_t::conjunction:
-            assert(child_f_.left && child_f_.right);
-            return child_f_.left->does_evaluate_to_true(variable_evaluations) &&
-                   child_f_.right->does_evaluate_to_true(variable_evaluations);
-        case formula::operation_t::disjunction:
-            assert(child_f_.left && child_f_.right);
-            return child_f_.left->does_evaluate_to_true(variable_evaluations) ||
-                   child_f_.right->does_evaluate_to_true(variable_evaluations);
-        case formula::operation_t::negation:
-            assert(child_f_.left);
-            return !child_f_.left->does_evaluate_to_true(variable_evaluations);
-        case formula::operation_t::eq_zero:
-            assert(child_t_.left);
-            return child_t_.left->evaluate(variable_evaluations, true).is_constant_false();
-        case formula::operation_t::c:
-            assert(child_t_.left && child_t_.right);
-            // C(a, b) is satisfied if a != 0 and b != 0
-            return child_t_.left->evaluate(variable_evaluations, true).is_constant_true() &&
-                   child_t_.right->evaluate(variable_evaluations, true).is_constant_true();
-        default:
-            assert(false && "Unrecognized.");
-            return false;
-    }
 }
 
 void formula::clear()
