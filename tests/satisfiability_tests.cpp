@@ -18,8 +18,8 @@ auto is_satisfiable = [](const json& formula_json, bool expected_result) {
         CHECK(f.is_model_satisfiable(m));
     }
 
-    variable_to_bits_evaluation_map_t model;
-    CHECK(f.brute_force_evaluate_with_points_count(model) == expected_result);
+    //variable_to_bits_evaluation_map_t model;
+    //CHECK(f.brute_force_evaluate_with_points_count(model) == expected_result);
 };
 
 TEST_CASE("satisfiable 1", "[satisfiability]")
