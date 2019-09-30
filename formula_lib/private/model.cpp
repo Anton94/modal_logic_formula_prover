@@ -7,6 +7,7 @@
 
 auto model::construct_model_points(const formulas_t& contacts, const terms_t& non_zero_terms, const variables_mask_t& used_variables, const formula_mgr* mgr) -> bool
 {
+    clear();
     mgr_ = mgr;
     used_variables_ = used_variables;
     number_of_contacts_ = contacts.size();
@@ -131,6 +132,7 @@ void model::clear()
     number_of_contacts_ = 0;
     points_.clear();
     contact_relations_.clear();
+    contact_relations_from_contacts_.clear();
     variable_evaluations_.clear();
 }
 
