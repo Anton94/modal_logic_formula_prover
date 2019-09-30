@@ -38,7 +38,6 @@ void tableau::clear()
     zero_terms_T_.clear();
     zero_terms_F_.clear();
     contact_T_terms_.clear();
-    // TODO: task 1: terms_to_F_contacts_.clear();
 }
 
 auto tableau::satisfiable_step() -> bool
@@ -88,12 +87,6 @@ auto tableau::satisfiable_step() -> bool
                 trace() << "Found a contradiction - " << *not_negated_f << " found in T formulas";
                 return false;
             }
-
-            // TODO: task 1:
-            //if(has_broken_contact_rule_F(not_negated_f))
-            //{
-            //    return false;
-            //}
 
             if(find_in_F(not_negated_f))
             {
@@ -269,7 +262,7 @@ auto tableau::satisfiable_step() -> bool
 
     auto process_F_conj_child = [&](const formula* child) {
         // F(T) is not satisfiable
-        if(!child->is_constant_true() && !find_in_T(child) /* TODO: task 1: && !has_broken_contact_rule_F(child) */)
+        if(!child->is_constant_true() && !find_in_T(child))
         {
             if(find_in_F(child))
             {
@@ -330,70 +323,6 @@ auto tableau::has_broken_contact_rule_T(const formula* f) const -> bool
     }
     return false;
 }
-// TODO: task 1:
-//auto tableau::has_broken_contact_rule_F(const formula* f) const -> bool
-//{
-//    const auto op = f->get_operation_type();
-//    if(op == formula::operation_t::c)
-//    {
-//        // C(a,b) -> a != 0 & b != 0
-//        // F(C(a,b)) has broken contact rule if a != 0 & b != 0
-//        const auto a = f->get_left_child_term();
-//        const auto b = f->get_right_child_term();
-//        if(zero_terms_F_.find(a) != zero_terms_F_.end() && zero_terms_F_.find(b) != zero_terms_F_.end())
-//        {
-//            trace() << "Found a contradiction with the contact rule - F(" << *f << ") 's terms are not zero";
-//            return true;
-//        }
-//    }
-//    else if(op == formula::operation_t::eq_zero)
-//    {
-//        const auto t = f->get_left_child_term();
-//        return has_broken_contact_rule_new_non_zero_term(t);
-//    }
-//
-//    return false;
-//}
-//
-//auto tableau::has_broken_contact_rule_new_non_zero_term(const term* key_t) const -> bool
-//{
-//    // a != 0, X != 0 -> C(a, X) // TODO: reversed?
-//    // a != 0 breaks the contact rule if there is F(C(x,y)) where x/y = a & y/x != 0, i.e. x != 0 & y != 0
-//
-//    auto iterpair = terms_to_F_contacts_.equal_range(key_t);
-//    for(auto it = iterpair.first, end = iterpair.second; it != end; ++it)
-//    {
-//        const auto t = it->first;
-//        const auto f = it->second; // F(C(x,y)) : f is a pointer to some C(x,y)
-//        assert(f->get_operation_type() == formula::operation_t::c);
-//
-//        const auto left_child = f->get_left_child_term();
-//        const auto right_child = f->get_right_child_term();
-//
-//        assert(*left_child == *t || *right_child == *t);
-//        // one of the childs is 't'
-//        const auto other_child = *left_child == *t ? right_child : left_child;
-//
-//        // we know that 't' is a non-zero term.
-//        // if both terms of 'f' are the same term 't'
-//        // then the rule is broken
-//        if(*left_child == *right_child)
-//        {
-//            trace() << "Found a contradiction with the contact rule - F(" << *f
-//                    << ") 's terms are both not zero";
-//            return true;
-//        }
-//        // now we have to check if the other child is also non-zero,
-//        // then the rule will be broken
-//        if(zero_terms_F_.find(other_child) != zero_terms_F_.end())
-//        {
-//            trace() << "Found a contradiction with the contact rule - F(" << *f
-//                    << ") 's terms are both not zero";
-//            return true;
-//        }
-//    }
-//    return false;
-//}
 
 auto tableau::find_in_T(const formula* f) const -> bool
 {
@@ -468,13 +397,6 @@ void tableau::add_formula_to_F(const formula* f)
     {
         trace() << "Adding " << *f << " to F contacts";
         contacts_F_.insert(f);
-        // TODO: task 1:
-        //const auto l = f->get_left_child_term();
-        //const auto r = f->get_right_child_term();
-        //trace() << "Adding " << *l << " to the terms -> F contacts mapping";
-        //terms_to_F_contacts_.insert({l, f});
-        //trace() << "Adding " << *r << " to the terms -> F contacts mapping";
-        //terms_to_F_contacts_.insert({r, f});
     }
     else if(op == formula::operation_t::eq_zero)
     {
@@ -540,14 +462,6 @@ void tableau::remove_formula_from_F(const formula* f)
         bool erased = contacts_F_.erase(f);
         assert(erased);
         (void)erased;
-
-        // TODO: task 1:
-        //const auto l = f->get_left_child_term();
-        //const auto r = f->get_right_child_term();
-        //trace() << "Removing " << *l << " from the terms -> F contacts mapping";
-        //remove_term_to_formula(terms_to_F_contacts_, l, f);
-        //trace() << "Removing " << *r << " from the terms -> F contacts mapping";
-        //remove_term_to_formula(terms_to_F_contacts_, r, f);
     }
     else if(op == formula::operation_t::eq_zero)
     {
@@ -617,7 +531,6 @@ void tableau::log_state_satisfiable() const
     trace() << "         Zero terms T: " << zero_terms_T_;
     trace() << "         Zero terms F: " << zero_terms_F_;
     trace() << "     T contacts terms: " << contact_T_terms_;
-    // TODO: task 1: trace() << "  terms to F contacts: " << terms_to_F_contacts_;
 }
 
 tableau::T_conjuction_child::T_conjuction_child(tableau& t, const formula* f)
@@ -689,8 +602,6 @@ auto tableau::F_disjunction_child::validate() const -> bool
         trace() << "Found a contradiction with child " << *f_ << " which has been found in T";
         return false;
     }
-    // TODO: task 1: 
-    //return !t_.has_broken_contact_rule_F(f_);
     return true;
 }
 

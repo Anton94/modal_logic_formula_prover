@@ -34,13 +34,6 @@ private:
     // T(C(a,b)) has broken contact rule if a = 0 | b = 0
     auto has_broken_contact_rule_T(const formula* f) const -> bool;
 
-    // F(C(a,b)) has broken contact rule if a != 0 & b != 0
-    // TODO:  task 1: we can't check that rule until we find the real evaluations
-    // we can have a != 0 & b != 0 but there might not be a contact between a and b
-    //auto has_broken_contact_rule_F(const formula* f) const -> bool;
-
-    //auto has_broken_contact_rule_new_non_zero_term(const term* t) const -> bool;
-
     auto find_in_T(const formula* f) const -> bool;
     auto find_in_F(const formula* f) const -> bool;
 
