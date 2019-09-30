@@ -32,7 +32,7 @@ private:
     auto satisfiable_step() -> bool;
 
     // T(C(a,b)) has broken contact rule if a = 0 | b = 0
-    auto has_broken_contact_rule_T(const formula* f) const -> bool;
+    auto has_broken_contact_rule(const formula* f) const -> bool;
 
     auto find_in_T(const formula* f) const -> bool;
     auto find_in_F(const formula* f) const -> bool;
@@ -44,8 +44,6 @@ private:
 
     // Removes only the key(*term) which has a matching address (pointer address)
     void remove_term(multiterms_t& terms, const term* t);
-    // Removes the key - value pair (*t - *f) which has a matching addresses (pointer addresses)
-    void remove_term_to_formula(multiterm_to_formula_t& mapping, const term* t, const formula* f);
 
     void log_state_satisfiable() const;
 
@@ -79,14 +77,14 @@ private:
 
     // TODO: explain the algorithm
     // Generates evaluations for the variables and checks if they satisfy the atomic operations.
-    auto path_has_satisfiable_variable_evaluation() -> bool;
+    auto has_satisfiable_model() -> bool;
 
     auto get_used_variables() const -> variables_mask_t;
 
     auto is_contact_F_rule_satisfied() const -> bool;
     auto is_zero_term_rule_satisfied() const -> bool;
 
-    std::ostream& print(std::ostream& out, const model::model_points_t& model_points_);
+    std::ostream& print(std::ostream& out, const model::points_t& model_points_);
 
     const formula_mgr* mgr_;
 

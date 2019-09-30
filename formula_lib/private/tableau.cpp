@@ -50,7 +50,7 @@ auto tableau::satisfiable_step() -> bool
     if(formulas_T_.empty() && formulas_F_.empty())
     {
         trace() << "There is no contradiciton in the path.";
-        return path_has_satisfiable_variable_evaluation();
+        return has_satisfiable_model();
     }
 
     if(!formulas_T_.empty())
@@ -140,20 +140,22 @@ auto tableau::satisfiable_step() -> bool
         }
 
         auto process_T_disj_child = [&](const formula* child) {
-            // T(F) is not satisfiable
-            if(!child->is_constant_false() && !find_in_F(child) && !has_broken_contact_rule_T(child))
+            if(child->is_constant_false() || // T(F) is not satisfiable
+               find_in_F(child) ||
+               has_broken_contact_rule(child))
             {
-                if(find_in_T(child))
-                {
-                    return satisfiable_step();
-                }
-
-                add_formula_to_T(child);
-                const auto res = satisfiable_step();
-                remove_formula_from_T(child);
-                return res;
+                return false;
             }
-            return false;
+
+            if(find_in_T(child))
+            {
+                return satisfiable_step();
+            }
+
+            add_formula_to_T(child);
+            const auto res = satisfiable_step();
+            remove_formula_from_T(child);
+            return res;
         };
 
         trace() << "Start of the left subtree: " << *left_f << " of " << *f;
@@ -202,7 +204,7 @@ auto tableau::satisfiable_step() -> bool
             return false;
         }
 
-        if(has_broken_contact_rule_T(not_negated_f)) // F(~C(a,b)) -> T(C(a,b))
+        if(has_broken_contact_rule(not_negated_f))
         {
             return false;
         }
@@ -261,20 +263,20 @@ auto tableau::satisfiable_step() -> bool
     }
 
     auto process_F_conj_child = [&](const formula* child) {
-        // F(T) is not satisfiable
-        if(!child->is_constant_true() && !find_in_T(child))
+        if(child->is_constant_true() || // F(T) is not satisfiable
+           find_in_T(child))
         {
-            if(find_in_F(child))
-            {
-                return satisfiable_step();
-            }
-
-            add_formula_to_F(child);
-            const auto res = satisfiable_step();
-            remove_formula_from_F(child);
-            return res;
+            return false;
         }
-        return false;
+        if (find_in_F(child))
+        {
+            return satisfiable_step();
+        }
+
+        add_formula_to_F(child);
+        const auto res = satisfiable_step();
+        remove_formula_from_F(child);
+        return res;
     };
 
     trace() << "Start of the left subtree: " << *left_f << " of " << *f;
@@ -288,7 +290,7 @@ auto tableau::satisfiable_step() -> bool
     return process_F_conj_child(right_f);
 }
 
-auto tableau::has_broken_contact_rule_T(const formula* f) const -> bool
+auto tableau::has_broken_contact_rule(const formula* f) const -> bool
 {
     const auto op = f->get_operation_type();
     if(op == formula::operation_t::c)
@@ -312,8 +314,7 @@ auto tableau::has_broken_contact_rule_T(const formula* f) const -> bool
     if(op == formula::operation_t::eq_zero)
     {
         const auto a = f->get_left_child_term();
-        // a = 0 -> ~C(a, X)
-        // a = 0 breaks the contact rule if there is T(C(x,y)) where x = a v y = a
+        // a = 0 breaks the contact rule if there is T(C(x,y)) where x = a or y = a
         if(contact_T_terms_.find(a) != contact_T_terms_.end())
         {
             trace() << "Found a contradiction with the contact rule - there is a contact with a zero term "
@@ -387,6 +388,7 @@ void tableau::add_formula_to_T(const formula* f)
     else
     {
         trace() << "Skipping adding constant formula " << *f << " to T formulas";
+        assert(f->is_constant());
     }
 }
 
@@ -412,6 +414,7 @@ void tableau::add_formula_to_F(const formula* f)
     else
     {
         trace() << "Skipping adding constant formula " << *f << " to F formulas";
+        assert(f->is_constant());
     }
 }
 
@@ -450,6 +453,7 @@ void tableau::remove_formula_from_T(const formula* f)
     else
     {
         trace() << "Skipping removing constant formula " << *f << " from T formulas";
+        assert(f->is_constant());
     }
 }
 
@@ -481,6 +485,7 @@ void tableau::remove_formula_from_F(const formula* f)
     else
     {
         trace() << "Skipping removing constant formula " << *f << " from F formulas";
+        assert(f->is_constant());
     }
 }
 
@@ -499,27 +504,6 @@ void tableau::remove_term(multiterms_t& terms, const term* t)
     }
     error() << "Unable to locate " << *t << " in the terms: " << terms;
     assert(false && "Unable to remove a term from mutitemrs");
-}
-
-void tableau::remove_term_to_formula(multiterm_to_formula_t& mapping, const term* t, const formula* f)
-{
-    auto iterpair = mapping.equal_range(t);
-
-    for(auto it = iterpair.first, end = iterpair.second; it != end; ++it)
-    {
-        const auto found_t = it->first;
-        const auto found_f = it->second;
-
-        if(found_t == t) // note that it compairs the pointers
-        {
-            assert(found_f == f);
-            (void)f;
-            mapping.erase(it);
-            return;
-        }
-    }
-    error() << "Unable to locate " << *t << " in the terms: " << mapping;
-    assert(false && "Unable to remove a term from mutitemr_to_formula");
 }
 
 void tableau::log_state_satisfiable() const
@@ -558,7 +542,7 @@ auto tableau::T_conjuction_child::validate() const -> bool
         return false;
     }
 
-    return !t_.has_broken_contact_rule_T(f_);
+    return !t_.has_broken_contact_rule(f_);
 }
 
 void tableau::T_conjuction_child::add_to_T()
@@ -622,12 +606,10 @@ void tableau::F_disjunction_child::remove_from_F()
     }
 }
 
-auto tableau::path_has_satisfiable_variable_evaluation() -> bool
+auto tableau::has_satisfiable_model() -> bool
 {
     trace() << "Start looking for an satisfiable evaluation of the variables.";
     model_.clear();
-
-    // TODO: Explain the algorithm in details
 
     // Cache all used variables in order to make evaluations for only them.
     const auto used_variables = get_used_variables();
@@ -640,7 +622,7 @@ auto tableau::path_has_satisfiable_variable_evaluation() -> bool
 
     while (!is_zero_term_rule_satisfied() || !is_contact_F_rule_satisfied())
     {
-        if (!model_.generate_next_model_points_evaluation_combination())
+        if (!model_.generate_next())
         {
             trace() << "Unable to generate a new combination of binary var. evaluations for the model points.";
             return false;
@@ -678,9 +660,9 @@ auto tableau::get_used_variables() const -> variables_mask_t
 
 auto tableau::is_contact_F_rule_satisfied() const -> bool
 {
-    for (const auto& neg_c : contacts_F_)
+    for (const auto& c : contacts_F_)
     {
-        if (model_.is_in_contact(neg_c->get_left_child_term(), neg_c->get_right_child_term()))
+        if (model_.is_in_contact(c->get_left_child_term(), c->get_right_child_term()))
         {
             return false;
         }
@@ -703,7 +685,7 @@ auto tableau::is_zero_term_rule_satisfied() const -> bool
     return true;
 }
 
-std::ostream& tableau::print(std::ostream& out, const model::model_points_t& model_points)
+std::ostream& tableau::print(std::ostream& out, const model::points_t& model_points)
 {
     for (const auto& term_eval : model_points)
     {

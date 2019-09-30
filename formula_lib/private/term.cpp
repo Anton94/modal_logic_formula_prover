@@ -170,7 +170,7 @@ auto term::evaluate(const full_variables_evaluations_t& variable_evaluations) co
     }
 }
 
-auto term::evaluate(const variable_id_to_model_points_t& variable_evaluations, const size_t elements_count) const -> model_points_set_t
+auto term::evaluate(const variable_id_to_points_t& variable_evaluations, const size_t elements_count) const -> model_points_set_t
 {
     switch (op_)
     {

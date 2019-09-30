@@ -189,7 +189,7 @@ auto formula_mgr::is_model_satisfiable(const model& model) const -> bool
 
     const auto& model_variable_evaluations = model.get_variables_evaluations();
     const auto number_of_contacts = model.get_number_of_contacts();
-    const auto number_of_non_zeros = model.get_model_points().size() - number_of_contacts * 2; // the contact points are twice as many as the contacts and the lefover is from the non-zero points
+    const auto number_of_non_zeros = model.get_number_of_non_zeros();
 
     return f_.evaluate(model_variable_evaluations, number_of_contacts, number_of_non_zeros);
 }
