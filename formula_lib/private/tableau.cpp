@@ -608,7 +608,7 @@ void tableau::F_disjunction_child::remove_from_F()
 
 auto tableau::has_satisfiable_model() -> bool
 {
-    trace() << "Start looking for an satisfiable evaluation of the variables.";
+    trace() << "Start looking for a satisfiable model.";
     model_.clear();
 
     // Cache all used variables in order to make evaluations for only them.
@@ -616,20 +616,30 @@ auto tableau::has_satisfiable_model() -> bool
 
     if (!model_.construct_model_points(contacts_T_, zero_terms_F_, used_variables, mgr_))
     {
-        trace() << "Unable to construct the model points with binary var. evaluations which evaluates the contact & non-zero terms to 1";
+        trace() << "Unable to construct a satisfiable model (to even satisfy contact and != 0 terms).";
         return false;
     }
 
-    while (!is_zero_term_rule_satisfied() || !is_contact_F_rule_satisfied())
+    do
     {
-        if (!model_.generate_next())
+        if(!is_zero_term_rule_satisfied())
         {
-            trace() << "Unable to generate a new combination of binary var. evaluations for the model points.";
-            return false;
+            continue;
         }
-    }
 
-    return true;
+        do
+        {
+            if(is_contact_F_rule_satisfied())
+            {
+                return true;
+            }
+        }
+        while(model_.generate_next_contact_relations());
+    }
+    while(model_.generate_next_model());
+
+    trace() << "Unable to generate a satisfiable model.";
+    return false;
 }
 
 auto tableau::get_used_variables() const -> variables_mask_t

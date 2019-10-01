@@ -18,13 +18,14 @@ auto model::construct_model_points(const formulas_t& contacts, const terms_t& no
     }
 
     initialize_contact_relations_from_contacts();
-    calculate_the_model_evaluation_of_each_variable();
+    calculate_model_evaluation_of_each_variable();
+    calculate_model_evaluation_of_each_point_term();
     calculate_contact_relations();
 
     return true;
 }
 
-auto model::generate_next() -> bool
+auto model::generate_next_model() -> bool
 {
     // TODO: maybe cache the valid evaluations per term
     // simulation of +1 operation from left to right but not just 0/1 bits but all combinations per element
@@ -33,7 +34,8 @@ auto model::generate_next() -> bool
         if (generate_next_positive_evaluation(point.t, point.evaluation))
         {
             // TODO: this maybe can be done smarter and not just whole new calculation
-            calculate_the_model_evaluation_of_each_variable();
+            calculate_model_evaluation_of_each_variable();
+            calculate_model_evaluation_of_each_point_term();
             calculate_contact_relations();
             return true;
         }
@@ -46,30 +48,73 @@ auto model::generate_next() -> bool
     return false;
 }
 
+auto model::generate_next_contact_relations() -> bool
+{
+    // simulation of +1 operation from left to right
+    for (size_t point_id = 0; point_id < points_.size(); ++point_id)
+    {
+        auto& point = points_[point_id];
+        // Note that the connectivity axiom is: t != 0 & t != 1 -> C(t, t*)
+        if(point.model_evaluation.all()) // t == 1
+        {
+            continue;
+        }
+
+        // Filter out full evaluations and thouse which already have contacts inbetween, could be tricky!!!
+//        if(is_in_contact(point.model_evaluation, point.model_evaluation.flip())) // there is a contact already
+//        {
+//            continue;
+//        }
+
+        if (generate_next_or_reset_connectivity_axiom_contact(point_id))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+auto model::generate_next_or_reset_connectivity_axiom_contact(size_t point_id) -> bool
+{
+    auto& point = points_[point_id];
+
+    assert(!point.model_evaluation.all());
+    assert(contact_relations_[point_id][point.connectivity_axiom_contact_point_id].test());
+    assert(contact_relations_[point.connectivity_axiom_contact_point_id][point_id].test());
+
+    contact_relations_[point_id].set(point.connectivity_axiom_contact_point_id, false);
+    contact_relations_[point_id].set(point.connectivity_axiom_contact_point_id, false);
+}
+
 auto model::is_in_contact(const term* a, const term* b) const -> bool
 {
     const auto eval_a = a->evaluate(variable_evaluations_, points_.size());
     const auto eval_b = b->evaluate(variable_evaluations_, points_.size());
-    if (eval_a.none() || eval_b.none())
+    return is_in_contact(eval_a, eval_b);
+}
+
+auto model::is_in_contact(const model_points_set_t& l, const model_points_set_t& r) const -> bool
+{
+    if (l.none() || r.none())
     {
         return false; // there is no way to be in contact if at least on of the evaluations is the empty set
     }
-    if ((eval_a & eval_b).any())
+    if ((l & r).any())
     {
         return true; // left eval set and right eval set has a common point, but each point is reflexive so there is a contact between the two sets
     }
 
     for (size_t i = 0; i < number_of_contacts_; ++i)
     {
-        auto point_in_eval_a = eval_a.find_first(); // TODO: iterate over the bitset with less set bits
-        while (point_in_eval_a != model_points_set_t::npos)
+        auto point_in_l = l.find_first(); // TODO: iterate over the bitset with less set bits
+        while (point_in_l != model_points_set_t::npos)
         {
-            const auto& points_in_contact_with_point_in_eval_a = contact_relations_[point_in_eval_a];
-            if ((points_in_contact_with_point_in_eval_a & eval_b).any())
+            const auto& points_in_contact_with_point_in_l = contact_relations_[point_in_l];
+            if ((points_in_contact_with_point_in_l & r).any())
             {
                 return true;
             }
-            point_in_eval_a = eval_a.find_next(point_in_eval_a);
+            point_in_l = l.find_next(point_in_l);
         }
     }
     return false;
@@ -150,8 +195,8 @@ auto model::construct_contact_model_points(const formulas_t& contacts) -> bool
         {
             return false;
         }
-        points_.push_back({ left, std::move(left_evaluation) });
-        points_.push_back({ right, std::move(right_evaluation) });
+        points_.push_back({ left, std::move(left_evaluation), model_points_set_t(), {} });
+        points_.push_back({ right, std::move(right_evaluation), model_points_set_t(), {} });
     }
 
     return true;
@@ -167,7 +212,7 @@ auto model::construct_non_zero_model_points(const terms_t& non_zero_terms) -> bo
         {
             return false;
         }
-        points_.push_back({ z, std::move(eval) });
+        points_.push_back({ z, std::move(eval), model_points_set_t(), {} });
     }
 
     return true;
@@ -211,7 +256,7 @@ auto model::generate_next_positive_evaluation(const term* t, variables_evaluatio
     return true;
 }
 
-void model::calculate_the_model_evaluation_of_each_variable()
+void model::calculate_model_evaluation_of_each_variable()
 {
     const auto points_size = points_.size();
     variable_evaluations_.clear();
@@ -233,11 +278,24 @@ void model::calculate_the_model_evaluation_of_each_variable()
     }
 }
 
+void model::calculate_model_evaluation_of_each_point_term()
+{
+    for(auto& point : points_)
+    {
+        point.model_evaluation = point.t->evaluate(variable_evaluations_, points_.size());
+    }
+}
+
 void model::calculate_contact_relations()
 {
     contact_relations_ = contact_relations_from_contacts_;
 
-    // TODO: connectivity axiome can add some more contacts
+    // TODO: connectivity axiom can add some more contacts
+    for(size_t point_id = 0; point_id < points_.size(); ++point_id)
+    {
+        auto& point = points_[point_id];
+        if(point.model_evaluation.all())
+    }
 }
 
 std::ostream& operator<<(std::ostream& out, const model& m)

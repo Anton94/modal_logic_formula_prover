@@ -36,7 +36,7 @@ struct model
         Not that each point's evaluation evaluates it's term to the constant true in order to that point to be in the MODEL evaluation of the term,
         i.e. for the point 0, the term 'a' and it's evaluation (xxx..x): a->evaluate(xxx..x) = constant_true in order to 0 belongs to v(a)
 
-        Connectivity axiome:
+        Connectivity axiom:
         a != 0 & a != 1 -> C(a,a*)
         in our case, we evaluate each point's term (i.e., v(a)) and if it's not the whole set of points, we will create a contact relation with an element from v(a*)
     */
@@ -44,6 +44,9 @@ struct model
     {
         const term* t;
         variables_evaluations_block evaluation;
+        model_points_set_t model_evaluation;
+
+        size_t connectivity_axiom_contact_point_id; // if model_evaluation is not the the whole set, it will be used to make a contact between t and t*, i.e. C(t, t*)
     };
     using points_t = std::vector<point_info>;
 
@@ -54,11 +57,16 @@ struct model
     auto construct_model_points(const formulas_t& contacts, const terms_t& non_zero_terms, const variables_mask_t& used_variables, const formula_mgr* mgr_) -> bool;
 
     // Generates a new model
-    auto generate_next() -> bool;
+    auto generate_next_model() -> bool;
+
+    // Generates only a different combination of contacts from the connectivity axiom
+    auto generate_next_contact_relations() -> bool;
 
     // Return true if there is a contact between the v(a) and v(b). Note that v(X) is a set of model points and there is a contact between the two sets iff
     // exist x from v(a), exist y from v(b) and xRy.
     auto is_in_contact(const term* a, const term* b) const -> bool;
+    //  Return true if there is a contact between the two given sets of model points
+    auto is_in_contact(const model_points_set_t& l, const model_points_set_t& r) const -> bool;
     // Returns true if v(a) is the empty set.
     auto is_empty_set(const term* a) const -> bool;
 
@@ -85,8 +93,13 @@ private:
     // Generates new evaluation until @t evalautes to constant true with it
     auto generate_next_positive_evaluation(const term* t, variables_evaluations_block& evaluation) const -> bool;
 
-    void calculate_the_model_evaluation_of_each_variable();
+    void calculate_model_evaluation_of_each_variable();
+    void calculate_model_evaluation_of_each_point_term();
     void calculate_contact_relations();
+
+    // Generates next contact pair between point's term(t) and it's addition(t*)
+    // Returns true if it succeed, otherwise it reset's it and returns false.
+    auto generate_next_or_reset_connectivity_axiom_contact(size_t point_id) -> bool;
 
     friend std::ostream& operator<<(std::ostream& out, const model& m);
 
@@ -103,7 +116,7 @@ private:
             2---3
             4
             5
-        from the connectivity axiome: 0---4
+        from the connectivity axiom: 0---4
 
         The bit matrix will be the following:
             \ 012345
@@ -115,7 +128,7 @@ private:
             5 000000    // no contacts with point 5
     */
     contacts_t contact_relations_;
-    contacts_t contact_relations_from_contacts_; // the connectivity axiome will change the contact relations when some point's evaluation change, but the rest of the contacts are fixed, so cache them
+    contacts_t contact_relations_from_contacts_; // the connectivity axiom will change the contact relations when some point's evaluation change, but the rest of the contacts are fixed, so cache them
 
     /*
         A vector of size @used_variables_, each element is a set of points, represented as a bitset.
