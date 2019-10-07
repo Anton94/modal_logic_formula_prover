@@ -98,9 +98,6 @@ private:
     // keeps the terms of the T contacts(the contacts in @contacts_T_),
     // i.e. for each T(C(a,b)) : a, b are in the collection
     multiterms_t contact_T_terms_;
-    // maps the term and the F contact (the contacts in @contacts_F_) in which it belongs to,
-    // i.e. for each F(C(a,b)), let C(a,b)'s pointer is 'c': a -> c and b -> c are mappings in the collection
-    //multiterm_to_formula_t terms_to_F_contacts_;
 
     model model_;
 };

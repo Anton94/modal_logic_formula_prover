@@ -130,15 +130,3 @@ std::ostream& operator<<(std::ostream& out, const multiterms_t& terms)
 
     return out;
 }
-
-std::ostream& operator<<(std::ostream& out, const multiterm_to_formula_t& mapping)
-{
-    for(const auto& m : mapping)
-    {
-        const auto term = m.first;
-        const auto contact = m.second;
-        out << *term << " -> " << *contact << "\n";
-    }
-
-    return out;
-}
