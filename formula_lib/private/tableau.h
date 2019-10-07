@@ -75,14 +75,9 @@ private:
         bool added_{};
     };
 
-    // TODO: explain the algorithm
-    // Generates evaluations for the variables and checks if they satisfy the atomic operations.
     auto has_satisfiable_model() -> bool;
 
     auto get_used_variables() const -> variables_mask_t;
-
-    auto is_contact_F_rule_satisfied() const -> bool;
-    auto is_zero_term_rule_satisfied() const -> bool;
 
     std::ostream& print(std::ostream& out, const model::points_t& model_points_);
 

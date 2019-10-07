@@ -608,25 +608,16 @@ void tableau::F_disjunction_child::remove_from_F()
 
 auto tableau::has_satisfiable_model() -> bool
 {
-    trace() << "Start looking for an satisfiable evaluation of the variables.";
+    trace() << "Start looking for an satisfiable model.";
     model_.clear();
 
-    // Cache all used variables in order to make evaluations for only them.
+    // Cache all used variables in the 'path' in order to make evaluations for only them and not all variables in the whole formula.
     const auto used_variables = get_used_variables();
 
-    if (!model_.construct_model_points(contacts_T_, zero_terms_F_, used_variables, mgr_))
+    if (!model_.create(contacts_T_, contacts_F_, zero_terms_T_, zero_terms_F_, used_variables, mgr_))
     {
-        trace() << "Unable to construct the model points with binary var. evaluations which evaluates the contact & non-zero terms to 1";
+        trace() << "Unable to construct a satisfiable model.";
         return false;
-    }
-
-    while (!is_zero_term_rule_satisfied() || !is_contact_F_rule_satisfied())
-    {
-        if (!model_.generate_next())
-        {
-            trace() << "Unable to generate a new combination of binary var. evaluations for the model points.";
-            return false;
-        }
     }
 
     return true;
@@ -656,33 +647,6 @@ auto tableau::get_used_variables() const -> variables_mask_t
         used_variables |= t->get_variables();
     }
     return used_variables;
-}
-
-auto tableau::is_contact_F_rule_satisfied() const -> bool
-{
-    for (const auto& c : contacts_F_)
-    {
-        if (model_.is_in_contact(c->get_left_child_term(), c->get_right_child_term()))
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-auto tableau::is_zero_term_rule_satisfied() const -> bool
-{
-    // The zero term, i.e. the <=(a,b) operation which is translated to (a * -b = 0),
-    // has the following semantic: <=(a,b) is satisfied iif v(a * -b) = empty_set which is a bitset of only zeros
-    // v(a * -b) = v(a) & v(-b) = v(a) & v(W\v(b)) = v(a) & ~v(b)
-    for (const auto& z : zero_terms_T_)
-    {
-        if (model_.is_not_empty_set(z))
-        {
-            return false;
-        }
-    }
-    return true;
 }
 
 std::ostream& tableau::print(std::ostream& out, const model::points_t& model_points)
