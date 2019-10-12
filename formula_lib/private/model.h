@@ -2,12 +2,13 @@
 
 #include "types.h"
 #include "variables_evaluations_block.h"
+#include "imodel.h"
 
 class formula_mgr;
 class term;
 class formula;
 
-struct model
+struct model : public i_model
 {
     /*
         Les't have 3 contacts and 1 non-zero term in the following formula:
@@ -48,8 +49,6 @@ struct model
     };
     using points_t = std::vector<point_info>;
 
-    using contacts_t = std::vector<model_points_set_t>;
-
     /*
      * Let's have C(a,b); C(c,d); e=0; f=0; ~C(g,h); ~C(i, j)
      * Then the model should be of the following type:
@@ -83,7 +82,8 @@ struct model
         -> bool;
 
     auto get_model_points() const -> const points_t&;
-    auto get_variables_evaluations() const -> const variable_id_to_points_t&;
+    auto get_variables_evaluations() const -> const variable_id_to_points_t& override;
+	auto get_contact_relations() const -> const contacts_t & override;
     auto get_number_of_contacts() const -> size_t;
     auto get_number_of_non_zeros() const -> size_t;
     auto get_number_of_contact_points() const -> size_t;
@@ -158,6 +158,9 @@ private:
         -> bool;
 
     void calculate_the_model_evaluation_of_each_variable();
+	// Inserts 1s in the contact relations matrix between 2k and 2k+1 points (where k is less than the number of contacts)
+	// because we first create the contact points and then the non-zeros
+	void fill_contact_relations();
 
     friend std::ostream& operator<<(std::ostream& out, const model& m);
 
@@ -185,7 +188,7 @@ private:
             4 100000    // from 4---0
             5 000000    // no contacts with point 5
     */
-    // contacts_t contact_relations_; // TODO: not used
+     contacts_t contact_relations_;
 
     /*
         A vector of size @used_variables_, each element is a set of points, represented as a bitset.

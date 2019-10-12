@@ -18,6 +18,7 @@ auto model::create(const formulas_t& contacts_T, const formulas_t& contacts_F, c
        construct_non_zero_model_points(zero_terms_F, contacts_F, zero_terms_T))
     {
         calculate_the_model_evaluation_of_each_variable();
+		fill_contact_relations();
         return true;
     }
     return false;
@@ -31,6 +32,11 @@ auto model::get_model_points() const -> const points_t&
 auto model::get_variables_evaluations() const -> const variable_id_to_points_t&
 {
     return variable_evaluations_;
+}
+
+auto model::get_contact_relations() const -> const contacts_t &
+{
+	return contact_relations_;
 }
 
 auto model::get_number_of_contacts() const -> size_t
@@ -59,7 +65,7 @@ void model::clear()
     used_variables_.clear();
     number_of_contacts_ = 0;
     points_.clear();
-    // contact_relations_.clear();
+    contact_relations_.clear();
     variable_evaluations_.clear();
 }
 
@@ -229,6 +235,23 @@ void model::calculate_the_model_evaluation_of_each_variable()
             Pi = point_evaluation.find_next(Pi);
         }
     }
+}
+
+void model::fill_contact_relations()
+{
+	contact_relations_.clear();
+	contact_relations_.resize(points_.size(), model_points_set_t(points_.size())); // Fill NxN matrix with 0s
+	for (size_t i = 0; i < number_of_contacts_; i += 2)
+	{
+		contact_relations_[i + 1].set(i);
+		contact_relations_[i].set(i + 1);
+	}
+
+	// Add also the reflexivity
+	for (size_t i = 0, count = points_.size(); i < count; ++i)
+	{
+		contact_relations_[i].set(i);
+	}
 }
 
 std::ostream& operator<<(std::ostream& out, const model& m)
