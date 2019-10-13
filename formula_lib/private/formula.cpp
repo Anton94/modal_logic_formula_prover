@@ -281,53 +281,67 @@ auto formula::evaluate(const std::vector<variables_evaluations_t>& evals, int R,
 	}
 }
 
-int formula::get_contacts_count() const
+std::pair<int, int> formula::get_contacts_count() const
 {
 	switch (op_)
 	{
 	case formula::operation_t::constant_true:
 	case formula::operation_t::constant_false:
 	case formula::operation_t::eq_zero:
-		return 0;
+		return std::pair<int, int>(0, 0);
 	case formula::operation_t::negation:
+	{
 		assert(child_f_.left);
-		return child_f_.left->get_contacts_count();
+		std::pair<int, int> res = child_f_.left->get_contacts_count();
+		return std::pair<int, int>(res.second, res.first);
+	}
 	case formula::operation_t::conjunction:
 	case formula::operation_t::disjunction:
+	{
 		assert(child_f_.left);
 		assert(child_f_.right);
-		return child_f_.left->get_contacts_count()
-			+ child_f_.right->get_contacts_count();
+		std::pair<int, int> left = child_f_.left->get_contacts_count();
+		std::pair<int, int> right = child_f_.right->get_contacts_count();
+		return std::pair<int, int>(left.first + right.first, left
+			.second + right.second);
+	}
 	case formula::operation_t::c:
-		return 1;
+		return std::pair<int, int>(1, 0);
 	default:
 		assert(false && "Unrecognized.");
-		return 0;
+		return std::pair<int, int>(0, 0);
 	}
 }
 
-int formula::get_zeroes_count() const
+std::pair<int, int> formula::get_zeroes_count() const
 {
 	switch (op_)
 	{
 	case formula::operation_t::constant_true:
 	case formula::operation_t::constant_false:
 	case formula::operation_t::c:
-		return 0;
+		return std::pair<int, int>(0, 0);
 	case formula::operation_t::negation:
+	{
 		assert(child_f_.left);
-		return child_f_.left->get_zeroes_count();
+		std::pair<int, int> res = child_f_.left->get_zeroes_count();
+		return std::pair<int, int>(res.second, res.first);
+	}
 	case formula::operation_t::conjunction:
 	case formula::operation_t::disjunction:
+	{
 		assert(child_f_.left);
 		assert(child_f_.right);
-		return child_f_.left->get_zeroes_count()
-			+ child_f_.right->get_zeroes_count();
+		std::pair<int, int> left = child_f_.left->get_zeroes_count();
+		std::pair<int, int> right = child_f_.right->get_zeroes_count();
+		return std::pair<int, int>(left.first + right.first, left
+			.second + right.second);
+	}
 	case formula::operation_t::eq_zero:
-		return 1;
+		return std::pair<int, int>(1, 0);
 	default:
 		assert(false && "Unrecognized.");
-		return 0;
+		return std::pair<int, int>(0, 0);
 	}
 }
 

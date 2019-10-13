@@ -5,6 +5,7 @@
 #include "../private/formula.h"
 #include "../private/tableau.h"
 #include "../private/types.h"
+#include "../private/basic_bruteforce_model.h"
 
 #include <ostream>
 #include <string>
@@ -30,9 +31,7 @@ public:
 	//			- R - number of contacts in the formula
 	//			- P - number of subsets in the formula
 	//		For all possible variablses verify if the formula is satisfiable.
-	auto brute_force_evaluate_with_points_count(variable_to_bits_evaluation_map_t& out_evaluations) const -> bool;
-    auto generate_next(variables_evaluations_t& current) const -> bool;
-	auto generate_next(std::vector<variables_evaluations_t>& current) const -> bool;
+	auto brute_force_evaluate_with_points_count(basic_bruteforce_model& out_model) const -> bool;
 
 	// Checks if the formula is satisfiable or not
     auto is_satisfiable(model& out_model) -> bool;

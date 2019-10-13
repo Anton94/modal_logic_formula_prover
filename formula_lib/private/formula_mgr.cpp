@@ -106,61 +106,9 @@ auto formula_mgr::build(json& f) -> bool
     return change_variables_to_variable_ids(f) && f_.build(f);
 }
 
-auto formula_mgr::generate_next(variables_evaluations_t& current) const -> bool
+auto formula_mgr::brute_force_evaluate_with_points_count(basic_bruteforce_model& out_model) const -> bool
 {
-	for (int i = 0; i < current.size(); ++i)
-	{
-		current[i].flip();
-
-		if (current[i])
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-
-auto formula_mgr::generate_next(std::vector<variables_evaluations_t>& current) const -> bool
-{
-	for (int i = current.size() - 1; i >= 0; --i)
-	{
-		if (generate_next((current[i])))
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-auto formula_mgr::brute_force_evaluate_with_points_count(variable_to_bits_evaluation_map_t& out_evaluations) const -> bool
-{
-	int R = f_.get_contacts_count();
-	int P = f_.get_zeroes_count();
-	int K = 2 * R + P;
-
-    // populate 00..00 for every variable
-    std::vector<variables_evaluations_t> evals(variables_.size(), variables_evaluations_t(K, false));
-
-	do
-	{
-		if (f_.evaluate(evals, R, P))
-		{
-			out_evaluations.clear();
-			for (int i = 0; i < variables_.size(); ++i)
-			{
-				std::vector<bool> output_evaluation;
-				for (int j = 0; j < evals[i].size(); ++j) 
-				{
-					output_evaluation.push_back(evals[i][j]);
-				}
-				out_evaluations.push_back({ get_variable(i), output_evaluation });
-			}
-			return true;
-		}
-	} while (generate_next(evals));
-
-	return false;
+	return out_model.create(f_, variables_.size());
 }
 
 auto formula_mgr::is_satisfiable(model& out_model) -> bool
