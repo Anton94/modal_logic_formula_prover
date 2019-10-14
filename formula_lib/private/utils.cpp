@@ -16,7 +16,5 @@ call_on_destroy::~call_on_destroy()
 
 uint64_t to_int(const std::vector<bool>& v)
 {
-    return std::accumulate(v.begin(), v.end(), 0ull, [](uint64_t acc, bool bit) {
-        return (acc << 1) + bit;
-    });
+    return std::accumulate(v.begin(), v.end(), 0ull, [](uint64_t acc, bool bit) { return (acc << 1) + bit; });
 }

@@ -27,10 +27,10 @@ std::ostream& operator<<(std::ostream& out, const variable_evaluation_set& varia
 
 struct pair_hash
 {
-	size_t operator() (const std::pair<int, int>& cords) const
-	{
-		return cords.first * 100 + cords.second;
-	}
+    size_t operator()(const std::pair<int, int>& cords) const
+    {
+        return cords.first * 100 + cords.second;
+    }
 };
 
 using relations_t = std::unordered_set<std::pair<int, int>, pair_hash>;

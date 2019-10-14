@@ -108,7 +108,7 @@ auto formula_mgr::build(json& f) -> bool
 
 auto formula_mgr::brute_force_evaluate_with_points_count(basic_bruteforce_model& out_model) const -> bool
 {
-	return out_model.create(f_, variables_.size());
+    return out_model.create(f_, variables_.size());
 }
 
 auto formula_mgr::is_satisfiable(model& out_model) -> bool
@@ -116,14 +116,13 @@ auto formula_mgr::is_satisfiable(model& out_model) -> bool
     info() << "Running satisfiability checking of " << f_ << "...";
 
     bool is_f_satisfiable{};
-    const auto elapsed_time = time_measured_call([&]() {
-        is_f_satisfiable = t_.is_satisfiable(f_, out_model);
-    });
+    const auto elapsed_time =
+        time_measured_call([&]() { is_f_satisfiable = t_.is_satisfiable(f_, out_model); });
 
     info() << (is_f_satisfiable ? "Satisfiable" : "NOT Satisfiable") << ". "
            << "Took " << elapsed_time.count() << "ms.";
 
-    if (is_f_satisfiable)
+    if(is_f_satisfiable)
     {
         assert(is_model_satisfiable(out_model));
     }

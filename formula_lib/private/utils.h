@@ -1,8 +1,8 @@
 #pragma once
 
+#include <chrono>
 #include <functional>
 #include <vector>
-#include <chrono>
 
 class call_on_destroy
 {

@@ -20,7 +20,7 @@ auto is_satisfiable = [](const json& formula_json, bool expected_result, bool ru
 
     if (run_bruteforce)
     {
-        variable_to_bits_evaluation_map_t model;
+        basic_bruteforce_model model;
         CHECK(f.brute_force_evaluate_with_points_count(model) == expected_result);
     }
 };

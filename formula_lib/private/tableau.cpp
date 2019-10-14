@@ -141,8 +141,7 @@ auto tableau::satisfiable_step() -> bool
 
         auto process_T_disj_child = [&](const formula* child) {
             if(child->is_constant_false() || // T(F) is not satisfiable
-               find_in_F(child) ||
-               has_broken_contact_rule(child))
+               find_in_F(child) || has_broken_contact_rule(child))
             {
                 return false;
             }
@@ -268,7 +267,7 @@ auto tableau::satisfiable_step() -> bool
         {
             return false;
         }
-        if (find_in_F(child))
+        if(find_in_F(child))
         {
             return satisfiable_step();
         }
@@ -611,10 +610,11 @@ auto tableau::has_satisfiable_model() -> bool
     trace() << "Start looking for an satisfiable model.";
     model_.clear();
 
-    // Cache all used variables in the 'path' in order to make evaluations for only them and not all variables in the whole formula.
+    // Cache all used variables in the 'path' in order to make evaluations for only them and not all variables
+    // in the whole formula.
     const auto used_variables = get_used_variables();
 
-    if (!model_.create(contacts_T_, contacts_F_, zero_terms_T_, zero_terms_F_, used_variables, mgr_))
+    if(!model_.create(contacts_T_, contacts_F_, zero_terms_T_, zero_terms_F_, used_variables, mgr_))
     {
         trace() << "Unable to construct a satisfiable model.";
         return false;
@@ -628,21 +628,21 @@ auto tableau::get_used_variables() const -> variables_mask_t
     assert(mgr_);
     variables_mask_t used_variables(mgr_->get_variables().size());
 
-    for (const auto& c : contacts_T_)
+    for(const auto& c : contacts_T_)
     {
         used_variables |= c->get_left_child_term()->get_variables();
         used_variables |= c->get_right_child_term()->get_variables();
     }
-    for (const auto& c : contacts_F_)
+    for(const auto& c : contacts_F_)
     {
         used_variables |= c->get_left_child_term()->get_variables();
         used_variables |= c->get_right_child_term()->get_variables();
     }
-    for (const auto& t : zero_terms_T_)
+    for(const auto& t : zero_terms_T_)
     {
         used_variables |= t->get_variables();
     }
-    for (const auto& t : zero_terms_F_)
+    for(const auto& t : zero_terms_F_)
     {
         used_variables |= t->get_variables();
     }
@@ -651,7 +651,7 @@ auto tableau::get_used_variables() const -> variables_mask_t
 
 std::ostream& tableau::print(std::ostream& out, const model::points_t& model_points)
 {
-    for (const auto& term_eval : model_points)
+    for(const auto& term_eval : model_points)
     {
         out << term_eval.t << " : ";
         mgr_->print(out, term_eval.evaluation);

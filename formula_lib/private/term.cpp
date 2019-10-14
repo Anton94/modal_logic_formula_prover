@@ -170,109 +170,113 @@ auto term::evaluate(const full_variables_evaluations_t& variable_evaluations) co
     }
 }
 
-auto term::evaluate(const variable_id_to_points_t& variable_evaluations, const size_t elements_count) const -> model_points_set_t
+auto term::evaluate(const variable_id_to_points_t& variable_evaluations, const size_t elements_count) const
+    -> model_points_set_t
 {
-    switch (op_)
+    switch(op_)
     {
-    case operation_t::constant_true:
-        return ~model_points_set_t(elements_count);
-    case operation_t::constant_false:
-        return model_points_set_t(elements_count);
-    case operation_t::union_:
-        assert(childs_.left && childs_.right);
-        return childs_.left->evaluate(variable_evaluations, elements_count) |
-            childs_.right->evaluate(variable_evaluations, elements_count);
-    case operation_t::intersaction_:
-        assert(childs_.left && childs_.right);
-        return childs_.left->evaluate(variable_evaluations, elements_count) &
-            childs_.right->evaluate(variable_evaluations, elements_count);
-    case operation_t::star_:
-        assert(childs_.left);
-        return ~childs_.left->evaluate(variable_evaluations, elements_count);
-    case operation_t::variable_:
-        assert(variable_id_ < variable_evaluations.size());
-        return variable_evaluations[variable_id_]; // returns the evaluation for the variable
-    default:
-        assert(false && "Unrecognized.");
-        return model_points_set_t(elements_count);
+        case operation_t::constant_true:
+            return ~model_points_set_t(elements_count);
+        case operation_t::constant_false:
+            return model_points_set_t(elements_count);
+        case operation_t::union_:
+            assert(childs_.left && childs_.right);
+            return childs_.left->evaluate(variable_evaluations, elements_count) |
+                   childs_.right->evaluate(variable_evaluations, elements_count);
+        case operation_t::intersaction_:
+            assert(childs_.left && childs_.right);
+            return childs_.left->evaluate(variable_evaluations, elements_count) &
+                   childs_.right->evaluate(variable_evaluations, elements_count);
+        case operation_t::star_:
+            assert(childs_.left);
+            return ~childs_.left->evaluate(variable_evaluations, elements_count);
+        case operation_t::variable_:
+            assert(variable_id_ < variable_evaluations.size());
+            return variable_evaluations[variable_id_]; // returns the evaluation for the variable
+        default:
+            assert(false && "Unrecognized.");
+            return model_points_set_t(elements_count);
     }
 }
 
-auto term::evaluate(relations_t& relations,
-	std::vector<variable_evaluation_set>& variables) const -> variable_evaluation_set
+auto term::evaluate(relations_t& relations, std::vector<variable_evaluation_set>& variables) const
+    -> variable_evaluation_set
 {
-	variable_evaluation_set whole_world;
-		for (int i = 0; i < variables_.size(); ++i)
-	{
-		whole_world.insert(i);
-	}
-	switch (op_)
-	{
-	case operation_t::constant_true:
-	{
-		return whole_world;
-	}
-	case operation_t::constant_false:
-	{
-		variable_evaluation_set empty_set;
-		return empty_set;
-	}
-	case operation_t::union_:
-	{
-		assert(childs_.left && childs_.right);
-		auto left = childs_.left->evaluate(relations, variables);
-		auto right = childs_.right->evaluate(relations, variables);
+    variable_evaluation_set whole_world;
+    for(int i = 0; i < variables_.size(); ++i)
+    {
+        whole_world.insert(i);
+    }
+    switch(op_)
+    {
+        case operation_t::constant_true:
+        {
+            return whole_world;
+        }
+        case operation_t::constant_false:
+        {
+            variable_evaluation_set empty_set;
+            return empty_set;
+        }
+        case operation_t::union_:
+        {
+            assert(childs_.left && childs_.right);
+            auto left = childs_.left->evaluate(relations, variables);
+            auto right = childs_.right->evaluate(relations, variables);
 
-		variable_evaluation_set result(left);
-		for (auto i = right.begin(); i != right.end(); i++) 
-		{
-			result.insert(*i);
-		}
+            variable_evaluation_set result(left);
+            for(auto i = right.begin(); i != right.end(); i++)
+            {
+                result.insert(*i);
+            }
 
-		return result;
-	}
-	case operation_t::intersaction_:
-	{
-		assert(childs_.left && childs_.right);
-		auto left = childs_.left->evaluate(relations, variables);
-		auto right = childs_.right->evaluate(relations, variables);
+            return result;
+        }
+        case operation_t::intersaction_:
+        {
+            assert(childs_.left && childs_.right);
+            auto left = childs_.left->evaluate(relations, variables);
+            auto right = childs_.right->evaluate(relations, variables);
 
-		variable_evaluation_set result;
-		for (auto i = left.begin(); i != left.end(); i++) {
-			if (right.find(*i) != right.end())
-			{
-				result.insert(*i);
-			}
-		}
+            variable_evaluation_set result;
+            for(auto i = left.begin(); i != left.end(); i++)
+            {
+                if(right.find(*i) != right.end())
+                {
+                    result.insert(*i);
+                }
+            }
 
-		return result;
-	}
-	case operation_t::star_:
-	{
-		assert(childs_.left);
-		auto left = childs_.left->evaluate(relations, variables);
+            return result;
+        }
+        case operation_t::star_:
+        {
+            assert(childs_.left);
+            auto left = childs_.left->evaluate(relations, variables);
 
-		variable_evaluation_set result;
-		for (auto i = whole_world.begin(); i != whole_world.end(); i++) {
-			if (left.find(*i) == left.end())
-			{
-				result.insert(*i);
-			}
-		}
-		return result;
-	}
-	case operation_t::variable_:
-	{
-		assert(variable_id_ < variables.size());
-		return variables[variable_id_]; // returns the evaluation for the variable
-	}
-	default:
-		assert(false && "Unrecognized.");
-		return variable_evaluation_set();
-	}
+            variable_evaluation_set result;
+            for(auto i = whole_world.begin(); i != whole_world.end(); i++)
+            {
+                if(left.find(*i) == left.end())
+                {
+                    result.insert(*i);
+                }
+            }
+            return result;
+        }
+        case operation_t::variable_:
+        {
+            assert(variable_id_ < variables.size());
+            return variables[variable_id_]; // returns the evaluation for the variable
+        }
+        default:
+            assert(false && "Unrecognized.");
+            return variable_evaluation_set();
+    }
 }
 
-auto term::evaluate(const variables_evaluations_block& evaluation_block, bool skip_subterm_creation) const -> evaluation_result
+auto term::evaluate(const variables_evaluations_block& evaluation_block, bool skip_subterm_creation) const
+    -> evaluation_result
 {
     using res_type = evaluation_result::result_type;
     switch(op_)
@@ -314,7 +318,8 @@ auto term::evaluate(const variables_evaluations_block& evaluation_block, bool sk
 
             assert(res_left.type == res_type::term && res_right.type == res_type::term);
 
-            auto t = create_internal_node(op_, skip_subterm_creation, res_left.release(), res_right.release());
+            auto t =
+                create_internal_node(op_, skip_subterm_creation, res_left.release(), res_right.release());
             return {res_type::term, t};
         }
         case operation_t::intersaction_:
@@ -350,7 +355,8 @@ auto term::evaluate(const variables_evaluations_block& evaluation_block, bool sk
 
             assert(res_left.type == res_type::term && res_right.type == res_type::term);
 
-            auto t = create_internal_node(op_, skip_subterm_creation, res_left.release(), res_right.release());
+            auto t =
+                create_internal_node(op_, skip_subterm_creation, res_left.release(), res_right.release());
             return {res_type::term, t};
         }
         case operation_t::star_:
@@ -611,7 +617,8 @@ void term::construct_variables()
     }
 }
 
-auto term::create_internal_node(operation_t op, bool skip_subterm_creation, term* left, term* right) const -> term*
+auto term::create_internal_node(operation_t op, bool skip_subterm_creation, term* left, term* right) const
+    -> term*
 {
     assert(op == operation_t::star_ || op == operation_t::union_ || op == operation_t::intersaction_);
 

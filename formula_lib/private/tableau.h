@@ -1,10 +1,10 @@
 #pragma once
 
 #include "formula.h"
+#include "model.h"
 #include "term.h"
 #include "types.h"
 #include "variables_evaluations_block_stack.h"
-#include "model.h"
 
 #include <ostream>
 #include <unordered_map>
