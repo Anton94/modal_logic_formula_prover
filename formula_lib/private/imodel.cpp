@@ -18,6 +18,23 @@ void imodel::clear()
     variable_evaluations_.clear();
 }
 
+void imodel::create_contact_relations_first_2k_in_contact(size_t number_of_points, size_t number_of_contacts)
+{
+    contact_relations_.clear();
+    contact_relations_.resize(number_of_points, model_points_set_t(number_of_points)); // Fill NxN matrix with 0s
+    for(size_t i = 0; i < number_of_contacts; i += 2)
+    {
+        contact_relations_[i + 1].set(i);
+        contact_relations_[i].set(i + 1);
+    }
+
+    // Add also the reflexivity
+    for(size_t i = 0, count = number_of_points; i < count; ++i)
+    {
+        contact_relations_[i].set(i);
+    }
+}
+
 std::ostream& operator<<(std::ostream& out, const imodel& m)
 {
     m.print(out);

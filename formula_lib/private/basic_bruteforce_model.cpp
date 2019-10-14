@@ -73,30 +73,12 @@ auto basic_bruteforce_model::create(const formula& f, size_t variables_count) ->
     {
         if(f.evaluate(variable_evaluations_, number_of_contacts_, number_of_non_empty_))
         {
-            fill_contact_relations();
+            create_contact_relations_first_2k_in_contact(number_of_points_, number_of_contacts_);
             return true;
         }
     } while(generate_next(variable_evaluations_));
 
     return false;
-}
-
-void basic_bruteforce_model::fill_contact_relations()
-{
-    contact_relations_.clear();
-    contact_relations_.resize(number_of_points_,
-                              model_points_set_t(number_of_points_)); // Fill NxN matrix with 0s
-    for(size_t i = 0; i < number_of_contacts_; i += 2)
-    {
-        contact_relations_[i + 1].set(i);
-        contact_relations_[i].set(i + 1);
-    }
-
-    // Add also the reflexivity
-    for(size_t i = 0; i < number_of_points_; ++i)
-    {
-        contact_relations_[i].set(i);
-    }
 }
 
 auto basic_bruteforce_model::print(std::ostream& out) const -> std::ostream&

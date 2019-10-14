@@ -18,7 +18,7 @@ auto model::create(const formulas_t& contacts_T, const formulas_t& contacts_F, c
        construct_non_zero_model_points(zero_terms_F, contacts_F, zero_terms_T))
     {
         calculate_the_model_evaluation_of_each_variable();
-        fill_contact_relations();
+        create_contact_relations_first_2k_in_contact(points_.size(), contacts_T.size());
         return true;
     }
     return false;
@@ -223,23 +223,6 @@ void model::calculate_the_model_evaluation_of_each_variable()
             variable_evaluations_[Pi].set(point); // adds the point to the v(Pi) set
             Pi = point_evaluation.find_next(Pi);
         }
-    }
-}
-
-void model::fill_contact_relations()
-{
-    contact_relations_.clear();
-    contact_relations_.resize(points_.size(), model_points_set_t(points_.size())); // Fill NxN matrix with 0s
-    for(size_t i = 0; i < number_of_contacts_; i += 2)
-    {
-        contact_relations_[i + 1].set(i);
-        contact_relations_[i].set(i + 1);
-    }
-
-    // Add also the reflexivity
-    for(size_t i = 0, count = points_.size(); i < count; ++i)
-    {
-        contact_relations_[i].set(i);
     }
 }
 

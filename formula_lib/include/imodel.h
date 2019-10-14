@@ -30,6 +30,11 @@ public:
     friend std::ostream& operator<<(std::ostream& out, const imodel& m);
 
 protected:
+    // Useful for models which have their first 2*@number_of_contacts in contact(2k with 2k + 1)
+    // Inserts 1s in the contact relations matrix between 2k and 2k+1 points (where k is less than the number
+    // of contacts)
+    void create_contact_relations_first_2k_in_contact(size_t number_of_points, size_t number_of_contacts);
+
     const formula_mgr* mgr_{};
 
     /*

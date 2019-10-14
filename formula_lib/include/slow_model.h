@@ -87,7 +87,6 @@ private:
     auto is_not_empty_set(const term* a) const -> bool;
 
     void calculate_the_model_evaluation_of_each_variable();
-    void calculate_contact_relations();
 
     friend std::ostream& operator<<(std::ostream& out, const slow_model& m);
 

@@ -160,10 +160,6 @@ private:
         -> bool;
 
     void calculate_the_model_evaluation_of_each_variable();
-    // Inserts 1s in the contact relations matrix between 2k and 2k+1 points (where k is less than the number
-    // of contacts)
-    // because we first create the contact points and then the non-zeros
-    void fill_contact_relations();
 
     variables_mask_t used_variables_{};
     size_t number_of_contacts_{};

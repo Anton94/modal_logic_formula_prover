@@ -20,7 +20,7 @@ auto slow_model::create(const formulas_t& contacts_T, const formulas_t& contacts
         return false;
     }
 
-    calculate_contact_relations();
+    create_contact_relations_first_2k_in_contact(points_.size(), contacts_T.size());
     calculate_the_model_evaluation_of_each_variable();
 
     while (!is_zero_term_rule_satisfied(zero_terms_T) || !is_contact_F_rule_satisfied(contacts_F))
@@ -193,22 +193,6 @@ auto slow_model::construct_non_zero_model_points(const terms_t& non_zero_terms) 
     }
 
     return true;
-}
-
-void slow_model::calculate_contact_relations()
-{
-    const auto n = points_.size();
-    contact_relations_.resize(n, model_points_set_t(n, false)); // construct a square zero matrix of size @n
-
-    // We have constructed the contact model points in a sequentional order,
-    // so point at position 2k is connected with point at position 2k+1 (each point at an even position is connected with the odd point right next to it)
-    for (size_t i = 0; i < number_of_contacts_; ++i)
-    {
-        const auto l_contact_point = i * 2;
-        const auto r_contact_point = i * 2 + 1;
-        contact_relations_[l_contact_point].set(r_contact_point);
-        contact_relations_[r_contact_point].set(l_contact_point);
-    }
 }
 
 auto slow_model::construct_non_zero_term_evaluation(const term* t, variables_evaluations_block& out_evaluation) const -> bool

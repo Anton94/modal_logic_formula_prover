@@ -26,7 +26,6 @@ public:
 private:
     auto generate_next(variables_evaluations_t& current) const -> bool;
     auto generate_next(std::vector<variables_evaluations_t>& current) const -> bool;
-    void fill_contact_relations();
 
     size_t number_of_contacts_;
     size_t number_of_non_empty_;
