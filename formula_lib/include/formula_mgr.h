@@ -40,10 +40,6 @@ public:
     // Checks if the provided model satisfies the formula
     auto is_model_satisfiable(const imodel& model) const -> bool;
 
-    // Checks if the formula evaluates to the constant true or not with the given subset of variable
-    // evaluations
-    // auto does_evaluates_to_true(const variable_to_evaluation_map_t& evaluations) -> bool;
-
     void clear();
 
     auto get_variables() const -> const variables_t&;
@@ -59,8 +55,6 @@ public:
 private:
     void move(formula_mgr&& rhs) noexcept;
 
-    auto has_satisfiable_evaluation(const formula& f, full_variables_evaluations_t& evaluations,
-                                    full_variables_evaluations_t::iterator it) const -> bool;
     auto change_variables_to_variable_ids(json& f) const -> bool;
 
     using variable_to_id_map_t = std::unordered_map<std::string, variable_id_t>;
@@ -72,37 +66,3 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& out, const formula_mgr& formulas);
-
-// Example of brute_force_evaluate_native
-// The W is chosen depending on the number of variables involved in the formula
-// and probably the number of operations.
-// For example:
-// Let V = {a, b}, then we might choose W = {1, 2, 3}
-// Here the possible relations are { <1,2>, <2,3>, <1,3> }
-// meaning that we need to check for each subset of the above possible relations.
-// { }
-
-// { <1,2> }
-// { <1,3> }
-// { <2,3> }
-
-// { <1,2>, <1,3> }
-// { <1,2>, <2,3> }
-// { <1,3>, <2,3> }
-
-// { <1,2>, <1,3>, <2, 3> }
-
-// For each of the above possibilities
-// we create all possible sets for the two variables
-// for example
-// a = {}, b = {}			- and check if satisfiable
-// a = {}, b = {1}			- and check if satisfiable
-// a = {}, b = {2}			- and check if satisfiable
-// a = {}, b = {3}			- and check if satisfiable
-// a = {}, b = {1,2}		- and check if satisfiable
-// a = {}, b = {1,3}		- and check if satisfiable
-// a = {}, b = {2,3}		- and check if satisfiable
-// a = {}, b = {1,2,3}		- and check if satisfiable
-// a = {1}, b = {}			- and check if satisfiable
-// a = {1}, b = {1}			- and check if satisfiable
-// ... and so on.

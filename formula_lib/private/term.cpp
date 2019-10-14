@@ -142,34 +142,6 @@ auto term::build(json& t) -> bool
     return true;
 }
 
-auto term::evaluate(const full_variables_evaluations_t& variable_evaluations) const -> bool
-{
-    switch(op_)
-    {
-        case operation_t::constant_true:
-            return true;
-        case operation_t::constant_false:
-            return false;
-        case operation_t::union_:
-            assert(childs_.left && childs_.right);
-            return childs_.left->evaluate(variable_evaluations) ||
-                   childs_.right->evaluate(variable_evaluations);
-        case operation_t::intersaction_:
-            assert(childs_.left && childs_.right);
-            return childs_.left->evaluate(variable_evaluations) &&
-                   childs_.right->evaluate(variable_evaluations);
-        case operation_t::star_:
-            assert(childs_.left);
-            return !childs_.left->evaluate(variable_evaluations);
-        case operation_t::variable_:
-            assert(variable_id_ < variable_evaluations.size());
-            return variable_evaluations[variable_id_]; // returns the evaluation for the variable
-        default:
-            assert(false && "Unrecognized.");
-            return false;
-    }
-}
-
 auto term::evaluate(const variable_id_to_points_t& variable_evaluations, const size_t elements_count) const
     -> model_points_set_t
 {
@@ -196,82 +168,6 @@ auto term::evaluate(const variable_id_to_points_t& variable_evaluations, const s
         default:
             assert(false && "Unrecognized.");
             return model_points_set_t(elements_count);
-    }
-}
-
-auto term::evaluate(relations_t& relations, std::vector<variable_evaluation_set>& variables) const
-    -> variable_evaluation_set
-{
-    variable_evaluation_set whole_world;
-    for(int i = 0; i < variables_.size(); ++i)
-    {
-        whole_world.insert(i);
-    }
-    switch(op_)
-    {
-        case operation_t::constant_true:
-        {
-            return whole_world;
-        }
-        case operation_t::constant_false:
-        {
-            variable_evaluation_set empty_set;
-            return empty_set;
-        }
-        case operation_t::union_:
-        {
-            assert(childs_.left && childs_.right);
-            auto left = childs_.left->evaluate(relations, variables);
-            auto right = childs_.right->evaluate(relations, variables);
-
-            variable_evaluation_set result(left);
-            for(auto i = right.begin(); i != right.end(); i++)
-            {
-                result.insert(*i);
-            }
-
-            return result;
-        }
-        case operation_t::intersaction_:
-        {
-            assert(childs_.left && childs_.right);
-            auto left = childs_.left->evaluate(relations, variables);
-            auto right = childs_.right->evaluate(relations, variables);
-
-            variable_evaluation_set result;
-            for(auto i = left.begin(); i != left.end(); i++)
-            {
-                if(right.find(*i) != right.end())
-                {
-                    result.insert(*i);
-                }
-            }
-
-            return result;
-        }
-        case operation_t::star_:
-        {
-            assert(childs_.left);
-            auto left = childs_.left->evaluate(relations, variables);
-
-            variable_evaluation_set result;
-            for(auto i = whole_world.begin(); i != whole_world.end(); i++)
-            {
-                if(left.find(*i) == left.end())
-                {
-                    result.insert(*i);
-                }
-            }
-            return result;
-        }
-        case operation_t::variable_:
-        {
-            assert(variable_id_ < variables.size());
-            return variables[variable_id_]; // returns the evaluation for the variable
-        }
-        default:
-            assert(false && "Unrecognized.");
-            return variable_evaluation_set();
     }
 }
 
