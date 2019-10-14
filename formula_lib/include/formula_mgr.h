@@ -2,7 +2,8 @@
 
 // TODO: pimpl ideom. will hide the private includes, etc.
 
-#include "../private/basic_bruteforce_model.h"
+#include "basic_bruteforce_model.h"
+#include "imodel.h"
 #include "../private/formula.h"
 #include "../private/tableau.h"
 #include "../private/types.h"
@@ -34,10 +35,10 @@ public:
     auto brute_force_evaluate_with_points_count(basic_bruteforce_model& out_model) const -> bool;
 
     // Checks if the formula is satisfiable or not
-    auto is_satisfiable(model& out_model) -> bool;
+    auto is_satisfiable(imodel& out_model) -> bool;
 
     // Checks if the provided model satisfies the formula
-    auto is_model_satisfiable(const model& model) const -> bool;
+    auto is_model_satisfiable(const imodel& model) const -> bool;
 
     // Checks if the formula evaluates to the constant true or not with the given subset of variable
     // evaluations

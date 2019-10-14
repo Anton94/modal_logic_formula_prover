@@ -111,7 +111,7 @@ auto formula_mgr::brute_force_evaluate_with_points_count(basic_bruteforce_model&
     return out_model.create(f_, variables_.size());
 }
 
-auto formula_mgr::is_satisfiable(model& out_model) -> bool
+auto formula_mgr::is_satisfiable(imodel& out_model) -> bool
 {
     info() << "Running satisfiability checking of " << f_ << "...";
 
@@ -130,7 +130,7 @@ auto formula_mgr::is_satisfiable(model& out_model) -> bool
     return is_f_satisfiable;
 }
 
-auto formula_mgr::is_model_satisfiable(const model& model) const -> bool
+auto formula_mgr::is_model_satisfiable(const imodel& model) const -> bool
 {
     info() << "Running satisfiability checking of " << f_ << " with provided model: \n" << model;
 

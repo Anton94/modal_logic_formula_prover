@@ -1,13 +1,24 @@
-#include "basic_bruteforce_model.h"
+#include "../include/basic_bruteforce_model.h"
+#include "formula_mgr.h"
 
-auto basic_bruteforce_model::get_variables_evaluations() const -> const variable_id_to_points_t&
+void basic_bruteforce_model::clear()
 {
-    return variable_evaluations_;
+    number_of_contacts_ = 0;
+    number_of_non_empty_ = 0;
+    number_of_points_ = 0;
+
+    imodel::clear();
 }
 
-auto basic_bruteforce_model::get_contact_relations() const -> const contacts_t&
+
+auto basic_bruteforce_model::get_number_of_contacts() const -> size_t
 {
-    return contact_relations_;
+    return number_of_contacts_;
+}
+
+auto basic_bruteforce_model::get_number_of_non_zeros() const -> size_t
+{
+    return number_of_non_empty_;
 }
 
 auto basic_bruteforce_model::generate_next(variables_evaluations_t& current) const -> bool
@@ -35,6 +46,17 @@ auto basic_bruteforce_model::generate_next(std::vector<variables_evaluations_t>&
         }
     }
     return false;
+}
+
+auto basic_bruteforce_model::create(const formulas_t& contacts_T, const formulas_t& contacts_F, const terms_t& zero_terms_T,
+            const terms_t& zero_terms_F, const variables_mask_t& used_variables, const formula_mgr* mgr)
+    -> bool
+{
+    assert(mgr);
+    assert(mgr->get_internal_formula());
+    mgr_ = mgr;
+    // TODO: do it in a cleaver way!!!!
+    return create(*mgr_->get_internal_formula(), mgr_->get_variables().size());
 }
 
 auto basic_bruteforce_model::create(const formula& f, size_t variables_count) -> bool
@@ -75,4 +97,10 @@ void basic_bruteforce_model::fill_contact_relations()
     {
         contact_relations_[i].set(i);
     }
+}
+
+auto basic_bruteforce_model::print(std::ostream& out) const -> std::ostream&
+{
+    // TODO: fill some additional info, e.g. evaluation for the points
+    return out;
 }

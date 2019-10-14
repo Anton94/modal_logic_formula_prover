@@ -1,4 +1,5 @@
 ﻿#include "microservice_controller.h"
+#include "model.h"
 
 #include <iostream>
 #include <string>

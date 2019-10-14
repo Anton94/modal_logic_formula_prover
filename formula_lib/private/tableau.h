@@ -1,7 +1,7 @@
 #pragma once
 
 #include "formula.h"
-#include "model.h"
+#include "imodel.h"
 #include "term.h"
 #include "types.h"
 #include "variables_evaluations_block_stack.h"
@@ -23,7 +23,7 @@ public:
     tableau& operator=(tableau&&) = default;
 
     // Checks if the formula is satisfiable or not
-    auto is_satisfiable(const formula& f, model& out_model) -> bool;
+    auto is_satisfiable(const formula& f, imodel& out_model) -> bool;
 
 private:
     void clear();
@@ -79,8 +79,6 @@ private:
 
     auto get_used_variables() const -> variables_mask_t;
 
-    std::ostream& print(std::ostream& out, const model::points_t& model_points_);
-
     const formula_mgr* mgr_;
 
     formulas_t formulas_T_;
@@ -94,5 +92,5 @@ private:
     // i.e. for each T(C(a,b)) : a, b are in the collection
     multiterms_t contact_T_terms_;
 
-    model model_;
+    imodel* model_{}; // just to avoid passing it through function arguments
 };

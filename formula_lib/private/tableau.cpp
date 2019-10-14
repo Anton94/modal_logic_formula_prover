@@ -6,7 +6,7 @@
 #include "utils.h"
 #include "variables_evaluations_block_stack.h"
 
-auto tableau::is_satisfiable(const formula& f, model& out_model) -> bool
+auto tableau::is_satisfiable(const formula& f, imodel& out_model) -> bool
 {
     clear();
 
@@ -19,12 +19,14 @@ auto tableau::is_satisfiable(const formula& f, model& out_model) -> bool
     mgr_ = f.get_mgr();
     const auto variables_count = mgr_->get_variables().size();
 
+    model_ = &out_model;
     if(satisfiable_step())
     {
-        out_model = model_;
         info() << "Model:\n" << out_model;
         return true;
     }
+    model_ = nullptr;
+    out_model.clear(); // it's not a good practive to modify the output parameter if it returns false, but it's ok for our purposes
     return false;
 }
 
@@ -38,6 +40,7 @@ void tableau::clear()
     zero_terms_T_.clear();
     zero_terms_F_.clear();
     contact_T_terms_.clear();
+    model_ = nullptr;
 }
 
 auto tableau::satisfiable_step() -> bool
@@ -608,13 +611,14 @@ void tableau::F_disjunction_child::remove_from_F()
 auto tableau::has_satisfiable_model() -> bool
 {
     trace() << "Start looking for an satisfiable model.";
-    model_.clear();
+    assert(model_);
+    model_->clear();
 
     // Cache all used variables in the 'path' in order to make evaluations for only them and not all variables
     // in the whole formula.
     const auto used_variables = get_used_variables();
 
-    if(!model_.create(contacts_T_, contacts_F_, zero_terms_T_, zero_terms_F_, used_variables, mgr_))
+    if(!model_->create(contacts_T_, contacts_F_, zero_terms_T_, zero_terms_F_, used_variables, mgr_))
     {
         trace() << "Unable to construct a satisfiable model.";
         return false;
@@ -647,14 +651,4 @@ auto tableau::get_used_variables() const -> variables_mask_t
         used_variables |= t->get_variables();
     }
     return used_variables;
-}
-
-std::ostream& tableau::print(std::ostream& out, const model::points_t& model_points)
-{
-    for(const auto& term_eval : model_points)
-    {
-        out << term_eval.t << " : ";
-        mgr_->print(out, term_eval.evaluation);
-    }
-    return out;
 }

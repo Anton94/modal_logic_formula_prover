@@ -2,7 +2,7 @@
 
 #include "imodel.h"
 #include "types.h"
-#include "variables_evaluations_block.h"
+#include "../private/variables_evaluations_block.h"
 
 class formula_mgr;
 class term;
@@ -79,17 +79,17 @@ struct model : public imodel
      */
     auto create(const formulas_t& contacts_T, const formulas_t& contacts_F, const terms_t& zero_terms_T,
                 const terms_t& zero_terms_F, const variables_mask_t& used_variables, const formula_mgr* mgr)
-        -> bool;
+        -> bool override;
 
     auto get_model_points() const -> const points_t&;
-    auto get_variables_evaluations() const -> const variable_id_to_points_t& override;
-    auto get_contact_relations() const -> const contacts_t& override;
-    auto get_number_of_contacts() const -> size_t;
-    auto get_number_of_non_zeros() const -> size_t;
+    auto get_number_of_contacts() const -> size_t override;
+    auto get_number_of_non_zeros() const -> size_t override;
     auto get_number_of_contact_points() const -> size_t;
     auto get_number_of_non_zero_points() const -> size_t;
 
-    void clear();
+    auto print(std::ostream& out) const -> std::ostream& override;
+
+    void clear() override;
 
     ~model() override = default;
 
@@ -165,50 +165,8 @@ private:
     // because we first create the contact points and then the non-zeros
     void fill_contact_relations();
 
-    friend std::ostream& operator<<(std::ostream& out, const model& m);
-
-    const formula_mgr* mgr_{};
     variables_mask_t used_variables_{};
     size_t number_of_contacts_{};
 
     points_t points_;
-
-    /*
-        Symetric square bit matrix. contacts_[i] gives a bit mask of all points which are in contact with the
-       point 'i'.
-        For example, let us have a model with 6 points:
-            0---1
-            2---3
-            4
-            5
-
-        The bit matrix will be the following:
-            \ 012345
-            0 010010    // from 0---1
-            1 100000    // from 1---0
-            2 000100    // from 2---3
-            3 001000    // from 3---2
-            4 100000    // from 4---0
-            5 000000    // no contacts with point 5
-    */
-    contacts_t contact_relations_;
-
-    /*
-        A vector of size @used_variables_, each element is a set of points, represented as a bitset.
-        Keeps the variable evaluations, i.e. v(p).
-
-        For example, let us have the following formula: C(a * b, c) & c != 0 & -a != 0
-        Then a model could be the following:
-            (110) (a * b) 0---1 (c) (001)
-            (011) (c)  2
-            (000) (-a) 3
-
-        Let assume that 'a' has a variable id 0, 'b' has id 1 and 'c' has id 2.
-        The bit matrix will be the following:
-            \ 0123     // variable ids (rows) \ model points (columns)
-            0 1000     // v(a) = { 0 }, i.e. all points which have evaluation with bit at positon 0 set to 1
-            1 1010     // v(b) = { 0, 2 }, ... at position 1 ...
-            2 0110     // v(c) = { 1, 2 }, ... at position 2 ...
-    */
-    variable_id_to_points_t variable_evaluations_; // a vector of bitsets representing the value of v(p)
 };
