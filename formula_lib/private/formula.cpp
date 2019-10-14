@@ -148,7 +148,7 @@ auto formula::build(json& f) -> bool
     return true;
 }
 
-auto formula::evaluate(const std::vector<variables_evaluations_t>& evals, int R, int P) const -> bool
+auto formula::evaluate(const variable_id_to_points_t& evals, int R, int P) const -> bool
 {
     switch(op_)
     {
@@ -190,6 +190,63 @@ auto formula::evaluate(const std::vector<variables_evaluations_t>& evals, int R,
                 }
             }
 
+            return false;
+        }
+        default:
+            assert(false && "Unrecognized.");
+            return false;
+    }
+}
+
+auto formula::evaluate(const variable_id_to_points_t& evals, const contacts_t& contact_relations) const -> bool
+{
+    switch(op_)
+    {
+        case formula::operation_t::constant_true:
+            return true;
+        case formula::operation_t::constant_false:
+            return false;
+        case formula::operation_t::conjunction:
+            assert(child_f_.left && child_f_.right);
+            return child_f_.left->evaluate(evals, contact_relations) && child_f_.right->evaluate(evals, contact_relations);
+        case formula::operation_t::disjunction:
+            assert(child_f_.left && child_f_.right);
+            return child_f_.left->evaluate(evals, contact_relations) || child_f_.right->evaluate(evals, contact_relations);
+        case formula::operation_t::negation:
+            assert(child_f_.left);
+            return !child_f_.left->evaluate(evals, contact_relations);
+        case formula::operation_t::eq_zero:
+        {
+            assert(child_t_.left);
+            const auto number_of_points = contact_relations.size(); // a bit hacky...
+            return child_t_.left->evaluate(evals, number_of_points).none();
+        }
+        case formula::operation_t::c:
+        {
+            assert(child_t_.left && child_t_.right);
+            const auto number_of_points = contact_relations.size();
+            auto eval_l = child_t_.left->evaluate(evals, number_of_points);
+            auto eval_r = child_t_.right->evaluate(evals, number_of_points);
+
+            if (eval_l.none() || eval_r.none())
+            {
+                return false; // there is no way to be in contact if at least on of the evaluations is the empty set
+            }
+            if ((eval_l & eval_r).any())
+            {
+                return true; // left eval set and right eval set has a common point, but each point is reflexive so there is a contact between the two sets
+            }
+
+            auto point_in_eval_l = eval_l.find_first(); // TODO: iterate over the bitset with less set bits
+            while (point_in_eval_l != model_points_set_t::npos)
+            {
+                const auto& points_in_contact_with_point_in_eval_l = contact_relations[point_in_eval_l];
+                if ((points_in_contact_with_point_in_eval_l & eval_r).any())
+                {
+                    return true;
+                }
+                point_in_eval_l = eval_l.find_next(point_in_eval_l);
+            }
             return false;
         }
         default:

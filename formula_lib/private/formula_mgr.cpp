@@ -135,10 +135,9 @@ auto formula_mgr::is_model_satisfiable(const imodel& model) const -> bool
     info() << "Running satisfiability checking of " << f_ << " with provided model: \n" << model;
 
     const auto& model_variable_evaluations = model.get_variables_evaluations();
-    const auto number_of_contacts = model.get_number_of_contacts();
-    const auto number_of_non_zeros = model.get_number_of_non_zeros();
+    const auto& model_contact_relations = model.get_contact_relations();
 
-    return f_.evaluate(model_variable_evaluations, number_of_contacts, number_of_non_zeros);
+    return f_.evaluate(model_variable_evaluations, model_contact_relations);
 }
 
 void formula_mgr::clear()

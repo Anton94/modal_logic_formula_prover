@@ -29,26 +29,6 @@ auto model::get_model_points() const -> const points_t&
     return points_;
 }
 
-auto model::get_number_of_contacts() const -> size_t
-{
-    return number_of_contacts_;
-}
-
-auto model::get_number_of_non_zeros() const -> size_t
-{
-    return points_.size() - get_number_of_contact_points();
-}
-
-auto model::get_number_of_contact_points() const -> size_t
-{
-    return get_number_of_contacts() * 2;
-}
-
-auto model::get_number_of_non_zero_points() const -> size_t
-{
-    return get_number_of_non_zeros();
-}
-
 void model::clear()
 {
     used_variables_.clear();

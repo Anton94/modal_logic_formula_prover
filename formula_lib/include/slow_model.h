@@ -53,10 +53,6 @@ struct slow_model : public imodel
         -> bool override;
 
     auto get_model_points() const -> const points_t&;
-    auto get_number_of_contacts() const -> size_t override;
-    auto get_number_of_non_zeros() const->size_t override;
-    auto get_number_of_contact_points() const-> size_t;
-    auto get_number_of_non_zero_points() const-> size_t;
 
     auto print(std::ostream& out) const -> std::ostream& override;
 

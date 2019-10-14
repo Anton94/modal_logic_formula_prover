@@ -10,17 +10,6 @@ void basic_bruteforce_model::clear()
     imodel::clear();
 }
 
-
-auto basic_bruteforce_model::get_number_of_contacts() const -> size_t
-{
-    return number_of_contacts_;
-}
-
-auto basic_bruteforce_model::get_number_of_non_zeros() const -> size_t
-{
-    return number_of_non_empty_;
-}
-
 auto basic_bruteforce_model::generate_next(variables_evaluations_t& current) const -> bool
 {
     for(int i = 0; i < current.size(); ++i)

@@ -26,7 +26,11 @@ public:
 
     auto build(json& f) -> bool;
 
-    auto evaluate(const std::vector<variables_evaluations_t>& evals, int R, int P) const -> bool;
+    // TODO: remove and use the one with contact relations if it does not have negative performance impact
+    auto evaluate(const variable_id_to_points_t& evals, int R, int P) const -> bool;
+
+    auto evaluate(const variable_id_to_points_t& evals, const contacts_t& contact_relations) const -> bool;
+
     std::pair<int, int> get_contacts_count() const;
     std::pair<int, int> get_zeroes_count() const;
 

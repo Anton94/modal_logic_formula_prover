@@ -14,9 +14,6 @@ public:
         -> bool override;
     auto create(const formula& f, size_t variables_count) -> bool;
 
-    auto get_number_of_contacts() const -> size_t override;
-    auto get_number_of_non_zeros() const -> size_t override;
-
     auto print(std::ostream& out) const -> std::ostream& override;
 
     void clear() override;

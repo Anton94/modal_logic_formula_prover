@@ -15,9 +15,6 @@ public:
 
     virtual auto get_variables_evaluations() const -> const variable_id_to_points_t&;
     virtual auto get_contact_relations() const -> const contacts_t&;
-    // TODO: refactor and remove the bellowe two methods
-    virtual auto get_number_of_contacts() const -> size_t = 0;
-    virtual auto get_number_of_non_zeros() const -> size_t = 0;
 
     // TODO: add get_points which returns a vector of binary variable evaluations
 
