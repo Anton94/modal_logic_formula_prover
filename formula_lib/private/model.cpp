@@ -213,6 +213,7 @@ auto model::print(std::ostream& out) const -> std::ostream&
     {
         out << std::to_string(i) << " : ";
         mgr_->print(out, points_[i].evaluation);
+        out << "\n";
     }
 
     return out;

@@ -22,14 +22,16 @@ void imodel::create_contact_relations_first_2k_in_contact(size_t number_of_point
 {
     contact_relations_.clear();
     contact_relations_.resize(number_of_points, model_points_set_t(number_of_points)); // Fill NxN matrix with 0s
-    for(size_t i = 0; i < number_of_contacts; i += 2)
+    for(size_t k = 0; k < number_of_contacts; ++k)
     {
-        contact_relations_[i + 1].set(i);
-        contact_relations_[i].set(i + 1);
+        const auto a = 2 * k;
+        const auto b = a + 1;
+        contact_relations_[a].set(b);
+        contact_relations_[b].set(a);
     }
 
     // Add also the reflexivity
-    for(size_t i = 0, count = number_of_points; i < count; ++i)
+    for(size_t i = 0; i < number_of_points; ++i)
     {
         contact_relations_[i].set(i);
     }
@@ -39,22 +41,38 @@ std::ostream& operator<<(std::ostream& out, const imodel& m)
 {
     m.print(out);
 
-    // TODO: contact connections print
+    out << "Model contact relations: \n";
+    for (size_t a = 0; a < m.contact_relations_.size(); ++a)
+    {
+        const auto& points_in_contact_with_a = m.contact_relations_[a];
 
-    out << "Model evaluation of the variables";
+        auto point_in_contact_with_a = points_in_contact_with_a.find_first();
+        // note that every point should have at least one contact(itself)
+        out << a << " is in contact with: ";
+        while (point_in_contact_with_a != model_points_set_t::npos)
+        {
+            out << point_in_contact_with_a << " ";
+            point_in_contact_with_a = points_in_contact_with_a.find_next(point_in_contact_with_a);
+        }
+        out << "\n";
+    }
+
+    out << "Model evaluation of the variables: \n";
     for(size_t i = 0; i < m.variable_evaluations_.size(); ++i)
     {
         const auto& variable_evaluation_bitset = m.variable_evaluations_[i];
 
-        out << "v(" << m.mgr_->get_variable(i) << ") = { ";
+        out << "v(" << m.mgr_->get_variable(i) << ") = {";
 
         auto model_point_id = variable_evaluation_bitset.find_first();
+        auto is_first = true;
         while(model_point_id != variables_evaluations_t::npos)
         {
-            out << std::to_string(model_point_id) << ", ";
+            out << (is_first ? " " : ", ") << std::to_string(model_point_id);
+            is_first = false;
             model_point_id = variable_evaluation_bitset.find_next(model_point_id);
         }
-        out << "}";
+        out << " }\n";
     }
 
     return out;
