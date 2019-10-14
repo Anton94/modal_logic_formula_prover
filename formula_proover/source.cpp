@@ -6,6 +6,7 @@
 #include "nlohmann_json/json.hpp"
 
 #include "formula_mgr.h"
+#include "model.h"
 #include "logger.h"
 
 using json = nlohmann::json;

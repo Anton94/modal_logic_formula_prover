@@ -1,4 +1,5 @@
 ﻿#include "microservice_controller.h"
+#include "model.h"
 
 #include <iostream>
 #include <string>
@@ -122,15 +123,18 @@ void microservice_controller::handle_post(http_request message)
                     formula_mgr mgr;
                     mgr.build(f_json);
 
-					variable_to_bits_evaluation_map_t out_evaluations;
-					bool isNativeSatisfied = mgr.brute_force_evaluate_with_points_count(out_evaluations);
+					basic_bruteforce_model bbm;
+					bool isNativeSatisfied = mgr.brute_force_evaluate_with_points_count(bbm);
 
                     model m;
                     const auto is_satisfiable = mgr.is_satisfiable(m);
 
                     std::stringstream msg;
 					msg << "Native? " << to_string(isNativeSatisfied) << "\n";
-					msg << out_evaluations << "\n";
+					for (model_points_set_t point : bbm.get_variables_evaluations())
+					{
+						msg << point << "\n";
+					}
                     msg << "Satisfiable? " << to_string(is_satisfiable) << "\n";
 
                     const auto msg_t = utility::conversions::to_string_t(msg.str());
@@ -249,7 +253,6 @@ void microservice_controller::handle_post(http_request message)
                     mgr.build(f_json);
 
                     std::stringstream msg;
-                    variable_to_evaluation_map_t out_evaluations;
                     model m;
                     const auto is_satisfiable = mgr.is_satisfiable(m);
                     msg << "is_satisfiable: " << to_string(is_satisfiable) << "\n";
@@ -268,10 +271,16 @@ void microservice_controller::handle_post(http_request message)
 
                     if(bruteforce_enabled)
                     {
-                        variable_to_bits_evaluation_map_t out_evals;
-                        const auto bruteforce_status = mgr.brute_force_evaluate_with_points_count(out_evals);
+						basic_bruteforce_model bbm;
+                        const auto bruteforce_status = mgr.brute_force_evaluate_with_points_count(bbm);
                         msg << "brute force: " << to_string(bruteforce_status) << "\n";
-                        msg << "brute force evaluations: " << out_evaluations << "\n";
+						if (bruteforce_status)
+						{
+							for (model_points_set_t point : bbm.get_variables_evaluations())
+							{
+								msg << point << "\n";
+							}
+						}
 
                         valid &= is_satisfiable == bruteforce_status;
                     }

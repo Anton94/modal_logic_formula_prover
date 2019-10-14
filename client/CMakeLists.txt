@@ -17,5 +17,5 @@ else()
 	message("ov='${ov}'")
 endif (WIN32)
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/dist DESTINATION /)
-file(COPY e2e/views DESTINATION dist)
+#file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/dist DESTINATION /)
+#file(COPY e2e/views DESTINATION dist)

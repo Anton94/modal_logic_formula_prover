@@ -6,7 +6,7 @@
 #include "utils.h"
 #include "variables_evaluations_block_stack.h"
 
-auto tableau::is_satisfiable(const formula& f, model& out_model) -> bool
+auto tableau::is_satisfiable(const formula& f, imodel& out_model) -> bool
 {
     clear();
 
@@ -19,12 +19,14 @@ auto tableau::is_satisfiable(const formula& f, model& out_model) -> bool
     mgr_ = f.get_mgr();
     const auto variables_count = mgr_->get_variables().size();
 
+    model_ = &out_model;
     if(satisfiable_step())
     {
-        out_model = model_;
         info() << "Model:\n" << out_model;
         return true;
     }
+    model_ = nullptr;
+    out_model.clear(); // it's not a good practive to modify the output parameter if it returns false, but it's ok for our purposes
     return false;
 }
 
@@ -38,6 +40,7 @@ void tableau::clear()
     zero_terms_T_.clear();
     zero_terms_F_.clear();
     contact_T_terms_.clear();
+    model_ = nullptr;
 }
 
 auto tableau::satisfiable_step() -> bool
@@ -141,8 +144,7 @@ auto tableau::satisfiable_step() -> bool
 
         auto process_T_disj_child = [&](const formula* child) {
             if(child->is_constant_false() || // T(F) is not satisfiable
-               find_in_F(child) ||
-               has_broken_contact_rule(child))
+               find_in_F(child) || has_broken_contact_rule(child))
             {
                 return false;
             }
@@ -268,7 +270,7 @@ auto tableau::satisfiable_step() -> bool
         {
             return false;
         }
-        if (find_in_F(child))
+        if(find_in_F(child))
         {
             return satisfiable_step();
         }
@@ -608,25 +610,18 @@ void tableau::F_disjunction_child::remove_from_F()
 
 auto tableau::has_satisfiable_model() -> bool
 {
-    trace() << "Start looking for an satisfiable evaluation of the variables.";
-    model_.clear();
+    trace() << "Start looking for an satisfiable model.";
+    assert(model_);
+    model_->clear();
 
-    // Cache all used variables in order to make evaluations for only them.
+    // Cache all used variables in the 'path' in order to make evaluations for only them and not all variables
+    // in the whole formula.
     const auto used_variables = get_used_variables();
 
-    if (!model_.construct_model_points(contacts_T_, zero_terms_F_, used_variables, mgr_))
+    if(!model_->create(contacts_T_, contacts_F_, zero_terms_T_, zero_terms_F_, used_variables, mgr_))
     {
-        trace() << "Unable to construct the model points with binary var. evaluations which evaluates the contact & non-zero terms to 1";
+        trace() << "Unable to construct a satisfiable model.";
         return false;
-    }
-
-    while (!is_zero_term_rule_satisfied() || !is_contact_F_rule_satisfied())
-    {
-        if (!model_.generate_next())
-        {
-            trace() << "Unable to generate a new combination of binary var. evaluations for the model points.";
-            return false;
-        }
     }
 
     return true;
@@ -637,60 +632,23 @@ auto tableau::get_used_variables() const -> variables_mask_t
     assert(mgr_);
     variables_mask_t used_variables(mgr_->get_variables().size());
 
-    for (const auto& c : contacts_T_)
+    for(const auto& c : contacts_T_)
     {
         used_variables |= c->get_left_child_term()->get_variables();
         used_variables |= c->get_right_child_term()->get_variables();
     }
-    for (const auto& c : contacts_F_)
+    for(const auto& c : contacts_F_)
     {
         used_variables |= c->get_left_child_term()->get_variables();
         used_variables |= c->get_right_child_term()->get_variables();
     }
-    for (const auto& t : zero_terms_T_)
+    for(const auto& t : zero_terms_T_)
     {
         used_variables |= t->get_variables();
     }
-    for (const auto& t : zero_terms_F_)
+    for(const auto& t : zero_terms_F_)
     {
         used_variables |= t->get_variables();
     }
     return used_variables;
-}
-
-auto tableau::is_contact_F_rule_satisfied() const -> bool
-{
-    for (const auto& c : contacts_F_)
-    {
-        if (model_.is_in_contact(c->get_left_child_term(), c->get_right_child_term()))
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-auto tableau::is_zero_term_rule_satisfied() const -> bool
-{
-    // The zero term, i.e. the <=(a,b) operation which is translated to (a * -b = 0),
-    // has the following semantic: <=(a,b) is satisfied iif v(a * -b) = empty_set which is a bitset of only zeros
-    // v(a * -b) = v(a) & v(-b) = v(a) & v(W\v(b)) = v(a) & ~v(b)
-    for (const auto& z : zero_terms_T_)
-    {
-        if (model_.is_not_empty_set(z))
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-std::ostream& tableau::print(std::ostream& out, const model::points_t& model_points)
-{
-    for (const auto& term_eval : model_points)
-    {
-        out << term_eval.t << " : ";
-        mgr_->print(out, term_eval.evaluation);
-    }
-    return out;
 }

@@ -181,154 +181,164 @@ auto formula::evaluate(const full_variables_evaluations_t& variable_evaluations)
     }
 }
 
-auto formula::evaluate(relations_t& relations,
-	std::vector<variable_evaluation_set>& variables) const -> bool
+auto formula::evaluate(relations_t& relations, std::vector<variable_evaluation_set>& variables) const -> bool
 {
-	switch (op_)
-	{
-	case formula::operation_t::constant_true:
-		return true;
-	case formula::operation_t::constant_false:
-		return false;
-	case formula::operation_t::conjunction:
-		assert(child_f_.left && child_f_.right);
-		return child_f_.left->evaluate(relations, variables) &&
-			child_f_.right->evaluate(relations, variables);
-	case formula::operation_t::disjunction:
-		assert(child_f_.left && child_f_.right);
-		return child_f_.left->evaluate(relations, variables) ||
-			child_f_.right->evaluate(relations, variables);
-	case formula::operation_t::negation:
-		assert(child_f_.left);
-		return !child_f_.left->evaluate(relations, variables);
-	case formula::operation_t::eq_zero:
-		assert(child_t_.left);
-		return child_t_.left->evaluate(relations, variables).empty();
-	case formula::operation_t::c:
-	{
-		assert(child_t_.left && child_t_.right);
-		auto left = child_t_.left->evaluate(relations, variables);
-		auto right = child_t_.right->evaluate(relations, variables);
-		
-		for (auto i = left.begin(); i != left.end(); i++)
-		{
-			for (auto j = right.begin(); j != right.end(); j++) {
-				if (*i == *j || // reflexivity of the contact
-					relations.find(std::pair<int, int>(*i, *j)) != relations.end() ||
-					relations.find(std::pair<int, int>(*j, *i)) != relations.end()) // symetry
-				{
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	default:
-		assert(false && "Unrecognized.");
-		return false;
-	}
+    switch(op_)
+    {
+        case formula::operation_t::constant_true:
+            return true;
+        case formula::operation_t::constant_false:
+            return false;
+        case formula::operation_t::conjunction:
+            assert(child_f_.left && child_f_.right);
+            return child_f_.left->evaluate(relations, variables) &&
+                   child_f_.right->evaluate(relations, variables);
+        case formula::operation_t::disjunction:
+            assert(child_f_.left && child_f_.right);
+            return child_f_.left->evaluate(relations, variables) ||
+                   child_f_.right->evaluate(relations, variables);
+        case formula::operation_t::negation:
+            assert(child_f_.left);
+            return !child_f_.left->evaluate(relations, variables);
+        case formula::operation_t::eq_zero:
+            assert(child_t_.left);
+            return child_t_.left->evaluate(relations, variables).empty();
+        case formula::operation_t::c:
+        {
+            assert(child_t_.left && child_t_.right);
+            auto left = child_t_.left->evaluate(relations, variables);
+            auto right = child_t_.right->evaluate(relations, variables);
+
+            for(auto i = left.begin(); i != left.end(); i++)
+            {
+                for(auto j = right.begin(); j != right.end(); j++)
+                {
+                    if(*i == *j || // reflexivity of the contact
+                       relations.find(std::pair<int, int>(*i, *j)) != relations.end() ||
+                       relations.find(std::pair<int, int>(*j, *i)) != relations.end()) // symetry
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        default:
+            assert(false && "Unrecognized.");
+            return false;
+    }
 }
 
 auto formula::evaluate(const std::vector<variables_evaluations_t>& evals, int R, int P) const -> bool
 {
-	switch (op_)
-	{
-	case formula::operation_t::constant_true:
-		return true;
-	case formula::operation_t::constant_false:
-		return false;
-	case formula::operation_t::conjunction:
-		assert(child_f_.left && child_f_.right);
-		return child_f_.left->evaluate(evals, R, P) &&
-			child_f_.right->evaluate(evals, R, P);
-	case formula::operation_t::disjunction:
-		assert(child_f_.left && child_f_.right);
-		return child_f_.left->evaluate(evals, R, P) ||
-			child_f_.right->evaluate(evals, R, P);
-	case formula::operation_t::negation:
-		assert(child_f_.left);
-		return !child_f_.left->evaluate(evals, R, P);
-	case formula::operation_t::eq_zero:
-		assert(child_t_.left);
-		return child_t_.left->evaluate(evals, 2 * R + P).none();
-	case formula::operation_t::c:
-	{
-		assert(child_t_.left && child_t_.right);
-		auto left = child_t_.left->evaluate(evals, 2 * R + P);
-		auto right = child_t_.right->evaluate(evals, 2 * R + P);
+    switch(op_)
+    {
+        case formula::operation_t::constant_true:
+            return true;
+        case formula::operation_t::constant_false:
+            return false;
+        case formula::operation_t::conjunction:
+            assert(child_f_.left && child_f_.right);
+            return child_f_.left->evaluate(evals, R, P) && child_f_.right->evaluate(evals, R, P);
+        case formula::operation_t::disjunction:
+            assert(child_f_.left && child_f_.right);
+            return child_f_.left->evaluate(evals, R, P) || child_f_.right->evaluate(evals, R, P);
+        case formula::operation_t::negation:
+            assert(child_f_.left);
+            return !child_f_.left->evaluate(evals, R, P);
+        case formula::operation_t::eq_zero:
+            assert(child_t_.left);
+            return child_t_.left->evaluate(evals, 2 * R + P).none();
+        case formula::operation_t::c:
+        {
+            assert(child_t_.left && child_t_.right);
+            auto left = child_t_.left->evaluate(evals, 2 * R + P);
+            auto right = child_t_.right->evaluate(evals, 2 * R + P);
 
-		// all reflexive model points
-		if ((left & right).any()) {
-			return true;
-		}
+            // all reflexive model points
+            if((left & right).any())
+            {
+                return true;
+            }
 
-		// if there is a model point which connects left to the right
-		// in the contact points which are R.
-		for (int i = 0; i < 2 * R; i += 2)
-		{
-			if ((left[i] && right[i + 1]) 
-				|| (right[i] && left[i + 1]))
-			{
-				return true;
-			}
-		}
+            // if there is a model point which connects left to the right
+            // in the contact points which are R.
+            for(int i = 0; i < 2 * R; i += 2)
+            {
+                if((left[i] && right[i + 1]) || (right[i] && left[i + 1]))
+                {
+                    return true;
+                }
+            }
 
-		return false;
-	}
-	default:
-		assert(false && "Unrecognized.");
-		return false;
-	}
+            return false;
+        }
+        default:
+            assert(false && "Unrecognized.");
+            return false;
+    }
 }
 
-int formula::get_contacts_count() const
+std::pair<int, int> formula::get_contacts_count() const
 {
-	switch (op_)
-	{
-	case formula::operation_t::constant_true:
-	case formula::operation_t::constant_false:
-	case formula::operation_t::eq_zero:
-		return 0;
-	case formula::operation_t::negation:
-		assert(child_f_.left);
-		return child_f_.left->get_contacts_count();
-	case formula::operation_t::conjunction:
-	case formula::operation_t::disjunction:
-		assert(child_f_.left);
-		assert(child_f_.right);
-		return child_f_.left->get_contacts_count()
-			+ child_f_.right->get_contacts_count();
-	case formula::operation_t::c:
-		return 1;
-	default:
-		assert(false && "Unrecognized.");
-		return 0;
-	}
+    switch(op_)
+    {
+        case formula::operation_t::constant_true:
+        case formula::operation_t::constant_false:
+        case formula::operation_t::eq_zero:
+            return std::pair<int, int>(0, 0);
+        case formula::operation_t::negation:
+        {
+            assert(child_f_.left);
+            std::pair<int, int> res = child_f_.left->get_contacts_count();
+            return std::pair<int, int>(res.second, res.first);
+        }
+        case formula::operation_t::conjunction:
+        case formula::operation_t::disjunction:
+        {
+            assert(child_f_.left);
+            assert(child_f_.right);
+            std::pair<int, int> left = child_f_.left->get_contacts_count();
+            std::pair<int, int> right = child_f_.right->get_contacts_count();
+            return std::pair<int, int>(left.first + right.first, left.second + right.second);
+        }
+        case formula::operation_t::c:
+            return std::pair<int, int>(1, 0);
+        default:
+            assert(false && "Unrecognized.");
+            return std::pair<int, int>(0, 0);
+    }
 }
 
-int formula::get_zeroes_count() const
+std::pair<int, int> formula::get_zeroes_count() const
 {
-	switch (op_)
-	{
-	case formula::operation_t::constant_true:
-	case formula::operation_t::constant_false:
-	case formula::operation_t::c:
-		return 0;
-	case formula::operation_t::negation:
-		assert(child_f_.left);
-		return child_f_.left->get_zeroes_count();
-	case formula::operation_t::conjunction:
-	case formula::operation_t::disjunction:
-		assert(child_f_.left);
-		assert(child_f_.right);
-		return child_f_.left->get_zeroes_count()
-			+ child_f_.right->get_zeroes_count();
-	case formula::operation_t::eq_zero:
-		return 1;
-	default:
-		assert(false && "Unrecognized.");
-		return 0;
-	}
+    switch(op_)
+    {
+        case formula::operation_t::constant_true:
+        case formula::operation_t::constant_false:
+        case formula::operation_t::c:
+            return std::pair<int, int>(0, 0);
+        case formula::operation_t::negation:
+        {
+            assert(child_f_.left);
+            std::pair<int, int> res = child_f_.left->get_zeroes_count();
+            return std::pair<int, int>(res.second, res.first);
+        }
+        case formula::operation_t::conjunction:
+        case formula::operation_t::disjunction:
+        {
+            assert(child_f_.left);
+            assert(child_f_.right);
+            std::pair<int, int> left = child_f_.left->get_zeroes_count();
+            std::pair<int, int> right = child_f_.right->get_zeroes_count();
+            return std::pair<int, int>(left.first + right.first, left.second + right.second);
+        }
+        case formula::operation_t::eq_zero:
+            return std::pair<int, int>(1, 0);
+        default:
+            assert(false && "Unrecognized.");
+            return std::pair<int, int>(0, 0);
+    }
 }
 
 void formula::clear()

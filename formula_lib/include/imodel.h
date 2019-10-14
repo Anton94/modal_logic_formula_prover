@@ -1,0 +1,79 @@
+#pragma once
+
+#include "types.h"
+#include "../private/types.h"
+#include <vector>
+
+class formula_mgr;
+
+class imodel
+{
+public:
+    virtual auto create(const formulas_t& contacts_T, const formulas_t& contacts_F, const terms_t& zero_terms_T,
+                const terms_t& zero_terms_F, const variables_mask_t& used_variables, const formula_mgr* mgr)
+        -> bool = 0;
+
+    virtual auto get_variables_evaluations() const -> const variable_id_to_points_t&;
+    virtual auto get_contact_relations() const -> const contacts_t&;
+    // TODO: refactor and remove the bellowe two methods
+    virtual auto get_number_of_contacts() const -> size_t = 0;
+    virtual auto get_number_of_non_zeros() const -> size_t = 0;
+
+    // TODO: add get_points which returns a vector of binary variable evaluations
+
+    virtual auto print(std::ostream& out) const -> std::ostream& = 0;
+
+    virtual void clear();
+    virtual ~imodel() = default;
+
+
+    friend std::ostream& operator<<(std::ostream& out, const imodel& m);
+
+protected:
+    const formula_mgr* mgr_{};
+
+    /*
+        Symetric square bit matrix. contacts_[i] gives a bit mask of all points which are in contact with the point 'i'.
+        For example, let us have a model with 6 points:
+            0---1  // contact between 0 and 1
+            2---3  // contact between 2 and 3
+            4      // point from !=0 term
+            5      // point from !=0 term
+
+        The bit matrix will be the following:
+            \ 012345
+            0 110000    // from 0---1 and reflexivity (0---0)
+            1 110000    // from 1---0 and reflexivity (1---1)
+            2 001100    // from 2---3 and reflexivity (2---2)
+            3 001100    // from 3---2 and reflexivity (3---3)
+            4 000010    // just reflexivity (4---4)
+            5 000001    // just reflexivity (5---5)
+    */
+    contacts_t contact_relations_;
+
+    /*
+        A vector of size the number of variables in the formula, each element is a set of points, represented as a bitset.
+        Keeps the variable evaluations, i.e. v(p).
+
+        Model evaluation 'v' which for a given term returns a subset of the model points.
+        :
+         - v(p) = { i | (i) (xxx...x)[p] == 1, i.e. in point 'i' the evaluation of the variable 'p' is 1 },
+        where 'p' is a variable(for optimzations it's an id of the string representation of that variable)
+         - v(a * b) = v(a) & v(b)
+         - v(a + b) = v(a) | v(b)
+         - v(-a) = ~v(a)
+
+        For example, let us have the following formula: C(a * b, c) & c != 0 & -a != 0
+        Then a model could be the following:
+            (110) (a * b) 0---1 (c) (001)
+            (011) (c)  2
+            (000) (-a) 3
+        Let assume that 'a' has a variable id 0, 'b' has id 1 and 'c' has id 2.
+        The bit matrix will be the following:
+            \ 0123     // variable ids (rows) \ model points (columns)
+            0 1000     // v(a) = { 0 }, i.e. all points which have evaluation with bit at positon 0 set to 1
+            1 1010     // v(b) = { 0, 2 }, ... at position 1 ...
+            2 0110     // v(c) = { 1, 2 }, ... at position 2 ...
+    */
+    variable_id_to_points_t variable_evaluations_; // a vector of bitsets representing the value of v(p)
+};

@@ -1,10 +1,10 @@
 #pragma once
 
 #include "formula.h"
+#include "imodel.h"
 #include "term.h"
 #include "types.h"
 #include "variables_evaluations_block_stack.h"
-#include "model.h"
 
 #include <ostream>
 #include <unordered_map>
@@ -23,7 +23,7 @@ public:
     tableau& operator=(tableau&&) = default;
 
     // Checks if the formula is satisfiable or not
-    auto is_satisfiable(const formula& f, model& out_model) -> bool;
+    auto is_satisfiable(const formula& f, imodel& out_model) -> bool;
 
 private:
     void clear();
@@ -75,16 +75,9 @@ private:
         bool added_{};
     };
 
-    // TODO: explain the algorithm
-    // Generates evaluations for the variables and checks if they satisfy the atomic operations.
     auto has_satisfiable_model() -> bool;
 
     auto get_used_variables() const -> variables_mask_t;
-
-    auto is_contact_F_rule_satisfied() const -> bool;
-    auto is_zero_term_rule_satisfied() const -> bool;
-
-    std::ostream& print(std::ostream& out, const model::points_t& model_points_);
 
     const formula_mgr* mgr_;
 
@@ -99,5 +92,5 @@ private:
     // i.e. for each T(C(a,b)) : a, b are in the collection
     multiterms_t contact_T_terms_;
 
-    model model_;
+    imodel* model_{}; // just to avoid passing it through function arguments
 };

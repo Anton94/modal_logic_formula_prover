@@ -2,6 +2,8 @@
 
 // TODO: pimpl ideom. will hide the private includes, etc.
 
+#include "basic_bruteforce_model.h"
+#include "imodel.h"
 #include "../private/formula.h"
 #include "../private/tableau.h"
 #include "../private/types.h"
@@ -24,24 +26,23 @@ public:
 
     auto build(json& f) -> bool;
 
-	// Bruteforce algorithm without the knowledge of relations
-	// Process: 
-	//		Go through the formula and calculate:
-	//			- R - number of contacts in the formula
-	//			- P - number of subsets in the formula
-	//		For all possible variablses verify if the formula is satisfiable.
-	auto brute_force_evaluate_with_points_count(variable_to_bits_evaluation_map_t& out_evaluations) const -> bool;
-    auto generate_next(variables_evaluations_t& current) const -> bool;
-	auto generate_next(std::vector<variables_evaluations_t>& current) const -> bool;
+    // Bruteforce algorithm without the knowledge of relations
+    // Process:
+    //		Go through the formula and calculate:
+    //			- R - number of contacts in the formula
+    //			- P - number of subsets in the formula
+    //		For all possible variablses verify if the formula is satisfiable.
+    auto brute_force_evaluate_with_points_count(basic_bruteforce_model& out_model) const -> bool;
 
-	// Checks if the formula is satisfiable or not
-    auto is_satisfiable(model& out_model) -> bool;
+    // Checks if the formula is satisfiable or not
+    auto is_satisfiable(imodel& out_model) -> bool;
 
     // Checks if the provided model satisfies the formula
-    auto is_model_satisfiable(const model& model) const -> bool;
+    auto is_model_satisfiable(const imodel& model) const -> bool;
 
-    // Checks if the formula evaluates to the constant true or not with the given subset of variable evaluations
-    //auto does_evaluates_to_true(const variable_to_evaluation_map_t& evaluations) -> bool;
+    // Checks if the formula evaluates to the constant true or not with the given subset of variable
+    // evaluations
+    // auto does_evaluates_to_true(const variable_to_evaluation_map_t& evaluations) -> bool;
 
     void clear();
 
@@ -52,8 +53,8 @@ public:
     auto get_variable(const std::string& name) const -> variable_id_t;
     auto get_internal_formula() const -> const formula*;
 
-    auto print(std::ostream& out, const variables_evaluations_block& block) const ->std::ostream&;
-    auto print(std::ostream& out, const variables_mask_t& variables_mask) const->std::ostream&;
+    auto print(std::ostream& out, const variables_evaluations_block& block) const -> std::ostream&;
+    auto print(std::ostream& out, const variables_mask_t& variables_mask) const -> std::ostream&;
 
 private:
     void move(formula_mgr&& rhs) noexcept;
@@ -72,9 +73,8 @@ private:
 
 std::ostream& operator<<(std::ostream& out, const formula_mgr& formulas);
 
-
 // Example of brute_force_evaluate_native
-// The W is chosen depending on the number of variables involved in the formula 
+// The W is chosen depending on the number of variables involved in the formula
 // and probably the number of operations.
 // For example:
 // Let V = {a, b}, then we might choose W = {1, 2, 3}
@@ -92,7 +92,7 @@ std::ostream& operator<<(std::ostream& out, const formula_mgr& formulas);
 
 // { <1,2>, <1,3>, <2, 3> }
 
-// For each of the above possibilities 
+// For each of the above possibilities
 // we create all possible sets for the two variables
 // for example
 // a = {}, b = {}			- and check if satisfiable
