@@ -51,7 +51,7 @@ auto basic_bruteforce_model::create(const formulas_t& contacts_T, const formulas
 auto basic_bruteforce_model::create(const formula& f, size_t variables_count) -> bool
 {
     number_of_contacts_ = f.get_contacts_count().first;
-    number_of_non_empty_ = f.get_zeroes_count().first;
+    number_of_non_empty_ = f.get_zeroes_count().second;
     number_of_points_ = 2 * number_of_contacts_ + number_of_non_empty_;
 
     // populate 00..00 for every variable
