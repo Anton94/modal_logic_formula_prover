@@ -62,7 +62,7 @@ auto model::construct_non_zero_model_points(const terms_t& zero_terms_F, const f
         {
             return false;
         }
-        points_.push_back({z, std::move(eval)});
+        points_.push_back(std::move(eval));
     }
 
     return true;
@@ -117,8 +117,8 @@ auto model::construct_contact_points(const formula* c, const formulas_t& contact
         {
             if(is_contacts_F_connectivity_rule_satisfied(contacts_F, left_eval, right_eval))
             {
-                points_.push_back({left, std::move(left_eval)});
-                points_.push_back({right, std::move(right_eval)});
+                points_.push_back(std::move(left_eval));
+                points_.push_back(std::move(right_eval));
                 return true;
             }
         } while(generate_next_point_evaluation(right, right_eval, contacts_F, zero_terms_T));
@@ -192,7 +192,7 @@ void model::calculate_the_model_evaluation_of_each_variable()
     // the bit at position Pi is 1
     for(size_t point = 0; point < points_size; ++point)
     {
-        const auto& point_evaluation = points_[point].evaluation.get_evaluations();
+        const auto& point_evaluation = points_[point].get_evaluations();
 
         // iterate only set bits(1s)
         auto Pi = point_evaluation.find_first();
@@ -210,7 +210,7 @@ auto model::print(std::ostream& out) const -> std::ostream&
     for(size_t i = 0; i < points_.size(); ++i)
     {
         out << std::to_string(i) << " : ";
-        mgr_->print(out, points_[i].evaluation);
+        mgr_->print(out, points_[i]);
         out << "\n";
     }
 

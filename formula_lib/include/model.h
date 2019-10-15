@@ -42,12 +42,6 @@ struct model : public imodel
         i.e. for the point 0, the term 'a' and it's evaluation (xxx..x): a->evaluate(xxx..x) = constant_true
        in order to 0 belongs to v(a)
     */
-    struct point_info
-    {
-        const term* t;
-        variables_evaluations_block evaluation;
-    };
-    using points_t = std::vector<point_info>;
 
     /*
      * Let's have C(a,b); C(c,d); e=0; f=0; ~C(g,h); ~C(i, j)
@@ -77,6 +71,9 @@ struct model : public imodel
      * !(Pi evaluates i to constant true && Pi evaluates j to constant true)
      *
      */
+
+    using points_t = std::vector<variables_evaluations_block>; // TODO: consider moving it to imodel
+
     auto create(const formulas_t& contacts_T, const formulas_t& contacts_F, const terms_t& zero_terms_T,
                 const terms_t& zero_terms_F, const variables_mask_t& used_variables, const formula_mgr* mgr)
         -> bool override;
@@ -126,13 +123,13 @@ private:
         -> bool;
 
     /*
-     * Returns true if out_evaluation evaluates all zero terms to false
+     * Returns true if evaluation evaluates all zero terms to false
      */
     auto are_zero_terms_T_satisfied(const terms_t& zero_terms_T,
                                     const variables_evaluations_block& evaluation) const -> bool;
     /*
      * Returns true if for each ~C(a,b) the following is satisfied:
-     *  !(out_evaluation evaluates a to true && out_evaluation evaluates b to true), i.e. the reflexivity of
+     *  !(evaluation evaluates a to true && evaluation evaluates b to true), i.e. the reflexivity of
      * the point and the ~C
      */
     auto is_contacts_F_reflexive_rule_satisfied(const formulas_t& contacts_F,
