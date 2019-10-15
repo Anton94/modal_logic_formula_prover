@@ -158,7 +158,6 @@ private:
     void calculate_the_model_evaluation_of_each_variable();
 
     variables_mask_t used_variables_{};
-    size_t number_of_contacts_{};
 
     points_t points_;
 };

@@ -12,7 +12,6 @@ auto model::create(const formulas_t& contacts_T, const formulas_t& contacts_F, c
     clear();
     used_variables_ = used_variables;
     mgr_ = mgr;
-    number_of_contacts_ = contacts_T.size();
 
     if(construct_contact_model_points(contacts_T, contacts_F, zero_terms_T) &&
        construct_non_zero_model_points(zero_terms_F, contacts_F, zero_terms_T))
@@ -32,7 +31,6 @@ auto model::get_model_points() const -> const points_t&
 void model::clear()
 {
     used_variables_.clear();
-    number_of_contacts_ = 0;
     points_.clear();
 
     imodel::clear();
