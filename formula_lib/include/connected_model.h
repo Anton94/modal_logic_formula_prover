@@ -115,6 +115,7 @@ private:
      * Returns a vector of set of points, each of which is a connected component (w.r.t. @contact_relations_)
      */
     auto get_connected_components() const -> std::vector<model_points_set_t>;
+    auto get_connected_component(size_t root_point_id, model_points_set_t& not_visited_points) const -> model_points_set_t;
 
     void reduce_variable_evaluations_to_subset_of_points(const model_points_set_t& points_subset);
     void reduce_model_to_subset_of_points(const model_points_set_t& points_subset);

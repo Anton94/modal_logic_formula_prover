@@ -4,6 +4,7 @@
 #include "term.h"
 
 #include <cassert>
+#include <queue>
 
 auto connected_model::create(const formulas_t& contacts_T, const formulas_t& contacts_F,
                              const terms_t& zero_terms_T, const terms_t& zero_terms_F,
@@ -204,8 +205,56 @@ auto connected_model::build_contact_relations_matrix(const formulas_t& contacts_
 
 auto connected_model::get_connected_components() const -> std::vector<model_points_set_t>
 {
-    // TODO: implement
-    return {};
+    if(points_.empty())
+    {
+        return {};
+    }
+
+    std::vector<model_points_set_t> connected_components;
+    model_points_set_t not_visited_points(points_.size(), true); // bitset of 1s for the not visited points, inverted because we have fast finding of 1s in the bitset
+
+    while(not_visited_points.any())
+    {
+        size_t root_point_id = not_visited_points.find_first();
+
+        auto connected_component = get_connected_component(root_point_id, not_visited_points);
+        connected_components.push_back(std::move(connected_component));
+    }
+    return connected_components;
+}
+
+auto connected_model::get_connected_component(size_t root_point_id, model_points_set_t& not_visited_points) const -> model_points_set_t
+{
+    assert(not_visited_points.test_set(root_point_id));
+
+    model_points_set_t connected_component(points_.size());
+
+    // A simple BFS traversing
+    std::queue<size_t> q;
+    q.push(root_point_id);
+
+    while(!q.empty())
+    {
+        const auto point_id = q.front();
+        q.pop();
+        assert(not_visited_points.test_set(point_id));
+
+        connected_component.set(point_id);
+        not_visited_points.set(point_id, false);
+
+        const auto& point_connections = contact_relations_[point_id];
+        auto connected_point_id = point_connections.find_first();
+        while(connected_point_id != model_points_set_t::npos)
+        {
+            if(not_visited_points.test_set(connected_point_id))
+            {
+                q.push(connected_point_id);
+            }
+            connected_point_id = point_connections.find_next(connected_point_id);
+        }
+    }
+
+    return connected_component;
 }
 
 void connected_model::reduce_variable_evaluations_to_subset_of_points(const model_points_set_t& points_subset)
