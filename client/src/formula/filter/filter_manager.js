@@ -16,13 +16,13 @@ export class filter_manager {
     }
 
     filter() {
-        this._formula_traverse_top_to_bottom(this.formula.get_ast(), new Set([operations.to_explanation(operations.formula().LESS)]), decompose_less);
-        this._formula_traverse_top_to_bottom(this.formula.get_ast(), operations.by_argument(), decompose_max_two_childs);
         this._formula_traverse_top_to_bottom(this.formula.get_ast(), new Set([operations.to_explanation(operations.formula().EQUIVALENCY)]), decompose_equivalency);
         this._formula_traverse_top_to_bottom(this.formula.get_ast(), new Set([operations.to_explanation(operations.formula().IMPLICATION)]), decompose_implication);
         this._formula_traverse_top_to_bottom(this.formula.get_ast(), operations.negation_operations(), remove_double_negations);
-        this._formula_traverse_top_to_bottom(this.formula.get_ast(), new Set([operations.to_explanation(operations.formula().CONTACT)]), decompose_contact_on_Tdis);
+        this._formula_traverse_top_to_bottom(this.formula.get_ast(), operations.by_argument(), decompose_max_two_childs);
         this._formula_traverse_top_to_bottom(this.formula.get_ast(), operations.all(), calculate_constants);
+        this._formula_traverse_top_to_bottom(this.formula.get_ast(), new Set([operations.to_explanation(operations.formula().LESS)]), decompose_less);
+        this._formula_traverse_top_to_bottom(this.formula.get_ast(), new Set([operations.to_explanation(operations.formula().CONTACT)]), decompose_contact_on_Tdis);
     }
 
     _formula_traverse_top_to_bottom(node, filter_names, func) {
