@@ -5,31 +5,39 @@
 
 using json = nlohmann::json;
 
-auto is_satisfiable = [](const json& formula_json, bool expected_result, bool run_bruteforce = true) {
+auto is_satisfiable = [](const json& formula_json, bool has_satisfiable_model, bool has_satisfiable_connected_model,
+                         bool run_bruteforce = true) {
     auto copy_f = formula_json;
     formula_mgr f;
     CHECK(f.build(copy_f));
 
     model m;
-    CHECK(f.is_satisfiable(m) == expected_result);
+    CHECK(f.is_satisfiable(m) == has_satisfiable_model);
 
-    if(expected_result)
+    if(has_satisfiable_model)
     {
         CHECK(f.is_model_satisfiable(m));
     }
 
     slow_model slow_m;
-    CHECK(f.is_satisfiable(slow_m) == expected_result);
+    CHECK(f.is_satisfiable(slow_m) == has_satisfiable_model);
 
-    if(expected_result)
+    if(has_satisfiable_model)
     {
         CHECK(f.is_model_satisfiable(slow_m));
     }
 
-    if (run_bruteforce)
+    connected_model connected_m;
+    CHECK(f.is_satisfiable(connected_m) == has_satisfiable_connected_model);
+    if(has_satisfiable_connected_model)
+    {
+        CHECK(f.is_model_satisfiable(slow_m));
+    }
+
+    if(run_bruteforce)
     {
         basic_bruteforce_model model;
-        CHECK(f.brute_force_evaluate_with_points_count(model) == expected_result);
+        CHECK(f.brute_force_evaluate_with_points_count(model) == has_satisfiable_model);
     }
 };
 
@@ -71,7 +79,7 @@ TEST_CASE("satisfiable 1", "[satisfiability]")
                }
             ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable 2", "[satisfiability]")
@@ -91,7 +99,7 @@ TEST_CASE("satisfiable 2", "[satisfiability]")
                }
             ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable 3", "[satisfiability]")
@@ -132,7 +140,7 @@ TEST_CASE("satisfiable 3", "[satisfiability]")
                }
             ]
         })"_json,
-        false);
+        false, false);
 }
 
 TEST_CASE("satisfiable 3.1", "[satisfiability]")
@@ -173,7 +181,7 @@ TEST_CASE("satisfiable 3.1", "[satisfiability]")
                }
             ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable evaluation with constant 0", "[satisfiability]")
@@ -212,7 +220,7 @@ TEST_CASE("satisfiable evaluation with constant 0", "[satisfiability]")
                }
             ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable evaluation with constant 1", "[satisfiability]")
@@ -274,7 +282,7 @@ TEST_CASE("satisfiable evaluation with constant 1", "[satisfiability]")
               }
            ]
         })"_json,
-        false);
+        false, false);
 }
 
 TEST_CASE("satisfiable evaluation with constant 1.1", "[satisfiability]")
@@ -336,7 +344,7 @@ TEST_CASE("satisfiable evaluation with constant 1.1", "[satisfiability]")
               }
            ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable evaluation with constant 2", "[satisfiability]")
@@ -399,7 +407,7 @@ TEST_CASE("satisfiable evaluation with constant 2", "[satisfiability]")
               }
            ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable evaluation with constant 3", "[satisfiability]")
@@ -447,7 +455,7 @@ TEST_CASE("satisfiable evaluation with constant 3", "[satisfiability]")
               }
            ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable evaluation with constant 4", "[satisfiability]")
@@ -495,7 +503,7 @@ TEST_CASE("satisfiable evaluation with constant 4", "[satisfiability]")
               }
            ]
         })"_json,
-        false);
+        false, false);
 }
 
 TEST_CASE("satisfiable evaluation with constant 5", "[satisfiability]")
@@ -543,7 +551,7 @@ TEST_CASE("satisfiable evaluation with constant 5", "[satisfiability]")
               }
            ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable evaluation with constant 6", "[satisfiability]")
@@ -590,7 +598,7 @@ TEST_CASE("satisfiable evaluation with constant 6", "[satisfiability]")
               }
            ]
         })"_json,
-        false);
+        false, false);
 }
 
 TEST_CASE("satisfiable evaluation with constant 7", "[satisfiability]")
@@ -637,7 +645,7 @@ TEST_CASE("satisfiable evaluation with constant 7", "[satisfiability]")
               }
            ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable 4", "[satisfiability]")
@@ -702,7 +710,7 @@ TEST_CASE("satisfiable 4", "[satisfiability]")
               }
            ]
          })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable 5", "[satisfiability]")
@@ -791,7 +799,7 @@ TEST_CASE("satisfiable 5", "[satisfiability]")
                }
             ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable 6", "[satisfiability]")
@@ -832,7 +840,7 @@ TEST_CASE("satisfiable 6", "[satisfiability]")
                }
             ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable 7", "[satisfiability]")
@@ -912,7 +920,7 @@ TEST_CASE("satisfiable 7", "[satisfiability]")
                }
             ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable 8", "[satisfiability]")
@@ -992,7 +1000,7 @@ TEST_CASE("satisfiable 8", "[satisfiability]")
                }
             ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable 9", "[satisfiability]")
@@ -1045,7 +1053,7 @@ TEST_CASE("satisfiable 9", "[satisfiability]")
               }
            ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable 10", "[satisfiability]")
@@ -1128,7 +1136,7 @@ TEST_CASE("satisfiable 10", "[satisfiability]")
               }
            ]
         })"_json,
-        false);
+        false, false);
 }
 
 TEST_CASE("satisfiable 11", "[satisfiability]")
@@ -1241,8 +1249,7 @@ TEST_CASE("satisfiable 11", "[satisfiability]")
               }
            ]
         })"_json,
-        false,
-        false);
+        false, false, false);
 }
 
 TEST_CASE("satisfiable 12", "[satisfiability]")
@@ -1355,8 +1362,7 @@ TEST_CASE("satisfiable 12", "[satisfiability]")
               }
            ]
         })"_json,
-        true,
-        false);
+        true, true, false);
 }
 
 TEST_CASE("satisfiable 13", "[satisfiability]")
@@ -1406,7 +1412,7 @@ TEST_CASE("satisfiable 13", "[satisfiability]")
               }
            ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable 14", "[satisfiability]")
@@ -1459,7 +1465,7 @@ TEST_CASE("satisfiable 14", "[satisfiability]")
               }
            ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable 15", "[satisfiability]")
@@ -1512,7 +1518,7 @@ TEST_CASE("satisfiable 15", "[satisfiability]")
               }
            ]
         })"_json,
-        false);
+        false, false);
 }
 
 TEST_CASE("satisfiable 16", "[satisfiability]")
@@ -1589,7 +1595,7 @@ TEST_CASE("satisfiable 16", "[satisfiability]")
               }
            ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable 17", "[satisfiability]")
@@ -1681,7 +1687,7 @@ TEST_CASE("satisfiable 17", "[satisfiability]")
               }
            ]
         })"_json,
-        false);
+        false, false);
 }
 
 TEST_CASE("satisfiable 18", "[satisfiability]")
@@ -1773,7 +1779,7 @@ TEST_CASE("satisfiable 18", "[satisfiability]")
               }
            ]
         })"_json,
-        false);
+        false, false);
 }
 
 TEST_CASE("satisfiable 18.1", "[satisfiability]")
@@ -1868,7 +1874,7 @@ TEST_CASE("satisfiable 18.1", "[satisfiability]")
               }
            ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable 18.2", "[satisfiability]")
@@ -1951,7 +1957,7 @@ TEST_CASE("satisfiable 18.2", "[satisfiability]")
                }
             ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable 19", "[satisfiability]")
@@ -2106,8 +2112,7 @@ TEST_CASE("satisfiable 19", "[satisfiability]")
                }
             ]
         })"_json,
-        true,
-        false);
+        true, true, false);
 }
 
 TEST_CASE("satisfiable evaluation of path 1", "[satisfiability]")
@@ -2193,7 +2198,7 @@ TEST_CASE("satisfiable evaluation of path 1", "[satisfiability]")
                }
             ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable evaluation of path 2", "[satisfiability]")
@@ -2327,8 +2332,7 @@ TEST_CASE("satisfiable evaluation of path 2", "[satisfiability]")
                }
             ]
         })"_json,
-        true,
-        false);
+        true, true, false);
 }
 
 TEST_CASE("satisfiable evaluation of path 3", "[satisfiability]")
@@ -2462,8 +2466,7 @@ TEST_CASE("satisfiable evaluation of path 3", "[satisfiability]")
                }
             ]
         })"_json,
-        true,
-        false);
+        true, true, false);
 }
 
 TEST_CASE("satisfiable evaluation of path 4", "[satisfiability]")
@@ -2522,7 +2525,7 @@ TEST_CASE("satisfiable evaluation of path 4", "[satisfiability]")
                }
             ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable evaluation of path 5", "[satisfiability]")
@@ -2614,8 +2617,7 @@ TEST_CASE("satisfiable evaluation of path 5", "[satisfiability]")
                }
             ]
         })"_json,
-        true,
-        false);
+        true, true, false);
 }
 
 TEST_CASE("satisfiable evaluation of path 6", "[satisfiability]")
@@ -2698,7 +2700,7 @@ TEST_CASE("satisfiable evaluation of path 6", "[satisfiability]")
               }
            ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable evaluation of path 7", "[satisfiability]")
@@ -2763,7 +2765,7 @@ TEST_CASE("satisfiable evaluation of path 7", "[satisfiability]")
               }
            ]
         })"_json,
-        false);
+        false, false);
 }
 
 TEST_CASE("satisfiable evaluation of path 8", "[satisfiability]")
@@ -2855,8 +2857,7 @@ TEST_CASE("satisfiable evaluation of path 8", "[satisfiability]")
                }
             ]
         })"_json,
-        true,
-        false);
+        true, true, false);
 }
 
 TEST_CASE("satisfiable with constants 1", "[satisfiability]")
@@ -2866,7 +2867,7 @@ TEST_CASE("satisfiable with constants 1", "[satisfiability]")
         R"({
             "name": "T"
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable with constants 2", "[satisfiability]")
@@ -2876,7 +2877,7 @@ TEST_CASE("satisfiable with constants 2", "[satisfiability]")
         R"({
             "name": "F"
         })"_json,
-        false);
+        false, false);
 }
 
 TEST_CASE("satisfiable with constants 3", "[satisfiability]")
@@ -2894,7 +2895,7 @@ TEST_CASE("satisfiable with constants 3", "[satisfiability]")
               }
            ]
         })"_json,
-        false);
+        false, false);
 }
 
 TEST_CASE("satisfiable with constants 4", "[satisfiability]")
@@ -2912,7 +2913,7 @@ TEST_CASE("satisfiable with constants 4", "[satisfiability]")
               }
            ]
         })"_json,
-        false);
+        false, false);
 }
 
 TEST_CASE("satisfiable with constants 5", "[satisfiability]")
@@ -2930,7 +2931,7 @@ TEST_CASE("satisfiable with constants 5", "[satisfiability]")
               }
            ]
         })"_json,
-        false);
+        false, false);
 }
 
 TEST_CASE("satisfiable with constants 6", "[satisfiability]")
@@ -2948,7 +2949,7 @@ TEST_CASE("satisfiable with constants 6", "[satisfiability]")
               }
            ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable with constants 7", "[satisfiability]")
@@ -2979,7 +2980,7 @@ TEST_CASE("satisfiable with constants 7", "[satisfiability]")
               }
            ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable with constants 8", "[satisfiability]")
@@ -3010,7 +3011,7 @@ TEST_CASE("satisfiable with constants 8", "[satisfiability]")
               }
            ]
         })"_json,
-        false);
+        false, false);
 }
 
 TEST_CASE("satisfiable with contact rule 1", "[satisfiability]")
@@ -3066,7 +3067,7 @@ TEST_CASE("satisfiable with contact rule 1", "[satisfiability]")
               }
            ]
         })"_json,
-        false);
+        false, false);
 }
 
 TEST_CASE("satisfiable with contact rule 1.5", "[satisfiability]")
@@ -3122,7 +3123,7 @@ TEST_CASE("satisfiable with contact rule 1.5", "[satisfiability]")
                 }
            ]
         })"_json,
-        false);
+        false, false);
 }
 
 TEST_CASE("satisfiable with contact rule 2", "[satisfiability]")
@@ -3178,7 +3179,7 @@ TEST_CASE("satisfiable with contact rule 2", "[satisfiability]")
               }
            ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable with contact rule 3", "[satisfiability]")
@@ -3264,7 +3265,7 @@ TEST_CASE("satisfiable with contact rule 3", "[satisfiability]")
               }
            ]
         })"_json,
-        false);
+        false, false);
 }
 
 TEST_CASE("satisfiable with contact rule 4", "[satisfiability]")
@@ -3350,7 +3351,7 @@ TEST_CASE("satisfiable with contact rule 4", "[satisfiability]")
               }
            ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable with contact rule 5", "[satisfiability]")
@@ -3460,7 +3461,7 @@ TEST_CASE("satisfiable with contact rule 5", "[satisfiability]")
               }
            ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable with contact rule 6", "[satisfiability]")
@@ -3570,8 +3571,7 @@ TEST_CASE("satisfiable with contact rule 6", "[satisfiability]")
               }
            ]
         })"_json,
-        false,
-        false);
+        false, false, false);
 }
 
 TEST_CASE("satisfiable with contact rule 6.1", "[satisfiability]")
@@ -3690,8 +3690,7 @@ TEST_CASE("satisfiable with contact rule 6.1", "[satisfiability]")
                }
             ]
         })"_json,
-        false,
-        false);
+        false, false, false);
 }
 
 TEST_CASE("satisfiable with contact rule 7", "[satisfiability]")
@@ -3789,7 +3788,7 @@ TEST_CASE("satisfiable with contact rule 7", "[satisfiability]")
               }
            ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable with contact rule 8", "[satisfiability]")
@@ -3890,7 +3889,7 @@ TEST_CASE("satisfiable with contact rule 8", "[satisfiability]")
               }
            ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact", "[satisfiability]")
@@ -3970,8 +3969,7 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
               }
            ]
         })"_json,
-        false,
-        false);
+        false, false, false);
 }
 
 TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact 2", "[satisfiability]")
@@ -4093,8 +4091,7 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
               }
            ]
         })"_json,
-        false,
-        false);
+        false, false, false);
 }
 
 TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact 3", "[satisfiability]")
@@ -4219,8 +4216,7 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
               }
            ]
         })"_json,
-        true,
-        false);
+        true, true, false);
 }
 
 TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact 4", "[satisfiability]")
@@ -4348,11 +4344,11 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
                 ]
             }
         })"_json,
-        true,
-        false);
+        true, true, false);
 }
 
-TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact using same terms 1", "[satisfiability]")
+TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact using same terms 1",
+          "[satisfiability]")
 {
     // C(a * -d, b * -c) & ( (C(a * -d, d) & <=(a,d)) | <=(b,c))
     is_satisfiable(
@@ -4471,11 +4467,11 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
               }
            ]
         })"_json,
-        false,
-        false);
+        false, false, false);
 }
 
-TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact using same terms 2", "[satisfiability]")
+TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact using same terms 2",
+          "[satisfiability]")
 {
     // C(a * -d, b * -c) & ((C(a * -d, d) & <=(a,d)) | <=(b,x))
     is_satisfiable(
@@ -4594,11 +4590,11 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
               }
            ]
         })"_json,
-        true,
-        false);
+        true, true, false);
 }
 
-TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact using same terms 2.1", "[satisfiability]")
+TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact using same terms 2.1",
+          "[satisfiability]")
 {
     // C(a * -d, b * -c) & ( (C(a * -d, -d) & <=(a,d)) | <=(b,x)))
     is_satisfiable(
@@ -4720,11 +4716,11 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
               }
            ]
         })"_json,
-        true,
-        false);
+        true, true, false);
 }
 
-TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact using same terms 3", "[satisfiability]")
+TEST_CASE("satisfiable with contact rule - adding zero terms after adding contact using same terms 3",
+          "[satisfiability]")
 {
     // ~C(a * -d, b * -c) & ( (~C(a * -d, d * -c) & (~<=(a,d) & ~<=(d,c))) | (~<=(b,c) & ~<=(a,d)) )
     is_satisfiable(
@@ -4921,11 +4917,11 @@ TEST_CASE("satisfiable with contact rule - adding zero terms after adding contac
               }
            ]
         })"_json,
-        true,
-        false);
+        true, true, false);
 }
 
-TEST_CASE("satisfiable with contact rule - adding non zero term and F contact with same left/right child 1", "[satisfiability]")
+TEST_CASE("satisfiable with contact rule - adding non zero term and F contact with same left/right child 1",
+          "[satisfiability]")
 {
     // ~C(a * -d, a * -d) & ~<=(a,d)
     is_satisfiable(
@@ -4996,10 +4992,11 @@ TEST_CASE("satisfiable with contact rule - adding non zero term and F contact wi
               }
            ]
         })"_json,
-        false);
+        false, false);
 }
 
-TEST_CASE("satisfiable with contact rule - adding non zero term and F contact with same left/right child 2", "[satisfiability]")
+TEST_CASE("satisfiable with contact rule - adding non zero term and F contact with same left/right child 2",
+          "[satisfiability]")
 {
     // ~<=(a,d) & ~C(a * -d, a * -d)
     is_satisfiable(
@@ -5070,7 +5067,7 @@ TEST_CASE("satisfiable with contact rule - adding non zero term and F contact wi
               }
            ]
         })"_json,
-        false);
+        false, false);
 }
 
 TEST_CASE("satisfiable evaluation of atomic formulas when there is a constant 1", "[satisfiability]")
@@ -5104,7 +5101,7 @@ TEST_CASE("satisfiable evaluation of atomic formulas when there is a constant 1"
                }
             ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable evaluation of atomic formulas when there is a constant 2", "[satisfiability]")
@@ -5159,7 +5156,7 @@ TEST_CASE("satisfiable evaluation of atomic formulas when there is a constant 2"
                }
             ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable evaluation of atomic formulas when there is a constant 3", "[satisfiability]")
@@ -5208,7 +5205,7 @@ TEST_CASE("satisfiable evaluation of atomic formulas when there is a constant 3"
                }
             ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable evaluation of atomic formulas when there is a constant 4", "[satisfiability]")
@@ -5260,7 +5257,7 @@ TEST_CASE("satisfiable evaluation of atomic formulas when there is a constant 4"
                }
             ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable when F disjunction has contradicting right child 1", "[satisfiability]")
@@ -5309,7 +5306,7 @@ TEST_CASE("satisfiable when F disjunction has contradicting right child 1", "[sa
                }
             ]
         })"_json,
-        true);
+        true, true);
 }
 
 TEST_CASE("satisfiable when T conjunction has contradicting right child 1", "[satisfiability]")
@@ -5358,5 +5355,5 @@ TEST_CASE("satisfiable when T conjunction has contradicting right child 1", "[sa
                }
             ]
         })"_json,
-        true);
+        true, true);
 }
