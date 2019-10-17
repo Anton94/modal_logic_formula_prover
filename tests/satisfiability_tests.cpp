@@ -6,7 +6,7 @@
 using json = nlohmann::json;
 
 auto is_satisfiable = [](const json& formula_json, bool has_satisfiable_model, bool has_satisfiable_connected_model,
-                         bool run_bruteforce = true) {
+                         bool run_slow_models = true) {
     auto copy_f = formula_json;
     formula_mgr f;
     CHECK(f.build(copy_f));
@@ -19,23 +19,23 @@ auto is_satisfiable = [](const json& formula_json, bool has_satisfiable_model, b
         CHECK(f.is_model_satisfiable(m));
     }
 
-    slow_model slow_m;
-    CHECK(f.is_satisfiable(slow_m) == has_satisfiable_model);
-
-    if(has_satisfiable_model)
-    {
-        CHECK(f.is_model_satisfiable(slow_m));
-    }
-
     connected_model connected_m;
     CHECK(f.is_satisfiable(connected_m) == has_satisfiable_connected_model);
     if(has_satisfiable_connected_model)
     {
-        CHECK(f.is_model_satisfiable(slow_m));
+        CHECK(f.is_model_satisfiable(connected_m));
     }
 
-    if(run_bruteforce)
+    if(run_slow_models)
     {
+        slow_model slow_m;
+        CHECK(f.is_satisfiable(slow_m) == has_satisfiable_model);
+
+        if(has_satisfiable_model)
+        {
+            CHECK(f.is_model_satisfiable(slow_m));
+        }
+
         basic_bruteforce_model model;
         CHECK(f.brute_force_evaluate_with_points_count(model) == has_satisfiable_model);
     }
@@ -5356,4 +5356,333 @@ TEST_CASE("satisfiable when T conjunction has contradicting right child 1", "[sa
             ]
         })"_json,
         true, true);
+}
+
+TEST_CASE("not satisfiable with 10 variables", "[satisfiability]")
+{
+    // C(a,b) & C(b,c) & <=(b,a) & ~C(a,c) & C(d, e) & C(f,g) & C(h, i) & C(h, j)
+    is_satisfiable(
+        R"({
+        "name": "conjunction",
+        "value": [
+           {
+              "name": "conjunction",
+              "value": [
+                 {
+                    "name": "conjunction",
+                    "value": [
+                       {
+                          "name": "contact",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "a"
+                             },
+                             {
+                                "name": "string",
+                                "value": "b"
+                             }
+                          ]
+                       },
+                       {
+                          "name": "contact",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "b"
+                             },
+                             {
+                                "name": "string",
+                                "value": "c"
+                             }
+                          ]
+                       }
+                    ]
+                 },
+                 {
+                    "name": "conjunction",
+                    "value": [
+                       {
+                          "name": "equal0",
+                          "value": {
+                             "name": "Tand",
+                             "value": [
+                                {
+                                   "name": "string",
+                                   "value": "b"
+                                },
+                                {
+                                   "name": "Tstar",
+                                   "value": {
+                                      "name": "string",
+                                      "value": "a"
+                                   }
+                                }
+                             ]
+                          }
+                       },
+                       {
+                          "name": "negation",
+                          "value": {
+                             "name": "contact",
+                             "value": [
+                                {
+                                   "name": "string",
+                                   "value": "a"
+                                },
+                                {
+                                   "name": "string",
+                                   "value": "c"
+                                }
+                             ]
+                          }
+                       }
+                    ]
+                 }
+              ]
+           },
+           {
+              "name": "conjunction",
+              "value": [
+                 {
+                    "name": "conjunction",
+                    "value": [
+                       {
+                          "name": "contact",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "d"
+                             },
+                             {
+                                "name": "string",
+                                "value": "e"
+                             }
+                          ]
+                       },
+                       {
+                          "name": "contact",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "f"
+                             },
+                             {
+                                "name": "string",
+                                "value": "g"
+                             }
+                          ]
+                       }
+                    ]
+                 },
+                 {
+                    "name": "conjunction",
+                    "value": [
+                       {
+                          "name": "contact",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "h"
+                             },
+                             {
+                                "name": "string",
+                                "value": "i"
+                             }
+                          ]
+                       },
+                       {
+                          "name": "contact",
+                          "value": [
+                             {
+                                "name": "string",
+                                "value": "h"
+                             },
+                             {
+                                "name": "string",
+                                "value": "j"
+                             }
+                          ]
+                       }
+                    ]
+                 }
+              ]
+           }
+        ]
+        })"_json,
+        false, false, false);
+}
+
+// hiden because in debug takes too much time
+TEST_CASE("not satisfiable with 13 variables", "[!hide][satisfiability]")
+{
+    // C(a,b) & C(b,c) & <=(b,a) & ~C(a,c) & C(d, e) & C(f,g) & C(h, i) & C(j, k) & C(l, m)
+    is_satisfiable(
+        R"({
+        "name": "conjunction",
+        "value": [
+           {
+              "name": "conjunction",
+              "value": [
+                 {
+                    "name": "conjunction",
+                    "value": [
+                       {
+                          "name": "conjunction",
+                          "value": [
+                             {
+                                "name": "contact",
+                                "value": [
+                                   {
+                                      "name": "string",
+                                      "value": "a"
+                                   },
+                                   {
+                                      "name": "string",
+                                      "value": "b"
+                                   }
+                                ]
+                             },
+                             {
+                                "name": "contact",
+                                "value": [
+                                   {
+                                      "name": "string",
+                                      "value": "b"
+                                   },
+                                   {
+                                      "name": "string",
+                                      "value": "c"
+                                   }
+                                ]
+                             }
+                          ]
+                       },
+                       {
+                          "name": "conjunction",
+                          "value": [
+                             {
+                                "name": "equal0",
+                                "value": {
+                                   "name": "Tand",
+                                   "value": [
+                                      {
+                                         "name": "string",
+                                         "value": "b"
+                                      },
+                                      {
+                                         "name": "Tstar",
+                                         "value": {
+                                            "name": "string",
+                                            "value": "a"
+                                         }
+                                      }
+                                   ]
+                                }
+                             },
+                             {
+                                "name": "negation",
+                                "value": {
+                                   "name": "contact",
+                                   "value": [
+                                      {
+                                         "name": "string",
+                                         "value": "a"
+                                      },
+                                      {
+                                         "name": "string",
+                                         "value": "c"
+                                      }
+                                   ]
+                                }
+                             }
+                          ]
+                       }
+                    ]
+                 },
+                 {
+                    "name": "conjunction",
+                    "value": [
+                       {
+                          "name": "conjunction",
+                          "value": [
+                             {
+                                "name": "contact",
+                                "value": [
+                                   {
+                                      "name": "string",
+                                      "value": "d"
+                                   },
+                                   {
+                                      "name": "string",
+                                      "value": "e"
+                                   }
+                                ]
+                             },
+                             {
+                                "name": "contact",
+                                "value": [
+                                   {
+                                      "name": "string",
+                                      "value": "f"
+                                   },
+                                   {
+                                      "name": "string",
+                                      "value": "g"
+                                   }
+                                ]
+                             }
+                          ]
+                       },
+                       {
+                          "name": "conjunction",
+                          "value": [
+                             {
+                                "name": "contact",
+                                "value": [
+                                   {
+                                      "name": "string",
+                                      "value": "h"
+                                   },
+                                   {
+                                      "name": "string",
+                                      "value": "i"
+                                   }
+                                ]
+                             },
+                             {
+                                "name": "contact",
+                                "value": [
+                                   {
+                                      "name": "string",
+                                      "value": "j"
+                                   },
+                                   {
+                                      "name": "string",
+                                      "value": "k"
+                                   }
+                                ]
+                             }
+                          ]
+                       }
+                    ]
+                 }
+              ]
+           },
+           {
+              "name": "contact",
+              "value": [
+                 {
+                    "name": "string",
+                    "value": "l"
+                 },
+                 {
+                    "name": "string",
+                    "value": "m"
+                 }
+              ]
+           }
+        ]
+        })"_json,
+        false, false, false);
 }
