@@ -17,7 +17,6 @@ auto tableau::is_satisfiable(const formula& f, imodel& out_model) -> bool
     add_formula_to_T(&f);
 
     mgr_ = f.get_mgr();
-    const auto variables_count = mgr_->get_variables().size();
 
     model_ = &out_model;
     if(satisfiable_step())
