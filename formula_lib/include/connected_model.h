@@ -105,6 +105,11 @@ private:
     auto is_contacts_T_rule_satisfied(const formulas_t& contacts_T) const -> bool;
 
     /*
+     * For given C(a,b) returns true if there is a contact between v(a) and v(b).
+     */
+    auto is_contact_satisfied(const formula* c) const -> bool;
+
+    /*
      * Builds N x N bit matrix with contact relations between all points,
      * which later reduces in order to satisfy all ~C atomic formulas.
      * Returns true if the produced contact relations satisfy all contact atomic formulas.
