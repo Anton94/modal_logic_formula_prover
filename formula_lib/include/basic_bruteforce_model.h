@@ -22,7 +22,10 @@ public:
 
 private:
     auto generate_next(variables_evaluations_t& current) const -> bool;
-    auto generate_next(std::vector<variables_evaluations_t>& current) const -> bool;
+    auto generate_next(std::vector<variables_evaluations_t>& current, const variables_mask_t& used_variables) const -> bool;
+
+	auto satisfiability_check(const formulas_t& contacts_T, const formulas_t& contacts_F, const terms_t& zero_terms_T,
+		const terms_t& zero_terms_F) const -> bool;
 
     size_t number_of_contacts_;
     size_t number_of_non_empty_;

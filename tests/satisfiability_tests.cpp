@@ -23,13 +23,19 @@ auto is_satisfiable = [](const json& formula_json, bool expected_result, bool ru
 
     if(expected_result)
     {
-        CHECK(f.is_model_satisfiable(slow_m));
+		CHECK(f.is_model_satisfiable(slow_m));
     }
 
     if (run_bruteforce)
     {
         basic_bruteforce_model model;
         CHECK(f.brute_force_evaluate_with_points_count(model) == expected_result);
+		CHECK(f.is_satisfiable(model) == expected_result);
+
+		if (expected_result)
+		{
+			CHECK(f.is_model_satisfiable(slow_m));
+		}
     }
 };
 
