@@ -4,6 +4,7 @@
 #include "term.h"
 
 #include <cassert>
+#include <queue>
 
 auto connected_model::create(const formulas_t& contacts_T, const formulas_t& contacts_F,
                              const terms_t& zero_terms_T, const terms_t& zero_terms_F,
@@ -33,6 +34,8 @@ auto connected_model::create(const formulas_t& contacts_T, const formulas_t& con
     // Now, we have in some sence the biggest model(w.r.t number of unique points and maximal contact relations between them)
     assert(mgr_->is_model_satisfiable(*this));
 
+    trace() << "Will try to find a connected component of points (which itself is a satisfiable model) in the following satisfiable model:\n" << *this;
+
     const auto connected_components = get_connected_components();
 
     const auto original_variable_evaluations = variable_evaluations_; // TODO: consider modifying the checking if the component is a model instead of modifying the variable_evaluations_
@@ -47,6 +50,7 @@ auto connected_model::create(const formulas_t& contacts_T, const formulas_t& con
             // Good. The connected component is also a valid model.
             // Remove all other points(outside the connected component) because we do not need them.
             reduce_model_to_subset_of_points(connected_component);
+            trace() << "Found a connected component which is also a satisfiable model for the formula:\n" << *this;
             assert(mgr_->is_model_satisfiable(*this));
             return true;
         }
@@ -55,6 +59,7 @@ auto connected_model::create(const formulas_t& contacts_T, const formulas_t& con
         variable_evaluations_ = original_variable_evaluations;
     }
 
+    trace() << "Unable to find such connected component of points.";
     return false;
 }
 
@@ -148,29 +153,40 @@ auto connected_model::is_contacts_T_rule_satisfied(const formulas_t& contacts_T)
     // C(a,b)
     for(const auto& c : contacts_T)
     {
-        const auto v_a = c->get_left_child_term()->evaluate(variable_evaluations_, points_.size());
-        const auto v_b = c->get_left_child_term()->evaluate(variable_evaluations_, points_.size());
-
-        auto point_from_v_a = v_a.find_first();
-        while (point_from_v_a != model_points_set_t::npos)
+        if(!is_contact_satisfied(c))
         {
-            const auto& contacts_of_point_from_v_a = contact_relations_[point_from_v_a];
-            if ((contacts_of_point_from_v_a & v_b).none())
-            {
-                return false;
-            }
-
-            point_from_v_a = v_a.find_next(point_from_v_a);
+            return false;
         }
     }
     return true;
+}
+
+auto connected_model::is_contact_satisfied(const formula* c) const -> bool
+{
+    assert(c && c->get_operation_type() == formula::operation_t::c);
+
+    const auto v_a = c->get_left_child_term()->evaluate(variable_evaluations_, points_.size());
+    const auto v_b = c->get_right_child_term()->evaluate(variable_evaluations_, points_.size());
+
+    auto point_from_v_a = v_a.find_first();
+    while (point_from_v_a != model_points_set_t::npos)
+    {
+        const auto& contacts_of_point_from_v_a = contact_relations_[point_from_v_a];
+        if ((contacts_of_point_from_v_a & v_b).any())
+        {
+            return true;
+        }
+
+        point_from_v_a = v_a.find_next(point_from_v_a);
+    }
+    return false;
 }
 
 auto connected_model::build_contact_relations_matrix(const formulas_t& contacts_T, const formulas_t& contacts_F) -> bool
 {
     const auto point_size = points_.size();
     contact_relations_.clear();
-    contact_relations_.resize(point_size, model_points_set_t(point_size, true)); // Fill NxN matrix with 1s
+    contact_relations_.resize(point_size, ~model_points_set_t(point_size)); // Fill NxN matrix with 1s
 
     // Removes the connection between each point in v_l and all points from v_r
     auto connection_remover = [&](auto& v_l, auto& v_r)
@@ -191,7 +207,7 @@ auto connected_model::build_contact_relations_matrix(const formulas_t& contacts_
     for(const auto& c : contacts_F)
     {
         const auto v_a = c->get_left_child_term()->evaluate(variable_evaluations_, points_.size());
-        const auto v_b = c->get_left_child_term()->evaluate(variable_evaluations_, points_.size());
+        const auto v_b = c->get_right_child_term()->evaluate(variable_evaluations_, points_.size());
 
         assert((v_a & v_b).none()); // no common points, because we built them that way
 
@@ -199,13 +215,69 @@ auto connected_model::build_contact_relations_matrix(const formulas_t& contacts_
         connection_remover(v_b, v_a);
     }
 
+    trace() << "Model with maximal valid points and all possible contacts between them(w.r.t. ~C):\n" << *this;
+
     return is_contacts_T_rule_satisfied(contacts_T);
 }
 
 auto connected_model::get_connected_components() const -> std::vector<model_points_set_t>
 {
-    // TODO: implement
-    return {};
+    if(points_.empty())
+    {
+        return {};
+    }
+
+    std::vector<model_points_set_t> connected_components;
+    model_points_set_t not_visited_points(points_.size());
+    // bitset of 1s for the not visited points, inverted because we have fast finding of 1s in the bitset
+    not_visited_points.set();
+
+    size_t root_point_id = not_visited_points.find_first();
+    while(root_point_id != model_points_set_t::npos)
+    {
+        auto connected_component = get_connected_component(root_point_id, not_visited_points);
+        connected_components.push_back(std::move(connected_component));
+
+        root_point_id = not_visited_points.find_next(root_point_id);
+    }
+    return connected_components;
+}
+
+auto connected_model::get_connected_component(size_t root_point_id, model_points_set_t& not_visited_points) const -> model_points_set_t
+{
+    assert(not_visited_points.test(root_point_id));
+
+    model_points_set_t connected_component(points_.size());
+
+    // A simple traversing
+    std::queue<size_t> q;
+    q.push(root_point_id);
+
+    while(!q.empty())
+    {
+        const auto point_id = q.front();
+        q.pop();
+        if(!not_visited_points.test(point_id)) // while the point waits in the queue some other point could also push it and
+        {
+            continue;
+        }
+
+
+        const auto& point_connections = contact_relations_[point_id];
+        auto connected_point_id = point_connections.find_first();
+        while(connected_point_id != model_points_set_t::npos)
+        {
+            if(not_visited_points.test(connected_point_id))
+            {
+                connected_component.set(point_id);
+                not_visited_points.reset(point_id);
+                q.push(connected_point_id);
+            }
+            connected_point_id = point_connections.find_next(connected_point_id);
+        }
+    }
+
+    return connected_component;
 }
 
 void connected_model::reduce_variable_evaluations_to_subset_of_points(const model_points_set_t& points_subset)
@@ -262,6 +334,7 @@ void connected_model::reduce_model_to_subset_of_points(const model_points_set_t&
 
     points_ = std::move(reduced_points);
     contact_relations_ = std::move(reduced_contact_relations);
+    calculate_the_model_evaluation_of_each_variable();
 }
 
 // TODO: common function

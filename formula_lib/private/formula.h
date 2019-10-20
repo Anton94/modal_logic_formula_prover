@@ -44,6 +44,8 @@ public:
         conjunction,
         disjunction,
         negation,
+
+        measured_less_eq,
         eq_zero,
         c,
 
@@ -68,6 +70,7 @@ public:
     auto is_term_operation() const -> bool;
     auto is_atomic() const -> bool;
     auto is_formula_operation() const -> bool;
+    auto is_measured_less_eq_operation() const -> bool;
     auto is_constant() const -> bool;
     auto is_constant_true() const -> bool;
     auto is_constant_false() const -> bool;
@@ -78,6 +81,7 @@ private:
     void move(formula&& rhs) noexcept;
 
     auto construct_eq_zero_atomic_formula(json&) -> bool;
+    auto construct_measured_less_eq_atomic_formula(json&) -> bool;
     auto construct_contact_atomic_formula(json&) -> bool;
     auto construct_binary_formula(json& f, operation_t op) -> bool;
     auto construct_negation_formula(json& f) -> bool;

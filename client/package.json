@@ -12,7 +12,8 @@
     "e2e_generate": "bash ./scripts/generate_formulas.sh && protractor e2e/tests/generate/conf.js",
     "e2e": "bash ./scripts/run-e2e-tests.sh",
     "build": "webpack",
-    "start": "webpack-dev-server"
+    "start": "webpack-dev-server --hot",
+    "watch": "webpack watch"
   },
   "author": "",
   "license": "ISC",

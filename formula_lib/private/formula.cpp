@@ -58,6 +58,10 @@ auto formula::operator==(const formula& rhs) const -> bool
         return *child_t_.left == *rhs.child_t_.left;
     }
     assert(child_t_.right && rhs.child_t_.right);
+    if(op_ == operation_t::measured_less_eq)
+    {
+        return *child_t_.left == *rhs.child_t_.left && *child_t_.right == *rhs.child_t_.right;
+    }
     if(op_ == operation_t::c)
     {
         // C is commutative, i.e. C(a,b) == C(b,a)
@@ -66,7 +70,7 @@ auto formula::operator==(const formula& rhs) const -> bool
                (*child_t_.left == *rhs.child_t_.right && *child_t_.right == *rhs.child_t_.left);
     }
 
-    assert(is_formula_operation());
+    assert(op_ == operation_t::conjunction || op_ == operation_t::disjunction);
     return *child_f_.left == *rhs.child_f_.left && *child_f_.right == *rhs.child_f_.right;
 }
 
@@ -120,6 +124,13 @@ auto formula::build(json& f) -> bool
             return false;
         }
     }
+    else if(op == "measured_less_eq")
+    {
+        if(!construct_measured_less_eq_atomic_formula(f))
+        {
+            return false;
+        }
+    }
     else if(op == "contact")
     {
         if(!construct_contact_atomic_formula(f))
@@ -168,6 +179,8 @@ auto formula::evaluate(const variable_id_to_points_t& evals, int R, int P) const
         case formula::operation_t::eq_zero:
             assert(child_t_.left);
             return child_t_.left->evaluate(evals, 2 * R + P).none();
+        case formula::operation_t::measured_less_eq:
+            return true; // TODO: does it make any sense to do anything with them when evaluating?
         case formula::operation_t::c:
         {
             assert(child_t_.left && child_t_.right);
@@ -221,6 +234,8 @@ auto formula::evaluate(const variable_id_to_points_t& evals, const contacts_t& c
             const auto number_of_points = contact_relations.size(); // a bit hacky...
             return child_t_.left->evaluate(evals, number_of_points).none();
         }
+        case formula::operation_t::measured_less_eq:
+            return true; // TODO: does it make any sense to do anything with them when evaluating?
         case formula::operation_t::c:
         {
             assert(child_t_.left && child_t_.right);
@@ -262,6 +277,7 @@ std::pair<int, int> formula::get_contacts_count() const
         case formula::operation_t::constant_true:
         case formula::operation_t::constant_false:
         case formula::operation_t::eq_zero:
+        case formula::operation_t::measured_less_eq:
             return std::pair<int, int>(0, 0);
         case formula::operation_t::negation:
         {
@@ -292,6 +308,7 @@ std::pair<int, int> formula::get_zeroes_count() const
     {
         case formula::operation_t::constant_true:
         case formula::operation_t::constant_false:
+        case formula::operation_t::measured_less_eq:
         case formula::operation_t::c:
             return std::pair<int, int>(0, 0);
         case formula::operation_t::negation:
@@ -362,7 +379,7 @@ auto formula::get_mgr() const -> const formula_mgr*
 
 auto formula::is_term_operation() const -> bool
 {
-    return op_ == operation_t::eq_zero || op_ == operation_t::c;
+    return op_ == operation_t::eq_zero || op_ == operation_t::measured_less_eq || op_ == operation_t::c;
 }
 
 auto formula::is_atomic() const -> bool
@@ -373,6 +390,11 @@ auto formula::is_atomic() const -> bool
 auto formula::is_formula_operation() const -> bool
 {
     return op_ == operation_t::conjunction || op_ == operation_t::disjunction || op_ == operation_t::negation;
+}
+
+auto formula::is_measured_less_eq_operation() const -> bool
+{
+    return op_ == operation_t::measured_less_eq;
 }
 
 auto formula::is_constant() const -> bool
@@ -399,7 +421,7 @@ void formula::change_formula_mgr(formula_mgr* new_mgr)
     {
         child_t_.left->change_formula_mgr(new_mgr);
     }
-    else if(op_ == operation_t::c)
+    else if(op_ == operation_t::c || op_ == operation_t::measured_less_eq)
     {
         child_t_.left->change_formula_mgr(new_mgr);
         child_t_.right->change_formula_mgr(new_mgr);
@@ -436,6 +458,9 @@ std::ostream& operator<<(std::ostream& out, const formula& f)
             break;
         case formula::operation_t::eq_zero:
             out << *f.get_left_child_term() << " = 0";
+            break;
+        case formula::operation_t::measured_less_eq:
+            out << "<=m(" << *f.get_left_child_term() << ", " << *f.get_right_child_term() << ")";
             break;
         case formula::operation_t::c:
             out << "C(" << *f.get_left_child_term() << ", " << *f.get_right_child_term() << ")";
@@ -512,6 +537,32 @@ auto formula::construct_contact_atomic_formula(json& f) -> bool
     // add child's hashes and multiply be the same factor because the operation is commutative
     hash_ = ((child_t_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
             ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435761);
+    return true;
+}
+
+auto formula::construct_measured_less_eq_atomic_formula(json& f) -> bool
+{
+    op_ = operation_t::measured_less_eq;
+
+    child_t_.left = new(std::nothrow) term(formula_mgr_);
+    child_t_.right = new(std::nothrow) term(formula_mgr_);
+    assert(child_t_.left && child_t_.right);
+
+    // check the json for correct information
+    auto& value_field = f["value"];
+    if(!value_field.is_array() || value_field.size() != 2)
+    {
+        return false;
+    }
+
+    // recursive construction of the child terms
+    if(!child_t_.left->build(value_field[0]) || !child_t_.right->build(value_field[1]))
+    {
+        return false;
+    }
+
+    hash_ = ((child_t_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
+            ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
     return true;
 }
 

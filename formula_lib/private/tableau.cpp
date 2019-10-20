@@ -17,7 +17,6 @@ auto tableau::is_satisfiable(const formula& f, imodel& out_model) -> bool
     add_formula_to_T(&f);
 
     mgr_ = f.get_mgr();
-    const auto variables_count = mgr_->get_variables().size();
 
     model_ = &out_model;
     if(satisfiable_step())
@@ -39,6 +38,9 @@ void tableau::clear()
     contacts_F_.clear();
     zero_terms_T_.clear();
     zero_terms_F_.clear();
+
+    measured_less_eq_T_.clear();
+    measured_less_eq_F_.clear();
     contact_T_terms_.clear();
     model_ = nullptr;
 }
@@ -340,6 +342,12 @@ auto tableau::find_in_T(const formula* f) const -> bool
         const auto t = f->get_left_child_term();
         return zero_terms_T_.find(t) != zero_terms_T_.end();
     }
+
+    if(op == formula::operation_t::measured_less_eq)
+    {
+        return measured_less_eq_T_.find(f) != measured_less_eq_T_.end();
+    }
+
     assert(f->is_formula_operation());
     return formulas_T_.find(f) != formulas_T_.end();
 }
@@ -357,6 +365,12 @@ auto tableau::find_in_F(const formula* f) const -> bool
         const auto t = f->get_left_child_term();
         return zero_terms_F_.find(t) != zero_terms_F_.end();
     }
+
+    if(op == formula::operation_t::measured_less_eq)
+    {
+        return measured_less_eq_F_.find(f) != measured_less_eq_F_.end();
+    }
+
     assert(f->is_formula_operation());
     return formulas_F_.find(f) != formulas_F_.end();
 }
@@ -381,6 +395,11 @@ void tableau::add_formula_to_T(const formula* f)
         const auto t = f->get_left_child_term();
         trace() << "Adding " << *t << " to zero terms T";
         zero_terms_T_.insert(t);
+    }
+    else if(op == formula::operation_t::measured_less_eq)
+    {
+        trace() << "Adding " << *f << " to T measured <=";
+        measured_less_eq_T_.insert(f);
     }
     else if(f->is_formula_operation())
     {
@@ -407,6 +426,11 @@ void tableau::add_formula_to_F(const formula* f)
         const auto t = f->get_left_child_term();
         trace() << "Adding " << *t << " to zero terms F";
         zero_terms_F_.insert(t);
+    }
+    else if(op == formula::operation_t::measured_less_eq)
+    {
+        trace() << "Adding " << *f << " to F measured <=";
+        measured_less_eq_F_.insert(f);
     }
     else if(f->is_formula_operation())
     {
@@ -445,6 +469,13 @@ void tableau::remove_formula_from_T(const formula* f)
         assert(erased);
         (void)erased;
     }
+    else if(op == formula::operation_t::measured_less_eq)
+    {
+        trace() << "Removing " << *f << " from T measured <=";
+        bool erased = measured_less_eq_T_.erase(f);
+        assert(erased);
+        (void)erased;
+    }
     else if(f->is_formula_operation())
     {
         trace() << "Removing " << *f << " from T formulas";
@@ -474,6 +505,13 @@ void tableau::remove_formula_from_F(const formula* f)
         const auto t = f->get_left_child_term();
         trace() << "Removing " << *t << " from zero terms";
         bool erased = zero_terms_F_.erase(t);
+        assert(erased);
+        (void)erased;
+    }
+    else if(op == formula::operation_t::measured_less_eq)
+    {
+        trace() << "Removing " << *f << " from F measured <=";
+        bool erased = measured_less_eq_F_.erase(f);
         assert(erased);
         (void)erased;
     }
@@ -516,6 +554,8 @@ void tableau::log_state_satisfiable() const
     trace() << "           Contacts F: " << contacts_F_;
     trace() << "         Zero terms T: " << zero_terms_T_;
     trace() << "         Zero terms F: " << zero_terms_F_;
+    trace() << "        Measured <= T: " << measured_less_eq_T_;
+    trace() << "        Measured <= F: " << measured_less_eq_F_;
     trace() << "     T contacts terms: " << contact_T_terms_;
 }
 
@@ -649,6 +689,16 @@ auto tableau::get_used_variables() const -> variables_mask_t
     for(const auto& t : zero_terms_F_)
     {
         used_variables |= t->get_variables();
+    }
+    for(const auto& c : measured_less_eq_T_)
+    {
+        used_variables |= c->get_left_child_term()->get_variables();
+        used_variables |= c->get_right_child_term()->get_variables();
+    }
+    for(const auto& c : measured_less_eq_F_)
+    {
+        used_variables |= c->get_left_child_term()->get_variables();
+        used_variables |= c->get_right_child_term()->get_variables();
     }
     return used_variables;
 }
