@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<script src="https://d3js.org/d3.v4.js"></script>
+
+<div id="my_dataviz"></div>
+
+<svg width="960" height="600"></svg>
+
+<script>
+
+var svg = d3.select("svg")
+    .call(d3.zoom().on("zoom", function () {
+       svg.attr("transform", d3.event.transform)
+    })),
+    width = +svg.attr("width"),
+    height = +svg.attr("height");
+
+var simulation = d3.forceSimulation()
+    .force("link", d3.forceLink().id(function(d) { return d.id; }))
+    .force("charge", d3.forceManyBody().strength(-500))
+    .force("center", d3.forceCenter(width / 2, height / 2))
+    .force('collision', d3.forceCollide().radius(function(d) {
+	    return 20
+	  }));
+
+var graph  = { 
+  "nodes": [{"id": 1, "name": "A"},
+            {"id": 2, "name": "B"},
+            {"id": 3, "name": "C"},
+            {"id": 4, "name": "D"},
+            {"id": 5, "name": "E"},
+            {"id": 6, "name": "F"},
+            {"id": 7, "name": "G"},
+            {"id": 8, "name": "H"},
+            {"id": 9, "name": "I"},
+            {"id": 10, "name": "J"},
+            {"id": 11, "name": "A0"},
+            {"id": 12, "name": "B0"},
+            {"id": 13, "name": "C0"},
+            {"id": 14, "name": "D0"},
+            {"id": 15, "name": "E0"},
+            {"id": 16, "name": "F0"},
+            {"id": 17, "name": "G0"},
+            {"id": 18, "name": "H0"},
+            {"id": 19, "name": "I0"},
+            {"id": 20, "name": "J0"}
+  ],
+  "links": [{"source": 1, "target": 2},
+            {"source": 1, "target": 5},
+            {"source": 1, "target": 6},
+            {"source": 2, "target": 3},
+            {"source": 2, "target": 7},
+            {"source": 3, "target": 4},
+            {"source": 8, "target": 3},
+            {"source": 4, "target": 5},
+            {"source": 4, "target": 9},
+            {"source": 5, "target": 10},
+            {"source": 11, "target": 12},
+            {"source": 11, "target": 15},
+            {"source": 11, "target": 16},
+            {"source": 12, "target": 13},
+            {"source": 12, "target": 17},
+            {"source": 13, "target": 14},
+            {"source": 18, "target": 13},
+            {"source": 14, "target": 15},
+            {"source": 14, "target": 19},
+            {"source": 15, "target": 20},
+            {"source": 10, "target": 20},
+            {"source": 6, "target": 16},
+            {"source": 3, "target": 13}
+  ]
+}
+
+var link = svg.append("g")
+            .style("stroke", "#aaa")
+            .selectAll("line")
+            .data(graph.links)
+            .enter().append("line");
+
+var node = svg.append("g")
+        .attr("class", "nodes")
+.selectAll("circle")
+        .data(graph.nodes)
+.enter().append("circle")
+      .attr("r", 6);
+
+var label = svg.append("g")
+  .attr("class", "labels")
+  .selectAll("text")
+  .data(graph.nodes)
+  .enter().append("text")
+    .attr("class", "label")
+    .text(function(d) { return d.name; });
+
+simulation
+  .nodes(graph.nodes)
+  .on("tick", ticked);
+
+simulation.force("link")
+  .links(graph.links);
+
+function ticked() {
+	console.log("in Tick");
+link
+    .attr("x1", function(d) { return d.source.x; })
+    .attr("y1", function(d) { return d.source.y; })
+    .attr("x2", function(d) { return d.target.x; })
+    .attr("y2", function(d) { return d.target.y; });
+
+node
+     .attr("r", 20)
+     .style("fill", "#d9d9d9")
+     .style("stroke", "#969696")
+     .style("stroke-width", "1px")
+     .attr("cx", function (d) { return d.x - 5; })
+     .attr("cy", function(d) { return d.y - 5; });
+
+label
+		.attr("x", function(d) { return d.x - 13; })
+        .attr("y", function (d) { return d.y; })
+        .style("font-size", "20px").style("fill", "#4393c3");
+}
+
+</script>
