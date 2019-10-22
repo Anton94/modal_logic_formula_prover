@@ -33,44 +33,62 @@ enum class term_operation_t
     invalid_,
 };
 
-class node
+class Node
 {
 public:
-    virtual ~node() = default;
+    virtual ~Node() = default;
 };
 
-class formula_node : public node
+class NFormula : public Node
 {
 public:
-    ~formula_node() override
+    NFormula(formula_operation_t op, node* left, node* right)
+        : op(op)
+        , left(left)
+        , right(right)
+    {
+    }
+
+    ~NFormula() override
     {
         delete left;
         delete right;
     };
 
-    formula_operation_t op{formula_operation_t::invalid};
-    node* left{};
-    node* right{};
+    formula_operation_t op;
+    node* left;
+    node* right;
 };
 
-class term_node : public node
+class NTerm : public Node
 {
 public:
-    ~term_node() override
+    NTerm(term_operation_t op, node* left, node* right)
+        : op(op)
+        , left(left)
+        , right(right)
+    {
+    }
+
+    ~NTerm() override
     {
         delete left;
         delete right;
     };
 
-    term_operation_t op{term_operation_t::invalid_};
-    node* left{};
-    node* right{};
+    term_operation_t op;
+    Node* left;
+    Node* right;
 };
 
-class term_variable_node : public node
+class NTermAtomicVariable : public Node
 {
 public:
-    ~term_variable_node() override = default;
+    NTermAtomicVariable(const char* variable)
+        : variable(variable)
+    {
+    }
+    ~NTermAtomicVariable() override = default;
 
     std::string variable; // TODO: use symbol_node and flex's lookup table for the variables...
 };

@@ -16,7 +16,10 @@
 
 %union {
     char *sval;
-    struct ast_node * ast;
+    Node* node;
+    NFormula* formula;
+    NTerm* term;
+    NTermAtomicVariable term_var;
 }
 
 %token <sval> T_STRING
@@ -32,7 +35,9 @@
 %left '&' '*'
 %right '~' '-'
 
-%type <ast> formula term
+%type <formula> formula
+%type <term> term
+%type <term_var> term_var
 
 %%
 modal_logic_formula
