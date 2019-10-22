@@ -42,7 +42,7 @@ public:
 class NFormula : public Node
 {
 public:
-    NFormula(formula_operation_t op, node* left, node* right)
+    NFormula(formula_operation_t op, Node* left = nullptr, Node* right = nullptr)
         : op(op)
         , left(left)
         , right(right)
@@ -53,17 +53,17 @@ public:
     {
         delete left;
         delete right;
-    };
+    }
 
     formula_operation_t op;
-    node* left;
-    node* right;
+    Node* left;
+    Node* right;
 };
 
 class NTerm : public Node
 {
 public:
-    NTerm(term_operation_t op, node* left, node* right)
+    NTerm(term_operation_t op, Node* left = nullptr, Node* right = nullptr)
         : op(op)
         , left(left)
         , right(right)
@@ -74,21 +74,11 @@ public:
     {
         delete left;
         delete right;
-    };
+    }
 
     term_operation_t op;
     Node* left;
     Node* right;
-};
 
-class NTermAtomicVariable : public Node
-{
-public:
-    NTermAtomicVariable(const char* variable)
-        : variable(variable)
-    {
-    }
-    ~NTermAtomicVariable() override = default;
-
-    std::string variable; // TODO: use symbol_node and flex's lookup table for the variables...
+    std::string variable; // TODO: separate place for variable terms
 };

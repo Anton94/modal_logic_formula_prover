@@ -1,25 +1,24 @@
 %{
-    #include <cstdio>
-    #include <iostream>
+#include <cstdio>
+#include <iostream>
 
-    #include "modal_logic_formula_ast.h"
+#include "modal_logic_formula_ast.h"
 
-    using namespace std;
+using namespace std;
 
-    // stuff from flex that bison needs to know about:
-    extern int yylex();
-    extern int yyparse();
+// stuff from flex that bison needs to know about:
+extern int yylex();
+extern int yyparse();
 
-    void yyerror(const char *s);
+void yyerror(const char *s);
 
+NFormula* whole_formula = nullptr;
 %}
 
 %union {
     char *sval;
-    Node* node;
-    NFormula* formula;
-    NTerm* term;
-    NTermAtomicVariable term_var;
+    NFormula *formula;
+    NTerm *term;
 }
 
 %token <sval> T_STRING
@@ -37,76 +36,78 @@
 
 %type <formula> formula
 %type <term> term
-%type <term_var> term_var
 
 %%
 modal_logic_formula
     : formula {
+		whole_formula = $1;
         cout << "done with the formula!" << endl;
     }
   ;
 formula
     : 'T' {
         cout << "read atomic formula T!" << endl;
-        $$ = new_ast_atomic_formula_node(formula_operation_t::constant_true, nullptr, nullptr);
+		$$ = new NFormula(formula_operation_t::constant_true);
     }
     | 'F' {
         cout << "read atomic formula F!" << endl;
-        $$ = new_ast_atomic_formula_node(formula_operation_t::constant_false, nullptr, nullptr);
+		$$ = new NFormula(formula_operation_t::constant_false);
     }
     | 'C' '(' term ',' term ')' {
         cout << "read atomic formula C" << endl;
-        $$ = new_ast_atomic_formula_node(formula_operation_t::contact, $3, $5);
+        $$ = new NFormula(formula_operation_t::contact, $3, $5);
     }
     | T_LESS_EQ '(' term ',' term ')'  {
         cout << "read atomic formula <=" << endl;
-        $$ = new_ast_atomic_formula_node(formula_operation_t::less_eq, $3, $5);
+        $$ = new NFormula(formula_operation_t::less_eq, $3, $5);
     }
     | '(' formula '*' formula ')' {
         cout << "read binary formula &" << endl;
-        $$ = new_ast_formula_node(formula_operation_t::conjunction, $2, $4);
+        $$ = new NFormula(formula_operation_t::conjunction, $2, $4);
     }
     | '(' formula '|' formula ')' {
         cout << "read binary formula |" << endl;
-        $$ = new_ast_formula_node(formula_operation_t::disjunction, $2, $4);
+        $$ = new NFormula(formula_operation_t::disjunction, $2, $4);
     }
     | '~' '(' formula ')' {
         cout << "read unary formula ~" << endl;
-        $$ = new_ast_formula_node(formula_operation_t::negation, $2, nullptr);
+        $$ = new NFormula(formula_operation_t::negation, $3);
     }
     |  '(' formula T_FORMULA_OP_IMPLICATION formula ')' {
         cout << "read binary formula ->" << endl;
-        $$ = new_ast_formula_node(formula_operation_t::implication, $2, $4);
+        $$ = new NFormula(formula_operation_t::implication, $2, $4);
     }
     |  '(' formula T_FORMULA_OP_EQUALITY formula ')' {
         cout << "read binary formula <->" << endl;
-        $$ = new_ast_formula_node(formula_operation_t::equality, $2, $4);
+        $$ = new NFormula(formula_operation_t::equality, $2, $4);
     }
   ;
 term
     : '1' {
         cout << "read atomic term 1!" << endl;
-        $$ = new_ast_term_atomic_node(term_operation_t::constant_true, nullptr);
+        $$ = new NTerm(term_operation_t::constant_true);
     }
     | '0' {
         cout << "read atomic term 0!" << endl;
-        $$ = new_ast_term_atomic_node(term_operation_t::constant_false, nullptr);
+        $$ = new NTerm(term_operation_t::constant_false);
     }
     | T_STRING {
-        cout << "read variable: " << $1 << endl; free($1);
-        $$ = new_ast_term_atomic_node(term_operation_t::variable_, $1);
+        cout << "read variable: " << $1 << endl;
+        $$ = new NTerm(term_operation_t::variable_);
+		$$->variable = $1;
+		free($1);
     }
     |  '(' term '*' term ')' {
         cout << "read binary term *" << endl;
-        $$ = new_ast_term_node(term_operation_t::intersaction_, $2, $4);
+        $$ = new NTerm(term_operation_t::intersaction_, $2, $4);
     }
     |  '(' term '+' term ')' {
         cout << "read binary term +" << endl;
-        $$ = new_ast_term_node(term_operation_t::union_, $2, $4);
+        $$ = new NTerm(term_operation_t::union_, $2, $4);
     }
     | '-' '(' term ')'{
         cout << "read unary term -" << endl;
-        $$ = new_ast_term_node(term_operation_t::star_, $3, nullptr);
+        $$ = new NTerm(term_operation_t::star_, $3);
     }
   ;
 %%
@@ -114,6 +115,8 @@ term
 int main(int, char**) {
   // lex through the input:
   yyparse();
+
+  delete whole_formula;
 }
 
 void yyerror(const char *s) {

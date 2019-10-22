@@ -1,8 +1,11 @@
 %{
 #include <cstdio>
 
+#include "modal_logic_formula_ast.h"
 #include "modal_logic_formula.tab.h"
 %}
+
+%option noyywrap
 
 %%
 [ \t\n]            ; // ignore all whitespace
