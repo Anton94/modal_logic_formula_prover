@@ -25,35 +25,31 @@ enum class term_operation_t
     constant_true,
     constant_false,
 
-    union_,
-    intersaction_,
-    star_,
-    variable_,
+    union_, // union is a keyword
+    intersaction,
+    complement,
+    variable,
 
-    invalid_,
+    invalid,
 };
+
+class Visitor;
 
 class Node
 {
 public:
+    virtual void accept(Visitor& v) = 0;
     virtual ~Node() = default;
 };
 
 class NFormula : public Node
 {
 public:
-    NFormula(formula_operation_t op, Node* left = nullptr, Node* right = nullptr)
-        : op(op)
-        , left(left)
-        , right(right)
-    {
-    }
+    NFormula(formula_operation_t op, Node* left = nullptr, Node* right = nullptr);
 
-    ~NFormula() override
-    {
-        delete left;
-        delete right;
-    }
+    void accept(Visitor& v) override;
+
+    ~NFormula() override;
 
     formula_operation_t op;
     Node* left;
@@ -63,18 +59,11 @@ public:
 class NTerm : public Node
 {
 public:
-    NTerm(term_operation_t op, Node* left = nullptr, Node* right = nullptr)
-        : op(op)
-        , left(left)
-        , right(right)
-    {
-    }
+    NTerm(term_operation_t op, Node* left = nullptr, Node* right = nullptr);
 
-    ~NTerm() override
-    {
-        delete left;
-        delete right;
-    }
+    void accept(Visitor& v) override;
+
+    ~NTerm() override;
 
     term_operation_t op;
     Node* left;

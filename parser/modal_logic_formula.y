@@ -1,8 +1,10 @@
 %{
 #include <cstdio>
 #include <iostream>
+#include <memory>
 
-#include "modal_logic_formula_ast.h"
+#include "ast.h"
+#include "visitor.h"
 
 using namespace std;
 
@@ -12,7 +14,7 @@ extern int yyparse();
 
 void yyerror(const char *s);
 
-NFormula* whole_formula = nullptr;
+std::unique_ptr<NFormula> parsed_formula;
 %}
 
 %union {
@@ -40,87 +42,87 @@ NFormula* whole_formula = nullptr;
 %%
 modal_logic_formula
     : formula {
-		whole_formula = $1;
-        cout << "done with the formula!" << endl;
+        parsed_formula.reset($1);
     }
   ;
 formula
     : 'T' {
-        cout << "read atomic formula T!" << endl;
-		$$ = new NFormula(formula_operation_t::constant_true);
+        $$ = new NFormula(formula_operation_t::constant_true);
     }
     | 'F' {
-        cout << "read atomic formula F!" << endl;
-		$$ = new NFormula(formula_operation_t::constant_false);
+        $$ = new NFormula(formula_operation_t::constant_false);
     }
     | 'C' '(' term ',' term ')' {
-        cout << "read atomic formula C" << endl;
         $$ = new NFormula(formula_operation_t::contact, $3, $5);
     }
     | T_LESS_EQ '(' term ',' term ')'  {
-        cout << "read atomic formula <=" << endl;
         $$ = new NFormula(formula_operation_t::less_eq, $3, $5);
     }
-    | '(' formula '*' formula ')' {
-        cout << "read binary formula &" << endl;
+    | T_MEASURED_LESS_EQ '(' term ',' term ')'  {
+        $$ = new NFormula(formula_operation_t::measured_less_eq, $3, $5);
+    }
+    | '(' formula '&' formula ')' {
         $$ = new NFormula(formula_operation_t::conjunction, $2, $4);
     }
     | '(' formula '|' formula ')' {
-        cout << "read binary formula |" << endl;
         $$ = new NFormula(formula_operation_t::disjunction, $2, $4);
     }
-    | '~' '(' formula ')' {
-        cout << "read unary formula ~" << endl;
-        $$ = new NFormula(formula_operation_t::negation, $3);
+    | '~' formula {
+        $$ = new NFormula(formula_operation_t::negation, $2);
     }
-    |  '(' formula T_FORMULA_OP_IMPLICATION formula ')' {
-        cout << "read binary formula ->" << endl;
+    | '(' formula T_FORMULA_OP_IMPLICATION formula ')' {
         $$ = new NFormula(formula_operation_t::implication, $2, $4);
     }
-    |  '(' formula T_FORMULA_OP_EQUALITY formula ')' {
-        cout << "read binary formula <->" << endl;
+    | '(' formula T_FORMULA_OP_EQUALITY formula ')' {
         $$ = new NFormula(formula_operation_t::equality, $2, $4);
     }
   ;
 term
     : '1' {
-        cout << "read atomic term 1!" << endl;
         $$ = new NTerm(term_operation_t::constant_true);
     }
     | '0' {
-        cout << "read atomic term 0!" << endl;
         $$ = new NTerm(term_operation_t::constant_false);
     }
     | T_STRING {
-        cout << "read variable: " << $1 << endl;
-        $$ = new NTerm(term_operation_t::variable_);
-		$$->variable = $1;
-		free($1);
+        $$ = new NTerm(term_operation_t::variable);
+        $$->variable = $1;
+        free($1);
     }
-    |  '(' term '*' term ')' {
-        cout << "read binary term *" << endl;
-        $$ = new NTerm(term_operation_t::intersaction_, $2, $4);
+    | '(' term '*' term ')' {
+        $$ = new NTerm(term_operation_t::intersaction, $2, $4);
     }
-    |  '(' term '+' term ')' {
-        cout << "read binary term +" << endl;
+    | '(' term '+' term ')' {
         $$ = new NTerm(term_operation_t::union_, $2, $4);
     }
-    | '-' '(' term ')'{
-        cout << "read unary term -" << endl;
-        $$ = new NTerm(term_operation_t::star_, $3);
+    | '-' term {
+        $$ = new NTerm(term_operation_t::complement, $2);
     }
   ;
 %%
 
-int main(int, char**) {
-  // lex through the input:
-  yyparse();
+void set_input_string(const char* in);
+void end_lexical_scan();
 
-  delete whole_formula;
+int main(int, char**)
+{
+    const auto input_formula = "~((C(a, b) & F) & <=m((a * b), (c + d)))";
+    std::cout << "Will try to parce: " << input_formula << std::endl;
+    set_input_string(input_formula);
+    int rv = yyparse();
+    end_lexical_scan();
+
+    std::cout << "Parsed formula:    ";
+    VPrinter printer(std::cout);
+    parsed_formula->accept(printer);
+    std::cout << std::endl;
+
+    return rv;
 }
 
-void yyerror(const char *s) {
-  cout << "EEK, parse error!  Message: " << s << endl;
-  // might as well halt now:
-  exit(-1);
+void yyerror(const char *s)
+{
+    cout << "EEK, parse error!  Message: " << s << endl;
+    // might as well halt now:
+    exit(-1);
 }

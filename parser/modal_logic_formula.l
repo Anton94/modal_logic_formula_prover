@@ -1,7 +1,7 @@
 %{
 #include <cstdio>
 
-#include "modal_logic_formula_ast.h"
+#include "ast.h"
 #include "modal_logic_formula.tab.h"
 %}
 
@@ -18,3 +18,13 @@
 [a-zA-Z0-9]+       {yylval.sval = strdup(yytext); return T_STRING;}
 .                  {return yytext[0];} // bison will trigger an error if it's unrecognized symbol
 %%
+
+void set_input_string(const char* in)
+{
+    yy_scan_string(in);
+}
+
+void end_lexical_scan()
+{
+    yy_delete_buffer(YY_CURRENT_BUFFER);
+}
