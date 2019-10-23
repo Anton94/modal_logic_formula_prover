@@ -2,7 +2,7 @@
 #include <cstdio>
 
 #include "ast.h"
-#include "parser.tab.h"
+#include "parser.hpp"
 %}
 
 %option noyywrap

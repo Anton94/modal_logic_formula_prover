@@ -5,7 +5,7 @@
 
 #include "ast.h"
 #include "visitor.h"
-#include "parser.h"
+#include "parser_API.h"
 
 using namespace std;
 
@@ -65,8 +65,14 @@ formula
     | '(' formula '&' formula ')' {
         $$ = new NFormula(formula_operation_t::conjunction, $2, $4);
     }
+    | formula '&' formula {
+        $$ = new NFormula(formula_operation_t::conjunction, $1, $3);
+    }
     | '(' formula '|' formula ')' {
         $$ = new NFormula(formula_operation_t::disjunction, $2, $4);
+    }
+    | formula '|' formula {
+        $$ = new NFormula(formula_operation_t::disjunction, $1, $3);
     }
     | '~' formula {
         $$ = new NFormula(formula_operation_t::negation, $2);
@@ -74,8 +80,14 @@ formula
     | '(' formula T_FORMULA_OP_IMPLICATION formula ')' {
         $$ = new NFormula(formula_operation_t::implication, $2, $4);
     }
+    | formula T_FORMULA_OP_IMPLICATION formula {
+        $$ = new NFormula(formula_operation_t::implication, $1, $3);
+    }
     | '(' formula T_FORMULA_OP_EQUALITY formula ')' {
         $$ = new NFormula(formula_operation_t::equality, $2, $4);
+    }
+    | formula T_FORMULA_OP_EQUALITY formula {
+        $$ = new NFormula(formula_operation_t::equality, $1, $3);
     }
   ;
 term
@@ -93,8 +105,14 @@ term
     | '(' term '*' term ')' {
         $$ = new NTerm(term_operation_t::intersaction, $2, $4);
     }
+    | term '*' term {
+        $$ = new NTerm(term_operation_t::intersaction, $1, $3);
+    }
     | '(' term '+' term ')' {
         $$ = new NTerm(term_operation_t::union_, $2, $4);
+    }
+    | term '+' term {
+        $$ = new NTerm(term_operation_t::union_, $1, $3);
     }
     | '-' term {
         $$ = new NTerm(term_operation_t::complement, $2);

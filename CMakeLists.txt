@@ -23,4 +23,5 @@ add_subdirectory (formula_proover)
 add_subdirectory (rest_server)
 add_subdirectory (tests)
 add_subdirectory (client)
+add_subdirectory (parser)
 
