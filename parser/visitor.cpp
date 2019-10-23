@@ -419,3 +419,62 @@ void VReduceTrivialAndOrNegOperations::visit(NTerm& t)
             assert(false && "Unrecognized.");
     }
 }
+
+void VConvertImplicationEqualityToConjDisj::visit(NFormula& f)
+{
+    switch(f.op)
+    {
+        case formula_operation_t::constant_true:
+        case formula_operation_t::constant_false:
+        case formula_operation_t::less_eq:
+        case formula_operation_t::measured_less_eq:
+        case formula_operation_t::contact:
+            break;
+        case formula_operation_t::conjunction:
+        case formula_operation_t::disjunction:
+            f.left->accept(*this);
+            f.right->accept(*this);
+            break;
+        case formula_operation_t::negation:
+            f.left->accept(*this);
+            break;
+        case formula_operation_t::implication:
+        {
+            f.left->accept(*this);
+            f.right->accept(*this);
+
+            // (f -> g)  => (~f | g)
+            auto* neg_f = new NFormula(formula_operation_t::negation, f.left);
+            f.left = neg_f;
+            f.op = formula_operation_t::disjunction;
+            // f.right stays as 'g'
+            break;
+        }
+        case formula_operation_t::equality:
+        {
+            f.left->accept(*this);
+            f.right->accept(*this);
+            // (f <-> g) => ((f & g) | (~f & ~g))
+
+            auto f_ = f.left; // f
+            auto g_ = f.right; // g
+            auto neg_f_ = new NFormula(formula_operation_t::negation, f.left->deep_copy()); // ~f
+            auto neg_g_ = new NFormula(formula_operation_t::negation, f.right->deep_copy()); // ~g
+
+            auto left_conj = new NFormula(formula_operation_t::conjunction, f_, g_); // (f & g)
+            auto right_conj = new NFormula(formula_operation_t::conjunction, neg_f_, neg_g_); // (~f & ~g)
+
+            // make the current node the disjunction one of: ((f & g) | (~f & ~g))
+            f.op = formula_operation_t::disjunction;
+            f.left = left_conj;
+            f.right = right_conj;
+            break;
+        }
+        default:
+            assert(false && "Unrecognized.");
+    }
+}
+
+void VConvertImplicationEqualityToConjDisj::visit(NTerm&)
+{
+}

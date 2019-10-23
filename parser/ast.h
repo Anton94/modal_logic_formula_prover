@@ -40,6 +40,9 @@ class Node
 public:
     virtual void accept(Visitor& v) = 0;
     virtual ~Node() = default;
+
+    // the caller should take care of the returned pointer(it's lifetime)
+    virtual auto deep_copy() const -> Node* = 0;
 };
 
 class NFormula : public Node
@@ -50,6 +53,8 @@ public:
     void accept(Visitor& v) override;
 
     ~NFormula() override;
+
+    auto deep_copy() const -> NFormula* override;
 
     formula_operation_t op;
     Node* left;
@@ -64,6 +69,8 @@ public:
     void accept(Visitor& v) override;
 
     ~NTerm() override;
+
+    auto deep_copy() const -> NTerm* override;
 
     term_operation_t op;
     NTerm* left;

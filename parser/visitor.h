@@ -53,3 +53,15 @@ public:
 
     ~VReduceTrivialAndOrNegOperations() override = default;
 };
+
+class VConvertImplicationEqualityToConjDisj : public Visitor
+{
+public:
+    /// Converts all formula nodes of type implication and equality to nodes which areusing just conjuction and disjunction
+    /// E.g. (f -> g)  => (~f | g)
+    ///      (f <-> g) => ((f & g) | (~f & ~g))
+    void visit(NFormula& f) override;
+    void visit(NTerm&) override;
+
+    ~VConvertImplicationEqualityToConjDisj() override = default;
+};
