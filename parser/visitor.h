@@ -22,7 +22,34 @@ public:
     void visit(NFormula& f) override;
     void visit(NTerm& t) override;
 
-    ~VPrinter() = default;
+    ~VPrinter() override = default;
 private:
     std::ostream& out_;
+};
+
+class VReduceTrivialAndOrNegOperations : public Visitor
+{
+public:
+    /// Removes all unnecessary childs of And/Or/Negation operations of the following type:
+    /// (formulas):
+    ///      -T -> F           -F -> T
+    /// (T & T) -> T      (F | F) -> F
+    ///
+    /// (g & T) -> g      (g | T) -> T
+    /// (T & g) -> g      (T | g) -> T
+    /// (g & F) -> F      (g | F) -> g
+    /// (F & g) -> F      (F | g) -> g
+    ///
+    /// (terms):
+    ///      -1 -> 0            -0 -> 1
+    /// (1 * 1) -> 1       (0 + 0) -> 0
+    ///
+    /// (t * 1) -> t       (t + 1) -> 1
+    /// (1 * t) -> t       (1 + t) -> 1
+    /// (t * 0) -> 0       (t + 0) -> t
+    /// (0 * t) -> 0       (0 + t) -> t
+    void visit(NFormula& f) override;
+    void visit(NTerm& t) override;
+
+    ~VReduceTrivialAndOrNegOperations() override = default;
 };

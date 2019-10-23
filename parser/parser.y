@@ -1,10 +1,7 @@
 %{
 #include <cstdio>
 #include <iostream>
-#include <memory>
 
-#include "ast.h"
-#include "visitor.h"
 #include "parser_API.h"
 
 using namespace std;
@@ -123,19 +120,16 @@ term
 void set_input_string(const char* in);
 void end_lexical_scan();
 
-int parse_from_input_string(const char* in)
+std::unique_ptr<NFormula> parse_from_input_string(const char* in)
 {
-    std::cout << "Will try to parce: " << in << std::endl;
+    parsed_formula.reset(nullptr);
+
     set_input_string(in);
     int rv = yyparse();
     end_lexical_scan();
 
-    std::cout << "Parsed formula:    ";
-    VPrinter printer(std::cout);
-    parsed_formula->accept(printer);
-    std::cout << std::endl;
-
-    return rv;
+    (void) rv;
+    return std::unique_ptr<NFormula>(parsed_formula.release());
 }
 
 void yyerror(const char *s)

@@ -59,15 +59,15 @@ public:
 class NTerm : public Node
 {
 public:
-    NTerm(term_operation_t op, Node* left = nullptr, Node* right = nullptr);
+    NTerm(term_operation_t op, NTerm* left = nullptr, NTerm* right = nullptr);
 
     void accept(Visitor& v) override;
 
     ~NTerm() override;
 
     term_operation_t op;
-    Node* left;
-    Node* right;
+    NTerm* left;
+    NTerm* right;
 
     std::string variable; // TODO: separate place for variable terms
 };

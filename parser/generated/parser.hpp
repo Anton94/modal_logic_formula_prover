@@ -59,7 +59,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 21 "parser.y" /* yacc.c:1909  */
+#line 18 "parser.y" /* yacc.c:1909  */
 
     char *sval;
     NFormula *formula;

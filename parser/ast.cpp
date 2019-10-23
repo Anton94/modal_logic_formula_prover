@@ -19,7 +19,7 @@ NFormula::~NFormula()
     delete right;
 }
 
-NTerm::NTerm(term_operation_t op, Node* left /*= nullptr*/, Node* right /*= nullptr*/)
+NTerm::NTerm(term_operation_t op, NTerm* left /*= nullptr*/, NTerm* right /*= nullptr*/)
     : op(op)
     , left(left)
     , right(right)
