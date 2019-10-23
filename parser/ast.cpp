@@ -1,3 +1,5 @@
+#include <cassert>
+
 #include "ast.h"
 #include "visitor.h"
 
@@ -52,6 +54,7 @@ auto NFormula::deep_copy() const -> NFormula*
             return new NFormula(op, left->deep_copy());
         default:
             assert(false && "Unrecognized.");
+            return nullptr;
     }
 }
 
@@ -120,6 +123,7 @@ auto NTerm::deep_copy() const -> NTerm*
             return new NTerm(op, left->deep_copy());
         default:
             assert(false && "Unrecognized.");
+            return nullptr;
     }
 }
 
