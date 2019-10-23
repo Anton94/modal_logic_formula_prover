@@ -8,8 +8,11 @@ set(generated_parser_hpp ${CMAKE_CURRENT_SOURCE_DIR}/generated/parser.hpp)
 set(generated_lexer_cpp ${CMAKE_CURRENT_SOURCE_DIR}/generated/lexer.cpp)
 
 if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    message("ERROR: Flex and bison might not work properly with other than gcc compiler. Will use the pregenerated lexer and parser!")
-elseif (NOT BISON_FOUND)
+    message("WARNING: Flex and bison might not work properly with other than gcc compiler (therefore the parser, too)!")
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/workaround_non_gcc_headers)
+endif()
+
+if (NOT BISON_FOUND)
     message("ERROR: Unable to find BISON. Will use the pregenerated lexer and parser!")
 elseif (NOT FLEX_FOUND)
     message("ERROR: Unable to find FLEX. Will use the pregenerated lexer and parser!")

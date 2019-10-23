@@ -6,6 +6,7 @@
 %}
 
 %option noyywrap
+%option never-interactive
 
 %%
 [ \t\n]            ; // ignore all whitespace
