@@ -479,12 +479,13 @@ void VConvertLessEqToEqZero::visit(NFormula& f)
         case formula_operation_t::constant_false:
         case formula_operation_t::less_eq:
         {
+            assert(f.left && f.right);
             //<=(l,r) -> (l * -r) = 0
             auto neg_r = new NTerm(term_operation_t::complement, static_cast<NTerm*>(f.right));
-            auto union_l_neg_r = new NTerm(term_operation_t::union_, static_cast<NTerm*>(f.left), neg_r);
+            auto intersection = new NTerm(term_operation_t::intersaction, static_cast<NTerm*>(f.left), neg_r);
 
             f.op = formula_operation_t::eq_zero;
-            f.left = union_l_neg_r;
+            f.left = intersection;
             f.right = nullptr;
             break;
         }

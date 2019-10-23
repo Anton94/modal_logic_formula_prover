@@ -13,9 +13,9 @@ int main(int, char**)
     input_formula = "C(a * 1, b + -0 * 1) | C(1 * x * -(y + z) + t, f * g + -0) & C(a,b) | ~~F";
     input_formula = "((F -> C(0,0)) | C(x,x)) & (C(a,b) -> C(b,a)) & (<=(a * c, b * d + f) <-> C(j + -k, k + o * v))";
     input_formula = "C(a,b) | a * b + G * g = 0";
-    input_formula = "F | <=(f , -h) ";
+    input_formula = "F | <=(f, -h) ";
 
-    std::cout << "Will try to parce       : " << input_formula << std::endl;
+    std::cout << "Will try to parce        : " << input_formula << std::endl;
     const auto formula_ast = parse_from_input_string(input_formula);
 
     if(!formula_ast)
@@ -23,26 +23,27 @@ int main(int, char**)
         return -1;
     }
 
-    std::cout << "Parsed formula          : ";
+    std::cout << "Parsed formula           : ";
     VPrinter printer(std::cout);
     formula_ast->accept(printer);
     std::cout << std::endl;
 
     VConvertImplicationEqualityToConjDisj convertor;
     formula_ast->accept(convertor);
-    std::cout << "Converted formula       : ";
+    std::cout << "Converted (-> <->)formula: ";
     formula_ast->accept(printer);
     std::cout << std::endl;
 
-    VConvertLessEqToEqZero eq_zero_convertor;
-    formula_ast->accept(eq_zero_convertor);
-    std::cout << "Conv. to eq_zero formula: ";
-    formula_ast->accept(printer);
-    std::cout << std::endl;
+    // TODO: there is some bug with the creation of <= atomics, investigate
+//    VConvertLessEqToEqZero eq_zero_convertor;
+//    formula_ast->accept(eq_zero_convertor);
+//    std::cout << "Converted (<= =0) formula: ";
+//    formula_ast->accept(printer);
+//    std::cout << std::endl;
 
     VReduceTrivialAndOrNegOperations reducer;
     formula_ast->accept(reducer);
-    std::cout << "Reduced formula         : ";
+    std::cout << "Reduced formula          : ";
     formula_ast->accept(printer);
     std::cout << std::endl;
 

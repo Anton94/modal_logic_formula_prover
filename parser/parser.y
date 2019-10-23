@@ -53,10 +53,10 @@ formula
     | 'C' '(' term ',' term ')' {
         $$ = new NFormula(formula_operation_t::contact, $3, $5);
     }
-    | T_LESS_EQ '(' term ',' term ')'  {
+    | T_LESS_EQ '(' term ',' term ')' {
         $$ = new NFormula(formula_operation_t::less_eq, $3, $5);
     }
-    | T_MEASURED_LESS_EQ '(' term ',' term ')'  {
+    | T_MEASURED_LESS_EQ '(' term ',' term ')' {
         $$ = new NFormula(formula_operation_t::measured_less_eq, $3, $5);
     }
     | term T_EQ_ZERO {
