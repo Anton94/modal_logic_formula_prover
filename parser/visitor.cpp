@@ -19,6 +19,7 @@ void VPrinter::visit(NFormula& f)
             break;
         case formula_operation_t::conjunction:
         {
+            assert(f.left && f.right);
             out_ << "(";
             f.left->accept(*this);
             out_ << " & ";
@@ -28,6 +29,7 @@ void VPrinter::visit(NFormula& f)
         }
         case formula_operation_t::disjunction:
         {
+            assert(f.left && f.right);
             out_ << "(";
             f.left->accept(*this);
             out_ << " | ";
@@ -37,6 +39,7 @@ void VPrinter::visit(NFormula& f)
         }
         case formula_operation_t::implication:
         {
+            assert(f.left && f.right);
             out_ << "(";
             f.left->accept(*this);
             out_ << " -> ";
@@ -46,6 +49,7 @@ void VPrinter::visit(NFormula& f)
         }
         case formula_operation_t::equality:
         {
+            assert(f.left && f.right);
             out_ << "(";
             f.left->accept(*this);
             out_ << " <-> ";
@@ -55,12 +59,14 @@ void VPrinter::visit(NFormula& f)
         }
         case formula_operation_t::negation:
         {
+            assert(f.left);
             out_ << "~";
             f.left->accept(*this);
             break;
         }
         case formula_operation_t::less_eq:
         {
+            assert(f.left && f.right);
             out_ << "<=(";
             f.left->accept(*this);
             out_ << ", ";
@@ -70,6 +76,7 @@ void VPrinter::visit(NFormula& f)
         }
         case formula_operation_t::measured_less_eq:
         {
+            assert(f.left && f.right);
             out_ << "<=m(";
             f.left->accept(*this);
             out_ << ", ";
@@ -79,6 +86,7 @@ void VPrinter::visit(NFormula& f)
         }
         case formula_operation_t::eq_zero:
         {
+            assert(f.left);
             out_ << "(";
             f.left->accept(*this);
             out_ << ")=0";
@@ -86,6 +94,7 @@ void VPrinter::visit(NFormula& f)
         }
         case formula_operation_t::contact:
         {
+            assert(f.left && f.right);
             out_ << "C(";
             f.left->accept(*this);
             out_ << ", ";
@@ -93,9 +102,6 @@ void VPrinter::visit(NFormula& f)
             out_ << ")";
             break;
         }
-        case formula_operation_t::invalid:
-            out_ << "UNDEFINED";
-            break;
         default:
             assert(false && "Unrecognized.");
     }
@@ -116,6 +122,7 @@ void VPrinter::visit(NTerm& t)
             break;
         case term_operation_t::union_:
         {
+            assert(t.left && t.right);
             out_ << "(";
             t.left->accept(*this);
             out_ << " + ";
@@ -125,6 +132,7 @@ void VPrinter::visit(NTerm& t)
         }
         case term_operation_t::intersaction:
         {
+            assert(t.left && t.right);
             out_ << "(";
             t.left->accept(*this);
             out_ << " * ";
@@ -134,13 +142,11 @@ void VPrinter::visit(NTerm& t)
         }
         case term_operation_t::complement:
         {
+            assert(t.left);
             out_ << "-";
             t.left->accept(*this);
             break;
         }
-        case term_operation_t::invalid:
-            out_ << "UNDEFINED";
-            break;
         default:
             assert(false && "Unrecognized.");
     }
@@ -223,14 +229,17 @@ void VReduceTrivialAndOrNegOperations::visit(NFormula& f)
         case formula_operation_t::implication:
         case formula_operation_t::equality:
         case formula_operation_t::contact: // TODO: reduce also C(a,0)->F ; C(0,a)->F
+            assert(f.left && f.right);
             f.left->accept(*this);
             f.right->accept(*this);
             break;
         case formula_operation_t::eq_zero:
+            assert(f.left);
             f.left->accept(*this);
             break;
         case formula_operation_t::conjunction:
         {
+            assert(f.left && f.right);
             f.left->accept(*this);
             f.right->accept(*this);
 
@@ -264,6 +273,7 @@ void VReduceTrivialAndOrNegOperations::visit(NFormula& f)
         }
         case formula_operation_t::disjunction:
         {
+            assert(f.left && f.right);
             f.left->accept(*this);
             f.right->accept(*this);
 
@@ -297,6 +307,7 @@ void VReduceTrivialAndOrNegOperations::visit(NFormula& f)
         }
         case formula_operation_t::negation:
         {
+            assert(f.left);
             f.left->accept(*this);
 
             auto left = static_cast<NFormula*>(f.left);
@@ -330,6 +341,7 @@ void VReduceTrivialAndOrNegOperations::visit(NTerm& t)
             break;
         case term_operation_t::union_:
         {
+            assert(t.left && t.right);
             t.left->accept(*this);
             t.right->accept(*this);
 
@@ -360,6 +372,7 @@ void VReduceTrivialAndOrNegOperations::visit(NTerm& t)
         }
         case term_operation_t::intersaction:
         {
+            assert(t.left && t.right);
             t.left->accept(*this);
             t.right->accept(*this);
 
@@ -390,6 +403,7 @@ void VReduceTrivialAndOrNegOperations::visit(NTerm& t)
         }
         case term_operation_t::complement:
         {
+            assert(t.left);
             t.left->accept(*this);
 
             // -0 -> 1
@@ -424,14 +438,17 @@ void VConvertImplicationEqualityToConjDisj::visit(NFormula& f)
             break;
         case formula_operation_t::conjunction:
         case formula_operation_t::disjunction:
+            assert(f.left && f.right);
             f.left->accept(*this);
             f.right->accept(*this);
             break;
         case formula_operation_t::negation:
+            assert(f.left);
             f.left->accept(*this);
             break;
         case formula_operation_t::implication:
         {
+            assert(f.left && f.right);
             f.left->accept(*this);
             f.right->accept(*this);
 
@@ -444,6 +461,7 @@ void VConvertImplicationEqualityToConjDisj::visit(NFormula& f)
         }
         case formula_operation_t::equality:
         {
+            assert(f.left && f.right);
             f.left->accept(*this);
             f.right->accept(*this);
             // (f <-> g) => ((f & g) | (~f & ~g))
@@ -477,6 +495,7 @@ void VConvertLessEqToEqZero::visit(NFormula& f)
     {
         case formula_operation_t::constant_true:
         case formula_operation_t::constant_false:
+            break;
         case formula_operation_t::less_eq:
         {
             assert(f.left && f.right);
@@ -497,10 +516,12 @@ void VConvertLessEqToEqZero::visit(NFormula& f)
         case formula_operation_t::disjunction:
         case formula_operation_t::implication:
         case formula_operation_t::equality:
+            assert(f.left && f.right);
             f.left->accept(*this);
             f.right->accept(*this);
             break;
         case formula_operation_t::negation:
+            assert(f.left);
             f.left->accept(*this);
             break;
         default:
