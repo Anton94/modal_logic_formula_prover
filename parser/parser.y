@@ -5,6 +5,7 @@
 
 #include "ast.h"
 #include "visitor.h"
+#include "parser.h"
 
 using namespace std;
 
@@ -104,11 +105,10 @@ term
 void set_input_string(const char* in);
 void end_lexical_scan();
 
-int main(int, char**)
+int parse_from_input_string(const char* in)
 {
-    const auto input_formula = "~((C(a, b) & F) & <=m((a * b), (c + d)))";
-    std::cout << "Will try to parce: " << input_formula << std::endl;
-    set_input_string(input_formula);
+    std::cout << "Will try to parce: " << in << std::endl;
+    set_input_string(in);
     int rv = yyparse();
     end_lexical_scan();
 

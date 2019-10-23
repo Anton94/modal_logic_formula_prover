@@ -2,7 +2,7 @@
 #include <cstdio>
 
 #include "ast.h"
-#include "modal_logic_formula.tab.h"
+#include "parser.tab.h"
 %}
 
 %option noyywrap
