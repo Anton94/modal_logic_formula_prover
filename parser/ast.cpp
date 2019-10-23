@@ -8,15 +8,29 @@ NFormula::NFormula(formula_operation_t op, Node* left /*= nullptr*/, Node* right
 {
 }
 
-void NFormula::accept(Visitor& v)
-{
-    v.visit(*this);
-}
-
 NFormula::~NFormula()
 {
     delete left;
     delete right;
+}
+
+NFormula::NFormula(NFormula&& rhs) noexcept
+{
+    move(std::move(rhs));
+}
+
+NFormula& NFormula::operator=(NFormula&& rhs) noexcept
+{
+    if(this != &rhs)
+    {
+        move(std::move(rhs));
+    }
+    return *this;
+}
+
+void NFormula::accept(Visitor& v)
+{
+    v.visit(*this);
 }
 
 auto NFormula::deep_copy() const -> NFormula*
@@ -41,6 +55,19 @@ auto NFormula::deep_copy() const -> NFormula*
     }
 }
 
+void NFormula::move(NFormula &&rhs) noexcept
+{
+    delete left;
+    delete right;
+
+    op = rhs.op;
+    left = rhs.left;
+    right = rhs.right;
+
+    // important, detach the @rhs's childs because otherwise rhs's destructor will destroy them
+    rhs.left = rhs.right = nullptr;
+}
+
 NTerm::NTerm(term_operation_t op, NTerm* left /*= nullptr*/, NTerm* right /*= nullptr*/)
     : op(op)
     , left(left)
@@ -48,15 +75,29 @@ NTerm::NTerm(term_operation_t op, NTerm* left /*= nullptr*/, NTerm* right /*= nu
 {
 }
 
-void NTerm::accept(Visitor& v)
-{
-    v.visit(*this);
-}
-
 NTerm::~NTerm()
 {
     delete left;
     delete right;
+}
+
+NTerm::NTerm(NTerm&& rhs) noexcept
+{
+    move(std::move(rhs));
+}
+
+NTerm& NTerm::operator=(NTerm&& rhs) noexcept
+{
+    if(this != &rhs)
+    {
+        move(std::move(rhs));
+    }
+    return *this;
+}
+
+void NTerm::accept(Visitor& v)
+{
+    v.visit(*this);
 }
 
 auto NTerm::deep_copy() const -> NTerm*
@@ -80,4 +121,18 @@ auto NTerm::deep_copy() const -> NTerm*
         default:
             assert(false && "Unrecognized.");
     }
+}
+
+void NTerm::move(NTerm &&rhs) noexcept
+{
+    delete left;
+    delete right;
+
+    op = rhs.op;
+    left = rhs.left;
+    right = rhs.right;
+    variable = std::move(rhs.variable);
+
+    // important, detach the @rhs's childs because otherwise rhs's destructor will destroy them
+    rhs.left = rhs.right = nullptr;
 }

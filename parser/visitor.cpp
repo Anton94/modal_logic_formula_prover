@@ -166,29 +166,6 @@ void free_childs(T& n)
     free_right_child(n);
 }
 
-// TODO: add move operator= and ctor to the nodes!
-
-// moves right into left
-void move(NFormula& l, NFormula& r)
-{
-    l.op = r.op;
-    l.left = r.left;
-    l.right = r.right;
-    // important, detach the @r's childs because otherwise it the destructor will free them
-    r.left = r.right = nullptr;
-}
-
-// moves right into left
-void move(NTerm& l, NTerm& r)
-{
-    l.op = r.op;
-    l.left = r.left;
-    l.right = r.right;
-    l.variable = std::move(r.variable);
-    // important, detach the @r's childs because otherwise it the destructor will free them
-    r.left = r.right = nullptr;
-}
-
 template<typename T>
 void remove_right_child_and_move_left_child_into_parent(T& p)
 {
@@ -200,7 +177,9 @@ void remove_right_child_and_move_left_child_into_parent(T& p)
     // move @p.left node directly into @p and delete the old left node
     T* old_left = static_cast<T*>(p.left); // T* cast is not very safe because NFormula's childs are of type Node and in theory they might not be NFormulas in future, but for now they are!
 
-    move(p, *old_left);
+    p.left = nullptr; // detach it from the parent in order to not be destroied
+
+    p = std::move(*old_left);
 
     delete old_left;
 }
@@ -216,7 +195,9 @@ void remove_left_child_and_move_right_child_into_parent(T& p)
     // move @p.right node directly into @p and delete the old right node
     T* old_right = static_cast<T*>(p.right); // T* cast is not very safe because NFormula's childs are of type Node and in theory they might not be NFormulas in future, but for now they are!
 
-    move(p, *old_right);
+    p.right = nullptr; // detach it from the parent in order to not be destroied
+
+    p = std::move(*old_right);
 
     delete old_right;
 }
