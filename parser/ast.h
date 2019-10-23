@@ -17,6 +17,8 @@ enum class formula_operation_t
     less_eq,
     measured_less_eq,
 
+    eq_zero,
+
     invalid,
 };
 

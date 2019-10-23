@@ -59,6 +59,9 @@ formula
     | T_MEASURED_LESS_EQ '(' term ',' term ')'  {
         $$ = new NFormula(formula_operation_t::measured_less_eq, $3, $5);
     }
+    | term T_EQ_ZERO {
+        $$ = new NFormula(formula_operation_t::eq_zero, $1);
+    }
     | '(' formula '&' formula ')' {
         $$ = new NFormula(formula_operation_t::conjunction, $2, $4);
     }

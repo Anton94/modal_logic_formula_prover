@@ -391,18 +391,18 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  15
+#define YYFINAL  23
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   86
+#define YYLAST   105
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  23
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  4
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  24
+#define YYNRULES  25
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  65
+#define YYNSTATES  68
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
@@ -450,8 +450,8 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyrline[] =
 {
        0,    42,    42,    47,    50,    53,    56,    59,    62,    65,
-      68,    71,    74,    77,    80,    83,    86,    91,    94,    97,
-     102,   105,   108,   111,   114
+      68,    71,    74,    77,    80,    83,    86,    89,    94,    97,
+     100,   105,   108,   111,   114,   117
 };
 #endif
 
@@ -479,10 +479,10 @@ static const yytype_uint16 yytoknum[] =
 };
 # endif
 
-#define YYPACT_NINF -18
+#define YYPACT_NINF -17
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-18)))
+  (!!((Yystate) == (-17)))
 
 #define YYTABLE_NINF -1
 
@@ -493,13 +493,13 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      35,   -17,    -9,    35,   -18,   -18,    -6,    35,    13,    70,
-       0,     0,   -18,     0,    75,   -18,    35,    35,    35,    35,
-     -18,     0,     0,   -18,   -18,    51,    57,    61,    35,    35,
-      35,    35,    15,    15,     9,   -18,   -18,    62,     0,     0,
-       0,     0,     0,    -5,    -4,    -3,     5,     0,     0,    26,
-     -18,    44,    45,    48,   -18,   -18,   -18,   -18,    29,    22,
-     -18,   -18,   -18,   -18,   -18
+      42,   -17,   -16,   -13,    42,     0,   -17,   -17,    -2,    42,
+     -17,   -17,    19,    89,    80,     0,     0,   -17,     0,   -17,
+       0,    94,    83,   -17,    42,    42,    42,    42,   -17,     0,
+       0,    62,    68,    21,    72,    42,    42,    42,    42,     0,
+       0,    40,    40,     9,   -17,    14,   -17,     0,     0,     0,
+      -3,    41,    12,    16,   -11,    17,    55,    56,    59,   -17,
+     -17,   -17,   -17,   -17,   -17,   -17,   -17,   -17
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -507,25 +507,25 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     0,     0,     0,     3,     4,     0,     0,     0,     2,
-       0,     0,    12,     0,     0,     1,     0,     0,     0,     0,
-      19,     0,     0,    17,    18,     0,     0,     0,     0,     0,
-       0,     0,    14,    16,    11,     9,    24,     0,     0,     0,
-       0,     0,     0,    14,    16,    11,     9,     0,     0,    23,
-      21,     0,     0,     0,    13,    15,    10,     8,    23,    21,
-       6,     7,     5,    22,    20
+       0,    20,     0,     0,     0,     0,     3,     4,     0,     0,
+      18,    19,     0,     2,     0,     0,     0,    13,     0,    25,
+       0,     0,     0,     1,     0,     0,     0,     0,     8,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,    15,    17,    12,    10,    24,    22,     0,     0,     0,
+      15,    17,    12,    10,    24,    22,     0,     0,     0,    14,
+      16,    11,     9,    23,    21,     6,     7,     5
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -18,   -18,    16,   -11
+     -17,   -17,     3,    -5
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     8,     9,    25
+      -1,    12,    13,    14
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -533,57 +533,61 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      26,    10,    27,    20,    18,    18,    19,    19,    19,    11,
-      36,    37,    13,    15,    21,    54,    55,    56,    22,    12,
-      19,    23,    24,    14,    18,    57,    19,    49,    50,    51,
-      52,    53,    32,    33,    34,    35,    58,    59,    39,     1,
-       2,    39,    64,     0,    43,    44,    45,    46,     3,    63,
-       4,     5,     6,     7,    38,    38,    39,    39,    38,     0,
-      39,    38,     0,    39,    60,    61,     0,    38,    62,    39,
-      40,    38,    47,    39,    48,     0,    41,    16,    17,    18,
-      42,    19,    28,    29,    30,     0,    31
+      19,    30,    15,     1,    22,    16,    26,    17,    27,    63,
+      31,    32,    21,    33,     5,    34,    20,    59,    18,    23,
+      27,    10,    11,    27,    45,    46,    30,    41,    42,    43,
+      44,    39,    61,    40,    54,    55,    62,    64,    50,    51,
+      52,    53,    56,    57,    58,     1,     2,     3,     0,    26,
+      26,    27,    27,     0,     0,     4,     5,     6,     7,     8,
+       9,    60,     0,    10,    11,    29,    29,    30,    30,    29,
+       0,    30,    29,     0,    30,    65,    66,     0,    29,    67,
+      30,    47,    29,     0,    30,     0,    28,    48,     0,    28,
+      29,    49,    30,    39,     0,    40,    24,    25,    26,     0,
+      27,    35,    36,    37,     0,    38
 };
 
 static const yytype_int8 yycheck[] =
 {
-      11,    18,    13,     3,     9,     9,    11,    11,    11,    18,
-      21,    22,    18,     0,    14,    20,    20,    20,    18,     3,
-      11,    21,    22,     7,     9,    20,    11,    38,    39,    40,
-      41,    42,    16,    17,    18,    19,    47,    48,    12,     4,
-       5,    12,    20,    -1,    28,    29,    30,    31,    13,    20,
-      15,    16,    17,    18,    10,    10,    12,    12,    10,    -1,
-      12,    10,    -1,    12,    20,    20,    -1,    10,    20,    12,
-      19,    10,    10,    12,    12,    -1,    19,     7,     8,     9,
-      19,    11,     7,     8,     9,    -1,    11
+       5,    12,    18,     3,     9,    18,     9,     4,    11,    20,
+      15,    16,     9,    18,    14,    20,    18,    20,    18,     0,
+      11,    21,    22,    11,    29,    30,    12,    24,    25,    26,
+      27,    10,    20,    12,    39,    40,    20,    20,    35,    36,
+      37,    38,    47,    48,    49,     3,     4,     5,    -1,     9,
+       9,    11,    11,    -1,    -1,    13,    14,    15,    16,    17,
+      18,    20,    -1,    21,    22,    10,    10,    12,    12,    10,
+      -1,    12,    10,    -1,    12,    20,    20,    -1,    10,    20,
+      12,    19,    10,    -1,    12,    -1,     6,    19,    -1,     6,
+      10,    19,    12,    10,    -1,    12,     7,     8,     9,    -1,
+      11,     7,     8,     9,    -1,    11
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     4,     5,    13,    15,    16,    17,    18,    24,    25,
-      18,    18,    25,    18,    25,     0,     7,     8,     9,    11,
-       3,    14,    18,    21,    22,    26,    26,    26,     7,     8,
-       9,    11,    25,    25,    25,    25,    26,    26,    10,    12,
-      19,    19,    19,    25,    25,    25,    25,    10,    12,    26,
-      26,    26,    26,    26,    20,    20,    20,    20,    26,    26,
-      20,    20,    20,    20,    20
+       0,     3,     4,     5,    13,    14,    15,    16,    17,    18,
+      21,    22,    24,    25,    26,    18,    18,    25,    18,    26,
+      18,    25,    26,     0,     7,     8,     9,    11,     6,    10,
+      12,    26,    26,    26,    26,     7,     8,     9,    11,    10,
+      12,    25,    25,    25,    25,    26,    26,    19,    19,    19,
+      25,    25,    25,    25,    26,    26,    26,    26,    26,    20,
+      20,    20,    20,    20,    20,    20,    20,    20
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
        0,    23,    24,    25,    25,    25,    25,    25,    25,    25,
-      25,    25,    25,    25,    25,    25,    25,    26,    26,    26,
-      26,    26,    26,    26,    26
+      25,    25,    25,    25,    25,    25,    25,    25,    26,    26,
+      26,    26,    26,    26,    26,    26
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     1,     1,     1,     6,     6,     6,     5,     3,
-       5,     3,     2,     5,     3,     5,     3,     1,     1,     1,
-       5,     3,     5,     3,     2
+       0,     2,     1,     1,     1,     6,     6,     6,     2,     5,
+       3,     5,     3,     2,     5,     3,     5,     3,     1,     1,
+       1,     5,     3,     5,     3,     2
 };
 
 
@@ -1264,7 +1268,7 @@ yyreduce:
     {
         parsed_formula.reset((yyvsp[0].formula));
     }
-#line 1268 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1272 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 3:
@@ -1272,7 +1276,7 @@ yyreduce:
     {
         (yyval.formula) = new NFormula(formula_operation_t::constant_true);
     }
-#line 1276 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1280 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 4:
@@ -1280,7 +1284,7 @@ yyreduce:
     {
         (yyval.formula) = new NFormula(formula_operation_t::constant_false);
     }
-#line 1284 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1288 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 5:
@@ -1288,7 +1292,7 @@ yyreduce:
     {
         (yyval.formula) = new NFormula(formula_operation_t::contact, (yyvsp[-3].term), (yyvsp[-1].term));
     }
-#line 1292 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1296 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 6:
@@ -1296,7 +1300,7 @@ yyreduce:
     {
         (yyval.formula) = new NFormula(formula_operation_t::less_eq, (yyvsp[-3].term), (yyvsp[-1].term));
     }
-#line 1300 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1304 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 7:
@@ -1304,149 +1308,157 @@ yyreduce:
     {
         (yyval.formula) = new NFormula(formula_operation_t::measured_less_eq, (yyvsp[-3].term), (yyvsp[-1].term));
     }
-#line 1308 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1312 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 8:
 #line 62 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::conjunction, (yyvsp[-3].formula), (yyvsp[-1].formula));
+        (yyval.formula) = new NFormula(formula_operation_t::eq_zero, (yyvsp[-1].term));
     }
-#line 1316 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1320 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 9:
 #line 65 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::conjunction, (yyvsp[-2].formula), (yyvsp[0].formula));
+        (yyval.formula) = new NFormula(formula_operation_t::conjunction, (yyvsp[-3].formula), (yyvsp[-1].formula));
     }
-#line 1324 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1328 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 10:
 #line 68 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::disjunction, (yyvsp[-3].formula), (yyvsp[-1].formula));
+        (yyval.formula) = new NFormula(formula_operation_t::conjunction, (yyvsp[-2].formula), (yyvsp[0].formula));
     }
-#line 1332 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1336 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 11:
 #line 71 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::disjunction, (yyvsp[-2].formula), (yyvsp[0].formula));
+        (yyval.formula) = new NFormula(formula_operation_t::disjunction, (yyvsp[-3].formula), (yyvsp[-1].formula));
     }
-#line 1340 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1344 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 12:
 #line 74 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::negation, (yyvsp[0].formula));
+        (yyval.formula) = new NFormula(formula_operation_t::disjunction, (yyvsp[-2].formula), (yyvsp[0].formula));
     }
-#line 1348 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1352 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 13:
 #line 77 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::implication, (yyvsp[-3].formula), (yyvsp[-1].formula));
+        (yyval.formula) = new NFormula(formula_operation_t::negation, (yyvsp[0].formula));
     }
-#line 1356 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1360 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
 #line 80 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::implication, (yyvsp[-2].formula), (yyvsp[0].formula));
+        (yyval.formula) = new NFormula(formula_operation_t::implication, (yyvsp[-3].formula), (yyvsp[-1].formula));
     }
-#line 1364 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1368 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
 #line 83 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::equality, (yyvsp[-3].formula), (yyvsp[-1].formula));
+        (yyval.formula) = new NFormula(formula_operation_t::implication, (yyvsp[-2].formula), (yyvsp[0].formula));
     }
-#line 1372 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1376 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
 #line 86 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::equality, (yyvsp[-2].formula), (yyvsp[0].formula));
+        (yyval.formula) = new NFormula(formula_operation_t::equality, (yyvsp[-3].formula), (yyvsp[-1].formula));
     }
-#line 1380 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1384 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 91 "parser.y" /* yacc.c:1646  */
+#line 89 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.term) = new NTerm(term_operation_t::constant_true);
+        (yyval.formula) = new NFormula(formula_operation_t::equality, (yyvsp[-2].formula), (yyvsp[0].formula));
     }
-#line 1388 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1392 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
 #line 94 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.term) = new NTerm(term_operation_t::constant_false);
+        (yyval.term) = new NTerm(term_operation_t::constant_true);
     }
-#line 1396 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1400 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
 #line 97 "parser.y" /* yacc.c:1646  */
     {
+        (yyval.term) = new NTerm(term_operation_t::constant_false);
+    }
+#line 1408 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 20:
+#line 100 "parser.y" /* yacc.c:1646  */
+    {
         (yyval.term) = new NTerm(term_operation_t::variable);
         (yyval.term)->variable = (yyvsp[0].sval);
         free((yyvsp[0].sval));
     }
-#line 1406 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 20:
-#line 102 "parser.y" /* yacc.c:1646  */
-    {
-        (yyval.term) = new NTerm(term_operation_t::intersaction, (yyvsp[-3].term), (yyvsp[-1].term));
-    }
-#line 1414 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1418 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 21:
 #line 105 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.term) = new NTerm(term_operation_t::intersaction, (yyvsp[-2].term), (yyvsp[0].term));
+        (yyval.term) = new NTerm(term_operation_t::intersaction, (yyvsp[-3].term), (yyvsp[-1].term));
     }
-#line 1422 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1426 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
 #line 108 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.term) = new NTerm(term_operation_t::union_, (yyvsp[-3].term), (yyvsp[-1].term));
+        (yyval.term) = new NTerm(term_operation_t::intersaction, (yyvsp[-2].term), (yyvsp[0].term));
     }
-#line 1430 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1434 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 23:
 #line 111 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.term) = new NTerm(term_operation_t::union_, (yyvsp[-2].term), (yyvsp[0].term));
+        (yyval.term) = new NTerm(term_operation_t::union_, (yyvsp[-3].term), (yyvsp[-1].term));
     }
-#line 1438 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1442 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 24:
 #line 114 "parser.y" /* yacc.c:1646  */
     {
+        (yyval.term) = new NTerm(term_operation_t::union_, (yyvsp[-2].term), (yyvsp[0].term));
+    }
+#line 1450 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 25:
+#line 117 "parser.y" /* yacc.c:1646  */
+    {
         (yyval.term) = new NTerm(term_operation_t::complement, (yyvsp[0].term));
     }
-#line 1446 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1458 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 1450 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1462 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1674,7 +1686,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 118 "parser.y" /* yacc.c:1906  */
+#line 121 "parser.y" /* yacc.c:1906  */
 
 
 void set_input_string(const char* in);

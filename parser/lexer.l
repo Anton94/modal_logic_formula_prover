@@ -13,6 +13,7 @@
 "<="               {return T_LESS_EQ;}
 "<=m"              {return T_MEASURED_LESS_EQ;}
 "=0"               {return T_EQ_ZERO;}
+"= 0"              {return T_EQ_ZERO;}
 "->"               {return T_FORMULA_OP_IMPLICATION;}
 "<->"              {return T_FORMULA_OP_EQUALITY;}
 [a-zA-Z0-9]+       {yylval.sval = strdup(yytext); return T_STRING;}

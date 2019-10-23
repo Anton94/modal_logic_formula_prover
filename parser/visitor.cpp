@@ -77,6 +77,13 @@ void VPrinter::visit(NFormula& f)
             out_ << ")";
             break;
         }
+        case formula_operation_t::eq_zero:
+        {
+            out_ << "(";
+            f.left->accept(*this);
+            out_ << ")=0";
+            break;
+        }
         case formula_operation_t::contact:
         {
             out_ << "C(";
@@ -218,6 +225,9 @@ void VReduceTrivialAndOrNegOperations::visit(NFormula& f)
         case formula_operation_t::contact: // TODO: reduce also C(a,0)->F ; C(0,a)->F
             f.left->accept(*this);
             f.right->accept(*this);
+            break;
+        case formula_operation_t::eq_zero:
+            f.left->accept(*this);
             break;
         case formula_operation_t::conjunction:
         {
@@ -409,6 +419,7 @@ void VConvertImplicationEqualityToConjDisj::visit(NFormula& f)
         case formula_operation_t::constant_false:
         case formula_operation_t::less_eq:
         case formula_operation_t::measured_less_eq:
+        case formula_operation_t::eq_zero:
         case formula_operation_t::contact:
             break;
         case formula_operation_t::conjunction:
