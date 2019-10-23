@@ -65,3 +65,13 @@ public:
 
     ~VConvertImplicationEqualityToConjDisj() override = default;
 };
+
+class VConvertLessEqToEqZero : public Visitor
+{
+public:
+    /// Converts the <=(a,b) operations to (a * -b) = 0 operations
+    void visit(NFormula& f) override;
+    void visit(NTerm&) override;
+
+    ~VConvertLessEqToEqZero() override = default;
+};

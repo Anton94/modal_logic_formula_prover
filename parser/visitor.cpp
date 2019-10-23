@@ -439,7 +439,7 @@ void VConvertImplicationEqualityToConjDisj::visit(NFormula& f)
             auto* neg_f = new NFormula(formula_operation_t::negation, f.left);
             f.left = neg_f;
             f.op = formula_operation_t::disjunction;
-            // f.right stays as 'g'
+            // f.right stays as is ('g')
             break;
         }
         case formula_operation_t::equality:
@@ -468,5 +468,45 @@ void VConvertImplicationEqualityToConjDisj::visit(NFormula& f)
 }
 
 void VConvertImplicationEqualityToConjDisj::visit(NTerm&)
+{
+}
+
+void VConvertLessEqToEqZero::visit(NFormula& f)
+{
+    switch(f.op)
+    {
+        case formula_operation_t::constant_true:
+        case formula_operation_t::constant_false:
+        case formula_operation_t::less_eq:
+        {
+            //<=(l,r) -> (l * -r) = 0
+            auto neg_r = new NTerm(term_operation_t::complement, static_cast<NTerm*>(f.right));
+            auto union_l_neg_r = new NTerm(term_operation_t::union_, static_cast<NTerm*>(f.left), neg_r);
+
+            f.op = formula_operation_t::eq_zero;
+            f.left = union_l_neg_r;
+            f.right = nullptr;
+            break;
+        }
+        case formula_operation_t::measured_less_eq:
+        case formula_operation_t::eq_zero:
+        case formula_operation_t::contact:
+            break;
+        case formula_operation_t::conjunction:
+        case formula_operation_t::disjunction:
+        case formula_operation_t::implication:
+        case formula_operation_t::equality:
+            f.left->accept(*this);
+            f.right->accept(*this);
+            break;
+        case formula_operation_t::negation:
+            f.left->accept(*this);
+            break;
+        default:
+            assert(false && "Unrecognized.");
+    }
+}
+
+void VConvertLessEqToEqZero::visit(NTerm&)
 {
 }
