@@ -1,6 +1,6 @@
-#line 2 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/lexer.cpp"
+#line 2 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/lexer.cpp"
 
-#line 4 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/lexer.cpp"
+#line 4 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/lexer.cpp"
 
 #define  YY_INT_ALIGNED short int
 
@@ -464,7 +464,7 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "lexer.l"
 #line 2 "lexer.l"
-#include "ast.h"
+#include "../ast.h"
 #include "parser.hpp"
 
 // Custom strdup because the one in cstdio is not standard(when compiling strictly C)
@@ -477,7 +477,7 @@ char* custom_strdup(const char * c, int length)
 
     return dup;
 }
-#line 481 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/lexer.cpp"
+#line 481 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/lexer.cpp"
 
 #define INITIAL 0
 
@@ -697,7 +697,7 @@ YY_DECL
 	{
 #line 20 "lexer.l"
 
-#line 701 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/lexer.cpp"
+#line 701 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/lexer.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -806,7 +806,7 @@ YY_RULE_SETUP
 #line 31 "lexer.l"
 ECHO;
 	YY_BREAK
-#line 810 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/lexer.cpp"
+#line 810 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/lexer.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 

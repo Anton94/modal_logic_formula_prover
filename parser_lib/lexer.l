@@ -1,5 +1,5 @@
 %{
-#include "ast.h"
+#include "../ast.h"
 #include "parser.hpp"
 
 // Custom strdup because the one in cstdio is not standard(when compiling strictly C)

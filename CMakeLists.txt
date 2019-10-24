@@ -18,10 +18,11 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/modules)
 
-add_subdirectory (parser)
+add_subdirectory (parser_lib)
 add_subdirectory (formula_lib)
 add_subdirectory (formula_proover)
 add_subdirectory (rest_server)
 add_subdirectory (tests)
 add_subdirectory (client)
+add_subdirectory (parser)
 

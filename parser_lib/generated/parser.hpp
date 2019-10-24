@@ -30,8 +30,8 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-#ifndef YY_YY_HOME_DEFAULT_WORKSPACE_UNIVERSITY_MODAL_LOGIC_FORMULA_PROVER_PARSER_GENERATED_PARSER_HPP_INCLUDED
-# define YY_YY_HOME_DEFAULT_WORKSPACE_UNIVERSITY_MODAL_LOGIC_FORMULA_PROVER_PARSER_GENERATED_PARSER_HPP_INCLUDED
+#ifndef YY_YY_HOME_DEFAULT_WORKSPACE_UNIVERSITY_MODAL_LOGIC_FORMULA_PROVER_PARSER_LIB_GENERATED_PARSER_HPP_INCLUDED
+# define YY_YY_HOME_DEFAULT_WORKSPACE_UNIVERSITY_MODAL_LOGIC_FORMULA_PROVER_PARSER_LIB_GENERATED_PARSER_HPP_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -65,7 +65,7 @@ union YYSTYPE
     NFormula *formula;
     NTerm *term;
 
-#line 69 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.hpp" /* yacc.c:1909  */
+#line 69 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -78,4 +78,4 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_HOME_DEFAULT_WORKSPACE_UNIVERSITY_MODAL_LOGIC_FORMULA_PROVER_PARSER_GENERATED_PARSER_HPP_INCLUDED  */
+#endif /* !YY_YY_HOME_DEFAULT_WORKSPACE_UNIVERSITY_MODAL_LOGIC_FORMULA_PROVER_PARSER_LIB_GENERATED_PARSER_HPP_INCLUDED  */

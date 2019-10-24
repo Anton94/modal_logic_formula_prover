@@ -67,7 +67,7 @@
 #include <cstdio>
 #include <iostream>
 
-#include "parser_API.h"
+#include "../parser_API.h"
 
 using namespace std;
 
@@ -79,7 +79,7 @@ void yyerror(const char *s);
 
 std::unique_ptr<NFormula> parsed_formula;
 
-#line 83 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:339  */
+#line 83 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -99,8 +99,8 @@ std::unique_ptr<NFormula> parsed_formula;
 
 /* In a future release of Bison, this section will be replaced
    by #include "parser.hpp".  */
-#ifndef YY_YY_HOME_DEFAULT_WORKSPACE_UNIVERSITY_MODAL_LOGIC_FORMULA_PROVER_PARSER_GENERATED_PARSER_HPP_INCLUDED
-# define YY_YY_HOME_DEFAULT_WORKSPACE_UNIVERSITY_MODAL_LOGIC_FORMULA_PROVER_PARSER_GENERATED_PARSER_HPP_INCLUDED
+#ifndef YY_YY_HOME_DEFAULT_WORKSPACE_UNIVERSITY_MODAL_LOGIC_FORMULA_PROVER_PARSER_LIB_GENERATED_PARSER_HPP_INCLUDED
+# define YY_YY_HOME_DEFAULT_WORKSPACE_UNIVERSITY_MODAL_LOGIC_FORMULA_PROVER_PARSER_LIB_GENERATED_PARSER_HPP_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -134,7 +134,7 @@ union YYSTYPE
     NFormula *formula;
     NTerm *term;
 
-#line 138 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:355  */
+#line 138 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -147,11 +147,11 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_HOME_DEFAULT_WORKSPACE_UNIVERSITY_MODAL_LOGIC_FORMULA_PROVER_PARSER_GENERATED_PARSER_HPP_INCLUDED  */
+#endif /* !YY_YY_HOME_DEFAULT_WORKSPACE_UNIVERSITY_MODAL_LOGIC_FORMULA_PROVER_PARSER_LIB_GENERATED_PARSER_HPP_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 
-#line 155 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:358  */
+#line 155 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -1268,7 +1268,7 @@ yyreduce:
     {
         parsed_formula.reset((yyvsp[0].formula));
     }
-#line 1272 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1272 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 3:
@@ -1276,7 +1276,7 @@ yyreduce:
     {
         (yyval.formula) = new NFormula(formula_operation_t::constant_true);
     }
-#line 1280 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1280 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 4:
@@ -1284,7 +1284,7 @@ yyreduce:
     {
         (yyval.formula) = new NFormula(formula_operation_t::constant_false);
     }
-#line 1288 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1288 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 5:
@@ -1292,7 +1292,7 @@ yyreduce:
     {
         (yyval.formula) = new NFormula(formula_operation_t::contact, (yyvsp[-3].term), (yyvsp[-1].term));
     }
-#line 1296 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1296 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 6:
@@ -1300,7 +1300,7 @@ yyreduce:
     {
         (yyval.formula) = new NFormula(formula_operation_t::less_eq, (yyvsp[-3].term), (yyvsp[-1].term));
     }
-#line 1304 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1304 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 7:
@@ -1308,7 +1308,7 @@ yyreduce:
     {
         (yyval.formula) = new NFormula(formula_operation_t::measured_less_eq, (yyvsp[-3].term), (yyvsp[-1].term));
     }
-#line 1312 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1312 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 8:
@@ -1316,7 +1316,7 @@ yyreduce:
     {
         (yyval.formula) = new NFormula(formula_operation_t::eq_zero, (yyvsp[-1].term));
     }
-#line 1320 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1320 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 9:
@@ -1324,7 +1324,7 @@ yyreduce:
     {
         (yyval.formula) = new NFormula(formula_operation_t::conjunction, (yyvsp[-3].formula), (yyvsp[-1].formula));
     }
-#line 1328 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1328 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 10:
@@ -1332,7 +1332,7 @@ yyreduce:
     {
         (yyval.formula) = new NFormula(formula_operation_t::conjunction, (yyvsp[-2].formula), (yyvsp[0].formula));
     }
-#line 1336 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1336 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 11:
@@ -1340,7 +1340,7 @@ yyreduce:
     {
         (yyval.formula) = new NFormula(formula_operation_t::disjunction, (yyvsp[-3].formula), (yyvsp[-1].formula));
     }
-#line 1344 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1344 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 12:
@@ -1348,7 +1348,7 @@ yyreduce:
     {
         (yyval.formula) = new NFormula(formula_operation_t::disjunction, (yyvsp[-2].formula), (yyvsp[0].formula));
     }
-#line 1352 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1352 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 13:
@@ -1356,7 +1356,7 @@ yyreduce:
     {
         (yyval.formula) = new NFormula(formula_operation_t::negation, (yyvsp[0].formula));
     }
-#line 1360 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1360 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
@@ -1364,7 +1364,7 @@ yyreduce:
     {
         (yyval.formula) = new NFormula(formula_operation_t::implication, (yyvsp[-3].formula), (yyvsp[-1].formula));
     }
-#line 1368 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1368 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
@@ -1372,7 +1372,7 @@ yyreduce:
     {
         (yyval.formula) = new NFormula(formula_operation_t::implication, (yyvsp[-2].formula), (yyvsp[0].formula));
     }
-#line 1376 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1376 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
@@ -1380,7 +1380,7 @@ yyreduce:
     {
         (yyval.formula) = new NFormula(formula_operation_t::equality, (yyvsp[-3].formula), (yyvsp[-1].formula));
     }
-#line 1384 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1384 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
@@ -1388,7 +1388,7 @@ yyreduce:
     {
         (yyval.formula) = new NFormula(formula_operation_t::equality, (yyvsp[-2].formula), (yyvsp[0].formula));
     }
-#line 1392 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1392 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
@@ -1396,7 +1396,7 @@ yyreduce:
     {
         (yyval.formula) = (yyvsp[-1].formula);
     }
-#line 1400 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1400 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
@@ -1404,7 +1404,7 @@ yyreduce:
     {
         (yyval.term) = new NTerm(term_operation_t::constant_true);
     }
-#line 1408 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1408 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 20:
@@ -1412,7 +1412,7 @@ yyreduce:
     {
         (yyval.term) = new NTerm(term_operation_t::constant_false);
     }
-#line 1416 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1416 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 21:
@@ -1422,7 +1422,7 @@ yyreduce:
         (yyval.term)->variable = (yyvsp[0].sval);
         free((yyvsp[0].sval));
     }
-#line 1426 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1426 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
@@ -1430,7 +1430,7 @@ yyreduce:
     {
         (yyval.term) = new NTerm(term_operation_t::intersaction, (yyvsp[-3].term), (yyvsp[-1].term));
     }
-#line 1434 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1434 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 23:
@@ -1438,7 +1438,7 @@ yyreduce:
     {
         (yyval.term) = new NTerm(term_operation_t::intersaction, (yyvsp[-2].term), (yyvsp[0].term));
     }
-#line 1442 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1442 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 24:
@@ -1446,7 +1446,7 @@ yyreduce:
     {
         (yyval.term) = new NTerm(term_operation_t::union_, (yyvsp[-3].term), (yyvsp[-1].term));
     }
-#line 1450 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1450 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
@@ -1454,7 +1454,7 @@ yyreduce:
     {
         (yyval.term) = new NTerm(term_operation_t::union_, (yyvsp[-2].term), (yyvsp[0].term));
     }
-#line 1458 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1458 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 26:
@@ -1462,7 +1462,7 @@ yyreduce:
     {
         (yyval.term) = new NTerm(term_operation_t::complement, (yyvsp[0].term));
     }
-#line 1466 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1466 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 27:
@@ -1470,11 +1470,11 @@ yyreduce:
     {
         (yyval.term) = (yyvsp[-1].term);
     }
-#line 1474 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1474 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 1478 "/home/default/workspace/university/modal_logic_formula_prover/parser/generated/parser.cpp" /* yacc.c:1646  */
+#line 1478 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
