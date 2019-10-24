@@ -1,8 +1,17 @@
 %{
-#include <cstdio>
-
 #include "ast.h"
 #include "parser.hpp"
+
+// Custom strdup because the one in cstdio is not standard(when compiling strictly C)
+char* custom_strdup(const char * c, int length)
+{
+    char* dup = (char*)malloc(length + 1);
+
+    if (dup != NULL)
+       strcpy(dup, c);
+
+    return dup;
+}
 %}
 
 %option noyywrap
@@ -17,7 +26,7 @@
 "= 0"              {return T_EQ_ZERO;}
 "->"               {return T_FORMULA_OP_IMPLICATION;}
 "<->"              {return T_FORMULA_OP_EQUALITY;}
-[a-zA-Z0-9]+       {yylval.sval = strdup(yytext); return T_STRING;}
+[a-zA-Z0-9]+       {yylval.sval = custom_strdup(yytext, yyleng); return T_STRING;}
 .                  {return yytext[0];} // bison will trigger an error if it's unrecognized symbol
 %%
 
