@@ -64,6 +64,7 @@ public:
 class VConvertContactsWithConstantTerms : public Visitor
 {
 public:
+    /// NOTE: better use it after the contacts are reduced, via VReduceConstants
     /// C(a,1)-> ~(a=0) C(1,a)-> ~(a=0)
     void visit(NFormula& f) override;
     void visit(NTerm&) override {}
@@ -85,6 +86,7 @@ public:
 class VReduceDoubleNegation : public Visitor
 {
 public:
+    /// NOTE: better use it after all visitors which might add additional negations!
     /// --g -> g
     void visit(NFormula& f) override;
     /// --t -> t
