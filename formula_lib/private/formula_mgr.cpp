@@ -109,6 +109,10 @@ auto formula_mgr::build(const std::string& f) -> bool
     formula_AST->accept(printer);
     info_buff << "\n";
 
+    // TODO: consider making VSplitDisjInLessEqAndContacts and VSplitDisjInLessEqAndContacts combined
+    // because in some intermediate splitting the two terms might match
+    // Nevertheless, this will still be not 100% sufficient because the order of spliting might take a big role and
+    // skip some pontential matches. For not just convert them after the splitting.
     VConvertLessEqContactWithEqualTerms convertor_lessEq_contact_with_equal_terms;
     formula_AST->accept(convertor_lessEq_contact_with_equal_terms);
     info_buff << "Converted C(a,a);<=(a,a)  : ";
@@ -119,6 +123,11 @@ auto formula_mgr::build(const std::string& f) -> bool
     formula_AST->accept(disj_in_contact_splitter);
     info_buff << "C(a+b,c)->C(a,c)|C(b,c) ;\n";
     info_buff << "<=(a+b,c)-><=(a,c)&<=(b,c): ";
+    formula_AST->accept(printer);
+    info_buff << "\n";
+
+    formula_AST->accept(convertor_lessEq_contact_with_equal_terms);
+    info_buff << "Converted C(a,a);<=(a,a)  : ";
     formula_AST->accept(printer);
     info_buff << "\n";
 
