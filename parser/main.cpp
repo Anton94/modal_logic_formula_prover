@@ -16,8 +16,9 @@ int main(int, char**)
     input_formula = "F | <=(f + g + -x, -h) ";
     input_formula = "~(C(a,0) | a * m + b + -h= 0) | (<=m(mmax,m) | <=(m1,Cm))";
     input_formula = "<=(a + b, c) | C(a + b, c) & C(a, b + c) & C(a + b + c, e + f + g)";
+    input_formula = "<=(a + b, c) | <=(a + b + c * -h, e + f * g)";
 
-    std::cout << "Will try to parce        : " << input_formula << std::endl;
+    std::cout << "Will try to parce         : " << input_formula << std::endl;
     const auto formula_ast = parse_from_input_string(input_formula);
 
     if(!formula_ast)
@@ -25,34 +26,41 @@ int main(int, char**)
         return -1;
     }
 
-    std::cout << "Parsed formula           : ";
+    std::cout << "Parsed formula            : ";
     VPrinter printer(std::cout);
     formula_ast->accept(printer);
     std::cout << std::endl;
 
     VConvertImplicationEqualityToConjDisj convertor;
     formula_ast->accept(convertor);
-    std::cout << "Converted (-> <->)formula: ";
+    std::cout << "Converted (-> <->)formula : ";
     formula_ast->accept(printer);
     std::cout << std::endl;
 
-    VSplitDisjInContacts disj_in_contact_splitter;
+    VSplitDisjInLessEqAndContacts disj_in_contact_splitter;
     formula_ast->accept(disj_in_contact_splitter);
-    std::cout << "C(a+b,c)->C(a,c)|C(b,c)  : ";
+    std::cout << "C(a+b,c)->C(a,c)|C(b,c) ;\n";
+    std::cout << "<=(a+b,c)-><=(a,c)&<=(b,c): ";
     formula_ast->accept(printer);
     std::cout << std::endl;
 
     VConvertLessEqToEqZero eq_zero_convertor;
     formula_ast->accept(eq_zero_convertor);
-    std::cout << "Converted (<= =0) formula: ";
+    std::cout << "Converted (<= =0) formula : ";
     formula_ast->accept(printer);
     std::cout << std::endl;
 
     VReduceTrivialAndOrNegOperations reducer;
     formula_ast->accept(reducer);
-    std::cout << "Reduced formula          : ";
+    std::cout << "Reduced formula           : ";
     formula_ast->accept(printer);
     std::cout << std::endl;
 
+    // TODO: add visitor(s) for:
+    //      <=(a,a) -> T (a * -a = 0)
+    //      C(a,a) -> ~(a=0)
+    //      C(a,0)->F ; C(0,a)->F
+    //      0=0 -> T
+    //      1=0 -> F
     return 0;
 }

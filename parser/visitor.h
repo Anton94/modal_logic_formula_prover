@@ -61,7 +61,7 @@ public:
     /// E.g. (f -> g)  => (~f | g)
     ///      (f <-> g) => ((f & g) | (~f & ~g))
     void visit(NFormula& f) override;
-    void visit(NTerm&) override;
+    void visit(NTerm&) override {}
 
     ~VConvertImplicationEqualityToConjDisj() override = default;
 };
@@ -71,17 +71,17 @@ class VConvertLessEqToEqZero : public Visitor
 public:
     /// Converts the <=(a,b) operations to (a * -b) = 0 operations
     void visit(NFormula& f) override;
-    void visit(NTerm&) override;
+    void visit(NTerm&) override {}
 
     ~VConvertLessEqToEqZero() override = default;
 };
 
-class VSplitDisjInContacts : public Visitor
+class VSplitDisjInLessEqAndContacts : public Visitor
 {
 public:
     /// Splits the C(a + b, c) to C(a,c) | C(b,c)
     void visit(NFormula& f) override;
-    void visit(NTerm&) override;
+    void visit(NTerm&) override {}
 
-    ~VSplitDisjInContacts() override = default;
+    ~VSplitDisjInLessEqAndContacts() override = default;
 };

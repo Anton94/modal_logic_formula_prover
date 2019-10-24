@@ -228,7 +228,7 @@ void VReduceTrivialAndOrNegOperations::visit(NFormula& f)
         case formula_operation_t::measured_less_eq:
         case formula_operation_t::implication:
         case formula_operation_t::equality:
-        case formula_operation_t::contact: // TODO: reduce also C(a,0)->F ; C(0,a)->F
+        case formula_operation_t::contact:
             assert(f.left && f.right);
             f.left->accept(*this);
             f.right->accept(*this);
@@ -485,10 +485,6 @@ void VConvertImplicationEqualityToConjDisj::visit(NFormula& f)
     }
 }
 
-void VConvertImplicationEqualityToConjDisj::visit(NTerm&)
-{
-}
-
 void VConvertLessEqToEqZero::visit(NFormula& f)
 {
     switch(f.op)
@@ -529,20 +525,43 @@ void VConvertLessEqToEqZero::visit(NFormula& f)
     }
 }
 
-void VConvertLessEqToEqZero::visit(NTerm&)
-{
-}
-
-void VSplitDisjInContacts::visit(NFormula& f)
+void VSplitDisjInLessEqAndContacts::visit(NFormula& f)
 {
     switch(f.op)
     {
         case formula_operation_t::constant_true:
         case formula_operation_t::constant_false:
-        case formula_operation_t::less_eq:
         case formula_operation_t::measured_less_eq:
         case formula_operation_t::eq_zero:
             break;
+        case formula_operation_t::less_eq:
+        {
+            assert(f.left && f.right);
+            auto left = static_cast<NTerm*>(f.left);
+            auto right = static_cast<NTerm*>(f.right);
+
+            // <=(a + b, c) -> <=(a,c) & <=(b,c)
+            if(left->op == term_operation_t::union_)
+            {
+                auto a = left->left;
+                auto b = left->right;
+                auto c = right;
+                left->left = left->right = nullptr;
+                delete left; // deletes only the disjunction node of (a + b)
+
+                auto new_less_eq_left = new NFormula(formula_operation_t::less_eq, a, c->deep_copy());
+                auto new_less_eq_right = new NFormula(formula_operation_t::less_eq, b, c);
+
+                f.op = formula_operation_t::conjunction;
+                f.left = new_less_eq_left;
+                f.right = new_less_eq_right;
+
+                f.left->accept(*this);
+                f.right->accept(*this);
+            }
+
+            break;
+        }
         case formula_operation_t::contact:
         {
             assert(f.left && f.right);
@@ -605,8 +624,4 @@ void VSplitDisjInContacts::visit(NFormula& f)
         default:
             assert(false && "Unrecognized.");
     }
-}
-
-void VSplitDisjInContacts::visit(NTerm&)
-{
 }
