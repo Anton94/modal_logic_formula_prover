@@ -75,11 +75,11 @@ public:
         constant_false,
 
         union_,
-        intersaction_,
-        star_,
-        variable_,
+        intersaction,
+        complement,
+        variable,
 
-        invalid_,
+        invalid,
     };
     using operation_t = operation_type;
 

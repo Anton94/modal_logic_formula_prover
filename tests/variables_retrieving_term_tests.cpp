@@ -131,7 +131,7 @@ TEST_CASE("complex term's variables", "[variables_check_term]")
     check_term_varibles_mask(*t_r, formula_mgr, { "e", "f", "g" });
 
     // (-a + b) * (c + -d)
-    CHECK(t_l->get_operation_type() == term::operation_t::intersaction_);
+    CHECK(t_l->get_operation_type() == term::operation_t::intersaction);
     auto t_l_l = t_l->get_left_child(); // -a + b
     auto t_l_r = t_l->get_right_child(); // c + -d
     check_term_varibles_mask(*t_l_l, formula_mgr, { "a", "b"});
@@ -142,37 +142,37 @@ TEST_CASE("complex term's variables", "[variables_check_term]")
     auto t_l_l_l = t_l_l->get_left_child(); // -a
     auto t_l_l_r = t_l_l->get_right_child(); // b
     check_term_varibles_mask(*t_l_l_l, formula_mgr, { "a" });
-    CHECK(t_l_l_r->get_operation_type() == term::operation_t::variable_);
+    CHECK(t_l_l_r->get_operation_type() == term::operation_t::variable);
     check_term_varibles_mask(*t_l_l_r, formula_mgr, { "b" });
 
-    CHECK(t_l_l_l->get_operation_type() == term::operation_t::star_);
+    CHECK(t_l_l_l->get_operation_type() == term::operation_t::complement);
     auto t_l_l_l_l = t_l_l_l->get_left_child(); // a
-    CHECK(t_l_l_l_l->get_operation_type() == term::operation_t::variable_);
+    CHECK(t_l_l_l_l->get_operation_type() == term::operation_t::variable);
     check_term_varibles_mask(*t_l_l_l_l, formula_mgr, { "a" });
 
     // c + -d
     CHECK(t_l_r->get_operation_type() == term::operation_t::union_);
     auto t_l_r_l = t_l_r->get_left_child(); // c
     auto t_l_r_r = t_l_r->get_right_child(); // -d
-    CHECK(t_l_r_l->get_operation_type() == term::operation_t::variable_);
+    CHECK(t_l_r_l->get_operation_type() == term::operation_t::variable);
     check_term_varibles_mask(*t_l_r_l, formula_mgr, { "c" });
     check_term_varibles_mask(*t_l_r_r, formula_mgr, { "d" });
 
-    CHECK(t_l_r_r->get_operation_type() == term::operation_t::star_);
+    CHECK(t_l_r_r->get_operation_type() == term::operation_t::complement);
     auto t_l_r_r_l = t_l_r_r->get_left_child(); // d
-    CHECK(t_l_r_r_l->get_operation_type() == term::operation_t::variable_);
+    CHECK(t_l_r_r_l->get_operation_type() == term::operation_t::variable);
     check_term_varibles_mask(*t_l_r_r_l, formula_mgr, { "d" });
 
     // Done with (-a + b) * (c + -d)
     // -(e * (f + g))
-    CHECK(t_r->get_operation_type() == term::operation_t::star_);
+    CHECK(t_r->get_operation_type() == term::operation_t::complement);
     auto t_r_l = t_r->get_left_child(); // e * (f + g)
     check_term_varibles_mask(*t_r_l, formula_mgr, { "e", "f", "g" });
 
-    CHECK(t_r_l->get_operation_type() == term::operation_t::intersaction_);
+    CHECK(t_r_l->get_operation_type() == term::operation_t::intersaction);
     auto t_r_l_l = t_r_l->get_left_child(); // e
     auto t_r_l_r = t_r_l->get_right_child(); // f + g
-    CHECK(t_r_l_l->get_operation_type() == term::operation_t::variable_);
+    CHECK(t_r_l_l->get_operation_type() == term::operation_t::variable);
     check_term_varibles_mask(*t_r_l_l, formula_mgr, { "e" });
     check_term_varibles_mask(*t_r_l_r, formula_mgr, { "f", "g" });
 
@@ -180,9 +180,9 @@ TEST_CASE("complex term's variables", "[variables_check_term]")
     CHECK(t_r_l_r->get_operation_type() == term::operation_t::union_);
     auto t_r_l_r_l = t_r_l_r->get_left_child(); // f
     auto t_r_l_r_r = t_r_l_r->get_right_child(); // g
-    CHECK(t_r_l_r_l->get_operation_type() == term::operation_t::variable_);
+    CHECK(t_r_l_r_l->get_operation_type() == term::operation_t::variable);
     check_term_varibles_mask(*t_r_l_r_l, formula_mgr, { "f" });
-    CHECK(t_r_l_r_r->get_operation_type() == term::operation_t::variable_);
+    CHECK(t_r_l_r_r->get_operation_type() == term::operation_t::variable);
     check_term_varibles_mask(*t_r_l_r_r, formula_mgr, { "g"});
 }
 
@@ -211,7 +211,7 @@ TEST_CASE("variables of term containing a variable", "[variables_check_term]")
     auto formula_mgr = create_atomic_formula_with_same_child_terms(term_json);
     auto term = formula_mgr.get_internal_formula()->get_left_child_term();
 
-    CHECK(term->get_operation_type() == term::operation_t::variable_);
+    CHECK(term->get_operation_type() == term::operation_t::variable);
     check_term_varibles_mask(*term, formula_mgr, { "a" });
 }
 
@@ -229,10 +229,10 @@ TEST_CASE("variables of term containing unary star operation of variable", "[var
     auto formula_mgr = create_atomic_formula_with_same_child_terms(term_json);
     auto term = formula_mgr.get_internal_formula()->get_left_child_term();
 
-    CHECK(term->get_operation_type() == term::operation_t::star_);
+    CHECK(term->get_operation_type() == term::operation_t::complement);
     check_term_varibles_mask(*term, formula_mgr, { "a" });
 
     auto t_l = term->get_left_child(); // a
-    CHECK(t_l->get_operation_type() == term::operation_t::variable_);
+    CHECK(t_l->get_operation_type() == term::operation_t::variable);
     check_term_varibles_mask(*t_l, formula_mgr, { "a" });
 }

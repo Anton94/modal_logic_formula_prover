@@ -6,7 +6,7 @@
 #include <cassert>
 
 term::term(formula_mgr* mgr)
-    : op_(operation_t::invalid_)
+    : op_(operation_t::invalid)
     , formula_mgr_(mgr)
     , childs_{nullptr, nullptr}
     , hash_(0ul)
@@ -36,7 +36,7 @@ term::~term()
 
 auto term::operator==(const term& rhs) const -> bool
 {
-    assert(op_ != operation_t::invalid_);
+    assert(op_ != operation_t::invalid);
     if(hash_ != rhs.hash_ || op_ != rhs.op_)
     {
         return false;
@@ -47,13 +47,13 @@ auto term::operator==(const term& rhs) const -> bool
         return true;
     }
 
-    if(op_ == operation_t::variable_)
+    if(op_ == operation_t::variable)
     {
         return variable_id_ == rhs.variable_id_;
     }
 
     assert(childs_.left && rhs.childs_.left);
-    if(op_ == operation_t::star_)
+    if(op_ == operation_t::complement)
     {
         return *childs_.left == *rhs.childs_.left;
     }
@@ -87,7 +87,7 @@ auto term::build(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> 
             is_constructed = construct_binary_operation(t, operation_t::union_, variable_to_id);
             break;
         case term_operation_t::intersaction:
-            is_constructed = construct_binary_operation(t, operation_t::intersaction_, variable_to_id);
+            is_constructed = construct_binary_operation(t, operation_t::intersaction, variable_to_id);
             break;
         case term_operation_t::complement:
             is_constructed = construct_complement_operation(t, variable_to_id);
@@ -137,7 +137,7 @@ auto term::build(json& t) -> bool
     }
     else if(op == "variable_id")
     {
-        op_ = operation_t::variable_;
+        op_ = operation_t::variable;
 
         auto& value_field = t["value"];
         if(!value_field.is_number_unsigned())
@@ -148,7 +148,7 @@ auto term::build(json& t) -> bool
     }
     else if(op == "Tand")
     {
-        if(!construct_binary_operation(t, operation_t::intersaction_))
+        if(!construct_binary_operation(t, operation_t::intersaction))
         {
             return false;
         }
@@ -162,7 +162,7 @@ auto term::build(json& t) -> bool
     }
     else if(op == "Tstar")
     {
-        op_ = operation_t::star_;
+        op_ = operation_t::complement;
 
         childs_.left = new(std::nothrow) term(formula_mgr_);
         assert(childs_.left);
@@ -200,14 +200,14 @@ auto term::evaluate(const variable_id_to_points_t& variable_evaluations, const s
             assert(childs_.left && childs_.right);
             return childs_.left->evaluate(variable_evaluations, elements_count) |
                    childs_.right->evaluate(variable_evaluations, elements_count);
-        case operation_t::intersaction_:
+        case operation_t::intersaction:
             assert(childs_.left && childs_.right);
             return childs_.left->evaluate(variable_evaluations, elements_count) &
                    childs_.right->evaluate(variable_evaluations, elements_count);
-        case operation_t::star_:
+        case operation_t::complement:
             assert(childs_.left);
             return ~childs_.left->evaluate(variable_evaluations, elements_count);
-        case operation_t::variable_:
+        case operation_t::variable:
             assert(variable_id_ < variable_evaluations.size());
             return variable_evaluations[variable_id_]; // returns the evaluation for the variable
         default:
@@ -263,7 +263,7 @@ auto term::evaluate(const variables_evaluations_block& evaluation_block, bool sk
                 create_internal_node(op_, skip_subterm_creation, res_left.release(), res_right.release());
             return {res_type::term, t};
         }
-        case operation_t::intersaction_:
+        case operation_t::intersaction:
         {
             auto res_left = childs_.left->evaluate(evaluation_block, skip_subterm_creation);
             if(res_left.is_constant_false())
@@ -300,7 +300,7 @@ auto term::evaluate(const variables_evaluations_block& evaluation_block, bool sk
                 create_internal_node(op_, skip_subterm_creation, res_left.release(), res_right.release());
             return {res_type::term, t};
         }
-        case operation_t::star_:
+        case operation_t::complement:
         {
             auto res_child = childs_.left->evaluate(evaluation_block, skip_subterm_creation);
             if(res_child.is_constant())
@@ -315,7 +315,7 @@ auto term::evaluate(const variables_evaluations_block& evaluation_block, bool sk
             auto t = create_internal_node(op_, skip_subterm_creation, res_child.release());
             return {res_type::term, t};
         }
-        case operation_t::variable_:
+        case operation_t::variable:
         {
             const auto& block_variables = evaluation_block.get_variables();
             assert(variable_id_ < block_variables.size());
@@ -339,7 +339,7 @@ auto term::evaluate(const variables_evaluations_block& evaluation_block, bool sk
 void term::clear()
 {
     free();
-    op_ = operation_t::invalid_;
+    op_ = operation_t::invalid;
     childs_ = {nullptr, nullptr};
     hash_ = 0;
 }
@@ -356,7 +356,7 @@ auto term::get_hash() const -> std::size_t
 
 auto term::get_variable() const -> std::string
 {
-    assert(op_ == operation_t::variable_);
+    assert(op_ == operation_t::variable);
     return formula_mgr_->get_variable(variable_id_);
 }
 
@@ -377,7 +377,7 @@ auto term::get_right_child() const -> const term*
 
 auto term::is_binary_operaton() const -> bool
 {
-    return op_ == operation_t::union_ || op_ == operation_t::intersaction_;
+    return op_ == operation_t::union_ || op_ == operation_t::intersaction;
 }
 
 auto term::is_constant() const -> bool
@@ -393,11 +393,11 @@ void term::change_formula_mgr(formula_mgr* new_mgr)
     switch(get_operation_type())
     {
         case operation_t::union_:
-        case operation_t::intersaction_:
+        case operation_t::intersaction:
             childs_.left->change_formula_mgr(new_mgr);
             childs_.right->change_formula_mgr(new_mgr);
             break;
-        case operation_t::star_:
+        case operation_t::complement:
             childs_.left->change_formula_mgr(new_mgr);
             break;
         default:
@@ -418,16 +418,16 @@ std::ostream& operator<<(std::ostream& out, const term& t)
         case term::operation_t::union_:
             out << "(" << *t.get_left_child() << " + " << *t.get_right_child() << ")";
             break;
-        case term::operation_t::intersaction_:
+        case term::operation_t::intersaction:
             out << "(" << *t.get_left_child() << " * " << *t.get_right_child() << ")";
             break;
-        case term::operation_t::star_:
+        case term::operation_t::complement:
             out << "-" << *t.get_left_child();
             break;
-        case term::operation_t::variable_:
+        case term::operation_t::variable:
             out << t.get_variable();
             break;
-        case term::operation_t::invalid_:
+        case term::operation_t::invalid:
             out << "UNDEFINED";
             break;
         default:
@@ -462,11 +462,11 @@ void term::move(term&& rhs) noexcept
     formula_mgr_ = rhs.formula_mgr_;
     variables_ = std::move(rhs.variables_);
 
-    if(is_binary_operaton() || op_ == operation_t::star_)
+    if(is_binary_operaton() || op_ == operation_t::complement)
     {
         childs_ = rhs.childs_;
     }
-    else if(op_ == operation_t::variable_)
+    else if(op_ == operation_t::variable)
     {
         variable_id_ = rhs.variable_id_;
     }
@@ -474,12 +474,12 @@ void term::move(term&& rhs) noexcept
     hash_ = rhs.hash_;
 
     // invalidate the rhs in order to not touch/deletes the moved resources, e.g. the childs
-    rhs.op_ = operation_t::invalid_;
+    rhs.op_ = operation_t::invalid;
 }
 
 auto term::construct_complement_operation(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> bool
 {
-    op_ = operation_t::star_;
+    op_ = operation_t::complement;
 
     childs_.left = new(std::nothrow) term(formula_mgr_);
     assert(childs_.left);
@@ -490,7 +490,7 @@ auto term::construct_complement_operation(const NTerm& t, const variable_to_id_m
 
 auto term::construct_variable_operation(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> bool
 {
-    op_ = operation_t::variable_;
+    op_ = operation_t::variable;
     auto it = variable_to_id.find(t.variable);
     if(it == variable_to_id.end())
     {
@@ -552,14 +552,14 @@ void term::construct_hash()
         case operation_t::constant_false:
             break;
         case operation_t::union_:
-        case operation_t::intersaction_:
+        case operation_t::intersaction:
             hash_ = ((childs_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
                     ((childs_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
             break;
-        case operation_t::star_:
+        case operation_t::complement:
             hash_ = (childs_.left->get_hash() & 0xFFFFFFFF) * 2654435761;
             break;
-        case operation_t::variable_:
+        case operation_t::variable:
             hash_ = (variable_id_ & 0xFFFFFFFF) * 2654435761;
             break;
         default:
@@ -580,13 +580,13 @@ void term::construct_variables()
             variables_.resize(formula_mgr_->get_variables().size());
             break;
         case operation_t::union_:
-        case operation_t::intersaction_:
+        case operation_t::intersaction:
             variables_ = childs_.left->variables_ | childs_.right->variables_;
             break;
-        case operation_t::star_:
+        case operation_t::complement:
             variables_ = childs_.left->variables_;
             break;
-        case operation_t::variable_:
+        case operation_t::variable:
         {
             const auto all_variables_count = formula_mgr_->get_variables().size();
             assert(variable_id_ < all_variables_count);
@@ -602,7 +602,7 @@ void term::construct_variables()
 auto term::create_internal_node(operation_t op, bool skip_subterm_creation, term* left, term* right) const
     -> term*
 {
-    assert(op == operation_t::star_ || op == operation_t::union_ || op == operation_t::intersaction_);
+    assert(op == operation_t::complement || op == operation_t::union_ || op == operation_t::intersaction);
 
     if(skip_subterm_creation)
     {
@@ -631,7 +631,7 @@ auto term::create_variable_node(size_t variable_id, bool skip_subterm_creation) 
     auto t = new(std::nothrow) term(formula_mgr_);
     assert(t);
 
-    t->op_ = operation_t::variable_;
+    t->op_ = operation_t::variable;
     t->variable_id_ = variable_id;
     t->construct_hash();
     t->construct_variables();
@@ -641,7 +641,7 @@ auto term::create_variable_node(size_t variable_id, bool skip_subterm_creation) 
 
 void term::free()
 {
-    if(op_ != operation_t::variable_ && !is_constant())
+    if(op_ != operation_t::variable && !is_constant())
     {
         delete childs_.left;
         delete childs_.right;
