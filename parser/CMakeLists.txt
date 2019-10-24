@@ -33,9 +33,18 @@ else()
     endif()
 endif()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+# Create a static library in order to be used from other projects
+message("Creating parser_lib")
 
-add_executable(parser main.cpp visitor.cpp ast.cpp parser_API.h visitor.h ast.h ${generated_parser_cpp} ${generated_parser_hpp} ${generated_lexer_cpp})
+set(PARSER_LIB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(PARSER_LIB_INCLUDE_DIR ${PARSER_LIB_INCLUDE_DIR} PARENT_SCOPE)
+
+set(LIB_SRCS visitor.cpp ast.cpp parser_API.h visitor.h ast.h ${generated_parser_cpp} ${generated_parser_hpp} ${generated_lexer_cpp})
+add_library(parser_lib STATIC ${LIB_SRCS})
+
+include_directories(${PARSER_LIB_INCLUDE_DIR})
+add_executable(parser main.cpp )
+target_link_libraries(parser parser_lib)
 
 #list(APPEND ECM_ENABLE_SANITIZERS "thread")
 #list(APPEND ECM_ENABLE_SANITIZERS "memory") # memory is not allowed with address
