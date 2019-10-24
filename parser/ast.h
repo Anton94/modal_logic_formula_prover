@@ -58,6 +58,9 @@ public:
     NFormula(const NFormula&) = delete;
     NFormula& operator=(const NFormula&) = delete;
 
+    auto operator==(const NFormula& rhs) const -> bool;
+    auto operator!=(const NFormula& rhs) const -> bool;
+
     void accept(Visitor& v) override;
 
     auto deep_copy() const -> NFormula* override;
@@ -80,6 +83,9 @@ public:
     NTerm& operator=(NTerm&&) noexcept;
     NTerm(const NTerm&) = delete;
     NTerm& operator=(const NTerm&) = delete;
+
+    auto operator==(const NTerm& rhs) const -> bool;
+    auto operator!=(const NTerm& rhs) const -> bool;
 
     void accept(Visitor& v) override;
 
