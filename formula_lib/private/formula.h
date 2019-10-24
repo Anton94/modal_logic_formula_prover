@@ -8,6 +8,7 @@
 
 class term;
 class formula_mgr;
+class NFormula;
 
 class formula
 {
@@ -23,6 +24,8 @@ public:
 
     auto operator==(const formula& rhs) const -> bool;
     auto operator!=(const formula& rhs) const -> bool;
+
+    auto build(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool;
 
     auto build(json& f) -> bool;
 
@@ -79,6 +82,13 @@ public:
 
 private:
     void move(formula&& rhs) noexcept;
+
+    auto construct_eq_zero_atomic_formula(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool;
+    auto construct_measured_less_eq_atomic_formula(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool;
+    auto construct_contact_atomic_formula(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool;
+    auto construct_binary_formula(const NFormula& f, operation_t op, const variable_to_id_map_t& variable_to_id) -> bool;
+    auto construct_binary_atomic_formula(const NFormula& f, operation_t op, const variable_to_id_map_t& variable_to_id) -> bool;
+    auto construct_negation_formula(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool;
 
     auto construct_eq_zero_atomic_formula(json&) -> bool;
     auto construct_measured_less_eq_atomic_formula(json&) -> bool;

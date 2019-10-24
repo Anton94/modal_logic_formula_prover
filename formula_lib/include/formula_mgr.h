@@ -24,6 +24,8 @@ public:
     formula_mgr(formula_mgr&& rhs) noexcept;
     formula_mgr& operator=(formula_mgr&& rhs) noexcept;
 
+    auto build(const std::string& f) -> bool;
+
     auto build(json& f) -> bool;
 
     // Bruteforce algorithm without the knowledge of relations
@@ -57,7 +59,6 @@ private:
 
     auto change_variables_to_variable_ids(json& f) const -> bool;
 
-    using variable_to_id_map_t = std::unordered_map<std::string, variable_id_t>;
     variable_to_id_map_t variable_to_id_;
 
     variables_t variables_;

@@ -7,6 +7,7 @@
 #include <unordered_set>
 
 class formula_mgr;
+class NTerm;
 
 class term
 {
@@ -22,6 +23,8 @@ public:
 
     auto operator==(const term& rhs) const -> bool;
     auto operator!=(const term& rhs) const -> bool;
+
+    auto build(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> bool;
 
     auto build(json& t) -> bool;
 
@@ -100,6 +103,9 @@ public:
 private:
     void move(term&& rhs) noexcept;
 
+    auto construct_complement_operation(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> bool;
+    auto construct_variable_operation(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> bool;
+    auto construct_binary_operation(const NTerm& t, operation_t op, const variable_to_id_map_t& variable_to_id) -> bool;
     auto construct_binary_operation(json& t, operation_t op) -> bool;
 
     // calculates and sets the hash depending on the @op_ and the child hashes (if any)

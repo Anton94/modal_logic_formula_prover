@@ -5,6 +5,7 @@
 #include <vector>
 
 using variable_id_t = size_t;
+using variable_to_id_map_t = std::unordered_map<std::string, variable_id_t>;
 
 // a bit mask - set bit at position X indicates that the variable with id X participates in the container
 using variables_mask_t = boost::dynamic_bitset<>;

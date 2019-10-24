@@ -1,4 +1,5 @@
 #include "term.h"
+#include "ast.h"
 #include "formula_mgr.h"
 #include "logger.h"
 
@@ -64,6 +65,50 @@ auto term::operator==(const term& rhs) const -> bool
 auto term::operator!=(const term& rhs) const -> bool
 {
     return !operator==(rhs);
+}
+
+auto term::build(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> bool
+{
+    clear();
+
+    auto is_constructed = true;
+    switch(t.op)
+    {
+        case term_operation_t::constant_true:
+            op_ = operation_t::constant_true;
+            break;
+        case term_operation_t::constant_false:
+            op_ = operation_t::constant_false;
+            break;
+        case term_operation_t::variable:
+            is_constructed = construct_variable_operation(t, variable_to_id);
+            break;
+        case term_operation_t::union_:
+            is_constructed = construct_binary_operation(t, operation_t::union_, variable_to_id);
+            break;
+        case term_operation_t::intersaction:
+            is_constructed = construct_binary_operation(t, operation_t::intersaction_, variable_to_id);
+            break;
+        case term_operation_t::complement:
+            is_constructed = construct_complement_operation(t, variable_to_id);
+            break;
+        default:
+            assert(false && "Unrecognized.");
+            is_constructed = false;
+    }
+
+    assert(is_constructed);
+    if(!is_constructed)
+    {
+        return false;
+    }
+
+    construct_hash();
+    construct_variables();
+
+    verbose() << "[Building] " << *this << " <" << hash_ << ">";
+
+    return true;
 }
 
 auto term::build(json& t) -> bool
@@ -430,6 +475,47 @@ void term::move(term&& rhs) noexcept
 
     // invalidate the rhs in order to not touch/deletes the moved resources, e.g. the childs
     rhs.op_ = operation_t::invalid_;
+}
+
+auto term::construct_complement_operation(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> bool
+{
+    op_ = operation_t::star_;
+
+    childs_.left = new(std::nothrow) term(formula_mgr_);
+    assert(childs_.left);
+
+    assert(t.left);
+    return childs_.left->build(*t.left, variable_to_id);
+}
+
+auto term::construct_variable_operation(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> bool
+{
+    op_ = operation_t::variable_;
+    auto it = variable_to_id.find(t.variable);
+    if(it == variable_to_id.end())
+    {
+        error() << "Unable to find the variable " << t.variable << " in the set of all variables";
+        assert(false);
+        return false;
+    }
+
+    variable_id_ = it->second;
+    return true;
+}
+
+auto term::construct_binary_operation(const NTerm& t, operation_t op, const variable_to_id_map_t& variable_to_id) -> bool
+{
+    op_ = op;
+    assert(is_binary_operaton());
+
+    // allocate the new term childs
+    childs_.left = new(std::nothrow) term(formula_mgr_);
+    childs_.right = new(std::nothrow) term(formula_mgr_);
+    assert(childs_.left && childs_.right);
+
+    // recursive construction of the child terms
+    assert(t.left && t.right);
+    return childs_.left->build(*t.left, variable_to_id) && childs_.right->build(*t.right, variable_to_id);
 }
 
 auto term::construct_binary_operation(json& t, operation_t op) -> bool

@@ -1,6 +1,7 @@
 #include "formula.h"
 #include "logger.h"
 #include "term.h"
+#include "ast.h"
 
 #include <cassert>
 
@@ -77,6 +78,62 @@ auto formula::operator==(const formula& rhs) const -> bool
 auto formula::operator!=(const formula& rhs) const -> bool
 {
     return !operator==(rhs);
+}
+
+auto formula::build(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool
+{
+    clear();
+
+    auto is_constructed = true;
+    switch(f.op)
+    {
+        case formula_operation_t::constant_true:
+            op_ = operation_t::constant_true;
+            break;
+        case formula_operation_t::constant_false:
+            op_ = operation_t::constant_false;
+            break;
+        case formula_operation_t::conjunction:
+            is_constructed = construct_binary_formula(f, operation_t::conjunction, variable_to_id);
+            break;
+        case formula_operation_t::disjunction:
+            is_constructed = construct_binary_formula(f, operation_t::disjunction, variable_to_id);
+            break;
+        case formula_operation_t::negation:
+            is_constructed = construct_negation_formula(f, variable_to_id);
+            break;
+        case formula_operation_t::measured_less_eq:
+            is_constructed = construct_measured_less_eq_atomic_formula(f, variable_to_id);
+            break;
+        case formula_operation_t::contact:
+            is_constructed = construct_contact_atomic_formula(f, variable_to_id);
+            break;
+        case formula_operation_t::eq_zero:
+            is_constructed = construct_eq_zero_atomic_formula(f, variable_to_id);
+            break;
+        case formula_operation_t::implication:
+        case formula_operation_t::equality:
+        case formula_operation_t::less_eq:
+            assert(false && "The AST's formula should not have implication, equality or less_eq operations. Convert them!");
+            is_constructed = false;
+        default:
+            assert(false && "Unrecognized.");
+            is_constructed = false;
+    }
+
+    assert(is_constructed);
+    if(!is_constructed)
+    {
+        return false;
+    }
+
+    // add also the operation to the hash
+    const auto op_code = static_cast<unsigned>(op_) + 1;
+    hash_ += (op_code & 0xFFFFFFFF) * 2654435723;
+
+    verbose() << "[Building] " << *this << " <" << hash_ << ">";
+
+    return true;
 }
 
 auto formula::build(json& f) -> bool
@@ -492,6 +549,100 @@ void formula::move(formula&& rhs) noexcept
 
     // invalidate the rhs in order to not touch/deletes the moved resources, e.g. the childs
     rhs.op_ = operation_t::invalid;
+}
+
+auto formula::construct_eq_zero_atomic_formula(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool
+{
+    op_ = operation_t::eq_zero;
+
+    child_t_.left = new(std::nothrow) term(formula_mgr_);
+    assert(child_t_.left);
+
+    if(!child_t_.left->build(*static_cast<const NTerm*>(f.left), variable_to_id))
+    {
+        return false;
+    }
+
+    // add child's hashes
+    hash_ = ((child_t_.left->get_hash() & 0xFFFFFFFF) * 2654435761);
+
+    return true;
+}
+
+auto formula::construct_contact_atomic_formula(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool
+{
+    op_ = operation_t::c;
+
+    child_t_.left = new(std::nothrow) term(formula_mgr_);
+    child_t_.right = new(std::nothrow) term(formula_mgr_);
+    assert(child_t_.left && child_t_.right);
+
+    // recursive construction of the child terms
+    if(!child_t_.left->build(*static_cast<const NTerm*>(f.left), variable_to_id) || !child_t_.right->build(*static_cast<const NTerm*>(f.right), variable_to_id))
+    {
+        return false;
+    }
+
+    // add child's hashes and multiply be the same factor because the operation is commutative
+    hash_ = ((child_t_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
+            ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435761);
+    return true;
+}
+
+auto formula::construct_measured_less_eq_atomic_formula(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool
+{
+    op_ = operation_t::measured_less_eq;
+
+    child_t_.left = new(std::nothrow) term(formula_mgr_);
+    child_t_.right = new(std::nothrow) term(formula_mgr_);
+    assert(child_t_.left && child_t_.right);
+
+    // recursive construction of the child terms
+    if(!child_t_.left->build(*static_cast<const NTerm*>(f.left), variable_to_id) || !child_t_.right->build(*static_cast<const NTerm*>(f.right), variable_to_id))
+    {
+        return false;
+    }
+
+    hash_ = ((child_t_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
+            ((child_t_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
+    return true;
+}
+
+auto formula::construct_negation_formula(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool
+{
+    op_ = operation_t::negation;
+
+    child_f_.left = new(std::nothrow) formula(formula_mgr_);
+    assert(child_f_.left);
+
+    if(!child_f_.left->build(*static_cast<const NFormula*>(f.left), variable_to_id))
+    {
+        return false;
+    }
+
+    hash_ = (child_f_.left->get_hash() & 0xFFFFFFFF) * 2654435761;
+    return true;
+}
+
+auto formula::construct_binary_formula(const NFormula& f, operation_t op, const variable_to_id_map_t& variable_to_id) -> bool
+{
+    op_ = op;
+    assert(op_ == operation_t::conjunction || op_ == operation_t::disjunction);
+
+    child_f_.left = new(std::nothrow) formula(formula_mgr_);
+    child_f_.right = new(std::nothrow) formula(formula_mgr_);
+    assert(child_f_.left && child_f_.right);
+
+    // recursive construction of the child formulas
+    if(!child_f_.left->build(*static_cast<const NFormula*>(f.left), variable_to_id) || !child_f_.right->build(*static_cast<const NFormula*>(f.right), variable_to_id))
+    {
+        return false;
+    }
+
+    // add child's hashes
+    hash_ = ((child_f_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
+            ((child_f_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
+    return true;
 }
 
 auto formula::construct_eq_zero_atomic_formula(json& f) -> bool

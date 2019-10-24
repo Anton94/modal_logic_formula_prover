@@ -1,6 +1,8 @@
 #include "formula_mgr.h"
 #include "logger.h"
 #include "utils.h"
+#include "parser_API.h"
+#include "visitor.h"
 
 namespace
 {
@@ -79,6 +81,87 @@ formula_mgr& formula_mgr::operator=(formula_mgr&& rhs) noexcept
         move(std::move(rhs));
     }
     return *this;
+}
+
+auto formula_mgr::build(const std::string& f) -> bool
+{
+    clear();
+
+    info() << "Start building a formula: " << f;
+
+    auto formula_AST = parse_from_input_string(f.c_str());
+    if(!formula_AST)
+    {
+        error() << "Unable to parse the input formula";
+        return false;
+    }
+
+    // TODO: more detailed logs
+    std::stringstream info_buff;
+    info_buff << "Parsed formula: ";
+    VPrinter printer(info_buff);
+    formula_AST->accept(printer);
+    info_buff << "\n";
+
+    VConvertImplicationEqualityToConjDisj convertor;
+    formula_AST->accept(convertor);
+    info_buff << "Converted (-> <->)        : ";
+    formula_AST->accept(printer);
+    info_buff << "\n";
+
+    VConvertLessEqContactWithEqualTerms convertor_lessEq_contact_with_equal_terms;
+    formula_AST->accept(convertor_lessEq_contact_with_equal_terms);
+    info_buff << "Converted C(a,a);<=(a,a)  : ";
+    formula_AST->accept(printer);
+    info_buff << "\n";
+
+    VSplitDisjInLessEqAndContacts disj_in_contact_splitter;
+    formula_AST->accept(disj_in_contact_splitter);
+    info_buff << "C(a+b,c)->C(a,c)|C(b,c) ;\n";
+    info_buff << "<=(a+b,c)-><=(a,c)&<=(b,c): ";
+    formula_AST->accept(printer);
+    info_buff << "\n";
+
+    VConvertLessEqToEqZero eq_zero_convertor;
+    formula_AST->accept(eq_zero_convertor);
+    info_buff << "Converted (<= =0) formula : ";
+    formula_AST->accept(printer);
+    info_buff << "\n";
+
+    VReduceConstants trivial_reducer;
+    formula_AST->accept(trivial_reducer);
+    info_buff << "Reduced constants         : ";
+    formula_AST->accept(printer);
+    info_buff << "\n";
+
+    VConvertContactsWithConstantTerms contacts_with_constant_as_term_convertor;
+    formula_AST->accept(contacts_with_constant_as_term_convertor);
+    info_buff << "Converted C(a,1)->~(a=0)  : ";
+    formula_AST->accept(printer);
+    info_buff << "\n";
+
+    VReduceDoubleNegation double_negation_reducer;
+    formula_AST->accept(double_negation_reducer);
+    info_buff << "Reduced double negation   : ";
+    formula_AST->accept(printer);
+    info_buff << "\n";
+
+    info() << info_buff.str();
+
+    // Will cash all variables and when building the formula tree we will use their ids instead of the heavy strings
+    VVariablesGetter::variables_set_t variables;
+    VVariablesGetter variables_getter(variables);
+    formula_AST->accept(variables_getter);
+
+    variables_.reserve(variables.size());
+    variable_to_id_.reserve(variables.size());
+    for(const auto& variable : variables)
+    {
+        variable_to_id_[variable] = variables_.size();
+        variables_.emplace_back(variable);
+    }
+
+    return f_.build(*formula_AST, variable_to_id_);
 }
 
 auto formula_mgr::build(json& f) -> bool
