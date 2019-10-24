@@ -33,7 +33,7 @@ public:
     enum class inequality_operation
     {
         LE, // less or equal
-        G, // grater
+        G, // greater
     };
 
     /*
