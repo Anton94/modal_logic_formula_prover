@@ -12,13 +12,16 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <functional>
 
 class formula_mgr
 {
     using json = nlohmann::json;
 
 public:
-    formula_mgr();
+	using termination_callback = std::function<bool()>;
+
+	formula_mgr(const termination_callback& c = {});
     formula_mgr(const formula_mgr&) = delete;
     formula_mgr& operator=(const formula_mgr&) = delete;
     formula_mgr(formula_mgr&& rhs) noexcept;
@@ -54,6 +57,9 @@ public:
     auto print(std::ostream& out, const variables_evaluations_block& block) const -> std::ostream&;
     auto print(std::ostream& out, const variables_mask_t& variables_mask) const -> std::ostream&;
 
+	// throws an exception. TODO: make custom exception, etc...
+	void terminate_if_need() const;
+
 private:
     void move(formula_mgr&& rhs) noexcept;
 
@@ -64,6 +70,8 @@ private:
     variables_t variables_;
     formula f_;
     tableau t_;
+
+	termination_callback is_terminated_;
 };
 
 std::ostream& operator<<(std::ostream& out, const formula_mgr& formulas);

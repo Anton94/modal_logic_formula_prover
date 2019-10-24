@@ -83,6 +83,12 @@ auto model::generate_next_point_evaluation(const term* t, variables_evaluations_
 {
     while(out_evaluation.generate_next_evaluation())
     {
+		mgr_->terminate_if_need();
+		//if (mgr_->is_terminated())
+		//{
+		//	info() << "The process was terminated in model's generation of point evaluation.";
+		//}
+
         // TODO the generation can be done smarter, e.g. when the evaluation of 't' is false, generate new
         // variable evaluations just for the varaibles in @t.
         if(does_point_evaluation_satisfies_basic_rules(t, out_evaluation, contacts_F, zero_terms_T))

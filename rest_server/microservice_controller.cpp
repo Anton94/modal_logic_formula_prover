@@ -112,6 +112,76 @@ void microservice_controller::handle_post(http_request message)
 
     std::string message_path = utility::conversions::to_utf8string(message.absolute_uri().path());
 
+	if (boost::starts_with(message_path, "/cancel"))
+	{
+		message.content_ready().then([=](web::http::http_request request) {
+			request.extract_string(true)
+				.then([=](string_t res) {
+				const auto f_str = utility::conversions::to_utf8string(web::uri().decode(res));
+				cts_.cancel();
+				message.reply(status_codes::OK, " cancel").then([](pplx::task<void> t) { handle_error(t); });
+			})
+				.then([=](pplx::task<void> t) {
+				try
+				{
+					t.get();
+				}
+				catch (...)
+				{
+					// opening the file (open_istream) failed.
+					// Reply with an error.
+					message.reply(status_codes::InternalError).then([](pplx::task<void> t) {
+						handle_error(t);
+					});
+				}
+			});
+		});
+		return;
+	}
+
+	if (boost::starts_with(message_path, "/task"))
+	{
+		message.content_ready().then([=](web::http::http_request request) {
+			auto token = cts_.get_token();
+			request.extract_string(true)
+				.then([=](string_t res) {
+				const auto f_str = utility::conversions::to_utf8string(web::uri().decode(res));
+				auto is_terminated = [&]() {
+					// TODO: mutex?
+					return token.is_canceled();
+				};
+
+				basic_bruteforce_model bbm;
+				//bool isNativeSatisfied = mgr.brute_force_evaluate_with_points_count(bbm);
+				model m;
+				try {
+					formula_mgr mgr(is_terminated);
+					mgr.build("C(a+c,b+t) & C(c+z,b+v) & C(a+l,b+k) & C(q+g,n+e) & C(a,m) & C(d,e)");
+					const auto is_satisfiable = mgr.is_satisfiable(bbm);
+				}
+				catch (const char* e) {
+					info() << "Canceled " << e;
+				}
+			}, token)
+				.then([=](pplx::task<void> t) {
+				try
+				{
+					t.get();
+				}
+				catch (...)
+				{
+					// opening the file (open_istream) failed.
+					// Reply with an error.
+					message.reply(status_codes::InternalError).then([](pplx::task<void> t) {
+						handle_error(t);
+					});
+				}
+			});
+		});
+		message.reply(status_codes::OK, " task").then([](pplx::task<void> t) { handle_error(t); });
+		return;
+	}
+
     if(boost::starts_with(message_path, "/satisfy"))
     {
         message.content_ready().then([=](web::http::http_request request) {

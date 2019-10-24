@@ -17,6 +17,7 @@ auto tableau::is_satisfiable(const formula& f, imodel& out_model) -> bool
     add_formula_to_T(&f);
 
     mgr_ = f.get_mgr();
+	assert(mgr_);
 
     model_ = &out_model;
     if(satisfiable_step())
@@ -47,6 +48,12 @@ void tableau::clear()
 
 auto tableau::satisfiable_step() -> bool
 {
+	mgr_->terminate_if_need();
+	//if (mgr_->is_terminated())
+	//{
+	//	info() << "The process was terminated in tableau's satisfiability step";
+	//}
+
     using op_t = formula::operation_t;
 
     trace() << "Making an algorithm step:";

@@ -63,8 +63,9 @@ auto get_all_variables(const json& f, variables_set_t& variables) -> bool
 }
 }
 
-formula_mgr::formula_mgr()
+formula_mgr::formula_mgr(const termination_callback& c)
     : f_(this)
+	, is_terminated_(c)
 {
 }
 
@@ -339,6 +340,17 @@ auto formula_mgr::change_variables_to_variable_ids(json& f) const -> bool
                "objects:\n"
             << f.dump(4);
     return false;
+}
+
+void formula_mgr::terminate_if_need() const
+{
+	if (is_terminated_)
+	{
+		if (is_terminated_())
+		{
+			throw "The process was terminated";
+		}
+	}
 }
 
 void formula_mgr::move(formula_mgr&& rhs) noexcept

@@ -70,6 +70,13 @@ void connected_model::construct_all_valid_unique_points(const formulas_t& contac
 
     do
     {
+		mgr_->terminate_if_need();
+		
+		//if (mgr_->is_terminated())
+		//{
+		//	info() << "The process was terminated in connected model's construction of all unique points.";
+		//}
+
         if(are_zero_terms_T_satisfied(zero_terms_T, evaluation) &&
            is_contacts_F_rule_satisfied_only_reflexivity(contacts_F, evaluation))
         {
@@ -124,6 +131,11 @@ auto connected_model::is_zero_terms_F_rule_satisfied(const terms_t& zero_terms_F
 {
     for(const auto& z : zero_terms_F)
     {
+		mgr_->terminate_if_need();
+		//if (mgr_->is_terminated())
+		//{
+		//	info() << "The process was terminated in connected model's checking of non-zero terms if they are satisfied.";
+		//}
         if(z->evaluate(variable_evaluations_, points_.size()).none())
         {
             return false;
@@ -153,6 +165,11 @@ auto connected_model::is_contacts_T_rule_satisfied(const formulas_t& contacts_T)
     // C(a,b)
     for(const auto& c : contacts_T)
     {
+		mgr_->terminate_if_need();
+		//if (mgr_->is_terminated())
+		//{
+		//	info() << "The process was terminated in connected model's checking if all T contacts are satisfied.";
+		//}
         if(!is_contact_satisfied(c))
         {
             return false;
@@ -206,6 +223,11 @@ auto connected_model::build_contact_relations_matrix(const formulas_t& contacts_
     // ~C(a,b)
     for(const auto& c : contacts_F)
     {
+		mgr_->terminate_if_need();
+		//if (mgr_->is_terminated())
+		//{
+		//	info() << "The process was terminated in connected model's building of contact relations matrix.";
+		//}
         const auto v_a = c->get_left_child_term()->evaluate(variable_evaluations_, points_.size());
         const auto v_b = c->get_right_child_term()->evaluate(variable_evaluations_, points_.size());
 
@@ -235,6 +257,12 @@ auto connected_model::get_connected_components() const -> std::vector<model_poin
     size_t root_point_id = not_visited_points.find_first();
     while(root_point_id != model_points_set_t::npos)
     {
+		mgr_->terminate_if_need();
+		//if (mgr_->is_terminated())
+		//{
+		//	info() << "The process was terminated in connected model's getting of connected components.";
+		//}
+
         auto connected_component = get_connected_component(root_point_id, not_visited_points);
         connected_components.push_back(std::move(connected_component));
 
@@ -255,13 +283,18 @@ auto connected_model::get_connected_component(size_t root_point_id, model_points
 
     while(!q.empty())
     {
+		mgr_->terminate_if_need();
+		//if (mgr_->is_terminated())
+		//{
+		//	info() << "The process was terminated in connected model's getting of connected component.";
+		//}
+
         const auto point_id = q.front();
         q.pop();
         if(!not_visited_points.test(point_id)) // while the point waits in the queue some other point could also push it and
         {
             continue;
         }
-
 
         const auto& point_connections = contact_relations_[point_id];
         auto connected_point_id = point_connections.find_first();

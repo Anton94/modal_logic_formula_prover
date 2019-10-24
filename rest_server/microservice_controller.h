@@ -40,5 +40,6 @@ private:
 
     http_listener m_listener;
 
+	pplx::cancellation_token_source cts_;
     std::string CLIENT_DIR = "../client/dist";
 };
