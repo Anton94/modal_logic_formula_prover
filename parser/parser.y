@@ -33,6 +33,7 @@ std::unique_ptr<NFormula> parsed_formula;
 %left '|' '+'
 %left '&' '*'
 %right '~' '-'
+%nonassoc '(' ')'
 
 %type <formula> formula
 %type <term> term
@@ -89,6 +90,9 @@ formula
     | formula T_FORMULA_OP_EQUALITY formula {
         $$ = new NFormula(formula_operation_t::equality, $1, $3);
     }
+    | '(' formula ')' {
+        $$ = $2;
+    }
   ;
 term
     : '1' {
@@ -116,6 +120,9 @@ term
     }
     | '-' term {
         $$ = new NTerm(term_operation_t::complement, $2);
+    }
+    | '(' term ')' {
+        $$ = $2;
     }
   ;
 %%

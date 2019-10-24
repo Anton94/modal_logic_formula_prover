@@ -14,6 +14,7 @@ int main(int, char**)
     input_formula = "((F -> C(0,0)) | C(x,x)) & (C(a,b) -> C(b,a)) & (<=(a * c, b * d + f) <-> C(j + -k, k + o * v))";
     input_formula = "C(a,b) | a * b + G * g = 0";
     input_formula = "F | <=(f + g + -x, -h) ";
+    input_formula = "~(C(a,0) | a * m + b + -h= 0) | (<=m(mmax,m) | <=(m1,Cm))";
 
     std::cout << "Will try to parce        : " << input_formula << std::endl;
     const auto formula_ast = parse_from_input_string(input_formula);
