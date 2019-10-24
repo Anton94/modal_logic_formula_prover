@@ -179,9 +179,9 @@ auto NTerm::operator==(const NTerm& rhs) const -> bool
             return op == rhs.op && variable == rhs.variable;
         case term_operation_t::union_:
         case term_operation_t::intersaction:
-            return op == rhs.op && *left == *rhs.left;
-        case term_operation_t::complement:
             return op == rhs.op && *left == *rhs.left && *right == *rhs.right;
+        case term_operation_t::complement:
+            return op == rhs.op && *left == *rhs.left;
         default:
             assert(false && "Unrecognized.");
             return false;
