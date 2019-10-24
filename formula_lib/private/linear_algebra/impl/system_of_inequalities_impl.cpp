@@ -1,19 +1,6 @@
 #include "system_of_inequalities_impl.h"
 
-namespace
-{
-auto get_kiwi_operation(system_of_inequalities_impl::inequality_operation op) -> kiwi::RelationalOperator
-{
-    switch(op)
-    {
-        case system_of_inequalities_impl::inequality_operation::LE:
-            return kiwi::RelationalOperator::OP_LE;
-        default:
-            assert(false);
-            return kiwi::RelationalOperator::OP_LE;
-    }
-}
-}
+#include <limits>
 
 system_of_inequalities_impl::system_of_inequalities_impl(size_t number_of_variables)
     : number_of_variables_(number_of_variables)
@@ -50,7 +37,23 @@ auto system_of_inequalities_impl::add_constraint(const variables_set& lhs, const
 
     kiwi::Expression lhs_expr = construct_expression(lhs_without_common_variables);
     kiwi::Expression rhs_expr = construct_expression(rhs_without_common_variables);
-    kiwi::Constraint constraint(lhs_expr - rhs_expr, get_kiwi_operation(op));
+
+    assert(op == inequality_operation::G || op == inequality_operation::LE);
+
+    auto row_expression = [](const kiwi::Expression& lhs_expr, const kiwi::Expression& rhs_expr, inequality_operation op) -> kiwi::Expression
+    {
+        switch(op)
+        {
+            case inequality_operation::LE:
+                return lhs_expr - rhs_expr;
+            case inequality_operation::G: // X > Y   ->   0 > Y - X   ->   0 >= Y - X + epsilon   ->   Y - X + epsilon <= 0
+                return rhs_expr - lhs_expr + std::numeric_limits<double>::epsilon();
+        }
+    };
+    kiwi::Expression constraint_expr = row_expression(lhs_expr, rhs_expr, op);
+
+    kiwi::Constraint constraint(constraint_expr, kiwi::OP_LE);
+
     try
     {
         solver_.addConstraint(constraint);

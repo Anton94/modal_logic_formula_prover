@@ -22,7 +22,7 @@ class system_of_inequalities
      *    a rhs bitset(again, of size @number_of_variables) for the set J.
      *    (1 at position 'n' in the bitset means that the n-th variable is in this bitset and will be summed)
      *
-     *  TODO: add at least '>' operation
+     * Note that the operation in each row can be <= or >.
      */
 public:
     system_of_inequalities(size_t number_of_variables);
@@ -32,7 +32,8 @@ public:
 
     enum class inequality_operation
     {
-        LE,
+        LE, // less or equal
+        G, // grater
     };
 
     /*
