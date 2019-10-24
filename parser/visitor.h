@@ -27,7 +27,7 @@ private:
     std::ostream& out_;
 };
 
-class VReduceTrivialAndOrNegOperations : public Visitor
+class VReduceConstants : public Visitor
 {
 public:
     /// Removes all unnecessary childs of And/Or/Negation operations of the following type:
@@ -40,6 +40,13 @@ public:
     /// (g & F) -> F      (g | F) -> g
     /// (F & g) -> F      (F | g) -> g
     ///
+    /// 0=0 -> T          1=0 -> F
+    ///
+    /// <=(0,a) -> T      <=(a,1) -> T
+    ///
+    /// C(0,0) -> F       C(1,1) -> T
+    /// C(a,0) -> F       C(0,a) -> F
+    ///
     /// (terms):
     ///      -1 -> 0            -0 -> 1
     /// (1 * 1) -> 1       (0 + 0) -> 0
@@ -51,7 +58,39 @@ public:
     void visit(NFormula& f) override;
     void visit(NTerm& t) override;
 
-    ~VReduceTrivialAndOrNegOperations() override = default;
+    ~VReduceConstants() override = default;
+};
+
+class VConvertContactsWithConstantTerms : public Visitor
+{
+public:
+    /// C(a,1)-> ~(a=0) C(1,a)-> ~(a=0)
+    void visit(NFormula& f) override;
+    void visit(NTerm&) override {}
+
+    ~VConvertContactsWithConstantTerms() override = default;
+};
+
+class VConvertLessEqContactWithEqualTerms : public Visitor
+{
+public:
+    /// <=(a,a) -> T because (a * -a = 0)
+    /// C(a,a) -> ~(a=0)
+    void visit(NFormula& f) override;
+    void visit(NTerm&) override {}
+
+    ~VConvertLessEqContactWithEqualTerms() override = default;
+};
+
+class VReduceDoubleNegation : public Visitor
+{
+public:
+    /// --g -> g
+    void visit(NFormula& f) override;
+    /// --t -> t
+    void visit(NTerm& t) override;
+
+    ~VReduceDoubleNegation() override = default;
 };
 
 class VConvertImplicationEqualityToConjDisj : public Visitor

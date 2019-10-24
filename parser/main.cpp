@@ -17,6 +17,8 @@ int main(int, char**)
     input_formula = "~(C(a,0) | a * m + b + -h= 0) | (<=m(mmax,m) | <=(m1,Cm))";
     input_formula = "<=(a + b, c) | C(a + b, c) & C(a, b + c) & C(a + b + c, e + f + g)";
     input_formula = "<=(a + b, c) | <=(a + b + c * -h, e + f * g)";
+    input_formula = "C(a+b,1) & C(1,e+g * -h) & C(a+b,0)";
+    input_formula = "<=(a,0 *(e+f))";
 
     std::cout << "Will try to parce         : " << input_formula << std::endl;
     const auto formula_ast = parse_from_input_string(input_formula);
@@ -33,7 +35,13 @@ int main(int, char**)
 
     VConvertImplicationEqualityToConjDisj convertor;
     formula_ast->accept(convertor);
-    std::cout << "Converted (-> <->)formula : ";
+    std::cout << "Converted (-> <->)        : ";
+    formula_ast->accept(printer);
+    std::cout << std::endl;
+
+    VConvertLessEqContactWithEqualTerms convertor_lessEq_contact_with_equal_terms;
+    formula_ast->accept(convertor_lessEq_contact_with_equal_terms);
+    std::cout << "Converted C(a,a);<=(a,a)  : ";
     formula_ast->accept(printer);
     std::cout << std::endl;
 
@@ -50,17 +58,23 @@ int main(int, char**)
     formula_ast->accept(printer);
     std::cout << std::endl;
 
-    VReduceTrivialAndOrNegOperations reducer;
-    formula_ast->accept(reducer);
-    std::cout << "Reduced formula           : ";
+    VReduceConstants trivial_reducer;
+    formula_ast->accept(trivial_reducer);
+    std::cout << "Reduced constants         : ";
     formula_ast->accept(printer);
     std::cout << std::endl;
 
-    // TODO: add visitor(s) for:
-    //      <=(a,a) -> T (a * -a = 0)
-    //      C(a,a) -> ~(a=0)
-    //      C(a,0)->F ; C(0,a)->F
-    //      0=0 -> T
-    //      1=0 -> F
+    VConvertContactsWithConstantTerms contacts_with_constant_as_term_convertor;
+    formula_ast->accept(contacts_with_constant_as_term_convertor);
+    std::cout << "Converted C(a,1)->~(a=0)  : ";
+    formula_ast->accept(printer);
+    std::cout << std::endl;
+
+    VReduceDoubleNegation double_negation_reducer;
+    formula_ast->accept(double_negation_reducer);
+    std::cout << "Reduced double negation   : ";
+    formula_ast->accept(printer);
+    std::cout << std::endl;
+
     return 0;
 }

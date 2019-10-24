@@ -217,7 +217,7 @@ void remove_left_child_and_move_right_child_into_parent(T& p)
 
 }
 
-void VReduceTrivialAndOrNegOperations::visit(NFormula& f)
+void VReduceConstants::visit(NFormula& f)
 {
     switch(f.op)
     {
@@ -225,18 +225,82 @@ void VReduceTrivialAndOrNegOperations::visit(NFormula& f)
         case formula_operation_t::constant_false:
             break;
         case formula_operation_t::less_eq:
+        {
+            assert(f.left);
+            f.left->accept(*this);
+            f.right->accept(*this);
+
+            auto left = static_cast<NTerm*>(f.left);
+            auto right = static_cast<NTerm*>(f.right);
+
+            // <=(0,a) -> T ;  <=(a,1) -> T
+            if(left->op == term_operation_t::constant_false || right->op == term_operation_t::constant_true)
+            {
+                free_childs(f);
+                f.op = formula_operation_t::constant_true;
+            }
+            break;
+        }
         case formula_operation_t::measured_less_eq:
         case formula_operation_t::implication:
         case formula_operation_t::equality:
-        case formula_operation_t::contact:
+        {
             assert(f.left && f.right);
             f.left->accept(*this);
             f.right->accept(*this);
             break;
+        }
+        case formula_operation_t::contact:
+        {
+            assert(f.left && f.right);
+            f.left->accept(*this);
+            f.right->accept(*this);
+
+            auto left = static_cast<NTerm*>(f.left);
+            auto right = static_cast<NTerm*>(f.right);
+
+            // C(0,0) -> F
+            if(left->op == term_operation_t::constant_false && right->op == term_operation_t::constant_false)
+            {
+                free_childs(f);
+                f.op = formula_operation_t::constant_false;
+            }
+            // C(1,1) -> T
+            else if(left->op == term_operation_t::constant_true && right->op == term_operation_t::constant_true)
+            {
+                free_childs(f);
+                f.op = formula_operation_t::constant_true;
+            }
+            // C(a,0)->F ; C(0,a)->F
+            else if(left->op == term_operation_t::constant_false || right->op == term_operation_t::constant_false)
+            {
+                free_childs(f);
+                f.op = formula_operation_t::constant_false;
+            }
+            break;
+        }
         case formula_operation_t::eq_zero:
+        {
             assert(f.left);
             f.left->accept(*this);
+
+            auto left = static_cast<NTerm*>(f.left);
+
+            // 0 =0 -> T
+            if(left->op == term_operation_t::constant_false)
+            {
+                free_left_child(f);
+                f.op = formula_operation_t::constant_true;
+            }
+            // 1 =0 -> F
+            else if(left->op == term_operation_t::constant_true)
+            {
+                free_left_child(f);
+                f.op = formula_operation_t::constant_false;
+            }
+
             break;
+        }
         case formula_operation_t::conjunction:
         {
             assert(f.left && f.right);
@@ -331,7 +395,70 @@ void VReduceTrivialAndOrNegOperations::visit(NFormula& f)
     }
 }
 
-void VReduceTrivialAndOrNegOperations::visit(NTerm& t)
+void VConvertContactsWithConstantTerms::visit(NFormula& f)
+{
+    switch(f.op)
+    {
+        case formula_operation_t::constant_true:
+        case formula_operation_t::constant_false:
+            break;
+        case formula_operation_t::contact:
+        {
+            assert(f.left && f.right);
+            auto left = static_cast<NTerm*>(f.left);
+            auto right = static_cast<NTerm*>(f.right);
+
+            // C(a,1)-> ~(a=0)
+            if(right->op == term_operation_t::constant_true)
+            {
+                free_right_child(f);
+                auto eq_zero_formula = new NFormula(formula_operation_t::eq_zero, left);
+
+                f.op = formula_operation_t::negation;
+                f.left = eq_zero_formula;
+
+                f.accept(*this); // we have changed f's type so we might have to make some additional reduces on it
+            }
+            // C(1,a)-> ~(a=0)
+            else if(left->op == term_operation_t::constant_true)
+            {
+                free_left_child(f);
+                auto eq_zero_formula = new NFormula(formula_operation_t::eq_zero, right);
+                f.right = nullptr;
+
+                f.op = formula_operation_t::negation;
+                f.left = eq_zero_formula;
+
+                f.accept(*this); // we have changed f's type so we might have to make some additional reduces on it
+            }
+            break;
+        }
+        case formula_operation_t::less_eq:
+        case formula_operation_t::measured_less_eq:
+        case formula_operation_t::eq_zero:
+            break;
+        case formula_operation_t::conjunction:
+        case formula_operation_t::disjunction:
+        case formula_operation_t::implication:
+        case formula_operation_t::equality:
+        {
+            assert(f.left && f.right);
+            f.left->accept(*this);
+            f.right->accept(*this);
+            break;
+        }
+        case formula_operation_t::negation:
+        {
+            assert(f.left);
+            f.left->accept(*this);
+            break;
+        }
+        default:
+            assert(false && "Unrecognized.");
+    }
+}
+
+void VReduceConstants::visit(NTerm& t)
 {
     switch(t.op)
     {
@@ -417,6 +544,175 @@ void VReduceTrivialAndOrNegOperations::visit(NTerm& t)
             {
                 t.op = term_operation_t::constant_false;
                 free_left_child(t);
+            }
+            break;
+        }
+        default:
+            assert(false && "Unrecognized.");
+    }
+}
+
+void VConvertLessEqContactWithEqualTerms::visit(NFormula& f)
+{
+    switch(f.op)
+    {
+        case formula_operation_t::constant_true:
+        case formula_operation_t::constant_false:
+            break;
+        case formula_operation_t::implication:
+        case formula_operation_t::equality:
+        case formula_operation_t::conjunction:
+        case formula_operation_t::disjunction:
+        case formula_operation_t::measured_less_eq:
+        {
+            assert(f.left && f.right);
+            f.left->accept(*this);
+            f.right->accept(*this);
+
+            break;
+        }
+        case formula_operation_t::contact:
+        {
+            assert(f.left && f.right);
+            auto left = static_cast<NTerm*>(f.left);
+            auto right = static_cast<NTerm*>(f.right);
+
+            // C(a,a) -> ~(a=0)
+            if(*left == *right)
+            {
+                free_left_child(f); // deletes left 'a'
+                auto a = right;
+                f.right = nullptr;
+                auto eq_zero_formula = new NFormula(formula_operation_t::eq_zero, a);
+
+                f.op = formula_operation_t::negation;
+                f.left = eq_zero_formula;
+            }
+            break;
+        }
+        case formula_operation_t::less_eq:
+        {
+            assert(f.left && f.right);
+            auto left = static_cast<NTerm*>(f.left);
+            auto right = static_cast<NTerm*>(f.right);
+
+            // <=(a,a) -> T because (a * -a = 0)
+            if(*left == *right)
+            {
+                free_childs(f);
+                f.op = formula_operation_t::constant_true;
+            }
+            break;
+        }
+        case formula_operation_t::negation:
+        case formula_operation_t::eq_zero:
+        {
+            assert(f.left);
+            f.left->accept(*this);
+            break;
+        }
+        default:
+            assert(false && "Unrecognized.");
+    }
+}
+
+void VReduceDoubleNegation::visit(NFormula& f)
+{
+    switch(f.op)
+    {
+        case formula_operation_t::constant_true:
+        case formula_operation_t::constant_false:
+            break;
+        case formula_operation_t::less_eq:
+        case formula_operation_t::measured_less_eq:
+        case formula_operation_t::implication:
+        case formula_operation_t::equality:
+        case formula_operation_t::contact:
+        case formula_operation_t::conjunction:
+        case formula_operation_t::disjunction:
+        {
+            assert(f.left && f.right);
+            f.left->accept(*this);
+            f.right->accept(*this);
+            break;
+        }
+        case formula_operation_t::eq_zero:
+        {
+            assert(f.left);
+            f.left->accept(*this);
+            break;
+        }
+        case formula_operation_t::negation:
+        {
+            assert(f.left);
+            f.left->accept(*this);
+
+            auto left = static_cast<NFormula*>(f.left);
+            // --g -> g
+            if(left->op == formula_operation_t::negation)
+            {
+                // 'f' is neg_neg_g;
+                auto neg_g = left; // '-g' node
+                auto g = static_cast<NFormula*>(neg_g->left); // 'g' node
+
+                neg_g->left = nullptr; // detach 'g' from '-g' node in order to not delete it when destroing '-g' node
+                delete neg_g;
+
+                // move 'g' node into 'f' node
+                f.op = g->op;
+                f.left = g->left;
+                f.right = g->right;
+
+                g->left = g->right = nullptr; // detach 'g' childs from 'g' because we have moved them to 'f' node and do not want to delete them
+                delete g;
+            }
+            break;
+        }
+        default:
+            assert(false && "Unrecognized.");
+    }
+}
+
+void VReduceDoubleNegation::visit(NTerm& t)
+{
+    switch(t.op)
+    {
+        case term_operation_t::constant_true:
+        case term_operation_t::constant_false:
+        case term_operation_t::variable:
+            break;
+        case term_operation_t::union_:
+        case term_operation_t::intersaction:
+        {
+            assert(t.left && t.right);
+            t.left->accept(*this);
+            t.right->accept(*this);
+
+            break;
+        }
+        case term_operation_t::complement:
+        {
+            assert(t.left);
+            t.left->accept(*this);
+
+            // --a -> a
+            if(t.left->op == term_operation_t::complement)
+            {
+                // 't' is neg_neg_a;
+                auto neg_a = t.left; // '-a' node
+                auto a = neg_a->left; // 'a' node
+
+                neg_a->left = nullptr; // detach 'a' from '-a' node in order to not delete it when destroing '-a' node
+                delete neg_a;
+
+                // move 'a' node into 't' node
+                t.op = a->op;
+                t.left = a->left;
+                t.right = a->right;
+                t.variable = std::move(a->variable);
+
+                a->left = a->right = nullptr; // detach 'a' childs from 'a' because we have moved them to 't' node and do not want to delete them
+                delete a;
             }
             break;
         }
