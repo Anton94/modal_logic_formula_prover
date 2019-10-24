@@ -119,6 +119,7 @@ auto NFormula::deep_copy() const -> NFormula*
         case formula_operation_t::implication:
         case formula_operation_t::equality:
             return new NFormula(op, left->deep_copy(), right->deep_copy());
+        case formula_operation_t::eq_zero:
         case formula_operation_t::negation:
             return new NFormula(op, left->deep_copy());
         default:
