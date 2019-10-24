@@ -75,3 +75,13 @@ public:
 
     ~VConvertLessEqToEqZero() override = default;
 };
+
+class VSplitDisjInContacts : public Visitor
+{
+public:
+    /// Splits the C(a + b, c) to C(a,c) | C(b,c)
+    void visit(NFormula& f) override;
+    void visit(NTerm&) override;
+
+    ~VSplitDisjInContacts() override = default;
+};

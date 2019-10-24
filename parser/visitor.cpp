@@ -532,3 +532,81 @@ void VConvertLessEqToEqZero::visit(NFormula& f)
 void VConvertLessEqToEqZero::visit(NTerm&)
 {
 }
+
+void VSplitDisjInContacts::visit(NFormula& f)
+{
+    switch(f.op)
+    {
+        case formula_operation_t::constant_true:
+        case formula_operation_t::constant_false:
+        case formula_operation_t::less_eq:
+        case formula_operation_t::measured_less_eq:
+        case formula_operation_t::eq_zero:
+            break;
+        case formula_operation_t::contact:
+        {
+            assert(f.left && f.right);
+            auto left = static_cast<NTerm*>(f.left);
+            auto right = static_cast<NTerm*>(f.right);
+
+            // C(a + b, c) -> C(a,c) | C(b,c)
+            if(left->op == term_operation_t::union_)
+            {
+                auto a = left->left;
+                auto b = left->right;
+                auto c = right;
+                left->left = left->right = nullptr;
+                delete left; // deletes only the disjunction node of (a + b)
+
+                auto new_contact_left = new NFormula(formula_operation_t::contact, a, c->deep_copy());
+                auto new_contact_right = new NFormula(formula_operation_t::contact, b, c);
+
+                f.op = formula_operation_t::disjunction;
+                f.left = new_contact_left;
+                f.right = new_contact_right;
+
+                f.left->accept(*this);
+                f.right->accept(*this);
+            }
+            // C(a, b + c) -> C(a, b) | C(a, c)
+            else if (right->op == term_operation_t::union_)
+            {
+                auto a = left;
+                auto b = right->left;
+                auto c = right->right;
+                right->left = right->right = nullptr;
+                delete right; // deletes only the disjunction node of (b + c)
+
+                auto new_contact_left = new NFormula(formula_operation_t::contact, a->deep_copy(), b);
+                auto new_contact_right = new NFormula(formula_operation_t::contact, a, c);
+
+                f.op = formula_operation_t::disjunction;
+                f.left = new_contact_left;
+                f.right = new_contact_right;
+
+                f.left->accept(*this);
+                f.right->accept(*this);
+            }
+
+            break;
+        }
+        case formula_operation_t::conjunction:
+        case formula_operation_t::disjunction:
+        case formula_operation_t::implication:
+        case formula_operation_t::equality:
+            assert(f.left && f.right);
+            f.left->accept(*this);
+            f.right->accept(*this);
+            break;
+        case formula_operation_t::negation:
+            assert(f.left);
+            f.left->accept(*this);
+            break;
+        default:
+            assert(false && "Unrecognized.");
+    }
+}
+
+void VSplitDisjInContacts::visit(NTerm&)
+{
+}

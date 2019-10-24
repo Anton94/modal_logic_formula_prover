@@ -15,6 +15,7 @@ int main(int, char**)
     input_formula = "C(a,b) | a * b + G * g = 0";
     input_formula = "F | <=(f + g + -x, -h) ";
     input_formula = "~(C(a,0) | a * m + b + -h= 0) | (<=m(mmax,m) | <=(m1,Cm))";
+    input_formula = "<=(a + b, c) | C(a + b, c) & C(a, b + c) & C(a + b + c, e + f + g)";
 
     std::cout << "Will try to parce        : " << input_formula << std::endl;
     const auto formula_ast = parse_from_input_string(input_formula);
@@ -32,6 +33,12 @@ int main(int, char**)
     VConvertImplicationEqualityToConjDisj convertor;
     formula_ast->accept(convertor);
     std::cout << "Converted (-> <->)formula: ";
+    formula_ast->accept(printer);
+    std::cout << std::endl;
+
+    VSplitDisjInContacts disj_in_contact_splitter;
+    formula_ast->accept(disj_in_contact_splitter);
+    std::cout << "C(a+b,c)->C(a,c)|C(b,c)  : ";
     formula_ast->accept(printer);
     std::cout << std::endl;
 
