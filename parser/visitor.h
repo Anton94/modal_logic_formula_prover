@@ -2,6 +2,8 @@
 
 #include <cassert>
 #include <ostream>
+#include <string>
+#include <unordered_set>
 
 class NFormula;
 class NTerm;
@@ -125,4 +127,19 @@ public:
     void visit(NTerm&) override {}
 
     ~VSplitDisjInLessEqAndContacts() override = default;
+};
+
+class VVariablesGetter : public Visitor
+{
+public:
+    using variables_set_t = std::unordered_set<std::string>;
+
+    VVariablesGetter(variables_set_t& out_variables);
+
+    void visit(NFormula& f) override;
+    void visit(NTerm& t) override;
+
+    ~VVariablesGetter() override = default;
+private:
+    variables_set_t& variables;
 };

@@ -921,3 +921,69 @@ void VSplitDisjInLessEqAndContacts::visit(NFormula& f)
             assert(false && "Unrecognized.");
     }
 }
+
+VVariablesGetter::VVariablesGetter(variables_set_t& out_variables)
+    : variables(out_variables)
+{
+}
+
+void VVariablesGetter::visit(NFormula& f)
+{
+    switch(f.op)
+    {
+        case formula_operation_t::constant_true:
+        case formula_operation_t::constant_false:
+            break;
+        case formula_operation_t::less_eq:
+        case formula_operation_t::measured_less_eq:
+        case formula_operation_t::implication:
+        case formula_operation_t::equality:
+        case formula_operation_t::contact:
+        case formula_operation_t::conjunction:
+        case formula_operation_t::disjunction:
+        {
+            assert(f.left && f.right);
+            f.left->accept(*this);
+            f.right->accept(*this);
+            break;
+        }
+        case formula_operation_t::eq_zero:
+        case formula_operation_t::negation:
+        {
+            assert(f.left);
+            f.left->accept(*this);
+            break;
+        }
+        default:
+            assert(false && "Unrecognized.");
+    }
+}
+
+void VVariablesGetter::visit(NTerm& t)
+{
+    switch(t.op)
+    {
+        case term_operation_t::constant_true:
+        case term_operation_t::constant_false:
+            break;
+        case term_operation_t::variable:
+            variables.insert(t.variable);
+            break;
+        case term_operation_t::union_:
+        case term_operation_t::intersaction:
+        {
+            assert(t.left && t.right);
+            t.left->accept(*this);
+            t.right->accept(*this);
+            break;
+        }
+        case term_operation_t::complement:
+        {
+            assert(t.left);
+            t.left->accept(*this);
+            break;
+        }
+        default:
+            assert(false && "Unrecognized.");
+    }
+}
