@@ -84,7 +84,7 @@ formula_mgr& formula_mgr::operator=(formula_mgr&& rhs) noexcept
     return *this;
 }
 
-auto formula_mgr::build(const std::string& f) -> bool
+auto formula_mgr::build(const std::string& f, const formula_refiners& refiners_flags) -> bool
 {
     clear();
 
@@ -117,23 +117,33 @@ auto formula_mgr::build(const std::string& f) -> bool
     // because in some intermediate splitting the two terms might match
     // Nevertheless, this will still be not 100% sufficient because the order of spliting might take a big role and
     // skip some pontential matches. For not just convert them after the splitting.
-    VConvertLessEqContactWithEqualTerms convertor_lessEq_contact_with_equal_terms;
-    formula_AST->accept(convertor_lessEq_contact_with_equal_terms);
-    info_buff << "Converted C(a,a);<=(a,a)  : ";
-    formula_AST->accept(printer);
-    info_buff << "\n";
+    if(has_flag(refiners_flags, formula_refiners::convert_contact_less_eq_with_same_terms))
+    {
+        VConvertLessEqContactWithEqualTerms convertor_lessEq_contact_with_equal_terms;
+        formula_AST->accept(convertor_lessEq_contact_with_equal_terms);
+        info_buff << "Converted C(a,a);<=(a,a)  : ";
+        formula_AST->accept(printer);
+        info_buff << "\n";
+    }
 
-    VSplitDisjInLessEqAndContacts disj_in_contact_splitter;
-    formula_AST->accept(disj_in_contact_splitter);
-    info_buff << "C(a+b,c)->C(a,c)|C(b,c) ;\n";
-    info_buff << "<=(a+b,c)-><=(a,c)&<=(b,c): ";
-    formula_AST->accept(printer);
-    info_buff << "\n";
+    if(has_flag(refiners_flags, formula_refiners::convert_disjunction_in_contact_less_eq))
+    {
+        VSplitDisjInLessEqAndContacts disj_in_contact_splitter;
+        formula_AST->accept(disj_in_contact_splitter);
+        info_buff << "C(a+b,c)->C(a,c)|C(b,c) ;\n";
+        info_buff << "<=(a+b,c)-><=(a,c)&<=(b,c): ";
+        formula_AST->accept(printer);
+        info_buff << "\n";
+    }
 
-    formula_AST->accept(convertor_lessEq_contact_with_equal_terms);
-    info_buff << "Converted C(a,a);<=(a,a)  : ";
-    formula_AST->accept(printer);
-    info_buff << "\n";
+    if(has_flag(refiners_flags, formula_refiners::convert_contact_less_eq_with_same_terms))
+    {
+        VConvertLessEqContactWithEqualTerms convertor_lessEq_contact_with_equal_terms;
+        formula_AST->accept(convertor_lessEq_contact_with_equal_terms);
+        info_buff << "Converted C(a,a);<=(a,a)  : ";
+        formula_AST->accept(printer);
+        info_buff << "\n";
+    }
 
     VConvertLessEqToEqZero eq_zero_convertor;
     formula_AST->accept(eq_zero_convertor);
@@ -141,23 +151,32 @@ auto formula_mgr::build(const std::string& f) -> bool
     formula_AST->accept(printer);
     info_buff << "\n";
 
-    VReduceConstants trivial_reducer;
-    formula_AST->accept(trivial_reducer);
-    info_buff << "Reduced constants         : ";
-    formula_AST->accept(printer);
-    info_buff << "\n";
+    if(has_flag(refiners_flags, formula_refiners::reduce_constants))
+    {
+        VReduceConstants trivial_reducer;
+        formula_AST->accept(trivial_reducer);
+        info_buff << "Reduced constants         : ";
+        formula_AST->accept(printer);
+        info_buff << "\n";
+    }
 
-    VConvertContactsWithConstantTerms contacts_with_constant_as_term_convertor;
-    formula_AST->accept(contacts_with_constant_as_term_convertor);
-    info_buff << "Converted C(a,1)->~(a=0)  : ";
-    formula_AST->accept(printer);
-    info_buff << "\n";
+    if(has_flag(refiners_flags, formula_refiners::reduce_contacts_less_eq_with_constants))
+    {
+        VConvertContactsWithConstantTerms contacts_with_constant_as_term_convertor;
+        formula_AST->accept(contacts_with_constant_as_term_convertor);
+        info_buff << "Converted C(a,1)->~(a=0)  : ";
+        formula_AST->accept(printer);
+        info_buff << "\n";
+    }
 
-    VReduceDoubleNegation double_negation_reducer;
-    formula_AST->accept(double_negation_reducer);
-    info_buff << "Reduced double negation   : ";
-    formula_AST->accept(printer);
-    info_buff << "\n";
+    if(has_flag(refiners_flags, formula_refiners::remove_double_negation))
+    {
+        VReduceDoubleNegation double_negation_reducer;
+        formula_AST->accept(double_negation_reducer);
+        info_buff << "Reduced double negation   : ";
+        formula_AST->accept(printer);
+        info_buff << "\n";
+    }
 
     info() << info_buff.str();
 
@@ -352,6 +371,11 @@ auto formula_mgr::change_variables_to_variable_ids(json& f) const -> bool
                "objects:\n"
             << f.dump(4);
     return false;
+}
+
+auto formula_mgr::has_flag(const formula_refiners& flags, const formula_refiners& flag) const -> bool
+{
+    return static_cast<int32_t>(flags) & static_cast<int32_t>(flag);
 }
 
 void formula_mgr::terminate_if_need() const

@@ -27,7 +27,19 @@ public:
     formula_mgr(formula_mgr&& rhs) noexcept;
     formula_mgr& operator=(formula_mgr&& rhs) noexcept;
 
-    auto build(const std::string& f) -> bool;
+    // TODO: better explanations
+    enum class formula_refiners : int32_t
+    {
+        none                                    = 0,
+        convert_contact_less_eq_with_same_terms = 1 << 1,
+        convert_disjunction_in_contact_less_eq  = 1 << 2,
+        reduce_constants                        = 1 << 3,
+        reduce_contacts_less_eq_with_constants  = 1 << 4,
+        remove_double_negation                  = 1 << 5,
+        all = convert_contact_less_eq_with_same_terms | convert_disjunction_in_contact_less_eq | reduce_constants | reduce_contacts_less_eq_with_constants | remove_double_negation
+    };
+
+    auto build(const std::string& f, const formula_refiners& refiners_flags = formula_refiners::all) -> bool;
 
     auto build(json& f) -> bool;
 
@@ -64,6 +76,8 @@ private:
     void move(formula_mgr&& rhs) noexcept;
 
     auto change_variables_to_variable_ids(json& f) const -> bool;
+
+    auto has_flag(const formula_refiners& flags, const formula_refiners& flag) const -> bool;
 
     variable_to_id_map_t variable_to_id_;
 
