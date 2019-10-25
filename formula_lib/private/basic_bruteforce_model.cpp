@@ -114,8 +114,10 @@ auto basic_bruteforce_model::satisfiability_check(const formulas_t& contacts_T, 
 	return true;
 }
 
-auto basic_bruteforce_model::create(const formula& f, size_t variables_count) -> bool
+auto basic_bruteforce_model::create(const formula& f, size_t variables_count, const formula_mgr* mgr) -> bool
 {
+    assert(mgr);
+    mgr_ = mgr;
     number_of_contacts_ = f.get_contacts_count().first;
     number_of_non_empty_ = f.get_zeroes_count().second;
     number_of_points_ = 2 * number_of_contacts_ + number_of_non_empty_;

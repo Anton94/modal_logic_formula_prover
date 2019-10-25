@@ -12,7 +12,7 @@ public:
     auto create(const formulas_t& contacts_T, const formulas_t& contacts_F, const terms_t& zero_terms_T,
                 const terms_t& zero_terms_F, const variables_mask_t& used_variables, const formula_mgr* mgr)
         -> bool override;
-    auto create(const formula& f, size_t variables_count) -> bool;
+    auto create(const formula& f, size_t variables_count, const formula_mgr* mgr) -> bool;
 
     auto print(std::ostream& out) const -> std::ostream& override;
 

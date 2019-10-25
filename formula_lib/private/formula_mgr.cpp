@@ -204,7 +204,7 @@ auto formula_mgr::build(json& f) -> bool
 
 auto formula_mgr::brute_force_evaluate_with_points_count(basic_bruteforce_model& out_model) const -> bool
 {
-    return out_model.create(f_, variables_.size());
+    return out_model.create(f_, variables_.size(), this);
 }
 
 auto formula_mgr::is_satisfiable(imodel& out_model) -> bool
