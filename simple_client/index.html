@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="shortcut icon" type="image/png" href="./img/home-icon.png"/>
+		<script src="./main.js"></script>
+		<script>
+			var IP_ADDRESS = "http://localhost:34567/";
+			var op_id = null;
+
+			// since now we are only posting tasks, these requests will be fast enough and 
+			// we can make them synchronous thus returning the result as soon as it comes.
+			// this should be done better in an upcoming version.
+			function is_satisfiable(formula) {
+				document.getElementById("is_satisfied_output").innerHTML = "";
+				document.getElementById("output").innerHTML = "";
+
+				$.post(IP_ADDRESS + "satisfy", { formula: formula })
+		            .done(function( data ) {
+		              console.log("good");
+		            });
+			}
+
+			function post_is_satisfiable(formula) {
+				document.getElementById("is_satisfied_output").innerHTML = "";
+				document.getElementById("output").innerHTML = "";
+
+				$.post(IP_ADDRESS + "satisfy", { formula: formula })
+		            .done(function( data ) {
+		              op_id = data;
+		            });
+			}
+
+			function check_task() {
+				document.getElementById("is_satisfied_output").innerHTML = "";
+				document.getElementById("output").innerHTML = "";
+
+				$.post(IP_ADDRESS + "check", { op_id: op_id })
+		            .done(function( data ) {
+		            	// depending on the data return RUNNING or CANCELED or DONE...
+		              console.log(data);
+		            });
+			}
+
+			function cancel_task() {
+				document.getElementById("is_satisfied_output").innerHTML = "";
+				document.getElementById("output").innerHTML = "";
+
+				$.post(IP_ADDRESS + "cancel", { op_id: op_id })
+		            .done(function( data ) {
+		            	// return true if success, return false if the task was already canceled
+		              console.log(data);
+		            });
+			}
+		</script>
+		<style>
+			code {
+				font-size: 15px;
+			}
+			label {
+				font-size: 15px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="formula_input">
+			<input id="formula"/>
+			<button onclick="is_satisfiable(document.getElementById('formula').value)">SATISFY</button>
+		</div>
+		<div id="is_satisfied">
+			<pre id="is_satisfied_output"></pre>
+		</div>
+		<div id="formula_output">
+			<pre id="output"></pre>
+		</div>
+
+		<code>F&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/bot.png" alt="Bottom"> - </code><label>False</label><br>
+		<code>T&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/top.png" alt="Top"> - </code><label>True</label><br>
+		<code>-&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Unary Complement</label><br>
+		<code>*&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Boolean Intersection</label><br>
+		<code>+&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Boolean Union</label><br>
+		<code>C&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Contact, syntax:</label><code>&nbsp;C(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
+		<code>&lt;=&nbsp;&nbsp;-&nbsp;≤ - </code><label>Part Of</label><br>
+		<code>&amp;&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/and.png" alt="And"> - </code><label>Conjunction</label><br>
+		<code>|&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/or.png" alt="Or"> - </code><label>Disjunction</label><br>
+		<code>~&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/not.png" alt="Not"> - </code><label>Negation</label><br>
+		<code>-&gt;&nbsp;&nbsp;-&nbsp;</code><label>Implication</label><br>
+		<code>&lt;-&gt;&nbsp;-&nbsp;</code><label>Equivalence</label><br>
+
+
+	</body>
+</html>
