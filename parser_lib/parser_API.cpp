@@ -52,6 +52,7 @@ bool find_nth(const std::string& s, int n, char c, size_t& pos)
             return false;
         }
         ++pos;
+        --n;
     }
     return true;
 }
@@ -67,7 +68,6 @@ void parser_error_info::printer(const std::string& parsed_formula, std::ostream&
     size_t error_line_begin = 0;
     if(find_nth(parsed_formula, line - 1 /*- the desired line ending*/, '\n', error_line_begin))
     {
-        if(line > 1) ++error_line_begin; // skip the matched '\n'
         const auto error_line_end = parsed_formula.find('\n', error_line_begin);
         const auto error_line_length =
             error_line_end == std::string::npos ? std::string::npos : (error_line_end - error_line_begin);
