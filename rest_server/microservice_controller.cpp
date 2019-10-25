@@ -175,6 +175,11 @@ void microservice_controller::handle_post(http_request message)
 					formula_mgr mgr(is_terminated);
 					mgr.build("C(a+c,b+t) & C(c+z,b+v) & C(a+l,b+k) & C(q+g,n+e) & C(a,m) & C(d,e)");
 					const auto is_satisfiable = mgr.is_satisfiable(bbm);
+					// TODO record the results somewhere in another 
+					// map { op_id -> result }
+					// so that the next request that the user does to check if the task is complete 
+					// we can return the result and after that remove that op_id from the map.
+					// Meaning that we remove op_id's on cancel and complete.
 				}
 				catch (const char* e) {
 					//info() << "Canceled ";
