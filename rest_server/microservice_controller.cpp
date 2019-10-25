@@ -118,8 +118,17 @@ void microservice_controller::handle_post(http_request message)
 			request.extract_string(true)
 				.then([=](string_t res) {
 				const auto f_str = utility::conversions::to_utf8string(web::uri().decode(res));
-				cts_.cancel();
-				message.reply(status_codes::OK, " cancel").then([](pplx::task<void> t) { handle_error(t); });
+				// lock here 
+				auto it = op_id_to_cts_.find(f_str);
+				bool was_removed = false;
+				if (it != op_id_to_cts_.end()) {
+					it->second->cancel();
+					was_removed = true;
+					// TODO: remove this op_id from the map and destroy the cts.
+				}
+				// relase lock 
+				
+				message.reply(status_codes::OK, was_removed ? "cancel true" : "cancel failed").then([](pplx::task<void> t) { handle_error(t); });
 			})
 				.then([=](pplx::task<void> t) {
 				try
@@ -141,8 +150,16 @@ void microservice_controller::handle_post(http_request message)
 
 	if (boost::starts_with(message_path, "/task"))
 	{
+		std::string op_id = generate_random_op_id(10);
+		// TODO: make the cts a reference or move it to the map.
+		pplx::cancellation_token_source* cts = new pplx::cancellation_token_source();
+		// require lock, also check if the element is there if so generate new op_id.
+		op_id_to_cts_[op_id] = cts;
+		// release lock
+		auto token = cts->get_token();
+
 		message.content_ready().then([=](web::http::http_request request) {
-			auto token = cts_.get_token();
+			
 			request.extract_string(true)
 				.then([=](string_t res) {
 				const auto f_str = utility::conversions::to_utf8string(web::uri().decode(res));
@@ -160,13 +177,22 @@ void microservice_controller::handle_post(http_request message)
 					const auto is_satisfiable = mgr.is_satisfiable(bbm);
 				}
 				catch (const char* e) {
-					info() << "Canceled " << e;
+					//info() << "Canceled ";
+				}
+				catch (...) {
+					info() << "Canceled force";
 				}
 			}, token)
 				.then([=](pplx::task<void> t) {
 				try
 				{
-					t.get();
+					try {
+						t.wait();
+					}
+					catch (...) {
+						info() << "Task failed due to cancelation";
+					}
+					
 				}
 				catch (...)
 				{
@@ -178,7 +204,7 @@ void microservice_controller::handle_post(http_request message)
 				}
 			});
 		});
-		message.reply(status_codes::OK, " task").then([](pplx::task<void> t) { handle_error(t); });
+		message.reply(status_codes::OK, op_id).then([](pplx::task<void> t) { handle_error(t); });
 		return;
 	}
 
@@ -390,4 +416,20 @@ void microservice_controller::handle_delete(http_request message)
 {
     ucout << message.to_string() << std::endl;
     message.reply(status_codes::OK);
+}
+
+std::string microservice_controller::generate_random_op_id(size_t length)
+{
+	auto randchar = []() -> char
+	{
+		const char charset[] =
+			"0123456789"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+			"abcdefghijklmnopqrstuvwxyz";
+		const size_t max_index = (sizeof(charset) - 1);
+		return charset[rand() % max_index];
+	};
+	std::string str(length, 0);
+	std::generate_n(str.begin(), length, randchar);
+	return str;
 }

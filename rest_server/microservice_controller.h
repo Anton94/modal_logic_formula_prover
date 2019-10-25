@@ -40,6 +40,9 @@ private:
 
     http_listener m_listener;
 
+	std::string generate_random_op_id(size_t length);
+
 	pplx::cancellation_token_source cts_;
+	std::unordered_map<std::string, pplx::cancellation_token_source*> op_id_to_cts_;
     std::string CLIENT_DIR = "../client/dist";
 };
