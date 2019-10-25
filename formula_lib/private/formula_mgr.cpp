@@ -88,12 +88,15 @@ auto formula_mgr::build(const std::string& f) -> bool
 {
     clear();
 
-    info() << "Start building a formula: " << f;
+    info() << "Start building a formula:\n" << f;
 
-    auto formula_AST = parse_from_input_string(f.c_str());
+    parser_error_info error_info;
+    auto formula_AST = parse_from_input_string(f.c_str(), error_info);
     if(!formula_AST)
     {
-        error() << "Unable to parse the input formula";
+        std::stringstream error_msg;
+        error_info.printer(f, error_msg);
+        error() << "\n" << error_msg.str();
         return false;
     }
 

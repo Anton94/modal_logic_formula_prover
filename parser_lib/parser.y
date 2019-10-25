@@ -5,7 +5,7 @@
 %code top {
     #include <cstdio>
     #include <memory>
-    #include <iostream> //todo: get rid of and redirect the error output somewhere...
+    #include <functional>
 
     #include "../ast.h"
 }
@@ -19,6 +19,7 @@
     void yyerror(YYLTYPE* yyllocp, yyscan_t unused, const char* msg);
 
     extern thread_local std::unique_ptr<NFormula> parsed_formula;
+    extern thread_local std::function<void(int/*line*/, int/*column*/, const char*/*msg*/)> on_error;
 }
 
 %define api.value.type union
@@ -130,5 +131,8 @@ term
 
 void yyerror(YYLTYPE* yyllocp, yyscan_t unused, const char* msg)
 {
-    std::cerr << "[" << yyllocp->first_line << ":" << yyllocp->first_column << "]: " << msg << std::endl;
+    if(on_error)
+    {
+        on_error(yyllocp->first_line, yyllocp->first_column, msg);
+    }
 }
