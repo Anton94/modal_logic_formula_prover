@@ -2,11 +2,12 @@
 #include "formula.h"
 #include "formula_mgr.h"
 #include "term.h"
+#include "linear_algebra/system_of_inequalities.h"
 
 #include <cassert>
 
 auto slow_model::create(const formulas_t& contacts_T, const formulas_t& contacts_F, const terms_t& zero_terms_T,
-            const terms_t& zero_terms_F, const variables_mask_t& used_variables, const formula_mgr* mgr)
+            const terms_t& zero_terms_F, const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F, const variables_mask_t& used_variables, const formula_mgr* mgr)
     -> bool
 {
     clear();
@@ -23,7 +24,8 @@ auto slow_model::create(const formulas_t& contacts_T, const formulas_t& contacts
     create_contact_relations_first_2k_in_contact(points_.size(), contacts_T.size());
     calculate_the_model_evaluation_of_each_variable();
 
-    while (!is_zero_term_rule_satisfied(zero_terms_T) || !is_contact_F_rule_satisfied(contacts_F))
+    while (!is_zero_term_rule_satisfied(zero_terms_T) || !is_contact_F_rule_satisfied(contacts_F) ||
+           !has_solvable_system_of_inequalities(measured_less_eq_T, measured_less_eq_F))
     {
         if (!generate_next())
         {
@@ -76,6 +78,40 @@ auto slow_model::is_zero_term_rule_satisfied(const terms_t& zero_terms_T) const 
     for (const auto& z : zero_terms_T)
     {
         if (is_not_empty_set(z))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+auto slow_model::has_solvable_system_of_inequalities(const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F) const -> bool
+{
+    // For each <=m(a,b) calculate v(a) and v(b), then we will create
+    // an inequality of the following type: SUM_I Xi <= SUM_J Xj, where I and J are set v(a) and v(b).
+    // For each ~<=m(a,b) calculate v(a) and v(b), then
+    // an inequality of the following type: SUM_I Xi > SUM_J Xj, where I and J are set v(a) and v(b).
+    // Each inequality is a row in the system of inequalities. If this system has a solution, then we are good.
+
+    const auto points_size = points_.size();
+    const auto number_of_variables = points_size;
+    system_of_inequalities system(number_of_variables);
+
+    for(const auto& m : measured_less_eq_T)
+    {
+        const auto v_a = m->get_left_child_term()->evaluate(variable_evaluations_, points_size);
+        const auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
+        if (!system.add_constraint(v_a, v_b, system_of_inequalities::inequality_operation::LE))
+        {
+            return false;
+        }
+    }
+
+    for(const auto& m : measured_less_eq_F)
+    {
+        const auto v_a = m->get_left_child_term()->evaluate(variable_evaluations_, points_size);
+        const auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
+        if (!system.add_constraint(v_a, v_b, system_of_inequalities::inequality_operation::G))
         {
             return false;
         }

@@ -49,7 +49,7 @@ struct slow_model : public imodel
     using contacts_t = std::vector<model_points_set_t>;
 
     auto create(const formulas_t& contacts_T, const formulas_t& contacts_F, const terms_t& zero_terms_T,
-                const terms_t& zero_terms_F, const variables_mask_t& used_variables, const formula_mgr* mgr)
+                const terms_t& zero_terms_F, const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F, const variables_mask_t& used_variables, const formula_mgr* mgr)
         -> bool override;
 
     auto get_model_points() const -> const points_t&;
@@ -72,6 +72,7 @@ private:
 
     auto is_contact_F_rule_satisfied(const formulas_t& contacts_F) const -> bool;
     auto is_zero_term_rule_satisfied(const terms_t& zero_terms_T) const -> bool;
+    auto has_solvable_system_of_inequalities(const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F) const -> bool;
 
     // Return true if there is a contact between the v(a) and v(b). Note that v(X) is a set of model points and there is a contact between the two sets iff
     // exist x from v(a), exist y from v(b) and xRy.

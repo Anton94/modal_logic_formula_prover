@@ -48,7 +48,7 @@ auto basic_bruteforce_model::generate_next(std::vector<variables_evaluations_t>&
 }
 
 auto basic_bruteforce_model::create(const formulas_t& contacts_T, const formulas_t& contacts_F, const terms_t& zero_terms_T,
-            const terms_t& zero_terms_F, const variables_mask_t& used_variables, const formula_mgr* mgr)
+            const terms_t& zero_terms_F, const formulas_t&, const formulas_t&, const variables_mask_t& used_variables, const formula_mgr* mgr)
     -> bool
 {
     assert(mgr);

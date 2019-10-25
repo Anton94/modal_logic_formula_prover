@@ -8,6 +8,7 @@
 
 auto connected_model::create(const formulas_t& contacts_T, const formulas_t& contacts_F,
                              const terms_t& zero_terms_T, const terms_t& zero_terms_F,
+                             const formulas_t&, const formulas_t&,
                              const variables_mask_t& used_variables, const formula_mgr* mgr) -> bool
 {
     clear();
