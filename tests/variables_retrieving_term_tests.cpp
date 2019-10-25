@@ -1,25 +1,22 @@
 #include "catch/catch.hpp"
 
 #include "library.h"
-#include "nlohmann_json/json.hpp"
 #include "term.h"
-
-using json = nlohmann::json;
 
 namespace
 {
 
-formula_mgr create_atomic_formula_with_same_child_terms(const json& term)
+formula_mgr create_atomic_formula_with_same_child_terms(const std::string& term)
 {
-    json formula;
-    formula["name"] = "contact";
-    json terms;
-    terms[0] = term;
-    terms[1] = term;
-    formula["value"] = terms;
+    std::string C_t;
+    C_t.append("C(");
+    C_t.append(term);
+    C_t.append(",");
+    C_t.append(term);
+    C_t.append(")");
 
     formula_mgr f;
-    CHECK(f.build(formula));
+    CHECK(f.build(C_t, formula_mgr::formula_refiners::none));
 
     return f;
 }
@@ -50,76 +47,7 @@ void check_term_varibles_mask(const term& t, const formula_mgr& mgr, const varia
 
 TEST_CASE("complex term's variables", "[variables_check_term]")
 {
-    // ((-a + b) * (c + -d)) + -(e * (f + g))
-    json term_json =
-        R"({
-            "name": "Tor",
-            "value": [
-               {
-                  "name": "Tand",
-                  "value": [
-                     {
-                        "name": "Tor",
-                        "value": [
-                           {
-                              "name": "Tstar",
-                              "value": {
-                                 "name": "string",
-                                 "value": "a"
-                              }
-                           },
-                           {
-                              "name": "string",
-                              "value": "b"
-                           }
-                        ]
-                     },
-                     {
-                        "name": "Tor",
-                        "value": [
-                           {
-                              "name": "string",
-                              "value": "c"
-                           },
-                           {
-                              "name": "Tstar",
-                              "value": {
-                                 "name": "string",
-                                 "value": "d"
-                              }
-                           }
-                        ]
-                     }
-                  ]
-               },
-               {
-                  "name": "Tstar",
-                  "value": {
-                     "name": "Tand",
-                     "value": [
-                        {
-                           "name": "string",
-                           "value": "e"
-                        },
-                        {
-                           "name": "Tor",
-                           "value": [
-                              {
-                                 "name": "string",
-                                 "value": "f"
-                              },
-                              {
-                                 "name": "string",
-                                 "value": "g"
-                              }
-                           ]
-                        }
-                     ]
-                  }
-               }
-            ]
-        })"_json;
-    auto formula_mgr = create_atomic_formula_with_same_child_terms(term_json);
+    auto formula_mgr = create_atomic_formula_with_same_child_terms("((-a + b) * (c + -d)) + -(e * (f + g))");
     auto term = formula_mgr.get_internal_formula()->get_left_child_term();
 
     check_term_varibles_mask(*term, formula_mgr, { "a", "b", "c", "d", "e", "f", "g" });
@@ -188,12 +116,7 @@ TEST_CASE("complex term's variables", "[variables_check_term]")
 
 TEST_CASE("variables of term containing a constant", "[variables_check_term]")
 {
-    // 0
-    json term_json =
-        R"({
-         "name": "0"
-      })"_json;
-    auto formula_mgr = create_atomic_formula_with_same_child_terms(term_json);
+    auto formula_mgr = create_atomic_formula_with_same_child_terms("0");
     auto term = formula_mgr.get_internal_formula()->get_left_child_term();
 
     CHECK(term->get_operation_type() == term::operation_t::constant_false);
@@ -202,13 +125,7 @@ TEST_CASE("variables of term containing a constant", "[variables_check_term]")
 
 TEST_CASE("variables of term containing a variable", "[variables_check_term]")
 {
-    // a
-    json term_json =
-        R"({
-         "name": "string",
-         "value": "a"
-      })"_json;
-    auto formula_mgr = create_atomic_formula_with_same_child_terms(term_json);
+    auto formula_mgr = create_atomic_formula_with_same_child_terms("a");
     auto term = formula_mgr.get_internal_formula()->get_left_child_term();
 
     CHECK(term->get_operation_type() == term::operation_t::variable);
@@ -217,16 +134,7 @@ TEST_CASE("variables of term containing a variable", "[variables_check_term]")
 
 TEST_CASE("variables of term containing unary star operation of variable", "[variables_check_term]")
 {
-    // -a
-    json term_json =
-        R"({
-         "name": "Tstar",
-         "value": {
-            "name": "string",
-            "value": "a"
-         }
-      })"_json;
-    auto formula_mgr = create_atomic_formula_with_same_child_terms(term_json);
+    auto formula_mgr = create_atomic_formula_with_same_child_terms("-a");
     auto term = formula_mgr.get_internal_formula()->get_left_child_term();
 
     CHECK(term->get_operation_type() == term::operation_t::complement);
