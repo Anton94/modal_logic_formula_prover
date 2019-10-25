@@ -59,7 +59,7 @@
 #define YYPULL 1
 
 /* "%code top" blocks.  */
-#line 6 "parser.y" /* yacc.c:316  */
+#line 5 "parser.y" /* yacc.c:316  */
 
     #include <cstdio>
     #include <memory>
@@ -103,7 +103,7 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 14 "parser.y" /* yacc.c:355  */
+#line 13 "parser.y" /* yacc.c:355  */
 
   typedef void* yyscan_t;
 
@@ -167,7 +167,7 @@ int yyparse (yyscan_t scanner);
 
 #line 169 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:358  */
 /* Unqualified %code blocks.  */
-#line 18 "parser.y" /* yacc.c:359  */
+#line 17 "parser.y" /* yacc.c:359  */
 
     int yylex(YYSTYPE* yylvalp, YYLTYPE* yyllocp, yyscan_t scanner);
     void yyerror(YYLTYPE* yyllocp, yyscan_t unused, const char* msg);
@@ -474,9 +474,9 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    45,    45,    50,    53,    56,    59,    62,    65,    68,
-      71,    74,    77,    80,    83,    86,    89,    92,    95,   100,
-     103,   106,   111,   114,   117,   120,   123,   126
+       0,    44,    44,    49,    52,    55,    58,    61,    64,    67,
+      70,    73,    76,    79,    82,    85,    88,    91,    94,    99,
+     102,   105,   110,   113,   116,   119,   122,   125
 };
 #endif
 
@@ -1389,7 +1389,7 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 45 "parser.y" /* yacc.c:1646  */
+#line 44 "parser.y" /* yacc.c:1646  */
     {
         parsed_formula.reset((*(NFormula**)(&yyvsp[0])));
     }
@@ -1397,7 +1397,7 @@ yyreduce:
     break;
 
   case 3:
-#line 50 "parser.y" /* yacc.c:1646  */
+#line 49 "parser.y" /* yacc.c:1646  */
     {
         (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::constant_true);
     }
@@ -1405,7 +1405,7 @@ yyreduce:
     break;
 
   case 4:
-#line 53 "parser.y" /* yacc.c:1646  */
+#line 52 "parser.y" /* yacc.c:1646  */
     {
         (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::constant_false);
     }
@@ -1413,7 +1413,7 @@ yyreduce:
     break;
 
   case 5:
-#line 56 "parser.y" /* yacc.c:1646  */
+#line 55 "parser.y" /* yacc.c:1646  */
     {
         (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::contact, (*(NTerm**)(&yyvsp[-3])), (*(NTerm**)(&yyvsp[-1])));
     }
@@ -1421,7 +1421,7 @@ yyreduce:
     break;
 
   case 6:
-#line 59 "parser.y" /* yacc.c:1646  */
+#line 58 "parser.y" /* yacc.c:1646  */
     {
         (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::less_eq, (*(NTerm**)(&yyvsp[-3])), (*(NTerm**)(&yyvsp[-1])));
     }
@@ -1429,7 +1429,7 @@ yyreduce:
     break;
 
   case 7:
-#line 62 "parser.y" /* yacc.c:1646  */
+#line 61 "parser.y" /* yacc.c:1646  */
     {
         (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::measured_less_eq, (*(NTerm**)(&yyvsp[-3])), (*(NTerm**)(&yyvsp[-1])));
     }
@@ -1437,7 +1437,7 @@ yyreduce:
     break;
 
   case 8:
-#line 65 "parser.y" /* yacc.c:1646  */
+#line 64 "parser.y" /* yacc.c:1646  */
     {
         (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::eq_zero, (*(NTerm**)(&yyvsp[-1])));
     }
@@ -1445,7 +1445,7 @@ yyreduce:
     break;
 
   case 9:
-#line 68 "parser.y" /* yacc.c:1646  */
+#line 67 "parser.y" /* yacc.c:1646  */
     {
         (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::conjunction, (*(NFormula**)(&yyvsp[-3])), (*(NFormula**)(&yyvsp[-1])));
     }
@@ -1453,7 +1453,7 @@ yyreduce:
     break;
 
   case 10:
-#line 71 "parser.y" /* yacc.c:1646  */
+#line 70 "parser.y" /* yacc.c:1646  */
     {
         (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::conjunction, (*(NFormula**)(&yyvsp[-2])), (*(NFormula**)(&yyvsp[0])));
     }
@@ -1461,7 +1461,7 @@ yyreduce:
     break;
 
   case 11:
-#line 74 "parser.y" /* yacc.c:1646  */
+#line 73 "parser.y" /* yacc.c:1646  */
     {
         (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::disjunction, (*(NFormula**)(&yyvsp[-3])), (*(NFormula**)(&yyvsp[-1])));
     }
@@ -1469,7 +1469,7 @@ yyreduce:
     break;
 
   case 12:
-#line 77 "parser.y" /* yacc.c:1646  */
+#line 76 "parser.y" /* yacc.c:1646  */
     {
         (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::disjunction, (*(NFormula**)(&yyvsp[-2])), (*(NFormula**)(&yyvsp[0])));
     }
@@ -1477,7 +1477,7 @@ yyreduce:
     break;
 
   case 13:
-#line 80 "parser.y" /* yacc.c:1646  */
+#line 79 "parser.y" /* yacc.c:1646  */
     {
         (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::negation, (*(NFormula**)(&yyvsp[0])));
     }
@@ -1485,7 +1485,7 @@ yyreduce:
     break;
 
   case 14:
-#line 83 "parser.y" /* yacc.c:1646  */
+#line 82 "parser.y" /* yacc.c:1646  */
     {
         (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::implication, (*(NFormula**)(&yyvsp[-3])), (*(NFormula**)(&yyvsp[-1])));
     }
@@ -1493,7 +1493,7 @@ yyreduce:
     break;
 
   case 15:
-#line 86 "parser.y" /* yacc.c:1646  */
+#line 85 "parser.y" /* yacc.c:1646  */
     {
         (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::implication, (*(NFormula**)(&yyvsp[-2])), (*(NFormula**)(&yyvsp[0])));
     }
@@ -1501,7 +1501,7 @@ yyreduce:
     break;
 
   case 16:
-#line 89 "parser.y" /* yacc.c:1646  */
+#line 88 "parser.y" /* yacc.c:1646  */
     {
         (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::equality, (*(NFormula**)(&yyvsp[-3])), (*(NFormula**)(&yyvsp[-1])));
     }
@@ -1509,7 +1509,7 @@ yyreduce:
     break;
 
   case 17:
-#line 92 "parser.y" /* yacc.c:1646  */
+#line 91 "parser.y" /* yacc.c:1646  */
     {
         (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::equality, (*(NFormula**)(&yyvsp[-2])), (*(NFormula**)(&yyvsp[0])));
     }
@@ -1517,7 +1517,7 @@ yyreduce:
     break;
 
   case 18:
-#line 95 "parser.y" /* yacc.c:1646  */
+#line 94 "parser.y" /* yacc.c:1646  */
     {
         (*(NFormula**)(&yyval)) = (*(NFormula**)(&yyvsp[-1]));
     }
@@ -1525,7 +1525,7 @@ yyreduce:
     break;
 
   case 19:
-#line 100 "parser.y" /* yacc.c:1646  */
+#line 99 "parser.y" /* yacc.c:1646  */
     {
         (*(NTerm**)(&yyval)) = new NTerm(term_operation_t::constant_true);
     }
@@ -1533,7 +1533,7 @@ yyreduce:
     break;
 
   case 20:
-#line 103 "parser.y" /* yacc.c:1646  */
+#line 102 "parser.y" /* yacc.c:1646  */
     {
         (*(NTerm**)(&yyval)) = new NTerm(term_operation_t::constant_false);
     }
@@ -1541,7 +1541,7 @@ yyreduce:
     break;
 
   case 21:
-#line 106 "parser.y" /* yacc.c:1646  */
+#line 105 "parser.y" /* yacc.c:1646  */
     {
         (*(NTerm**)(&yyval)) = new NTerm(term_operation_t::variable);
         (*(NTerm**)(&yyval))->variable = (*(const char**)(&yyvsp[0]));
@@ -1551,7 +1551,7 @@ yyreduce:
     break;
 
   case 22:
-#line 111 "parser.y" /* yacc.c:1646  */
+#line 110 "parser.y" /* yacc.c:1646  */
     {
         (*(NTerm**)(&yyval)) = new NTerm(term_operation_t::intersaction, (*(NTerm**)(&yyvsp[-3])), (*(NTerm**)(&yyvsp[-1])));
     }
@@ -1559,7 +1559,7 @@ yyreduce:
     break;
 
   case 23:
-#line 114 "parser.y" /* yacc.c:1646  */
+#line 113 "parser.y" /* yacc.c:1646  */
     {
         (*(NTerm**)(&yyval)) = new NTerm(term_operation_t::intersaction, (*(NTerm**)(&yyvsp[-2])), (*(NTerm**)(&yyvsp[0])));
     }
@@ -1567,7 +1567,7 @@ yyreduce:
     break;
 
   case 24:
-#line 117 "parser.y" /* yacc.c:1646  */
+#line 116 "parser.y" /* yacc.c:1646  */
     {
         (*(NTerm**)(&yyval)) = new NTerm(term_operation_t::union_, (*(NTerm**)(&yyvsp[-3])), (*(NTerm**)(&yyvsp[-1])));
     }
@@ -1575,7 +1575,7 @@ yyreduce:
     break;
 
   case 25:
-#line 120 "parser.y" /* yacc.c:1646  */
+#line 119 "parser.y" /* yacc.c:1646  */
     {
         (*(NTerm**)(&yyval)) = new NTerm(term_operation_t::union_, (*(NTerm**)(&yyvsp[-2])), (*(NTerm**)(&yyvsp[0])));
     }
@@ -1583,7 +1583,7 @@ yyreduce:
     break;
 
   case 26:
-#line 123 "parser.y" /* yacc.c:1646  */
+#line 122 "parser.y" /* yacc.c:1646  */
     {
         (*(NTerm**)(&yyval)) = new NTerm(term_operation_t::complement, (*(NTerm**)(&yyvsp[0])));
     }
@@ -1591,7 +1591,7 @@ yyreduce:
     break;
 
   case 27:
-#line 126 "parser.y" /* yacc.c:1646  */
+#line 125 "parser.y" /* yacc.c:1646  */
     {
         (*(NTerm**)(&yyval)) = (*(NTerm**)(&yyvsp[-1]));
     }
@@ -1834,10 +1834,10 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 130 "parser.y" /* yacc.c:1906  */
+#line 129 "parser.y" /* yacc.c:1906  */
 
 
 void yyerror(YYLTYPE* yyllocp, yyscan_t unused, const char* msg)
 {
-    std::cerr << "[" << yyllocp->first_line << ":" << yyllocp->first_column << "]: " << msg << std::endl;
+    std::cerr << "[" << (int)yyllocp->first_line << ":" << (int)yyllocp->first_column << "]: " << msg << std::endl;
 }

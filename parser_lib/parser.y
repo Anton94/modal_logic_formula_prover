@@ -1,7 +1,6 @@
 %define api.pure full
 %locations
-%lex-param {yyscan_t scanner}
-%parse-param {yyscan_t scanner}
+%param { yyscan_t scanner }
 
 %code top {
     #include <cstdio>
