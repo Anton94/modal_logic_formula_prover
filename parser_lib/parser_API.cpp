@@ -8,6 +8,8 @@ thread_local std::unique_ptr<NFormula> parsed_formula;
 thread_local std::function<void(int /*line*/, int /*column*/, const char* /*msg*/)>
     on_error; // TODO: enhacne with a structure
 
+void on_before_parsing();
+
 std::unique_ptr<NFormula> parse_from_input_string(const char* in, parser_error_info& info)
 {
     parsed_formula.reset(nullptr);
@@ -16,6 +18,8 @@ std::unique_ptr<NFormula> parse_from_input_string(const char* in, parser_error_i
         info.column = column;
         info.msg = msg;
     };
+
+    on_before_parsing();
 
     yyscan_t scanner;
     yylex_init(&scanner);
