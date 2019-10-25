@@ -17,7 +17,7 @@ formula_mgr build(const std::pair<std::string, std::string>& a, const std::pair<
     f_str << "C(" << a.first << "," << a.second << ") | C(" << b.first << "," << b.second << ")";
 
     formula_mgr f;
-    CHECK(f.build(f_str.str()));
+    CHECK(f.build(f_str.str(), formula_mgr::formula_refiners::none));
 
     return f;
 }
@@ -85,37 +85,37 @@ void check_equality_of_contacts_with_terms(const std::string& a, const std::stri
 
 // TODO: fix the tests, the parser is making a lot of optimizations and the majority of the assert's are not OK to be tests as is
 // Maybe if we disable the converters/reducers after the formula is passed it will be OK, or we can think of another test suits.
-TEST_CASE("complex terms 0", "[!hide][contact_commutativity]")
+TEST_CASE("complex terms 0", "[contact_commutativity]")
 {
     check_equality_of_contacts_with_terms("((-a + b) * (c + -d)) + -(e * (f + g))", "((-a + b) * (c + -d)) + -(m * (f + g))" /* Note the 'm' variable */);
 }
 
-TEST_CASE("complex terms 1", "[!hide][contact_commutativity]")
+TEST_CASE("complex terms 1", "[contact_commutativity]")
 {
     check_equality_of_contacts_with_terms("((-a + b) * (c + -d)) + -(e * (f + g))", "((-a + b) * (c + -d)) + -(e * f)");
 }
 
-TEST_CASE("constants", "[!hide][contact_commutativity]")
+TEST_CASE("constants", "[contact_commutativity]")
 {
     check_equality_of_contacts_with_terms("0", "1");
 }
 
-TEST_CASE("variables", "[!hide][contact_commutativity]")
+TEST_CASE("variables", "[contact_commutativity]")
 {
     check_equality_of_contacts_with_terms("a", "b");
 }
 
-TEST_CASE("variable and negation of variable", "[!hide][contact_commutativity]")
+TEST_CASE("variable and negation of variable", "[contact_commutativity]")
 {
     check_equality_of_contacts_with_terms("a", "-b");
 }
 
-TEST_CASE("negation of variables", "[!hide][contact_commutativity]")
+TEST_CASE("negation of variables", "[contact_commutativity]")
 {
     check_equality_of_contacts_with_terms("-a", "-b");
 }
 
-TEST_CASE("negation of variable and negation of constant", "[!hide][contact_commutativity]")
+TEST_CASE("negation of variable and negation of constant", "[contact_commutativity]")
 {
     check_equality_of_contacts_with_terms("-a", "-0");
 }
