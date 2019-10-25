@@ -1,21 +1,34 @@
-%{
-#include "../ast.h"
-#include "parser.hpp"
+%option noinput nounput noyywrap 8bit nodefault
+%option yylineno
+%option reentrant bison-bridge bison-locations
 
-// Custom strdup because the one in cstdio is not standard(when compiling strictly C)
-char* custom_strdup(const char * c, int length)
-{
-    char* dup = (char*)malloc(length + 1);
-
-    if (dup != NULL)
-       strcpy(dup, c);
-
-    return dup;
-}
-%}
-
-%option noyywrap
 %option never-interactive
+
+%{
+    #include "../ast.h"
+    #include "parser.hpp"
+
+    #define YY_USER_ACTION                                             \
+      yylloc->first_line = yylloc->last_line;                          \
+      yylloc->first_column = yylloc->last_column;                      \
+      if (yylloc->last_line == yylineno)                               \
+        yylloc->last_column += yyleng;                                 \
+      else {                                                           \
+        yylloc->last_line = yylineno;                                  \
+        yylloc->last_column = yytext + yyleng - strrchr(yytext, '\n'); \
+      }
+
+    // Custom strdup because the one in cstdio is not standard(when compiling strictly C)
+    char* custom_strdup(const char * c, int length)
+    {
+        char* dup = (char*)malloc(length + 1);
+
+        if (dup != NULL)
+           strcpy(dup, c);
+
+        return dup;
+    }
+%}
 
 %%
 [ \t\n]            ; // ignore all whitespace
@@ -26,16 +39,6 @@ char* custom_strdup(const char * c, int length)
 "= 0"              {return T_EQ_ZERO;}
 "->"               {return T_FORMULA_OP_IMPLICATION;}
 "<->"              {return T_FORMULA_OP_EQUALITY;}
-[a-zA-Z0-9]+       {yylval.sval = custom_strdup(yytext, yyleng); return T_STRING;}
+[a-zA-Z0-9]+       {yylval->T_STRING = custom_strdup(yytext, yyleng); return T_STRING;}
 .                  {return yytext[0];} // bison will trigger an error if it's unrecognized symbol
 %%
-
-void set_input_string(const char* in)
-{
-    yy_scan_string(in);
-}
-
-void end_lexical_scan()
-{
-    yy_delete_buffer(YY_CURRENT_BUFFER);
-}

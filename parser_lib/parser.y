@@ -1,32 +1,34 @@
-%{
-#include <cstdio>
-#include <iostream>
+%define api.pure full
+%locations
+%lex-param {yyscan_t scanner}
+%parse-param {yyscan_t scanner}
 
-#include "../parser_API.h"
+%code top {
+    #include <cstdio>
+    #include <memory>
+    #include <iostream> //todo: get rid of and redirect the error output somewhere...
 
-using namespace std;
-
-// stuff from flex that bison needs to know about:
-extern int yylex();
-extern int yyparse();
-
-void yyerror(const char *s);
-
-std::unique_ptr<NFormula> parsed_formula;
-%}
-
-%union {
-    char *sval;
-    NFormula *formula;
-    NTerm *term;
+    #include "../ast.h"
 }
 
-%token <sval> T_STRING
+%code requires {
+  typedef void* yyscan_t;
+}
 
-%token T_LESS_EQ
-%token T_MEASURED_LESS_EQ
-%token T_EQ_ZERO
-%token T_FORMULA_OP_IMPLICATION T_FORMULA_OP_EQUALITY
+%code {
+    int yylex(YYSTYPE* yylvalp, YYLTYPE* yyllocp, yyscan_t scanner);
+    void yyerror(YYLTYPE* yyllocp, yyscan_t unused, const char* msg);
+
+    extern thread_local std::unique_ptr<NFormula> parsed_formula;
+}
+
+%define api.value.type union
+%token <const char*> T_STRING   "string"
+%token T_LESS_EQ                "<="
+%token T_MEASURED_LESS_EQ       "<=m"
+%token T_EQ_ZERO                "=0"
+%token T_FORMULA_OP_IMPLICATION "->"
+%token T_FORMULA_OP_EQUALITY    "<->"
 
 // the operators precedence is from low to hight (w.r.t. the order (by line) in which they are defined)
 %left T_FORMULA_OP_IMPLICATION T_FORMULA_OP_EQUALITY
@@ -35,8 +37,8 @@ std::unique_ptr<NFormula> parsed_formula;
 %right '~' '-'
 %nonassoc '(' ')'
 
-%type <formula> formula
-%type <term> term
+%type <NFormula*> formula
+%type <NTerm*> term
 
 %%
 modal_logic_formula
@@ -54,13 +56,13 @@ formula
     | 'C' '(' term ',' term ')' {
         $$ = new NFormula(formula_operation_t::contact, $3, $5);
     }
-    | T_LESS_EQ '(' term ',' term ')' {
+    | "<=" '(' term ',' term ')' {
         $$ = new NFormula(formula_operation_t::less_eq, $3, $5);
     }
-    | T_MEASURED_LESS_EQ '(' term ',' term ')' {
+    | "<=m" '(' term ',' term ')' {
         $$ = new NFormula(formula_operation_t::measured_less_eq, $3, $5);
     }
-    | term T_EQ_ZERO {
+    | term "=0" {
         $$ = new NFormula(formula_operation_t::eq_zero, $1);
     }
     | '(' formula '&' formula ')' {
@@ -78,16 +80,16 @@ formula
     | '~' formula {
         $$ = new NFormula(formula_operation_t::negation, $2);
     }
-    | '(' formula T_FORMULA_OP_IMPLICATION formula ')' {
+    | '(' formula "->" formula ')' {
         $$ = new NFormula(formula_operation_t::implication, $2, $4);
     }
-    | formula T_FORMULA_OP_IMPLICATION formula {
+    | formula "->" formula {
         $$ = new NFormula(formula_operation_t::implication, $1, $3);
     }
-    | '(' formula T_FORMULA_OP_EQUALITY formula ')' {
+    | '(' formula "<->" formula ')' {
         $$ = new NFormula(formula_operation_t::equality, $2, $4);
     }
-    | formula T_FORMULA_OP_EQUALITY formula {
+    | formula "<->" formula {
         $$ = new NFormula(formula_operation_t::equality, $1, $3);
     }
     | '(' formula ')' {
@@ -101,10 +103,10 @@ term
     | '0' {
         $$ = new NTerm(term_operation_t::constant_false);
     }
-    | T_STRING {
+    | "string" {
         $$ = new NTerm(term_operation_t::variable);
         $$->variable = $1;
-        free($1);
+        free((void*)$1);
     }
     | '(' term '*' term ')' {
         $$ = new NTerm(term_operation_t::intersaction, $2, $4);
@@ -127,24 +129,7 @@ term
   ;
 %%
 
-void set_input_string(const char* in);
-void end_lexical_scan();
-
-std::unique_ptr<NFormula> parse_from_input_string(const char* in)
+void yyerror(YYLTYPE* yyllocp, yyscan_t unused, const char* msg)
 {
-    parsed_formula.reset(nullptr);
-
-    set_input_string(in);
-    int rv = yyparse();
-    end_lexical_scan();
-
-    (void) rv;
-    return std::unique_ptr<NFormula>(parsed_formula.release());
-}
-
-void yyerror(const char *s)
-{
-    cout << "EEK, parse error!  Message: " << s << endl;
-    // might as well halt now:
-    exit(-1);
+    std::cerr << "[" << yyllocp->first_line << ":" << yyllocp->first_column << "]: " << msg << std::endl;
 }

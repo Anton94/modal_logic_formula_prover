@@ -39,6 +39,12 @@
 #if YYDEBUG
 extern int yydebug;
 #endif
+/* "%code requires" blocks.  */
+#line 14 "parser.y" /* yacc.c:1909  */
+
+  typedef void* yyscan_t;
+
+#line 48 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.hpp" /* yacc.c:1909  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -59,13 +65,14 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 18 "parser.y" /* yacc.c:1909  */
 
-    char *sval;
-    NFormula *formula;
-    NTerm *term;
-
-#line 69 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.hpp" /* yacc.c:1909  */
+  /* formula  */
+  NFormula* formula;
+  /* term  */
+  NTerm* term;
+  /* "string"  */
+  const char* T_STRING;
+#line 76 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -73,9 +80,22 @@ typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_DECLARED 1
 #endif
 
+/* Location type.  */
+#if ! defined YYLTYPE && ! defined YYLTYPE_IS_DECLARED
+typedef struct YYLTYPE YYLTYPE;
+struct YYLTYPE
+{
+  int first_line;
+  int first_column;
+  int last_line;
+  int last_column;
+};
+# define YYLTYPE_IS_DECLARED 1
+# define YYLTYPE_IS_TRIVIAL 1
+#endif
 
-extern YYSTYPE yylval;
 
-int yyparse (void);
+
+int yyparse (yyscan_t scanner);
 
 #endif /* !YY_YY_HOME_DEFAULT_WORKSPACE_UNIVERSITY_MODAL_LOGIC_FORMULA_PROVER_PARSER_LIB_GENERATED_PARSER_HPP_INCLUDED  */

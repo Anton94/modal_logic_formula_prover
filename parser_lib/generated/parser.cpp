@@ -50,7 +50,7 @@
 #define YYSKELETON_NAME "yacc.c"
 
 /* Pure parsers.  */
-#define YYPURE 0
+#define YYPURE 2
 
 /* Push parsers.  */
 #define YYPUSH 0
@@ -58,28 +58,22 @@
 /* Pull parsers.  */
 #define YYPULL 1
 
+/* "%code top" blocks.  */
+#line 6 "parser.y" /* yacc.c:316  */
+
+    #include <cstdio>
+    #include <memory>
+    #include <iostream> //todo: get rid of and redirect the error output somewhere...
+
+    #include "../ast.h"
+
+#line 71 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:316  */
 
 
 
 /* Copy the first part of user declarations.  */
-#line 1 "parser.y" /* yacc.c:339  */
 
-#include <cstdio>
-#include <iostream>
-
-#include "../parser_API.h"
-
-using namespace std;
-
-// stuff from flex that bison needs to know about:
-extern int yylex();
-extern int yyparse();
-
-void yyerror(const char *s);
-
-std::unique_ptr<NFormula> parsed_formula;
-
-#line 83 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:339  */
+#line 77 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -108,6 +102,12 @@ std::unique_ptr<NFormula> parsed_formula;
 #if YYDEBUG
 extern int yydebug;
 #endif
+/* "%code requires" blocks.  */
+#line 14 "parser.y" /* yacc.c:355  */
+
+  typedef void* yyscan_t;
+
+#line 111 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:355  */
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
@@ -128,13 +128,14 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 18 "parser.y" /* yacc.c:355  */
 
-    char *sval;
-    NFormula *formula;
-    NTerm *term;
-
-#line 138 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:355  */
+  /* formula  */
+  NFormula* formula;
+  /* term  */
+  NTerm* term;
+  /* "string"  */
+  const char* T_STRING;
+#line 139 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -142,16 +143,38 @@ typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_DECLARED 1
 #endif
 
+/* Location type.  */
+#if ! defined YYLTYPE && ! defined YYLTYPE_IS_DECLARED
+typedef struct YYLTYPE YYLTYPE;
+struct YYLTYPE
+{
+  int first_line;
+  int first_column;
+  int last_line;
+  int last_column;
+};
+# define YYLTYPE_IS_DECLARED 1
+# define YYLTYPE_IS_TRIVIAL 1
+#endif
 
-extern YYSTYPE yylval;
 
-int yyparse (void);
+
+int yyparse (yyscan_t scanner);
 
 #endif /* !YY_YY_HOME_DEFAULT_WORKSPACE_UNIVERSITY_MODAL_LOGIC_FORMULA_PROVER_PARSER_LIB_GENERATED_PARSER_HPP_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 
-#line 155 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:358  */
+#line 169 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:358  */
+/* Unqualified %code blocks.  */
+#line 18 "parser.y" /* yacc.c:359  */
+
+    int yylex(YYSTYPE* yylvalp, YYLTYPE* yyllocp, yyscan_t scanner);
+    void yyerror(YYLTYPE* yyllocp, yyscan_t unused, const char* msg);
+
+    extern thread_local std::unique_ptr<NFormula> parsed_formula;
+
+#line 178 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:359  */
 
 #ifdef short
 # undef short
@@ -332,13 +355,15 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
 
 #if (! defined yyoverflow \
      && (! defined __cplusplus \
-         || (defined YYSTYPE_IS_TRIVIAL && YYSTYPE_IS_TRIVIAL)))
+         || (defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL \
+             && defined YYSTYPE_IS_TRIVIAL && YYSTYPE_IS_TRIVIAL)))
 
 /* A type that is properly aligned for any stack member.  */
 union yyalloc
 {
   yytype_int16 yyss_alloc;
   YYSTYPE yyvs_alloc;
+  YYLTYPE yyls_alloc;
 };
 
 /* The size of the maximum gap between one aligned stack and the next.  */
@@ -347,8 +372,8 @@ union yyalloc
 /* The size of an array large to enough to hold all stacks, each with
    N elements.  */
 # define YYSTACK_BYTES(N) \
-     ((N) * (sizeof (yytype_int16) + sizeof (YYSTYPE)) \
-      + YYSTACK_GAP_MAXIMUM)
+     ((N) * (sizeof (yytype_int16) + sizeof (YYSTYPE) + sizeof (YYLTYPE)) \
+      + 2 * YYSTACK_GAP_MAXIMUM)
 
 # define YYCOPY_NEEDED 1
 
@@ -449,9 +474,9 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    43,    43,    48,    51,    54,    57,    60,    63,    66,
-      69,    72,    75,    78,    81,    84,    87,    90,    93,    98,
-     101,   104,   109,   112,   115,   118,   121,   124
+       0,    45,    45,    50,    53,    56,    59,    62,    65,    68,
+      71,    74,    77,    80,    83,    86,    89,    92,    95,   100,
+     103,   106,   111,   114,   117,   120,   123,   126
 };
 #endif
 
@@ -460,10 +485,9 @@ static const yytype_uint8 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "T_STRING", "T_LESS_EQ",
-  "T_MEASURED_LESS_EQ", "T_EQ_ZERO", "T_FORMULA_OP_IMPLICATION",
-  "T_FORMULA_OP_EQUALITY", "'|'", "'+'", "'&'", "'*'", "'~'", "'-'", "'('",
-  "')'", "'T'", "'F'", "'C'", "','", "'1'", "'0'", "$accept",
+  "$end", "error", "$undefined", "\"string\"", "\"<=\"", "\"<=m\"",
+  "\"=0\"", "\"->\"", "\"<->\"", "'|'", "'+'", "'&'", "'*'", "'~'", "'-'",
+  "'('", "')'", "'T'", "'F'", "'C'", "','", "'1'", "'0'", "$accept",
   "modal_logic_formula", "formula", "term", YY_NULLPTR
 };
 #endif
@@ -615,7 +639,7 @@ do                                                              \
     }                                                           \
   else                                                          \
     {                                                           \
-      yyerror (YY_("syntax error: cannot back up")); \
+      yyerror (&yylloc, scanner, YY_("syntax error: cannot back up")); \
       YYERROR;                                                  \
     }                                                           \
 while (0)
@@ -624,6 +648,32 @@ while (0)
 #define YYTERROR        1
 #define YYERRCODE       256
 
+
+/* YYLLOC_DEFAULT -- Set CURRENT to span from RHS[1] to RHS[N].
+   If N is 0, then set CURRENT to the empty location which ends
+   the previous symbol: RHS[0] (always defined).  */
+
+#ifndef YYLLOC_DEFAULT
+# define YYLLOC_DEFAULT(Current, Rhs, N)                                \
+    do                                                                  \
+      if (N)                                                            \
+        {                                                               \
+          (Current).first_line   = YYRHSLOC (Rhs, 1).first_line;        \
+          (Current).first_column = YYRHSLOC (Rhs, 1).first_column;      \
+          (Current).last_line    = YYRHSLOC (Rhs, N).last_line;         \
+          (Current).last_column  = YYRHSLOC (Rhs, N).last_column;       \
+        }                                                               \
+      else                                                              \
+        {                                                               \
+          (Current).first_line   = (Current).last_line   =              \
+            YYRHSLOC (Rhs, 0).last_line;                                \
+          (Current).first_column = (Current).last_column =              \
+            YYRHSLOC (Rhs, 0).last_column;                              \
+        }                                                               \
+    while (0)
+#endif
+
+#define YYRHSLOC(Rhs, K) ((Rhs)[K])
 
 
 /* Enable debugging if requested.  */
@@ -640,9 +690,48 @@ do {                                            \
     YYFPRINTF Args;                             \
 } while (0)
 
-/* This macro is provided for backward compatibility. */
+
+/* YY_LOCATION_PRINT -- Print the location on the stream.
+   This macro was not mandated originally: define only if we know
+   we won't break user code: when these are the locations we know.  */
+
 #ifndef YY_LOCATION_PRINT
-# define YY_LOCATION_PRINT(File, Loc) ((void) 0)
+# if defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL
+
+/* Print *YYLOCP on YYO.  Private, do not rely on its existence. */
+
+YY_ATTRIBUTE_UNUSED
+static unsigned
+yy_location_print_ (FILE *yyo, YYLTYPE const * const yylocp)
+{
+  unsigned res = 0;
+  int end_col = 0 != yylocp->last_column ? yylocp->last_column - 1 : 0;
+  if (0 <= yylocp->first_line)
+    {
+      res += YYFPRINTF (yyo, "%d", yylocp->first_line);
+      if (0 <= yylocp->first_column)
+        res += YYFPRINTF (yyo, ".%d", yylocp->first_column);
+    }
+  if (0 <= yylocp->last_line)
+    {
+      if (yylocp->first_line < yylocp->last_line)
+        {
+          res += YYFPRINTF (yyo, "-%d", yylocp->last_line);
+          if (0 <= end_col)
+            res += YYFPRINTF (yyo, ".%d", end_col);
+        }
+      else if (0 <= end_col && yylocp->first_column < end_col)
+        res += YYFPRINTF (yyo, "-%d", end_col);
+    }
+  return res;
+ }
+
+#  define YY_LOCATION_PRINT(File, Loc)          \
+  yy_location_print_ (File, &(Loc))
+
+# else
+#  define YY_LOCATION_PRINT(File, Loc) ((void) 0)
+# endif
 #endif
 
 
@@ -652,7 +741,7 @@ do {                                                                      \
     {                                                                     \
       YYFPRINTF (stderr, "%s ", Title);                                   \
       yy_symbol_print (stderr,                                            \
-                  Type, Value); \
+                  Type, Value, Location, scanner); \
       YYFPRINTF (stderr, "\n");                                           \
     }                                                                     \
 } while (0)
@@ -663,10 +752,12 @@ do {                                                                      \
 `----------------------------------------*/
 
 static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
+yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, YYLTYPE const * const yylocationp, yyscan_t scanner)
 {
   FILE *yyo = yyoutput;
   YYUSE (yyo);
+  YYUSE (yylocationp);
+  YYUSE (scanner);
   if (!yyvaluep)
     return;
 # ifdef YYPRINT
@@ -682,12 +773,14 @@ yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvalue
 `--------------------------------*/
 
 static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep)
+yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, YYLTYPE const * const yylocationp, yyscan_t scanner)
 {
   YYFPRINTF (yyoutput, "%s %s (",
              yytype < YYNTOKENS ? "token" : "nterm", yytname[yytype]);
 
-  yy_symbol_value_print (yyoutput, yytype, yyvaluep);
+  YY_LOCATION_PRINT (yyoutput, *yylocationp);
+  YYFPRINTF (yyoutput, ": ");
+  yy_symbol_value_print (yyoutput, yytype, yyvaluep, yylocationp, scanner);
   YYFPRINTF (yyoutput, ")");
 }
 
@@ -720,7 +813,7 @@ do {                                                            \
 `------------------------------------------------*/
 
 static void
-yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule)
+yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, YYLTYPE *yylsp, int yyrule, yyscan_t scanner)
 {
   unsigned long int yylno = yyrline[yyrule];
   int yynrhs = yyr2[yyrule];
@@ -733,8 +826,8 @@ yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule)
       YYFPRINTF (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr,
                        yystos[yyssp[yyi + 1 - yynrhs]],
-                       &(yyvsp[(yyi + 1) - (yynrhs)])
-                                              );
+                       &yyvsp[(yyi + 1) - (yynrhs)]
+                       , &(yylsp[(yyi + 1) - (yynrhs)])                       , scanner);
       YYFPRINTF (stderr, "\n");
     }
 }
@@ -742,7 +835,7 @@ yy_reduce_print (yytype_int16 *yyssp, YYSTYPE *yyvsp, int yyrule)
 # define YY_REDUCE_PRINT(Rule)          \
 do {                                    \
   if (yydebug)                          \
-    yy_reduce_print (yyssp, yyvsp, Rule); \
+    yy_reduce_print (yyssp, yyvsp, yylsp, Rule, scanner); \
 } while (0)
 
 /* Nonzero means print parse trace.  It is left uninitialized so that
@@ -1000,9 +1093,11 @@ yysyntax_error (YYSIZE_T *yymsg_alloc, char **yymsg,
 `-----------------------------------------------*/
 
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep)
+yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, YYLTYPE *yylocationp, yyscan_t scanner)
 {
   YYUSE (yyvaluep);
+  YYUSE (yylocationp);
+  YYUSE (scanner);
   if (!yymsg)
     yymsg = "Deleting";
   YY_SYMBOL_PRINT (yymsg, yytype, yyvaluep, yylocationp);
@@ -1015,22 +1110,34 @@ yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep)
 
 
 
-/* The lookahead symbol.  */
-int yychar;
-
-/* The semantic value of the lookahead symbol.  */
-YYSTYPE yylval;
-/* Number of syntax errors so far.  */
-int yynerrs;
-
-
 /*----------.
 | yyparse.  |
 `----------*/
 
 int
-yyparse (void)
+yyparse (yyscan_t scanner)
 {
+/* The lookahead symbol.  */
+int yychar;
+
+
+/* The semantic value of the lookahead symbol.  */
+/* Default value used for initialization, for pacifying older GCCs
+   or non-GCC compilers.  */
+YY_INITIAL_VALUE (static YYSTYPE yyval_default;)
+YYSTYPE yylval YY_INITIAL_VALUE (= yyval_default);
+
+/* Location data for the lookahead symbol.  */
+static YYLTYPE yyloc_default
+# if defined YYLTYPE_IS_TRIVIAL && YYLTYPE_IS_TRIVIAL
+  = { 1, 1, 1, 1 }
+# endif
+;
+YYLTYPE yylloc = yyloc_default;
+
+    /* Number of syntax errors so far.  */
+    int yynerrs;
+
     int yystate;
     /* Number of tokens to shift before error messages enabled.  */
     int yyerrstatus;
@@ -1038,6 +1145,7 @@ yyparse (void)
     /* The stacks and their tools:
        'yyss': related to states.
        'yyvs': related to semantic values.
+       'yyls': related to locations.
 
        Refer to the stacks through separate pointers, to allow yyoverflow
        to reallocate them elsewhere.  */
@@ -1052,6 +1160,14 @@ yyparse (void)
     YYSTYPE *yyvs;
     YYSTYPE *yyvsp;
 
+    /* The location stack.  */
+    YYLTYPE yylsa[YYINITDEPTH];
+    YYLTYPE *yyls;
+    YYLTYPE *yylsp;
+
+    /* The locations where the error started and ended.  */
+    YYLTYPE yyerror_range[3];
+
     YYSIZE_T yystacksize;
 
   int yyn;
@@ -1061,6 +1177,7 @@ yyparse (void)
   /* The variables used to return semantic value and location from the
      action routines.  */
   YYSTYPE yyval;
+  YYLTYPE yyloc;
 
 #if YYERROR_VERBOSE
   /* Buffer for error messages, and its allocated size.  */
@@ -1069,7 +1186,7 @@ yyparse (void)
   YYSIZE_T yymsg_alloc = sizeof yymsgbuf;
 #endif
 
-#define YYPOPSTACK(N)   (yyvsp -= (N), yyssp -= (N))
+#define YYPOPSTACK(N)   (yyvsp -= (N), yyssp -= (N), yylsp -= (N))
 
   /* The number of symbols on the RHS of the reduced rule.
      Keep to zero when no symbol should be popped.  */
@@ -1077,6 +1194,7 @@ yyparse (void)
 
   yyssp = yyss = yyssa;
   yyvsp = yyvs = yyvsa;
+  yylsp = yyls = yylsa;
   yystacksize = YYINITDEPTH;
 
   YYDPRINTF ((stderr, "Starting parse\n"));
@@ -1085,6 +1203,7 @@ yyparse (void)
   yyerrstatus = 0;
   yynerrs = 0;
   yychar = YYEMPTY; /* Cause a token to be read.  */
+  yylsp[0] = yylloc;
   goto yysetstate;
 
 /*------------------------------------------------------------.
@@ -1110,6 +1229,7 @@ yyparse (void)
            memory.  */
         YYSTYPE *yyvs1 = yyvs;
         yytype_int16 *yyss1 = yyss;
+        YYLTYPE *yyls1 = yyls;
 
         /* Each stack pointer address is followed by the size of the
            data in use in that stack, in bytes.  This used to be a
@@ -1118,8 +1238,10 @@ yyparse (void)
         yyoverflow (YY_("memory exhausted"),
                     &yyss1, yysize * sizeof (*yyssp),
                     &yyvs1, yysize * sizeof (*yyvsp),
+                    &yyls1, yysize * sizeof (*yylsp),
                     &yystacksize);
 
+        yyls = yyls1;
         yyss = yyss1;
         yyvs = yyvs1;
       }
@@ -1142,6 +1264,7 @@ yyparse (void)
           goto yyexhaustedlab;
         YYSTACK_RELOCATE (yyss_alloc, yyss);
         YYSTACK_RELOCATE (yyvs_alloc, yyvs);
+        YYSTACK_RELOCATE (yyls_alloc, yyls);
 #  undef YYSTACK_RELOCATE
         if (yyss1 != yyssa)
           YYSTACK_FREE (yyss1);
@@ -1151,6 +1274,7 @@ yyparse (void)
 
       yyssp = yyss + yysize - 1;
       yyvsp = yyvs + yysize - 1;
+      yylsp = yyls + yysize - 1;
 
       YYDPRINTF ((stderr, "Stack size increased to %lu\n",
                   (unsigned long int) yystacksize));
@@ -1185,7 +1309,7 @@ yybackup:
   if (yychar == YYEMPTY)
     {
       YYDPRINTF ((stderr, "Reading a token: "));
-      yychar = yylex ();
+      yychar = yylex (&yylval, &yylloc, scanner);
     }
 
   if (yychar <= YYEOF)
@@ -1228,7 +1352,7 @@ yybackup:
   YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
   *++yyvsp = yylval;
   YY_IGNORE_MAYBE_UNINITIALIZED_END
-
+  *++yylsp = yylloc;
   goto yynewstate;
 
 
@@ -1259,222 +1383,223 @@ yyreduce:
      GCC warning that YYVAL may be used uninitialized.  */
   yyval = yyvsp[1-yylen];
 
-
+  /* Default location.  */
+  YYLLOC_DEFAULT (yyloc, (yylsp - yylen), yylen);
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
         case 2:
-#line 43 "parser.y" /* yacc.c:1646  */
+#line 45 "parser.y" /* yacc.c:1646  */
     {
-        parsed_formula.reset((yyvsp[0].formula));
+        parsed_formula.reset((*(NFormula**)(&yyvsp[0])));
     }
-#line 1272 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1397 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 48 "parser.y" /* yacc.c:1646  */
+#line 50 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::constant_true);
+        (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::constant_true);
     }
-#line 1280 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1405 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 51 "parser.y" /* yacc.c:1646  */
+#line 53 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::constant_false);
+        (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::constant_false);
     }
-#line 1288 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1413 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 54 "parser.y" /* yacc.c:1646  */
+#line 56 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::contact, (yyvsp[-3].term), (yyvsp[-1].term));
+        (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::contact, (*(NTerm**)(&yyvsp[-3])), (*(NTerm**)(&yyvsp[-1])));
     }
-#line 1296 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1421 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 57 "parser.y" /* yacc.c:1646  */
+#line 59 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::less_eq, (yyvsp[-3].term), (yyvsp[-1].term));
+        (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::less_eq, (*(NTerm**)(&yyvsp[-3])), (*(NTerm**)(&yyvsp[-1])));
     }
-#line 1304 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1429 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 60 "parser.y" /* yacc.c:1646  */
+#line 62 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::measured_less_eq, (yyvsp[-3].term), (yyvsp[-1].term));
+        (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::measured_less_eq, (*(NTerm**)(&yyvsp[-3])), (*(NTerm**)(&yyvsp[-1])));
     }
-#line 1312 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1437 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 63 "parser.y" /* yacc.c:1646  */
+#line 65 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::eq_zero, (yyvsp[-1].term));
+        (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::eq_zero, (*(NTerm**)(&yyvsp[-1])));
     }
-#line 1320 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1445 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 66 "parser.y" /* yacc.c:1646  */
+#line 68 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::conjunction, (yyvsp[-3].formula), (yyvsp[-1].formula));
+        (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::conjunction, (*(NFormula**)(&yyvsp[-3])), (*(NFormula**)(&yyvsp[-1])));
     }
-#line 1328 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1453 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 69 "parser.y" /* yacc.c:1646  */
+#line 71 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::conjunction, (yyvsp[-2].formula), (yyvsp[0].formula));
+        (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::conjunction, (*(NFormula**)(&yyvsp[-2])), (*(NFormula**)(&yyvsp[0])));
     }
-#line 1336 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1461 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 72 "parser.y" /* yacc.c:1646  */
+#line 74 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::disjunction, (yyvsp[-3].formula), (yyvsp[-1].formula));
+        (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::disjunction, (*(NFormula**)(&yyvsp[-3])), (*(NFormula**)(&yyvsp[-1])));
     }
-#line 1344 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1469 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 75 "parser.y" /* yacc.c:1646  */
+#line 77 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::disjunction, (yyvsp[-2].formula), (yyvsp[0].formula));
+        (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::disjunction, (*(NFormula**)(&yyvsp[-2])), (*(NFormula**)(&yyvsp[0])));
     }
-#line 1352 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1477 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 78 "parser.y" /* yacc.c:1646  */
+#line 80 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::negation, (yyvsp[0].formula));
+        (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::negation, (*(NFormula**)(&yyvsp[0])));
     }
-#line 1360 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1485 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 81 "parser.y" /* yacc.c:1646  */
+#line 83 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::implication, (yyvsp[-3].formula), (yyvsp[-1].formula));
+        (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::implication, (*(NFormula**)(&yyvsp[-3])), (*(NFormula**)(&yyvsp[-1])));
     }
-#line 1368 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1493 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 84 "parser.y" /* yacc.c:1646  */
+#line 86 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::implication, (yyvsp[-2].formula), (yyvsp[0].formula));
+        (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::implication, (*(NFormula**)(&yyvsp[-2])), (*(NFormula**)(&yyvsp[0])));
     }
-#line 1376 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1501 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 87 "parser.y" /* yacc.c:1646  */
+#line 89 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::equality, (yyvsp[-3].formula), (yyvsp[-1].formula));
+        (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::equality, (*(NFormula**)(&yyvsp[-3])), (*(NFormula**)(&yyvsp[-1])));
     }
-#line 1384 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1509 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 90 "parser.y" /* yacc.c:1646  */
+#line 92 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = new NFormula(formula_operation_t::equality, (yyvsp[-2].formula), (yyvsp[0].formula));
+        (*(NFormula**)(&yyval)) = new NFormula(formula_operation_t::equality, (*(NFormula**)(&yyvsp[-2])), (*(NFormula**)(&yyvsp[0])));
     }
-#line 1392 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1517 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 93 "parser.y" /* yacc.c:1646  */
+#line 95 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.formula) = (yyvsp[-1].formula);
+        (*(NFormula**)(&yyval)) = (*(NFormula**)(&yyvsp[-1]));
     }
-#line 1400 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1525 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 98 "parser.y" /* yacc.c:1646  */
+#line 100 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.term) = new NTerm(term_operation_t::constant_true);
+        (*(NTerm**)(&yyval)) = new NTerm(term_operation_t::constant_true);
     }
-#line 1408 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1533 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 101 "parser.y" /* yacc.c:1646  */
+#line 103 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.term) = new NTerm(term_operation_t::constant_false);
+        (*(NTerm**)(&yyval)) = new NTerm(term_operation_t::constant_false);
     }
-#line 1416 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1541 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 104 "parser.y" /* yacc.c:1646  */
+#line 106 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.term) = new NTerm(term_operation_t::variable);
-        (yyval.term)->variable = (yyvsp[0].sval);
-        free((yyvsp[0].sval));
+        (*(NTerm**)(&yyval)) = new NTerm(term_operation_t::variable);
+        (*(NTerm**)(&yyval))->variable = (*(const char**)(&yyvsp[0]));
+        free((void*)(*(const char**)(&yyvsp[0])));
     }
-#line 1426 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1551 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 109 "parser.y" /* yacc.c:1646  */
+#line 111 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.term) = new NTerm(term_operation_t::intersaction, (yyvsp[-3].term), (yyvsp[-1].term));
+        (*(NTerm**)(&yyval)) = new NTerm(term_operation_t::intersaction, (*(NTerm**)(&yyvsp[-3])), (*(NTerm**)(&yyvsp[-1])));
     }
-#line 1434 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1559 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 112 "parser.y" /* yacc.c:1646  */
+#line 114 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.term) = new NTerm(term_operation_t::intersaction, (yyvsp[-2].term), (yyvsp[0].term));
+        (*(NTerm**)(&yyval)) = new NTerm(term_operation_t::intersaction, (*(NTerm**)(&yyvsp[-2])), (*(NTerm**)(&yyvsp[0])));
     }
-#line 1442 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1567 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 115 "parser.y" /* yacc.c:1646  */
+#line 117 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.term) = new NTerm(term_operation_t::union_, (yyvsp[-3].term), (yyvsp[-1].term));
+        (*(NTerm**)(&yyval)) = new NTerm(term_operation_t::union_, (*(NTerm**)(&yyvsp[-3])), (*(NTerm**)(&yyvsp[-1])));
     }
-#line 1450 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1575 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 118 "parser.y" /* yacc.c:1646  */
+#line 120 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.term) = new NTerm(term_operation_t::union_, (yyvsp[-2].term), (yyvsp[0].term));
+        (*(NTerm**)(&yyval)) = new NTerm(term_operation_t::union_, (*(NTerm**)(&yyvsp[-2])), (*(NTerm**)(&yyvsp[0])));
     }
-#line 1458 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1583 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 121 "parser.y" /* yacc.c:1646  */
+#line 123 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.term) = new NTerm(term_operation_t::complement, (yyvsp[0].term));
+        (*(NTerm**)(&yyval)) = new NTerm(term_operation_t::complement, (*(NTerm**)(&yyvsp[0])));
     }
-#line 1466 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1591 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 124 "parser.y" /* yacc.c:1646  */
+#line 126 "parser.y" /* yacc.c:1646  */
     {
-        (yyval.term) = (yyvsp[-1].term);
+        (*(NTerm**)(&yyval)) = (*(NTerm**)(&yyvsp[-1]));
     }
-#line 1474 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1599 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 1478 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
+#line 1603 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1495,6 +1620,7 @@ yyreduce:
   YY_STACK_PRINT (yyss, yyssp);
 
   *++yyvsp = yyval;
+  *++yylsp = yyloc;
 
   /* Now 'shift' the result of the reduction.  Determine what state
      that goes to, based on the state we popped back to and the rule
@@ -1524,7 +1650,7 @@ yyerrlab:
     {
       ++yynerrs;
 #if ! YYERROR_VERBOSE
-      yyerror (YY_("syntax error"));
+      yyerror (&yylloc, scanner, YY_("syntax error"));
 #else
 # define YYSYNTAX_ERROR yysyntax_error (&yymsg_alloc, &yymsg, \
                                         yyssp, yytoken)
@@ -1551,7 +1677,7 @@ yyerrlab:
                 yymsgp = yymsg;
               }
           }
-        yyerror (yymsgp);
+        yyerror (&yylloc, scanner, yymsgp);
         if (yysyntax_error_status == 2)
           goto yyexhaustedlab;
       }
@@ -1559,7 +1685,7 @@ yyerrlab:
 #endif
     }
 
-
+  yyerror_range[1] = yylloc;
 
   if (yyerrstatus == 3)
     {
@@ -1575,7 +1701,7 @@ yyerrlab:
       else
         {
           yydestruct ("Error: discarding",
-                      yytoken, &yylval);
+                      yytoken, &yylval, &yylloc, scanner);
           yychar = YYEMPTY;
         }
     }
@@ -1596,6 +1722,7 @@ yyerrorlab:
   if (/*CONSTCOND*/ 0)
      goto yyerrorlab;
 
+  yyerror_range[1] = yylsp[1-yylen];
   /* Do not reclaim the symbols of the rule whose action triggered
      this YYERROR.  */
   YYPOPSTACK (yylen);
@@ -1629,9 +1756,9 @@ yyerrlab1:
       if (yyssp == yyss)
         YYABORT;
 
-
+      yyerror_range[1] = *yylsp;
       yydestruct ("Error: popping",
-                  yystos[yystate], yyvsp);
+                  yystos[yystate], yyvsp, yylsp, scanner);
       YYPOPSTACK (1);
       yystate = *yyssp;
       YY_STACK_PRINT (yyss, yyssp);
@@ -1641,6 +1768,11 @@ yyerrlab1:
   *++yyvsp = yylval;
   YY_IGNORE_MAYBE_UNINITIALIZED_END
 
+  yyerror_range[2] = yylloc;
+  /* Using YYLLOC is tempting, but would change the location of
+     the lookahead.  YYLOC is available though.  */
+  YYLLOC_DEFAULT (yyloc, yyerror_range, 2);
+  *++yylsp = yyloc;
 
   /* Shift the error token.  */
   YY_SYMBOL_PRINT ("Shifting", yystos[yyn], yyvsp, yylsp);
@@ -1668,7 +1800,7 @@ yyabortlab:
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
 yyexhaustedlab:
-  yyerror (YY_("memory exhausted"));
+  yyerror (&yylloc, scanner, YY_("memory exhausted"));
   yyresult = 2;
   /* Fall through.  */
 #endif
@@ -1680,7 +1812,7 @@ yyreturn:
          user semantic actions for why this is necessary.  */
       yytoken = YYTRANSLATE (yychar);
       yydestruct ("Cleanup: discarding lookahead",
-                  yytoken, &yylval);
+                  yytoken, &yylval, &yylloc, scanner);
     }
   /* Do not reclaim the symbols of the rule whose action triggered
      this YYABORT or YYACCEPT.  */
@@ -1689,7 +1821,7 @@ yyreturn:
   while (yyssp != yyss)
     {
       yydestruct ("Cleanup: popping",
-                  yystos[*yyssp], yyvsp);
+                  yystos[*yyssp], yyvsp, yylsp, scanner);
       YYPOPSTACK (1);
     }
 #ifndef yyoverflow
@@ -1702,27 +1834,10 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 128 "parser.y" /* yacc.c:1906  */
+#line 130 "parser.y" /* yacc.c:1906  */
 
 
-void set_input_string(const char* in);
-void end_lexical_scan();
-
-std::unique_ptr<NFormula> parse_from_input_string(const char* in)
+void yyerror(YYLTYPE* yyllocp, yyscan_t unused, const char* msg)
 {
-    parsed_formula.reset(nullptr);
-
-    set_input_string(in);
-    int rv = yyparse();
-    end_lexical_scan();
-
-    (void) rv;
-    return std::unique_ptr<NFormula>(parsed_formula.release());
-}
-
-void yyerror(const char *s)
-{
-    cout << "EEK, parse error!  Message: " << s << endl;
-    // might as well halt now:
-    exit(-1);
+    std::cerr << "[" << yyllocp->first_line << ":" << yyllocp->first_column << "]: " << msg << std::endl;
 }
