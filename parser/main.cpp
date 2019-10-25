@@ -18,7 +18,7 @@ int main(int, char**)
     input_formula = "<=(a + b, c) | C(a + b, c) & C(a, b + c) & C(a + b + c, e + f + g)";
     input_formula = "<=(a + b, c) | <=(a + b + c * -h, e + f * g)";
     input_formula = "C(a+b,1) & C(1,e+g * -h) & C(a+b,0)";
-    input_formula = "C(a,b) | <=(E,fafgs)    & \n C(b,a) | <=(fasfa,e+)";
+    input_formula = "C(a,b) <=(x,x)";
 
     std::cout << "Will try to parce         : " << input_formula << std::endl;
     parser_error_info error_info;

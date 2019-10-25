@@ -11,6 +11,11 @@ thread_local std::function<void(int /*line*/, int /*column*/, const char* /*msg*
 std::unique_ptr<NFormula> parse_from_input_string(const char* in, parser_error_info& info)
 {
     parsed_formula.reset(nullptr);
+    on_error = [&](int line, int column, const char* msg) {
+        info.line = line;
+        info.column = column;
+        info.msg = msg;
+    };
 
     yyscan_t scanner;
     yylex_init(&scanner);
@@ -18,18 +23,17 @@ std::unique_ptr<NFormula> parse_from_input_string(const char* in, parser_error_i
     YY_BUFFER_STATE buff = yy_scan_string(in, scanner);
     yyset_lineno(1, scanner);
     yyset_column(0, scanner);
-
-    on_error = [&](int line, int column, const char* msg) {
-        info.line = line;
-        info.column = column;
-        info.msg = msg;
-    };
-
-    yyparse(scanner); // 0 is OK 1,2 are errors, might be useful.
+    auto res = yyparse(scanner);
     yy_delete_buffer(buff, scanner);
     yylex_destroy(scanner);
 
     on_error = {};
+
+    if(res != 0)
+    {
+        parsed_formula.reset(nullptr);
+        return nullptr;
+    }
     return std::unique_ptr<NFormula>(parsed_formula.release());
 }
 
