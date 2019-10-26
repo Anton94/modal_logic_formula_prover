@@ -20,19 +20,25 @@ elseif (NOT FLEX_FOUND)
 else()
     message("[PARSER] Found Bison: " ${BISON_VERSION})
     message("[PARSER] Found Flex: " ${FLEX_VERSION})
-    BISON_TARGET(Parser parser.y ${generated_parser_cpp})
-    FLEX_TARGET(Scanner lexer.l ${generated_lexer_cpp} DEFINES_FILE "${generated_lexer_hpp}")
-    ADD_FLEX_BISON_DEPENDENCY(Scanner Parser)
+    if(BISON_VERSION VERSION_LESS "3.4")
+        message("Bison version is less than 3.4 and not tested for compatability. If you insist, you can remove the check and try it.")
+    elseif(FLEX_VERSION VERSION_LESS "2.6")
+        message("Flex version is less than 2.6 and not tested for compatability. If you insist, you can remove the check and try it.")
+    else()
+        BISON_TARGET(Parser parser.y ${generated_parser_cpp})
+        FLEX_TARGET(Scanner lexer.l ${generated_lexer_cpp} DEFINES_FILE "${generated_lexer_hpp}")
+        ADD_FLEX_BISON_DEPENDENCY(Scanner Parser)
 
-    if((NOT ${generated_parser_cpp} STREQUAL ${BISON_Parser_OUTPUT_SOURCE}) OR
-       (NOT ${generated_parser_hpp} STREQUAL ${BISON_Parser_OUTPUT_HEADER}) OR
-       (NOT ${generated_lexer_cpp} STREQUAL ${FLEX_Scanner_OUTPUTS}) OR
-       (NOT ${generated_lexer_hpp} STREQUAL ${FLEX_Scanner_OUTPUT_HEADER}))
-        message("[PARSER] ERROR: For some reason the generated output files of bison/flex are not the same as the generated once. You can swap them by hand or fix the issue.")
-        message("[PARSER] Expected generated files: " ${generated_parser_cpp} ${generated_parser_hpp} ${generated_lexer_cpp} ${generated_lexer_hpp})
-        message("[PARSER] Bison generated files: " ${BISON_Parser_OUTPUTS})
-        message("[PARSER] Flex generated files: " ${FLEX_Scanner_OUTPUTS})
-    endif()
+        if((NOT ${generated_parser_cpp} STREQUAL ${BISON_Parser_OUTPUT_SOURCE}) OR
+           (NOT ${generated_parser_hpp} STREQUAL ${BISON_Parser_OUTPUT_HEADER}) OR
+           (NOT ${generated_lexer_cpp} STREQUAL ${FLEX_Scanner_OUTPUTS}) OR
+           (NOT ${generated_lexer_hpp} STREQUAL ${FLEX_Scanner_OUTPUT_HEADER}))
+            message("[PARSER] ERROR: For some reason the generated output files of bison/flex are not the same as the generated once. You can swap them by hand or fix the issue.")
+            message("[PARSER] Expected generated files: " ${generated_parser_cpp} ${generated_parser_hpp} ${generated_lexer_cpp} ${generated_lexer_hpp})
+            message("[PARSER] Bison generated files: " ${BISON_Parser_OUTPUTS})
+            message("[PARSER] Flex generated files: " ${FLEX_Scanner_OUTPUTS})
+        endif()
+	endif()
 endif()
 
 # Create a static library in order to be used from other projects
