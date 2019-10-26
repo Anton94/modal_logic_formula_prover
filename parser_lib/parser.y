@@ -177,7 +177,7 @@ void free_all_nodes()
     parsed_formula.release();
 }
 
-void yyerror(YYLTYPE* yyllocp, yyscan_t unused, const char* msg)
+void yyerror(YYLTYPE* yyllocp, yyscan_t, const char* msg)
 {
     if(on_error)
     {
