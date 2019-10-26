@@ -4,8 +4,7 @@
 #include <iostream>
 #include <string>
 
-#include <boost/algorithm/string/predicate.hpp>
-#include <boost/filesystem.hpp>
+#include <filesystem/filesystem.hpp>
 
 #include "nlohmann_json/json.hpp"
 
@@ -21,6 +20,12 @@ std::string to_string(bool b)
 {
     return b ? "true" : "false";
 }
+
+bool starts_with(const std::string& s, const std::string& prefix)
+{
+    return s.find(prefix) == 0;
+}
+
 }
 
 using n_json = nlohmann::json;
@@ -56,18 +61,18 @@ void microservice_controller::handle_get(http_request message)
 
     std::string message_path = utility::conversions::to_utf8string(message.absolute_uri().path());
 
-    if(boost::starts_with(message_path, "/rest"))
+    if(starts_with(message_path, "/rest"))
     {
         // for now we do not have any get get request
         message.reply(status_codes::OK);
         return;
     }
 
-    std::string relative_file(CLIENT_DIR + message_path);
-    if(boost::filesystem::exists(relative_file))
+    fs::path relative_file(CLIENT_DIR + message_path);
+    if(fs::exists(relative_file))
     {
         auto content_type = U("application/octet-stream");
-        auto ext = boost::filesystem::extension(relative_file);
+        auto ext = relative_file.extension();
         if(ext.compare(".html") == 0)
         {
             content_type = U("text/html");
@@ -112,7 +117,7 @@ void microservice_controller::handle_post(http_request message)
 
     std::string message_path = utility::conversions::to_utf8string(message.absolute_uri().path());
 
-	if (boost::starts_with(message_path, "/cancel"))
+	if (starts_with(message_path, "/cancel"))
 	{
 		message.content_ready().then([=](web::http::http_request request) {
 			request.extract_string(true)
@@ -148,7 +153,7 @@ void microservice_controller::handle_post(http_request message)
 		return;
 	}
 
-	if (boost::starts_with(message_path, "/task"))
+	if (starts_with(message_path, "/task"))
 	{
 		std::string op_id = generate_random_op_id(10);
 		// TODO: make the cts a reference or move it to the map.
@@ -213,7 +218,7 @@ void microservice_controller::handle_post(http_request message)
 		return;
 	}
 
-    if(boost::starts_with(message_path, "/satisfy"))
+    if(starts_with(message_path, "/satisfy"))
     {
         message.content_ready().then([=](web::http::http_request request) {
             request.extract_string(true)
@@ -260,7 +265,7 @@ void microservice_controller::handle_post(http_request message)
         return;
     }
 
-    if(boost::starts_with(message_path, "/build_formula"))
+    if(starts_with(message_path, "/build_formula"))
     {
         message.content_ready().then([=](web::http::http_request request) {
             request.extract_string(true)
@@ -298,7 +303,7 @@ void microservice_controller::handle_post(http_request message)
         return;
     }
 
-    if(boost::starts_with(message_path, "/bruteforce_satisfy"))
+    if(starts_with(message_path, "/bruteforce_satisfy"))
     {
         message.content_ready().then([=](web::http::http_request request) {
             request.extract_string(true)
@@ -336,7 +341,7 @@ void microservice_controller::handle_post(http_request message)
         return;
     }
 
-    if(boost::starts_with(message_path, "/is_satisfied_certificate"))
+    if(starts_with(message_path, "/is_satisfied_certificate"))
     {
         auto paths = http::uri::split_path(http::uri::decode(message.relative_uri().path()));
         auto queries = http::uri::split_query(message.relative_uri().query());
