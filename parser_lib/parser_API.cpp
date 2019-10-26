@@ -2,6 +2,7 @@
 #include "parser.h"
 
 #include <cassert>
+#include <functional>
 
 thread_local std::unique_ptr<NFormula> parsed_formula;
 
