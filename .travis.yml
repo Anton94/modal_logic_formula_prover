@@ -69,7 +69,7 @@ matrix:
             - cmake
       env:
         - COMPILERCXX='clang++-7'
-        - COMPILERC='clang-7'env:
+        - COMPILERC='clang-7'
 
     - os: linux
       compiler: clang
