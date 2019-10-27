@@ -118,3 +118,5 @@ script:
   - cd build
   - cmake -DCMAKE_INSTALL_PREFIX=./install -DCMAKE_C_COMPILER=$COMPILERC -DCMAKE_CXX_COMPILER=$COMPILERCXX -DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=gold ..
   - cmake --build .
+  - cd tests
+  - ./tests -d yes
