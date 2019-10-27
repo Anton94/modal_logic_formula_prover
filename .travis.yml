@@ -90,7 +90,7 @@ matrix:
         - COMPILERC='clang-8'
         - BUILD_TYPE='Debug'
 
-    os: linux
+    - os: linux
       compiler: clang
       addons: &clang60
         apt:
