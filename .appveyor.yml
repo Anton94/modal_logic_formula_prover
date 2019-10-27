@@ -135,5 +135,5 @@ build_script:
   - cd build
   - cmake -G "Ninja" -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ..
   - cmake --build .
-  - cd tests\%BUILD_TYPE%
+  - cd tests
   - tests.exe -d yes
