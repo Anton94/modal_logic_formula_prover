@@ -12,36 +12,6 @@ matrix:
     # 1/ Linux Clang Builds
     - os: linux
       compiler: clang
-      addons: &clang38
-        apt:
-          sources:
-            - llvm-toolchain-xenial-3.8
-            - ubuntu-toolchain-r-test
-          packages:
-            - libstdc++-5-dev
-            - clang-3.8
-            - cmake
-      env:
-        - COMPILERCXX='clang++-3.8'
-        - COMPILERC='clang-3.8'
-
-    - os: linux
-      compiler: clang
-      addons: &clang39
-        apt:
-          sources:
-            - llvm-toolchain-xenial-3.9
-            - ubuntu-toolchain-r-test
-          packages:
-            - libstdc++-6-dev
-            - clang-3.9
-            - cmake
-      env:
-        - COMPILERCXX='clang++-3.9'
-        - COMPILERC='clang-3.9'
-
-    - os: linux
-      compiler: clang
       addons: &clang40
         apt:
           sources:
@@ -69,6 +39,34 @@ matrix:
       env:
         - COMPILERCXX='clang++-5.0'
         - COMPILERC='clang-5.0'
+
+    - os: linux
+      compiler: clang
+      addons: &clang60
+        apt:
+          sources:
+            - llvm-toolchain-xenial-6.0
+            - ubuntu-toolchain-r-test
+          packages:
+            - clang-6.0
+            - cmake
+      env:
+        - COMPILERCXX='clang++-6.0'
+        - COMPILERC='clang-6.0'
+
+    - os: linux
+      compiler: clang
+      addons: &clang70
+        apt:
+          sources:
+            - llvm-toolchain-xenial-7.0
+            - ubuntu-toolchain-r-test
+          packages:
+            - clang-7.0
+            - cmake
+      env:
+        - COMPILERCXX='clang++-7.0'
+        - COMPILERC='clang-7.0'
 
     # 2/ Linux GCC Builds
     - os: linux
