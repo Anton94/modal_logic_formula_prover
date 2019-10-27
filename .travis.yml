@@ -59,14 +59,28 @@ matrix:
       addons: &clang70
         apt:
           sources:
-            - llvm-toolchain-xenial-7.0
+            - llvm-toolchain-xenial-7
             - ubuntu-toolchain-r-test
           packages:
-            - clang-7.0
+            - clang-7
             - cmake
       env:
-        - COMPILERCXX='clang++-7.0'
-        - COMPILERC='clang-7.0'
+        - COMPILERCXX='clang++-7'
+        - COMPILERC='clang-7'
+
+    - os: linux
+      compiler: clang
+      addons: &clang80
+        apt:
+          sources:
+            - llvm-toolchain-xenial-8
+            - ubuntu-toolchain-r-test
+          packages:
+            - clang-8
+            - cmake
+      env:
+        - COMPILERCXX='clang++-8'
+        - COMPILERC='clang-8'
 
     # 2/ Linux GCC Builds
     - os: linux
@@ -107,6 +121,32 @@ matrix:
       env:
         - COMPILERCXX='g++-7'
         - COMPILERC='gcc-7'
+
+    - os: linux
+      compiler: gcc
+      addons: &gcc8
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-8
+            - cmake
+      env:
+        - COMPILERCXX='g++-8'
+        - COMPILERC='gcc-8'
+
+    - os: linux
+      compiler: gcc
+      addons: &gcc9
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-9
+            - cmake
+      env:
+        - COMPILERCXX='g++-9'
+        - COMPILERC='gcc-9'
 
 before_install:
   - sudo apt-get install libcpprest-dev
