@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.com/Anton94/modal_logic_formula_prover.svg?branch=master)](https://travis-ci.com/Anton94/modal_logic_formula_prover)
+[![Build status](https://ci.appveyor.com/api/projects/status/0bjq49fxgpb66jkn?svg=true)](https://ci.appveyor.com/project/Anton94/modal-logic-formula-prover)
 
 # modal_logic_formula_prover
 TODO: Master degree project for prooving/disprooving formulas (space and probability)
