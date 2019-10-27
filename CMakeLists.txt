@@ -20,3 +20,13 @@ add_subdirectory (tests)
 #add_subdirectory (client)
 add_subdirectory (parser)
 
+if(${ENABLE_THREAD_SANITIZER})
+    list(APPEND ECM_ENABLE_SANITIZERS "thread")
+endif()
+if(${ENABLE_MEMORY_SANITIZER})
+    list(APPEND ECM_ENABLE_SANITIZERS "memory") # memory is not allowed with address
+elseif(${ENABLE_ADDRESS_UB_LEAK_SANITIZERS})
+    list(APPEND ECM_ENABLE_SANITIZERS "address;undefined;leak")
+endif()
+
+include(ECMEnableSanitizers)

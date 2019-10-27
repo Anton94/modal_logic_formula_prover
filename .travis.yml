@@ -24,6 +24,7 @@ matrix:
       env:
         - COMPILERCXX='clang++-4.0'
         - COMPILERC='clang-4.0'
+        - ENABLE_ADDRESS_UB_LEAK_SANITIZERS=true
 
     - os: linux
       compiler: clang
@@ -39,6 +40,7 @@ matrix:
       env:
         - COMPILERCXX='clang++-5.0'
         - COMPILERC='clang-5.0'
+        - ENABLE_ADDRESS_UB_LEAK_SANITIZERS=true
 
     - os: linux
       compiler: clang
@@ -53,6 +55,7 @@ matrix:
       env:
         - COMPILERCXX='clang++-6.0'
         - COMPILERC='clang-6.0'
+        - ENABLE_ADDRESS_UB_LEAK_SANITIZERS=true
 
     - os: linux
       compiler: clang
@@ -66,7 +69,7 @@ matrix:
             - cmake
       env:
         - COMPILERCXX='clang++-7'
-        - COMPILERC='clang-7'
+        - COMPILERC='clang-7'env:
 
     - os: linux
       compiler: clang
@@ -95,6 +98,7 @@ matrix:
       env:
         - COMPILERCXX='g++-5'
         - COMPILERC='gcc-5'
+        - ENABLE_ADDRESS_UB_LEAK_SANITIZERS=true
 
     - os: linux
       compiler: gcc
@@ -108,6 +112,7 @@ matrix:
       env:
         - COMPILERCXX='g++-6'
         - COMPILERC='gcc-6'
+        - ENABLE_ADDRESS_UB_LEAK_SANITIZERS=true
 
     - os: linux
       compiler: gcc
@@ -121,6 +126,7 @@ matrix:
       env:
         - COMPILERCXX='g++-7'
         - COMPILERC='gcc-7'
+        - ENABLE_ADDRESS_UB_LEAK_SANITIZERS=true
 
     - os: linux
       compiler: gcc
@@ -134,6 +140,7 @@ matrix:
       env:
         - COMPILERCXX='g++-8'
         - COMPILERC='gcc-8'
+        - ENABLE_ADDRESS_UB_LEAK_SANITIZERS=true
 
     - os: linux
       compiler: gcc
@@ -147,6 +154,7 @@ matrix:
       env:
         - COMPILERCXX='g++-9'
         - COMPILERC='gcc-9'
+        - ENABLE_ADDRESS_UB_LEAK_SANITIZERS=true
 
 before_install:
   - sudo apt-get install libcpprest-dev
@@ -154,7 +162,7 @@ before_install:
 script:
   - mkdir build
   - cd build
-  - cmake -DCMAKE_INSTALL_PREFIX=./install -DCMAKE_C_COMPILER=$COMPILERC -DCMAKE_CXX_COMPILER=$COMPILERCXX -DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=gold ..
+  - cmake -DCMAKE_INSTALL_PREFIX=./install -DENABLE_ADDRESS_UB_LEAK_SANITIZERS=$DENABLE_ADDRESS_UB_LEAK_SANITIZERS -DCMAKE_C_COMPILER=$COMPILERC -DCMAKE_CXX_COMPILER=$COMPILERCXX -DCMAKE_EXE_LINKER_FLAGS=-fuse-ld=gold ..
   - cmake --build .
   - cd tests
   - ./tests -d yes
