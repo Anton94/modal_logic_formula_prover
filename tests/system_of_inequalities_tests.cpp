@@ -47,7 +47,7 @@ void check_inequalities(size_t number_of_variables, const std::vector<inequality
     // TODO: remove the printing when the automatic variable's value checking is done
     for(size_t i = 0; i < number_of_variables; ++i)
     {
-        std::cout << "X" << i << " : " << variables_values[i] << "\n";
+        //std::cout << "X" << i << " : " << variables_values[i] << "\n";
     }
 }
 }
@@ -204,7 +204,7 @@ TEST_CASE("system_of_inequalities 101 variables 100 inequalities of type Xk > Xk
     check_inequalities(number_of_variables, inequalities);
 }
 
-TEST_CASE("system_of_inequalities 101 variables 100 inequalities of type X0 + .. + Xk > Xk+1 + ... + X100 and 100 inequalities of type Xk > Xk+1", "[system_of_inequalities]")
+TEST_CASE("system_of_inequalities 101 variables 100 inequalities of type X0 + .. + Xk > Xk+1 + ... + X100 and 100 inequalities of type Xk > Xk+1", "[!hide][system_of_inequalities]")
 {
     std::vector<inequality> inequalities;
     size_t number_of_variables = 101;
