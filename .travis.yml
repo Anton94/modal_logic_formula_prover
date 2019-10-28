@@ -229,6 +229,7 @@ before_install:
   - export cpprestsdk_DIR=/usr/local/lib/x86_64-linux-gnu/cmake/
   - find . -name "*clang-7*"
   - find . -name "*cpprest*"
+  - echo "Hello World"
 
 script:
   - mkdir build
