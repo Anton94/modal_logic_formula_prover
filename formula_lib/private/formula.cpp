@@ -551,7 +551,7 @@ std::ostream& operator<<(std::ostream& out, const formula& f)
             out << "~" << *f.get_left_child_formula();
             break;
         case formula::operation_t::eq_zero:
-            out << *f.get_left_child_term() << " = 0";
+            out << "(" << *f.get_left_child_term() << ")=0";
             break;
         case formula::operation_t::measured_less_eq:
             out << "<=m(" << *f.get_left_child_term() << ", " << *f.get_right_child_term() << ")";
