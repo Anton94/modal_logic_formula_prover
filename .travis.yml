@@ -226,8 +226,9 @@ matrix:
 
 before_install:
   - sudo apt-get install libcpprest-dev
-  - export cpprestsdk_DIR=/usr/lib/x86_64-linux-gnu/cmake/
-  - find . -name "cpprestsdk*"
+  - export cpprestsdk_DIR=/usr/local/lib/x86_64-linux-gnu/cmake/
+  - find . -name "*clang-7*"
+  - find . -name "*cpprest*"
 
 script:
   - mkdir build
