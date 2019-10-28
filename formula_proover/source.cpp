@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
             return 0;
         }
 
-        std::string formula = "C(a,b) & <=(b,c) & C(a,c)";
+        std::string formula = "C(a,b) & <=(b,c) & C(a,c) & <=m(a,b) & ~<=m(b,c + a)";
         if(result.count("formula"))
         {
             auto formula_arg = result["formula"].as<std::string>();
@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
         const auto variables = f.get_variables();
         info() << "Variables: " << variables;
 
-        model m;
+        slow_model m;
         const auto res = f.is_satisfiable(m);
         info() << "The formula is " << (res ? "" : "not ") << "satisfiable.";
     }
