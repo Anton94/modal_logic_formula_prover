@@ -27,11 +27,47 @@ void check_inequalities(size_t number_of_variables, const std::vector<inequality
 
     CHECK(system.is_solvable());
 
+    auto check_variable_values = [&](size_t verify_first_n_inequalities)
+    {
+        const auto variables_values = system.get_variables_values();
+        CHECK(variables_values.size() == number_of_variables);
+
+        auto sum_of_variables = [&](const variables_set& variables)
+        {
+            double sum = 0;
+            auto variable_id = variables.find_first();
+            while(variable_id != variables_set::npos)
+            {
+                sum += variables_values[variable_id];
+                variable_id = variables.find_next(variable_id);
+            }
+            return sum;
+        };
+
+        assert(verify_first_n_inequalities <= inequalities.size());
+        for(size_t i = 0; i < verify_first_n_inequalities; ++i)
+        {
+            const auto& inequality = inequalities[i];
+            double lhs_sum = sum_of_variables(inequality.lhs);
+            double rhs_sum = sum_of_variables(inequality.rhs);
+            if(inequality.op == system_of_inequalities::inequality_operation::G)
+            {
+                CHECK(lhs_sum > rhs_sum);
+            }
+            else
+            {
+                assert(inequality.op == system_of_inequalities::inequality_operation::LE);
+                CHECK((lhs_sum < rhs_sum || lhs_sum == Approx(rhs_sum)));
+            }
+        }
+    };
+
     for(size_t i = 0, count = inequalities.size() - 1; i < count; ++i)
     {
         const auto& inequality = inequalities[i];
 
         CHECK(system.add_constraint(inequality.lhs, inequality.rhs, inequality.op));
+        check_variable_values(i + 1);
     }
 
     const auto& last_inequality = inequalities.back();
@@ -39,15 +75,9 @@ void check_inequalities(size_t number_of_variables, const std::vector<inequality
           is_last_inequality_solvable);
     CHECK(system.is_solvable() == is_last_inequality_solvable);
 
-    // TODO: check if the provided values satisfies the system (via system.get_variables_values())
-    // check them after each added inequality
-    const auto variables_values = system.get_variables_values();
-    CHECK(variables_values.size() == number_of_variables);
-
-    // TODO: remove the printing when the automatic variable's value checking is done
-    for(size_t i = 0; i < number_of_variables; ++i)
+    if(is_last_inequality_solvable)
     {
-        //std::cout << "X" << i << " : " << variables_values[i] << "\n";
+        check_variable_values(inequalities.size());
     }
 }
 }
