@@ -83,6 +83,7 @@ public:
 private:
     void move(formula&& rhs) noexcept;
 
+    auto evaluate(const variable_id_to_points_t& evals, int R, int P, bool is_negated) const -> bool;
     auto evaluate(const variable_id_to_points_t& evals, const contacts_t& contact_relations, bool is_negated) const -> bool;
 
     auto construct_eq_zero_atomic_formula(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool;
