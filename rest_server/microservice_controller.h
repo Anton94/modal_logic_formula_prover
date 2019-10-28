@@ -41,8 +41,21 @@ private:
     http_listener m_listener;
 
 	std::string generate_random_op_id(size_t length);
+	void remove_op_id(std::string op_id);
 
 	pplx::cancellation_token_source cts_;
-	std::unordered_map<std::string, pplx::cancellation_token_source*> op_id_to_cts_;
-    std::string CLIENT_DIR = "../client/dist";
+	
+	struct task_result {
+		std::string status_code; // enum "RUNNING", "CANCELED", "FINISHED", ...
+		bool is_satisfied;
+	};
+
+	std::mutex op_id_to_ctx_mutex_;
+	std::unordered_map<std::string, pplx::cancellation_token_source> op_id_to_cts_;
+	std::unordered_set<std::string> active_tasks;
+	std::unordered_map<std::string, task_result> op_id_to_task_result;
+
+	std::string CLIENT_DIR = "../client/dist";
 };
+
+

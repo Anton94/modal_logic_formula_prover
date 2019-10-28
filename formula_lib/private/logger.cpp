@@ -2,10 +2,10 @@
 
 namespace
 {
-logger_func_t verbose_logger;
-logger_func_t trace_logger;
-logger_func_t info_logger;
-logger_func_t error_logger;
+thread_local logger_func_t verbose_logger;
+thread_local logger_func_t trace_logger;
+thread_local logger_func_t info_logger;
+thread_local logger_func_t error_logger;
 }
 
 void set_verbose_logger(const logger_func_t& f)

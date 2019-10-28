@@ -37,6 +37,8 @@ microservice_controller::microservice_controller(utility::string_t url)
                        std::bind(&microservice_controller::handle_put, this, std::placeholders::_1));
     m_listener.support(methods::DEL,
                        std::bind(&microservice_controller::handle_delete, this, std::placeholders::_1));
+
+	srand(time(NULL));
 }
 
 void handle_error(pplx::task<void>& t)
@@ -113,21 +115,66 @@ void microservice_controller::handle_post(http_request message)
 
     std::string message_path = utility::conversions::to_utf8string(message.absolute_uri().path());
 
+	if (starts_with(message_path, "/ping"))
+	{
+		message.content_ready().then([=](web::http::http_request request) {
+			auto http_get_vars = uri::split_query(request.request_uri().query());
+			request.extract_string(true)
+				.then([=](string_t res) {
+				const auto alive_op_id = utility::conversions::to_utf8string(web::uri().decode(res));
+
+				std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
+
+				if (op_id_to_cts_.find(alive_op_id) == op_id_to_cts_.end())
+				{
+					message.reply(status_codes::BadRequest, "no such op_id.").then([](pplx::task<void> t) { handle_error(t); });
+				}
+				else 
+				{
+					auto& res = op_id_to_task_result.find(alive_op_id)->second;
+					if (res.status_code == "FINISHED")
+					{
+						message.reply(status_codes::OK, res.is_satisfied).then([](pplx::task<void> t) { handle_error(t); });
+						remove_op_id(alive_op_id);
+					}
+					else
+					{
+						active_tasks.insert(alive_op_id);
+						message.reply(status_codes::OK, res.status_code).then([](pplx::task<void> t) { handle_error(t); });
+					}
+				}
+			})
+				.then([=](pplx::task<void> t) {
+				try
+				{
+					t.get();
+				}
+				catch (...)
+				{
+				}
+			});
+		});
+		return;
+	}
+
 	if (starts_with(message_path, "/cancel"))
 	{
 		message.content_ready().then([=](web::http::http_request request) {
 			request.extract_string(true)
 				.then([=](string_t res) {
 				const auto f_str = utility::conversions::to_utf8string(web::uri().decode(res));
-				// lock here 
+
+				std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
 				auto it = op_id_to_cts_.find(f_str);
 				bool was_removed = false;
 				if (it != op_id_to_cts_.end()) {
-					it->second->cancel();
+					it->second.cancel();
+					op_id_to_cts_.erase(it);
+					active_tasks.insert(f_str);
+					op_id_to_task_result.find(f_str)->second.status_code = "CANCELED";
+
 					was_removed = true;
-					// TODO: remove this op_id from the map and destroy the cts.
 				}
-				// relase lock 
 				
 				message.reply(status_codes::OK, was_removed ? "cancel true" : "cancel failed").then([](pplx::task<void> t) { handle_error(t); });
 			})
@@ -151,13 +198,34 @@ void microservice_controller::handle_post(http_request message)
 
 	if (starts_with(message_path, "/task"))
 	{
-		std::string op_id = generate_random_op_id(10);
-		// TODO: make the cts a reference or move it to the map.
-		pplx::cancellation_token_source* cts = new pplx::cancellation_token_source();
-		// require lock, also check if the element is there if so generate new op_id.
-		op_id_to_cts_[op_id] = cts;
-		// release lock
-		auto token = cts->get_token();
+		// require lock, also check if the element is there if so generate new op_id.		
+		
+		struct id_token
+		{
+			std::string id;
+			pplx::cancellation_token token;
+		};
+		auto generate_new_op_id_and_token = [&]() -> id_token
+		{
+			std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
+			while (true)
+			{
+				std::string op_id = generate_random_op_id(10);
+				if (op_id_to_cts_.find(op_id) != op_id_to_cts_.end())
+				{
+					continue;
+				}
+				active_tasks.insert(op_id);
+				auto& task_res = op_id_to_task_result[op_id];
+				task_res.status_code = "RUNNING";
+
+				return { op_id, op_id_to_cts_[op_id].get_token() };
+			}
+		};
+
+		auto id_token = generate_new_op_id_and_token();
+		auto op_id = std::move(id_token.id);
+		auto token = std::move(id_token.token);
 
 		message.content_ready().then([=](web::http::http_request request) {
 			
@@ -181,9 +249,12 @@ void microservice_controller::handle_post(http_request message)
 					// so that the next request that the user does to check if the task is complete 
 					// we can return the result and after that remove that op_id from the map.
 					// Meaning that we remove op_id's on cancel and complete.
+					active_tasks.insert(op_id);
+					op_id_to_task_result.find(op_id)->second.status_code = "FINISHED";
+					op_id_to_task_result.find(op_id)->second.is_satisfied = is_satisfiable;
 				}
 				catch (const char* e) {
-					//info() << "Canceled ";
+					info() << "Canceled ";
 				}
 				catch (...) {
 					info() << "Canceled force";
@@ -434,4 +505,12 @@ std::string microservice_controller::generate_random_op_id(size_t length)
 	std::string str(length, 0);
 	std::generate_n(str.begin(), length, randchar);
 	return str;
+}
+
+void microservice_controller::remove_op_id(std::string op_id)
+{
+	std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
+	op_id_to_cts_.erase(op_id);
+	op_id_to_task_result.erase(op_id);
+	active_tasks.erase(op_id);
 }
