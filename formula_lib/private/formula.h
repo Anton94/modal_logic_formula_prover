@@ -83,8 +83,15 @@ public:
 private:
     void move(formula&& rhs) noexcept;
 
-    auto evaluate(const variable_id_to_points_t& evals, int R, int P, bool is_negated) const -> bool;
-    auto evaluate(const variable_id_to_points_t& evals, const contacts_t& contact_relations, bool is_negated) const -> bool;
+    struct internal_evaluation_result
+    {
+        bool evaluated_value{};
+        bool is_used_only_less_eq_measured_as_atomic{}; // only the atomic <=m participates in the subformula evaluations
+        constexpr static const bool no_evaluation{};
+    };
+
+    auto evaluate(const variable_id_to_points_t& evals, int R, int P, bool neutral_value) const -> bool;
+    auto evaluate_internal(const variable_id_to_points_t& evals, const contacts_t& contact_relations) const -> internal_evaluation_result;
 
     auto construct_eq_zero_atomic_formula(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool;
     auto construct_measured_less_eq_atomic_formula(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool;

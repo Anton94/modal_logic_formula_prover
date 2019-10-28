@@ -277,36 +277,59 @@ auto formula::evaluate(const variable_id_to_points_t& evals, int R, int P, bool 
 
 auto formula::evaluate(const variable_id_to_points_t& evals, const contacts_t& contact_relations) const -> bool
 {
-    return evaluate(evals, contact_relations, false);
+    auto res = evaluate_internal(evals, contact_relations);
+    if(res.is_used_only_less_eq_measured_as_atomic)
+    {
+        return true;
+    }
+    return res.evaluated_value;
 }
 
-auto formula::evaluate(const variable_id_to_points_t& evals, const contacts_t& contact_relations, bool is_negated) const -> bool
+auto formula::evaluate_internal(const variable_id_to_points_t& evals, const contacts_t& contact_relations) const -> internal_evaluation_result
 {
     switch(op_)
     {
         case formula::operation_t::constant_true:
-            return true;
+            return {true, false};
         case formula::operation_t::constant_false:
-            return false;
+            return {true, false};
         case formula::operation_t::conjunction:
+        {
             assert(child_f_.left && child_f_.right);
-            return child_f_.left->evaluate(evals, contact_relations, is_negated) && child_f_.right->evaluate(evals, contact_relations, is_negated);
+            auto res_left = child_f_.left->evaluate_internal(evals, contact_relations);
+            if(!res_left.is_used_only_less_eq_measured_as_atomic && !res_left.evaluated_value)
+            {
+                return {false, false}; // left branch uses something other than just <=m and evaluates to false, so skip the right branch
+            }
+            auto res_right = child_f_.right->evaluate_internal(evals, contact_relations);
+            return {res_right.evaluated_value, res_left.is_used_only_less_eq_measured_as_atomic && res_right.is_used_only_less_eq_measured_as_atomic};
+        }
         case formula::operation_t::disjunction:
+        {
             assert(child_f_.left && child_f_.right);
-            return child_f_.left->evaluate(evals, contact_relations, is_negated) || child_f_.right->evaluate(evals, contact_relations, is_negated);
+            auto res_left = child_f_.left->evaluate_internal(evals, contact_relations);
+            if(!res_left.is_used_only_less_eq_measured_as_atomic && res_left.evaluated_value)
+            {
+                return {true, false}; // left branch uses something other than just <=m and evaluates to true, so skip the right branch
+            }
+            auto res_right = child_f_.right->evaluate_internal(evals, contact_relations);
+            return {res_right.evaluated_value, res_left.is_used_only_less_eq_measured_as_atomic && res_right.is_used_only_less_eq_measured_as_atomic};
+        }
         case formula::operation_t::negation:
+        {
             assert(child_f_.left);
-            return !child_f_.left->evaluate(evals, contact_relations, !is_negated);
+            auto res = child_f_.left->evaluate_internal(evals, contact_relations);
+            res.evaluated_value = !res.evaluated_value;
+            return res;
+        }
         case formula::operation_t::eq_zero:
         {
             assert(child_t_.left);
             const auto number_of_points = contact_relations.size(); // a bit hacky...
-            return child_t_.left->evaluate(evals, number_of_points).none();
+            return {child_t_.left->evaluate(evals, number_of_points).none(), false};
         }
         case formula::operation_t::measured_less_eq:
-            // do nothing with the <=m(a,b) atomic, just return neutral value
-            // if there is a negation(is_negated==true) somewhere before this atomic <=m, then returns false, otherwise returns true
-            return !is_negated;
+            return {internal_evaluation_result::no_evaluation, true};
         case formula::operation_t::c:
         {
             assert(child_t_.left && child_t_.right);
@@ -316,11 +339,11 @@ auto formula::evaluate(const variable_id_to_points_t& evals, const contacts_t& c
 
             if (eval_l.none() || eval_r.none())
             {
-                return false; // there is no way to be in contact if at least on of the evaluations is the empty set
+                return {false, false}; // there is no way to be in contact if at least on of the evaluations is the empty set
             }
             if ((eval_l & eval_r).any())
             {
-                return true; // left eval set and right eval set has a common point, but each point is reflexive so there is a contact between the two sets
+                return {true, false}; // left eval set and right eval set has a common point, but each point is reflexive so there is a contact between the two sets
             }
 
             auto point_in_eval_l = eval_l.find_first(); // TODO: iterate over the bitset with less set bits
@@ -329,15 +352,15 @@ auto formula::evaluate(const variable_id_to_points_t& evals, const contacts_t& c
                 const auto& points_in_contact_with_point_in_eval_l = contact_relations[point_in_eval_l];
                 if ((points_in_contact_with_point_in_eval_l & eval_r).any())
                 {
-                    return true;
+                    return {true, false};
                 }
                 point_in_eval_l = eval_l.find_next(point_in_eval_l);
             }
-            return false;
+            return {false, false};
         }
         default:
             assert(false && "Unrecognized.");
-            return false;
+            return {false, false};
     }
 }
 
