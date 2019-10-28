@@ -107,7 +107,7 @@ std::ostream& operator<<(std::ostream& out, const formulas_t& formulas)
 {
     for(const auto f_ptr : formulas)
     {
-        out << *f_ptr << " <" << f_ptr->get_hash() << "> ";
+        out << *f_ptr;
     }
 
     return out;
@@ -117,7 +117,7 @@ std::ostream& operator<<(std::ostream& out, const terms_t& terms)
 {
     for(const auto t_ptr : terms)
     {
-        out << *t_ptr << " <" << t_ptr->get_hash() << "> ";
+        out << *t_ptr;
     }
 
     return out;
@@ -127,7 +127,7 @@ std::ostream& operator<<(std::ostream& out, const multiterms_t& terms)
 {
     for(const auto t_ptr : terms)
     {
-        out << *t_ptr << " <" << t_ptr->get_hash() << "> ";
+        out << *t_ptr;
     }
 
     return out;
