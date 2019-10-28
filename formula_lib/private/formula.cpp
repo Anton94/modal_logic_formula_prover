@@ -270,6 +270,11 @@ auto formula::evaluate(const variable_id_to_points_t& evals, int R, int P) const
 
 auto formula::evaluate(const variable_id_to_points_t& evals, const contacts_t& contact_relations) const -> bool
 {
+    return evaluate(evals, contact_relations, false);
+}
+
+auto formula::evaluate(const variable_id_to_points_t& evals, const contacts_t& contact_relations, bool is_negated) const -> bool
+{
     switch(op_)
     {
         case formula::operation_t::constant_true:
@@ -278,13 +283,13 @@ auto formula::evaluate(const variable_id_to_points_t& evals, const contacts_t& c
             return false;
         case formula::operation_t::conjunction:
             assert(child_f_.left && child_f_.right);
-            return child_f_.left->evaluate(evals, contact_relations) && child_f_.right->evaluate(evals, contact_relations);
+            return child_f_.left->evaluate(evals, contact_relations, is_negated) && child_f_.right->evaluate(evals, contact_relations, is_negated);
         case formula::operation_t::disjunction:
             assert(child_f_.left && child_f_.right);
-            return child_f_.left->evaluate(evals, contact_relations) || child_f_.right->evaluate(evals, contact_relations);
+            return child_f_.left->evaluate(evals, contact_relations, is_negated) || child_f_.right->evaluate(evals, contact_relations, is_negated);
         case formula::operation_t::negation:
             assert(child_f_.left);
-            return !child_f_.left->evaluate(evals, contact_relations);
+            return !child_f_.left->evaluate(evals, contact_relations, !is_negated);
         case formula::operation_t::eq_zero:
         {
             assert(child_t_.left);
@@ -292,7 +297,9 @@ auto formula::evaluate(const variable_id_to_points_t& evals, const contacts_t& c
             return child_t_.left->evaluate(evals, number_of_points).none();
         }
         case formula::operation_t::measured_less_eq:
-            return true; // TODO: does it make any sense to do anything with them when evaluating?
+            // do nothing with the <=m(a,b) atomic, just return neutral value
+            // if there is a negation(is_negated==true) somewhere before this atomic <=m, then returns false, otherwise returns true
+            return !is_negated;
         case formula::operation_t::c:
         {
             assert(child_t_.left && child_t_.right);
