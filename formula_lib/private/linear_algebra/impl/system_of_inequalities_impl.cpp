@@ -47,7 +47,7 @@ auto system_of_inequalities_impl::add_constraint(const variables_set& lhs, const
             case inequality_operation::LE:
                 return lhs_expr - rhs_expr;
             case inequality_operation::G: // X > Y   ->   0 > Y - X   ->   0 >= Y - X + epsilon   ->   Y - X + epsilon <= 0
-                return rhs_expr - lhs_expr + std::numeric_limits<double>::epsilon();
+                return rhs_expr - lhs_expr + 0.0000001 /*std::numeric_limits<double>::epsilon() too small for our purposes TODO: find out best epsilon*/;
         }
     };
     kiwi::Expression constraint_expr = row_expression(lhs_expr, rhs_expr, op);
