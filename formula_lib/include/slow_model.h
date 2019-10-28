@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../private/variables_evaluations_block.h"
+#include "../private/linear_algebra/system_of_inequalities.h" // TODO: not pretty, refactor
 #include "types.h"
 #include "imodel.h"
 
@@ -39,6 +40,8 @@ struct slow_model : public imodel
         a != 0 & a != 1 -> C(a,a*)
         in our case, we evaluate each point's term (i.e., v(a)) and if it's not the whole set of points, we will create a contact relation with an element from v(a*)
     */
+    slow_model();
+
     struct point_info
     {
         const term* t;
@@ -72,7 +75,7 @@ private:
 
     auto is_contact_F_rule_satisfied(const formulas_t& contacts_F) const -> bool;
     auto is_zero_term_rule_satisfied(const terms_t& zero_terms_T) const -> bool;
-    auto has_solvable_system_of_inequalities(const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F) const -> bool;
+    auto has_solvable_system_of_inequalities(const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F) -> bool;
 
     // Return true if there is a contact between the v(a) and v(b). Note that v(X) is a set of model points and there is a contact between the two sets iff
     // exist x from v(a), exist y from v(b) and xRy.
@@ -85,6 +88,8 @@ private:
 
     void calculate_the_model_evaluation_of_each_variable();
 
+    auto print_system_sum_variables(std::ostream& out, const model_points_set_t& variables) const -> std::ostream&;
+
     friend std::ostream& operator<<(std::ostream& out, const slow_model& m);
 
     variables_mask_t used_variables_{};
@@ -92,4 +97,7 @@ private:
 
     points_t points_;
 
+    formulas_t measured_less_eq_T_;
+    formulas_t measured_less_eq_F_;
+    system_of_inequalities system_;
 };

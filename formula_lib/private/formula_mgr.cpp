@@ -252,6 +252,7 @@ auto formula_mgr::is_model_satisfiable(const imodel& model) const -> bool
     const auto& model_variable_evaluations = model.get_variables_evaluations();
     const auto& model_contact_relations = model.get_contact_relations();
 
+    // TODO: what about the system of inequalities?
     return f_.evaluate(model_variable_evaluations, model_contact_relations);
 }
 

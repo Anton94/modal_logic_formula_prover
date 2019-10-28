@@ -2,9 +2,13 @@
 #include "formula.h"
 #include "formula_mgr.h"
 #include "term.h"
-#include "linear_algebra/system_of_inequalities.h"
 
 #include <cassert>
+
+slow_model::slow_model()
+    : system_(0)
+{
+}
 
 auto slow_model::create(const formulas_t& contacts_T, const formulas_t& contacts_F, const terms_t& zero_terms_T,
             const terms_t& zero_terms_F, const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F, const variables_mask_t& used_variables, const formula_mgr* mgr)
@@ -24,6 +28,7 @@ auto slow_model::create(const formulas_t& contacts_T, const formulas_t& contacts
     create_contact_relations_first_2k_in_contact(points_.size(), contacts_T.size());
     calculate_the_model_evaluation_of_each_variable();
 
+    system_ = system_of_inequalities(points_.size());
     while (!is_zero_term_rule_satisfied(zero_terms_T) || !is_contact_F_rule_satisfied(contacts_F) ||
            !has_solvable_system_of_inequalities(measured_less_eq_T, measured_less_eq_F))
     {
@@ -33,6 +38,8 @@ auto slow_model::create(const formulas_t& contacts_T, const formulas_t& contacts
             return false;
         }
     }
+    measured_less_eq_T_ = measured_less_eq_T;
+    measured_less_eq_F_ = measured_less_eq_F;
 
     return true;
 }
@@ -85,7 +92,7 @@ auto slow_model::is_zero_term_rule_satisfied(const terms_t& zero_terms_T) const 
     return true;
 }
 
-auto slow_model::has_solvable_system_of_inequalities(const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F) const -> bool
+auto slow_model::has_solvable_system_of_inequalities(const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F) -> bool
 {
     // For each <=m(a,b) calculate v(a) and v(b), then we will create
     // an inequality of the following type: SUM_I Xi <= SUM_J Xj, where I and J are set v(a) and v(b).
@@ -94,14 +101,13 @@ auto slow_model::has_solvable_system_of_inequalities(const formulas_t& measured_
     // Each inequality is a row in the system of inequalities. If this system has a solution, then we are good.
 
     const auto points_size = points_.size();
-    const auto number_of_variables = points_size;
-    system_of_inequalities system(number_of_variables);
+    system_.clear();
 
     for(const auto& m : measured_less_eq_T)
     {
         const auto v_a = m->get_left_child_term()->evaluate(variable_evaluations_, points_size);
         const auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
-        if (!system.add_constraint(v_a, v_b, system_of_inequalities::inequality_operation::LE))
+        if (!system_.add_constraint(v_a, v_b, system_of_inequalities::inequality_operation::LE))
         {
             return false;
         }
@@ -111,7 +117,7 @@ auto slow_model::has_solvable_system_of_inequalities(const formulas_t& measured_
     {
         const auto v_a = m->get_left_child_term()->evaluate(variable_evaluations_, points_size);
         const auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
-        if (!system.add_constraint(v_a, v_b, system_of_inequalities::inequality_operation::G))
+        if (!system_.add_constraint(v_a, v_b, system_of_inequalities::inequality_operation::G))
         {
             return false;
         }
@@ -172,6 +178,9 @@ void slow_model::clear()
     used_variables_.clear();
     number_of_contacts_ = 0;
     points_.clear();
+    measured_less_eq_T_.clear();
+    measured_less_eq_F_.clear();
+    system_.clear();
 
     imodel::clear();
 }
@@ -259,14 +268,67 @@ void slow_model::calculate_the_model_evaluation_of_each_variable()
     }
 }
 
+auto slow_model::print_system_sum_variables(std::ostream& out, const model_points_set_t& variables) const -> std::ostream&
+{
+    // iterate only set bits(1s)
+    auto var_id = variables.find_first();
+    bool has_printed_first = false;
+    while (var_id != variables_evaluations_t::npos)
+    {
+        if(has_printed_first)
+        {
+            out << " + ";
+        }
+        out << "X" << var_id;
+        has_printed_first = true;
+        var_id = variables.find_next(var_id);
+    }
+    return out;
+}
+
 auto slow_model::print(std::ostream& out) const -> std::ostream&
 {
     out << "Model points: \n";
-    for(size_t i = 0; i < points_.size(); ++i)
+    const auto points_size = points_.size();
+    for(size_t i = 0; i < points_size; ++i)
     {
         out << std::to_string(i) << " : ";
         mgr_->print(out, points_[i].evaluation);
         out << "\n";
+    }
+
+    out << "Measured  : " << measured_less_eq_T_ << "\n";
+    out << "Measured ~: " << measured_less_eq_F_ << "\n";
+    out << "System:\n";
+    for(const auto m : measured_less_eq_T_) // <=m(a,b)
+    {
+        const auto v_a = m->get_left_child_term()->evaluate(variable_evaluations_, points_size);
+        const auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
+
+        out << "| ";
+        print_system_sum_variables(out, v_a);
+        out << " <= ";
+        print_system_sum_variables(out, v_b);
+        out << " # " << *m << "\n";
+    }
+    for(const auto m : measured_less_eq_F_) // ~<=m(a,b)
+    {
+        const auto v_a = m->get_left_child_term()->evaluate(variable_evaluations_, points_size);
+        const auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
+
+        out << "| ";
+        print_system_sum_variables(out, v_a);
+        out << " > ";
+        print_system_sum_variables(out, v_b);
+        out << " # ~" << *m << "\n";
+    }
+
+    out << "Solution:\n";
+    auto variables_values = system_.get_variables_values();
+    assert(variables_values.size() == points_size);
+    for(size_t i = 0; i < points_size; ++i)
+    {
+        out << "X" << i << " = " << variables_values[i] << "\n";
     }
 
     return out;

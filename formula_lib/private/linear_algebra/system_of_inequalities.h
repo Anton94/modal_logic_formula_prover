@@ -28,6 +28,9 @@ public:
     system_of_inequalities(size_t number_of_variables);
     ~system_of_inequalities();
 
+    system_of_inequalities(system_of_inequalities&& rhs) noexcept;
+    system_of_inequalities& operator=(system_of_inequalities&& rhs) noexcept;
+
     using variables_set = boost::dynamic_bitset<>;
 
     enum class inequality_operation

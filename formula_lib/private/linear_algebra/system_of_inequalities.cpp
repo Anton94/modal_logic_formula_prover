@@ -10,6 +10,20 @@ system_of_inequalities::system_of_inequalities(size_t number_of_variables)
 
 system_of_inequalities::~system_of_inequalities() = default;
 
+system_of_inequalities::system_of_inequalities(system_of_inequalities&& rhs) noexcept
+{
+    impl_ = std::move(rhs.impl_);
+}
+
+system_of_inequalities& system_of_inequalities::operator=(system_of_inequalities&& rhs) noexcept
+{
+    if(this != &rhs)
+    {
+        impl_ = std::move(rhs.impl_);
+    }
+    return *this;
+}
+
 auto system_of_inequalities::add_constraint(const variables_set& lhs, const variables_set& rhs, inequality_operation op) -> bool
 {
     assert(impl_);
