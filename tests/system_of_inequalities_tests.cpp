@@ -67,6 +67,7 @@ void check_inequalities(size_t number_of_variables, const std::vector<inequality
         const auto& inequality = inequalities[i];
 
         CHECK(system.add_constraint(inequality.lhs, inequality.rhs, inequality.op));
+        CHECK(system.is_solvable());
         check_variable_values(i + 1);
     }
 
@@ -193,6 +194,77 @@ TEST_CASE("system_of_inequalities 3", "[system_of_inequalities]")
         inequalities.emplace_back(std::move(i));
     }
     check_inequalities(number_of_variables, inequalities);
+}
+
+TEST_CASE("system_of_inequalities 4", "[system_of_inequalities]")
+{
+    std::vector<inequality> inequalities;
+    size_t number_of_variables = 4;
+
+    {
+        inequality i;
+        i.lhs = variables_set(number_of_variables);
+        i.rhs = variables_set(number_of_variables);
+        i.op = system_of_inequalities::inequality_operation::G;
+
+        i.lhs.set(0);
+        i.rhs.set(1);
+        // X0 > X1
+        inequalities.emplace_back(std::move(i));
+    }
+    {
+        inequality i;
+        i.lhs = variables_set(number_of_variables);
+        i.rhs = variables_set(number_of_variables);
+        i.op = system_of_inequalities::inequality_operation::LE;
+
+        i.lhs.set(0);
+        i.rhs.set(1);
+        // X0 <= X1
+        inequalities.emplace_back(std::move(i));
+    }
+    check_inequalities(number_of_variables, inequalities, false);
+}
+
+TEST_CASE("system_of_inequalities 5", "[system_of_inequalities]")
+{
+    std::vector<inequality> inequalities;
+    size_t number_of_variables = 4;
+
+    {
+        inequality i;
+        i.lhs = variables_set(number_of_variables);
+        i.rhs = variables_set(number_of_variables);
+        i.op = system_of_inequalities::inequality_operation::G;
+
+        i.lhs.set(0);
+        i.rhs.set(1);
+        // X0 > X1
+        inequalities.emplace_back(std::move(i));
+    }
+    {
+        inequality i;
+        i.lhs = variables_set(number_of_variables);
+        i.rhs = variables_set(number_of_variables);
+        i.op = system_of_inequalities::inequality_operation::G;
+
+        i.lhs.set(1);
+        i.rhs.set(2);
+        // X1 > X2
+        inequalities.emplace_back(std::move(i));
+    }
+    {
+        inequality i;
+        i.lhs = variables_set(number_of_variables);
+        i.rhs = variables_set(number_of_variables);
+        i.op = system_of_inequalities::inequality_operation::LE;
+
+        i.lhs.set(0);
+        i.rhs.set(2);
+        // X0 <= X2
+        inequalities.emplace_back(std::move(i));
+    }
+    check_inequalities(number_of_variables, inequalities, false);
 }
 
 TEST_CASE("system_of_inequalities 100 variables 100 inequalities of type Xk > 0", "[system_of_inequalities]")
