@@ -111,82 +111,6 @@ auto term::build(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> 
     return true;
 }
 
-auto term::build(json& t) -> bool
-{
-    clear();
-
-    // check the json for correct information
-    if(!t.contains("name"))
-    {
-        return false;
-    }
-    auto& name_field = t["name"];
-    if(!name_field.is_string())
-    {
-        return false;
-    }
-
-    auto op = name_field.get<std::string>();
-    if(op == "1")
-    {
-        op_ = operation_t::constant_true;
-    }
-    else if(op == "0")
-    {
-        op_ = operation_t::constant_false;
-    }
-    else if(op == "variable_id")
-    {
-        op_ = operation_t::variable;
-
-        auto& value_field = t["value"];
-        if(!value_field.is_number_unsigned())
-        {
-            return false;
-        }
-        variable_id_ = value_field.get<size_t>();
-    }
-    else if(op == "Tand")
-    {
-        if(!construct_binary_operation(t, operation_t::intersaction))
-        {
-            return false;
-        }
-    }
-    else if(op == "Tor")
-    {
-        if(!construct_binary_operation(t, operation_t::union_))
-        {
-            return false;
-        }
-    }
-    else if(op == "Tstar")
-    {
-        op_ = operation_t::complement;
-
-        childs_.left = new(std::nothrow) term(formula_mgr_);
-        assert(childs_.left);
-
-        auto& value_field = t["value"];
-
-        if(!value_field.is_object() || !childs_.left->build(value_field))
-        {
-            return false;
-        }
-    }
-    else
-    {
-        assert(false && "Unrecognized operation :(");
-        return false;
-    }
-
-    construct_hash();
-    construct_variables();
-
-    verbose() << "[Building] " << *this << " <" << hash_ << ">";
-    return true;
-}
-
 auto term::evaluate(const variable_id_to_points_t& variable_evaluations, const size_t elements_count) const
     -> model_points_set_t
 {
@@ -516,32 +440,6 @@ auto term::construct_binary_operation(const NTerm& t, operation_t op, const vari
     // recursive construction of the child terms
     assert(t.left && t.right);
     return childs_.left->build(*t.left, variable_to_id) && childs_.right->build(*t.right, variable_to_id);
-}
-
-auto term::construct_binary_operation(json& t, operation_t op) -> bool
-{
-    op_ = op;
-    assert(is_binary_operaton());
-
-    // allocate the new term childs
-    childs_.left = new(std::nothrow) term(formula_mgr_);
-    childs_.right = new(std::nothrow) term(formula_mgr_);
-    assert(childs_.left && childs_.right);
-
-    // check the json for correct information
-    auto& value_field = t["value"];
-    if(!value_field.is_array() || value_field.size() != 2)
-    {
-        return false;
-    }
-
-    // recursive construction of the child terms
-    if(!childs_.left->build(value_field[0]) || !childs_.right->build(value_field[1]))
-    {
-        return false;
-    }
-
-    return true;
 }
 
 void term::construct_hash()

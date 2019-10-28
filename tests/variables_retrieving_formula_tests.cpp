@@ -4,8 +4,6 @@
 #include <string>
 #include <unordered_set>
 
-using json = nlohmann::json;
-
 void variables_check(const std::string& f_str, const variables_set_t& expected_variables, const formula_mgr::formula_refiners& flags = formula_mgr::formula_refiners::all)
 {
     formula_mgr f;

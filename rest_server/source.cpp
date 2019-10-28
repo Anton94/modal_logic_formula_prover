@@ -3,7 +3,6 @@
 #include <string>
 
 #include "cmd_options/cxxopts.hpp"
-#include "nlohmann_json/json.hpp"
 
 #include "microservice_controller.h"
 //#include <cpprest/filestream.h>
@@ -13,8 +12,6 @@ using namespace web;                  // Common features like URIs.
 using namespace web::http;            // Common HTTP functionality
 using namespace web::http::client;    // HTTP client features
 using namespace concurrency::streams; // Asynchronous streams
-
-using json = nlohmann::json;
 
 std::unique_ptr<microservice_controller> g_http;
 
@@ -51,10 +48,7 @@ int main(int argc, char* argv[])
     {
         cxxopts::Options options("FormulaProover", "One line description of MyProgram");
 
-        options.add_options()("h,help", "Print help")
-            //("f,formula", "Formula in json fomrat", cxxopts::value<std::string>())
-            //("i,input_file", "File containing a formula in json fomrat", cxxopts::value<std::string>());
-            ;
+        options.add_options()("h,help", "Print help");
 
         auto result = options.parse(argc, argv);
 

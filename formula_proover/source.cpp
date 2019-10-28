@@ -5,8 +5,6 @@
 #include "cmd_options/cxxopts.hpp"
 #include "library.h"
 
-using json = nlohmann::json;
-
 int main(int argc, char* argv[])
 {
     set_trace_logger([](std::stringstream&& s) { std::cout << s.rdbuf() << std::endl; });

@@ -16,8 +16,6 @@
 
 class formula_mgr
 {
-    using json = nlohmann::json;
-
 public:
 	using termination_callback = std::function<bool()>;
 
@@ -40,8 +38,6 @@ public:
     };
 
     auto build(const std::string& f, const formula_refiners& refiners_flags = formula_refiners::all) -> bool;
-
-    auto build(json& f) -> bool;
 
     // Bruteforce algorithm without the knowledge of relations
     // Process:
@@ -74,8 +70,6 @@ public:
 
 private:
     void move(formula_mgr&& rhs) noexcept;
-
-    auto change_variables_to_variable_ids(json& f) const -> bool;
 
     auto has_flag(const formula_refiners& flags, const formula_refiners& flag) const -> bool;
 

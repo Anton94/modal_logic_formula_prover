@@ -1,6 +1,5 @@
 #pragma once
 
-#include "nlohmann_json/json.hpp"
 #include "types.h"
 #include "variables_evaluations_block.h"
 
@@ -12,8 +11,6 @@ class NFormula;
 
 class formula
 {
-    using json = nlohmann::json;
-
 public:
     formula(formula_mgr* mgr);
     ~formula();
@@ -26,8 +23,6 @@ public:
     auto operator!=(const formula& rhs) const -> bool;
 
     auto build(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool;
-
-    auto build(json& f) -> bool;
 
     // TODO: remove and use the one with contact relations if it does not have negative performance impact
     auto evaluate(const variable_id_to_points_t& evals, int R, int P) const -> bool;
@@ -100,12 +95,6 @@ private:
     auto construct_binary_formula(const NFormula& f, operation_t op, const variable_to_id_map_t& variable_to_id) -> bool;
     auto construct_binary_atomic_formula(const NFormula& f, operation_t op, const variable_to_id_map_t& variable_to_id) -> bool;
     auto construct_negation_formula(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool;
-
-    auto construct_eq_zero_atomic_formula(json&) -> bool;
-    auto construct_measured_less_eq_atomic_formula(json&) -> bool;
-    auto construct_contact_atomic_formula(json&) -> bool;
-    auto construct_binary_formula(json& f, operation_t op) -> bool;
-    auto construct_negation_formula(json& f) -> bool;
 
     void free();
 

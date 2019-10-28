@@ -1,6 +1,5 @@
 #pragma once
 
-#include "nlohmann_json/json.hpp"
 #include "types.h"
 #include "variables_evaluations_block.h"
 #include <ostream>
@@ -11,8 +10,6 @@ class NTerm;
 
 class term
 {
-    using json = nlohmann::json;
-
 public:
     term(formula_mgr* mgr);
     ~term();
@@ -25,8 +22,6 @@ public:
     auto operator!=(const term& rhs) const -> bool;
 
     auto build(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> bool;
-
-    auto build(json& t) -> bool;
 
     auto evaluate(const variable_id_to_points_t& variable_evaluations, const size_t elements_count) const
         -> model_points_set_t;
@@ -106,7 +101,6 @@ private:
     auto construct_complement_operation(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> bool;
     auto construct_variable_operation(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> bool;
     auto construct_binary_operation(const NTerm& t, operation_t op, const variable_to_id_map_t& variable_to_id) -> bool;
-    auto construct_binary_operation(json& t, operation_t op) -> bool;
 
     // calculates and sets the hash depending on the @op_ and the child hashes (if any)
     void construct_hash();

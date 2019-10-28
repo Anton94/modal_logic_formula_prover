@@ -4,65 +4,6 @@
 #include "parser_API.h"
 #include "visitor.h"
 
-namespace
-{
-
-using json = nlohmann::json;
-
-auto get_all_variables(const json& f, variables_set_t& variables) -> bool
-{
-    if(!f.contains("name"))
-    {
-        error() << "Json (sub)formula is missing a 'name' field:\n" << f.dump(4);
-        return false;
-    }
-
-    auto& name_field = f["name"];
-    if(!name_field.is_string())
-    {
-        error() << "Json (sub)formula has 'name' field which is not a string:\n" << f.dump(4);
-        return false;
-    }
-
-    auto op = name_field.get<std::string>();
-    if(op == "T" || op == "F" || op == "1" || op == "0")
-    {
-        return true;
-    }
-
-    if(!f.contains("value"))
-    {
-        error() << "Json (sub)formula is missing a 'value' field:\n" << f.dump(4);
-        return false;
-    }
-    auto& value_field = f["value"];
-
-    if(op == "string") // variable
-    {
-        if(!value_field.is_string())
-        {
-            error() << "Json (sub)formula has 'value' field which is not a string:\n" << f.dump(4);
-            return false;
-        }
-        variables.insert(value_field.get<std::string>());
-        return true;
-    }
-
-    if(value_field.is_object())
-    {
-        return get_all_variables(value_field, variables);
-    }
-    if(value_field.is_array() && value_field.size() == 2)
-    {
-        return get_all_variables(value_field[0], variables) && get_all_variables(value_field[1], variables);
-    }
-    error()
-        << "Json (sub)formula has 'value' field which is neither an object, nor an array of two objects:\n"
-        << f.dump(4);
-    return false;
-}
-}
-
 formula_mgr::formula_mgr(const termination_callback& c)
     : f_(this)
 	, is_terminated_(c)
@@ -196,31 +137,6 @@ auto formula_mgr::build(const std::string& f, const formula_refiners& refiners_f
     return f_.build(*formula_AST, variable_to_id_);
 }
 
-auto formula_mgr::build(json& f) -> bool
-{
-    clear();
-
-    info() << "Start building a formula";
-    verbose() << f.dump(4);
-
-    // Will cash all variables and swap the string representations with their id in the cache.
-    variables_set_t variables_set;
-    if(!get_all_variables(f, variables_set))
-    {
-        return false;
-    }
-
-    variables_.reserve(variables_set.size());
-    variable_to_id_.reserve(variables_set.size());
-    for(const auto& variable : variables_set)
-    {
-        variable_to_id_[variable] = variables_.size();
-        variables_.emplace_back(variable);
-    }
-
-    return change_variables_to_variable_ids(f) && f_.build(f);
-}
-
 auto formula_mgr::brute_force_evaluate_with_points_count(basic_bruteforce_model& out_model) const -> bool
 {
     return out_model.create(f_, variables_.size(), this);
@@ -313,65 +229,6 @@ auto formula_mgr::print(std::ostream& out, const variables_mask_t& variables_mas
         }
     }
     return out;
-}
-
-auto formula_mgr::change_variables_to_variable_ids(json& f) const -> bool
-{
-    if(!f.contains("name"))
-    {
-        error() << "Json (sub)formula is missing a 'name' field:\n" << f.dump(4);
-        return false;
-    }
-
-    auto& name_field = f["name"];
-    if(!name_field.is_string())
-    {
-        error() << "Json (sub)formula has 'name' field which is not a string:\n" << f.dump(4);
-        return false;
-    }
-
-    auto op = name_field.get<std::string>();
-    if(op == "T" || op == "F" || op == "1" || op == "0")
-    {
-        return true;
-    }
-
-    if(!f.contains("value"))
-    {
-        error() << "Json (sub)formula is missing a 'value' field:\n" << f.dump(4);
-        return false;
-    }
-
-    auto& value_field = f["value"];
-    if(op == "string") // variable
-    {
-        if(!value_field.is_string())
-        {
-            error() << "Json (sub)formula has 'value' field which is not a string:\n" << f.dump(4);
-            return false;
-        }
-        name_field = "variable_id";
-
-        const auto variable_str = value_field.get<std::string>();
-        assert(variable_to_id_.find(variable_str) != variable_to_id_.end());
-        value_field = variable_to_id_.find(variable_str)->second;
-        return true;
-    }
-
-    if(value_field.is_object())
-    {
-        return change_variables_to_variable_ids(value_field);
-    }
-    if(value_field.is_array() && value_field.size() == 2)
-    {
-        return change_variables_to_variable_ids(value_field[0]) &&
-               change_variables_to_variable_ids(value_field[1]);
-    }
-
-    error() << "Json (sub)formula has 'value' field which is neither an object, nor an array of two "
-               "objects:\n"
-            << f.dump(4);
-    return false;
 }
 
 auto formula_mgr::has_flag(const formula_refiners& flags, const formula_refiners& flag) const -> bool

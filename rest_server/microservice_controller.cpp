@@ -6,8 +6,6 @@
 
 #include <filesystem/filesystem.hpp>
 
-#include "nlohmann_json/json.hpp"
-
 // using namespace std;
 using namespace web;
 using namespace utility;
@@ -27,8 +25,6 @@ bool starts_with(const std::string& s, const std::string& prefix)
 }
 
 }
-
-using n_json = nlohmann::json;
 
 microservice_controller::microservice_controller(utility::string_t url)
     : m_listener(url)
@@ -225,9 +221,8 @@ void microservice_controller::handle_post(http_request message)
                 .then([=](string_t res) {
                     const auto f_str = utility::conversions::to_utf8string(web::uri().decode(res));
                     //ucout << f_str << std::endl;
-                    n_json f_json = n_json::parse(f_str);
                     formula_mgr mgr;
-                    mgr.build(f_json);
+                    mgr.build(f_str);
 
 					basic_bruteforce_model bbm;
 					bool isNativeSatisfied = mgr.brute_force_evaluate_with_points_count(bbm);
@@ -271,10 +266,9 @@ void microservice_controller::handle_post(http_request message)
             request.extract_string(true)
                 .then([=](string_t res) {
                     ucout << web::uri().decode(res) << std::endl;
-                    n_json f_json =
-                        n_json::parse(utility::conversions::to_utf8string(web::uri().decode(res)));
+                    const auto f_str = utility::conversions::to_utf8string(web::uri().decode(res));
                     formula_mgr mgr;
-                    mgr.build(f_json);
+                    mgr.build(f_str);
 
                     std::stringstream built_formula;
                     built_formula << mgr;
@@ -309,10 +303,9 @@ void microservice_controller::handle_post(http_request message)
             request.extract_string(true)
                 .then([=](string_t res) {
                     ucout << web::uri().decode(res) << std::endl;
-                    n_json f_json =
-                        n_json::parse(utility::conversions::to_utf8string(web::uri().decode(res)));
+                    const auto f_str = utility::conversions::to_utf8string(web::uri().decode(res));
                     formula_mgr mgr;
-                    mgr.build(f_json);
+                    mgr.build(f_str);
 
                     std::stringstream built_formula;
                     built_formula << mgr;
@@ -354,9 +347,8 @@ void microservice_controller::handle_post(http_request message)
                     const auto f_str = utility::conversions::to_utf8string(web::uri().decode(res));
                     //ucout << f_str << std::endl;
 
-                    n_json f_json = n_json::parse(f_str);
                     formula_mgr mgr;
-                    mgr.build(f_json);
+                    mgr.build(f_str);
 
                     std::stringstream msg;
                     model m;
