@@ -3,6 +3,7 @@ cmake_minimum_required (VERSION 2.8.11)
 add_subdirectory(../formula_lib formula_lib)
 
 include_directories(${FORMULA_LIB_INCLUDE_DIR})
+include_directories(${PARSER_LIB_INCLUDE_DIR})
 
 message ("Including '${FORMULA_LIB_PRIVATE_DIR}' in order to test it")
 include_directories(${FORMULA_LIB_PRIVATE_DIR})
