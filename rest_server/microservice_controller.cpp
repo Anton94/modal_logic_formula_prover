@@ -1,5 +1,6 @@
 ﻿#include "microservice_controller.h"
 #include "model.h"
+#include "thread_termiator.h"
 
 #include <iostream>
 #include <string>
@@ -231,17 +232,15 @@ void microservice_controller::handle_post(http_request message)
 			
 			request.extract_string(true)
 				.then([=](string_t res) {
-				const auto f_str = utility::conversions::to_utf8string(web::uri().decode(res));
-				auto is_terminated = [&]() {
-					// TODO: mutex?
-					return token.is_canceled();
-				};
+                const auto f_str = utility::conversions::to_utf8string(web::uri().decode(res));
+
+                set_termination_callback([&]() { return token.is_canceled(); }); // TODO: pass by value?
 
 				basic_bruteforce_model bbm;
 				//bool isNativeSatisfied = mgr.brute_force_evaluate_with_points_count(bbm);
 				model m;
 				try {
-					formula_mgr mgr(is_terminated);
+                    formula_mgr mgr;
 					mgr.build("C(a+c,b+t) & C(c+z,b+v) & C(a+l,b+k) & C(q+g,n+e) & C(a,m) & C(d,e)");
 					const auto is_satisfiable = mgr.is_satisfiable(bbm);
 					// TODO record the results somewhere in another 
@@ -253,7 +252,7 @@ void microservice_controller::handle_post(http_request message)
 					op_id_to_task_result.find(op_id)->second.status_code = "FINISHED";
 					op_id_to_task_result.find(op_id)->second.is_satisfied = is_satisfiable;
 				}
-                catch (const formula_mgr::TerminationException&) {
+                catch (const TerminationException&) {
 					info() << "Canceled ";
 				}
 				catch (...) {

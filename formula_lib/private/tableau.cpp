@@ -5,6 +5,7 @@
 #include "term.h"
 #include "utils.h"
 #include "variables_evaluations_block_stack.h"
+#include "../include/thread_termiator.h"
 
 auto tableau::is_satisfiable(const formula& f, imodel& out_model) -> bool
 {
@@ -48,7 +49,7 @@ void tableau::clear()
 
 auto tableau::satisfiable_step() -> bool
 {
-	mgr_->is_terminate_requested();
+    TERMINATE_IF_NEEDED();
 	//if (mgr_->is_terminated())
 	//{
 	//	info() << "The process was terminated in tableau's satisfiability step";

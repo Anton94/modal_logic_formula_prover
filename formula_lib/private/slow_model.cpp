@@ -2,6 +2,7 @@
 #include "formula.h"
 #include "formula_mgr.h"
 #include "term.h"
+#include "thread_termiator.h"
 
 #include <cassert>
 
@@ -141,7 +142,7 @@ auto slow_model::is_in_contact(const term* a, const term* b) const -> bool
     auto point_in_eval_a = eval_a.find_first(); // TODO: iterate over the bitset with less set bits
     while (point_in_eval_a != model_points_set_t::npos)
     {
-		mgr_->is_terminate_requested();
+        TERMINATE_IF_NEEDED();
 
         const auto& points_in_contact_with_point_in_eval_a = contact_relations_[point_in_eval_a];
         if ((points_in_contact_with_point_in_eval_a & eval_b).any())
@@ -236,7 +237,7 @@ auto slow_model::generate_next_positive_evaluation(const term* t, variables_eval
 {
     do
     {
-		mgr_->is_terminate_requested();
+        TERMINATE_IF_NEEDED();
 
         if (!evaluation.generate_next_evaluation()) // TODO the generation can be done smarter, e.g. when the evaluation is false, generate new variable evaluations just for the varaibles in @t.
         {

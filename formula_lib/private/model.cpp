@@ -2,6 +2,7 @@
 #include "formula.h"
 #include "formula_mgr.h"
 #include "term.h"
+#include "../include/thread_termiator.h"
 
 #include <cassert>
 
@@ -83,7 +84,7 @@ auto model::generate_next_point_evaluation(const term* t, variables_evaluations_
 {
     while(out_evaluation.generate_next_evaluation())
     {
-		mgr_->is_terminate_requested();
+        TERMINATE_IF_NEEDED();
 		//if (mgr_->is_terminated())
 		//{
 		//	info() << "The process was terminated in model's generation of point evaluation.";

@@ -1,5 +1,6 @@
 #include "../include/basic_bruteforce_model.h"
 #include "formula_mgr.h"
+#include "../include/thread_termiator.h"
 
 void basic_bruteforce_model::clear()
 {
@@ -27,7 +28,7 @@ auto basic_bruteforce_model::generate_next(variables_evaluations_t& current) con
 
 auto basic_bruteforce_model::generate_next(std::vector<variables_evaluations_t>& current, const variables_mask_t& used_variables) const -> bool
 {
-	mgr_->is_terminate_requested();
+    TERMINATE_IF_NEEDED();
 	/*if (mgr_->is_terminated())
 	{
 		info() << "The process was terminated in brute force's satisfiability step";

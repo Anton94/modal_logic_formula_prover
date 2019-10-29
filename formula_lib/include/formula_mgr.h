@@ -12,15 +12,12 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <functional>
-#include <exception>
 
 class formula_mgr
 {
 public:
-	using termination_callback = std::function<bool()>;
 
-	formula_mgr(const termination_callback& c = {});
+    formula_mgr();
     formula_mgr(const formula_mgr&) = delete;
     formula_mgr& operator=(const formula_mgr&) = delete;
     formula_mgr(formula_mgr&& rhs) noexcept;
@@ -49,6 +46,7 @@ public:
     auto brute_force_evaluate_with_points_count(basic_bruteforce_model& out_model) const -> bool;
 
     // Checks if the formula is satisfiable or not
+    // If thermiate is requested throws TerminationException.
     auto is_satisfiable(imodel& out_model) -> bool;
 
     // Checks if the provided model satisfies the formula
@@ -66,13 +64,6 @@ public:
     auto print(std::ostream& out, const variables_evaluations_block& block) const -> std::ostream&;
     auto print(std::ostream& out, const variables_mask_t& variables_mask) const -> std::ostream&;
 
-    class TerminationException : public std::exception
-    {
-        const char* what() const noexcept override { return "Termination exception"; }
-    };
-    // If thermiate is requested throws TerminationException.
-    void is_terminate_requested() const;
-
 private:
     void move(formula_mgr&& rhs) noexcept;
 
@@ -83,8 +74,6 @@ private:
     variables_t variables_;
     formula f_;
     tableau t_;
-
-	termination_callback is_terminated_;
 };
 
 std::ostream& operator<<(std::ostream& out, const formula_mgr& formulas);
