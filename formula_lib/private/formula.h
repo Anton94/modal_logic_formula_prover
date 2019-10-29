@@ -81,8 +81,8 @@ private:
 
     struct internal_evaluation_result
     {
-        bool evaluated_value{};
-        bool is_used_only_less_eq_measured_as_atomic{}; // only the atomic <=m participates in the subformula evaluations
+        bool evaluated_value;
+        bool is_used_only_less_eq_measured_as_atomic; // only the atomic <=m participates in the subformula evaluations
         constexpr static const bool no_evaluation{};
     };
 
