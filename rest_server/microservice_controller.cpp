@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <string>
+#include <thread>
 
 #include <filesystem/filesystem.hpp>
 
@@ -17,12 +18,12 @@ namespace
 {
 std::string to_string(bool b)
 {
-    return b ? "true" : "false";
+	return b ? "true" : "false";
 }
 
 bool starts_with(const std::string& s, const std::string& prefix)
 {
-    return s.find(prefix) == 0;
+	return s.find(prefix) == 0;
 }
 
 }
@@ -40,6 +41,7 @@ microservice_controller::microservice_controller(utility::string_t url)
                        std::bind(&microservice_controller::handle_delete, this, std::placeholders::_1));
 
 	srand(time(NULL));
+
 }
 
 void handle_error(pplx::task<void>& t)
@@ -119,41 +121,38 @@ void microservice_controller::handle_post(http_request message)
 	if (starts_with(message_path, "/ping"))
 	{
 		message.content_ready().then([=](web::http::http_request request) {
-			auto http_get_vars = uri::split_query(request.request_uri().query());
-			request.extract_string(true)
-				.then([=](string_t res) {
-				const auto alive_op_id = utility::conversions::to_utf8string(web::uri().decode(res));
+			auto query_params = uri::split_query(request.request_uri().query());
+			auto op_id_u = query_params.find(U("op_id"));
+			if (op_id_u == query_params.end()) {
+				message.reply(status_codes::BadRequest, "Missing 'op_id' query parameter.")
+					.then([](pplx::task<void> t) { handle_error(t); });
+				return;
+			}
 
-				std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
+			auto op_id = utility::conversions::to_utf8string(op_id_u->second);
+			std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
 
-				if (op_id_to_cts_.find(alive_op_id) == op_id_to_cts_.end())
+			if (op_id_to_cts_.find(op_id) == op_id_to_cts_.end())
+			{
+				message.reply(status_codes::BadRequest, "no such op_id.")
+					.then([](pplx::task<void> t) { handle_error(t); });
+			}
+			else 
+			{
+				auto& res = op_id_to_task_result.find(op_id)->second;
+				if (res.status_code == "FINISHED")
 				{
-					message.reply(status_codes::BadRequest, "no such op_id.").then([](pplx::task<void> t) { handle_error(t); });
+					message.reply(status_codes::OK, res.is_satisfied)
+						.then([](pplx::task<void> t) { handle_error(t); });
+					remove_op_id(op_id);
 				}
-				else 
+				else
 				{
-					auto& res = op_id_to_task_result.find(alive_op_id)->second;
-					if (res.status_code == "FINISHED")
-					{
-						message.reply(status_codes::OK, res.is_satisfied).then([](pplx::task<void> t) { handle_error(t); });
-						remove_op_id(alive_op_id);
-					}
-					else
-					{
-						active_tasks.insert(alive_op_id);
-						message.reply(status_codes::OK, res.status_code).then([](pplx::task<void> t) { handle_error(t); });
-					}
+					active_tasks.insert(op_id);
+					message.reply(status_codes::OK, res.status_code)
+						.then([](pplx::task<void> t) { handle_error(t); });
 				}
-			})
-				.then([=](pplx::task<void> t) {
-				try
-				{
-					t.get();
-				}
-				catch (...)
-				{
-				}
-			});
+			}
 		});
 		return;
 	}
@@ -161,38 +160,30 @@ void microservice_controller::handle_post(http_request message)
 	if (starts_with(message_path, "/cancel"))
 	{
 		message.content_ready().then([=](web::http::http_request request) {
-			request.extract_string(true)
-				.then([=](string_t res) {
-				const auto f_str = utility::conversions::to_utf8string(web::uri().decode(res));
+			auto query_params = uri::split_query(request.request_uri().query());
+			auto op_id_u = query_params.find(U("op_id"));
+			if (op_id_u == query_params.end()) {
+				message.reply(status_codes::BadRequest, "Missing 'op_id' query parameter.")
+					.then([](pplx::task<void> t) { handle_error(t); });
+				return;
+			}
 
-				std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
-				auto it = op_id_to_cts_.find(f_str);
-				bool was_removed = false;
-				if (it != op_id_to_cts_.end()) {
-					it->second.cancel();
-					op_id_to_cts_.erase(it);
-					active_tasks.insert(f_str);
-					op_id_to_task_result.find(f_str)->second.status_code = "CANCELED";
+			auto op_id = utility::conversions::to_utf8string(op_id_u->second);
 
-					was_removed = true;
-				}
+			std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
+			auto it = op_id_to_cts_.find(op_id);
+			bool was_removed = false;
+			if (it != op_id_to_cts_.end() && op_id_to_task_result.find(op_id)->second.status_code != "FINISHED") {
+				it->second.cancel();
+				op_id_to_cts_.erase(it);
+				active_tasks.insert(op_id);
+				op_id_to_task_result.find(op_id)->second.status_code = "CANCELED";
+
+				was_removed = true;
+			}
 				
-				message.reply(status_codes::OK, was_removed ? "cancel true" : "cancel failed").then([](pplx::task<void> t) { handle_error(t); });
-			})
-				.then([=](pplx::task<void> t) {
-				try
-				{
-					t.get();
-				}
-				catch (...)
-				{
-					// opening the file (open_istream) failed.
-					// Reply with an error.
-					message.reply(status_codes::InternalError).then([](pplx::task<void> t) {
-						handle_error(t);
-					});
-				}
-			});
+			message.reply(status_codes::OK, was_removed ? "cancel true" : "cancel failed")
+				.then([](pplx::task<void> t) { handle_error(t); });
 		});
 		return;
 	}
@@ -229,25 +220,30 @@ void microservice_controller::handle_post(http_request message)
 		auto token = std::move(id_token.token);
 
 		message.content_ready().then([=](web::http::http_request request) {
-			
+			auto query_params = uri::split_query(request.request_uri().query());
+			auto algorith_type_u = query_params.find(U("algorith_type"));
+			if (algorith_type_u == query_params.end()) {
+				message.reply(status_codes::BadRequest, "Missing 'algorith' query parameter.")
+					.then([](pplx::task<void> t) { handle_error(t); });
+				return;
+			}
+
+			auto algorith_type = utility::conversions::to_utf8string(algorith_type_u->second);
+
 			request.extract_string(true)
 				.then([=](string_t res) {
                 const auto f_str = utility::conversions::to_utf8string(web::uri().decode(res));
 
                 set_termination_callback([&]() { return token.is_canceled(); }); // TODO: pass by value?
 
-				basic_bruteforce_model bbm;
-				//bool isNativeSatisfied = mgr.brute_force_evaluate_with_points_count(bbm);
-				model m;
 				try {
-                    formula_mgr mgr;
-					mgr.build("C(a+c,b+t) & C(c+z,b+v) & C(a+l,b+k) & C(q+g,n+e) & C(a,m) & C(d,e)");
+					// TODO: depending on the algorithm type choose what is going to be evaluate
+					// here.
+					formula_mgr mgr;
+					mgr.build(f_str);
+					basic_bruteforce_model bbm;
 					const auto is_satisfiable = mgr.is_satisfiable(bbm);
-					// TODO record the results somewhere in another 
-					// map { op_id -> result }
-					// so that the next request that the user does to check if the task is complete 
-					// we can return the result and after that remove that op_id from the map.
-					// Meaning that we remove op_id's on cancel and complete.
+
 					active_tasks.insert(op_id);
 					op_id_to_task_result.find(op_id)->second.status_code = "FINISHED";
 					op_id_to_task_result.find(op_id)->second.is_satisfied = is_satisfiable;
@@ -508,7 +504,6 @@ std::string microservice_controller::generate_random_op_id(size_t length)
 
 void microservice_controller::remove_op_id(std::string op_id)
 {
-	std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
 	op_id_to_cts_.erase(op_id);
 	op_id_to_task_result.erase(op_id);
 	active_tasks.erase(op_id);
