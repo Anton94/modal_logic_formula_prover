@@ -83,7 +83,7 @@ auto model::generate_next_point_evaluation(const term* t, variables_evaluations_
 {
     while(out_evaluation.generate_next_evaluation())
     {
-		mgr_->terminate_if_need();
+		mgr_->is_terminate_requested();
 		//if (mgr_->is_terminated())
 		//{
 		//	info() << "The process was terminated in model's generation of point evaluation.";

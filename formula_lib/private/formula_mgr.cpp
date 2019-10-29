@@ -236,15 +236,15 @@ auto formula_mgr::has_flag(const formula_refiners& flags, const formula_refiners
     return static_cast<int32_t>(flags) & static_cast<int32_t>(flag);
 }
 
-void formula_mgr::terminate_if_need() const
+void formula_mgr::is_terminate_requested() const
 {
-	if (is_terminated_)
-	{
-		if (is_terminated_())
-		{
-			throw "The process was terminated";
-		}
-	}
+    if (is_terminated_)
+    {
+        if (is_terminated_())
+        {
+            throw TerminationException();
+        }
+    }
 }
 
 void formula_mgr::move(formula_mgr&& rhs) noexcept

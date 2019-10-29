@@ -48,7 +48,7 @@ void tableau::clear()
 
 auto tableau::satisfiable_step() -> bool
 {
-	mgr_->terminate_if_need();
+	mgr_->is_terminate_requested();
 	//if (mgr_->is_terminated())
 	//{
 	//	info() << "The process was terminated in tableau's satisfiability step";

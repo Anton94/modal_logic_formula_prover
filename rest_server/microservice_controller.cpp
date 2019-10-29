@@ -253,7 +253,7 @@ void microservice_controller::handle_post(http_request message)
 					op_id_to_task_result.find(op_id)->second.status_code = "FINISHED";
 					op_id_to_task_result.find(op_id)->second.is_satisfied = is_satisfiable;
 				}
-				catch (const char* e) {
+                catch (const formula_mgr::TerminationException&) {
 					info() << "Canceled ";
 				}
 				catch (...) {

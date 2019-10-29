@@ -27,7 +27,7 @@ auto basic_bruteforce_model::generate_next(variables_evaluations_t& current) con
 
 auto basic_bruteforce_model::generate_next(std::vector<variables_evaluations_t>& current, const variables_mask_t& used_variables) const -> bool
 {
-	mgr_->terminate_if_need();
+	mgr_->is_terminate_requested();
 	/*if (mgr_->is_terminated())
 	{
 		info() << "The process was terminated in brute force's satisfiability step";

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // TODO: pimpl ideom. will hide the private includes, etc.
 
@@ -13,6 +13,7 @@
 #include <unordered_map>
 #include <vector>
 #include <functional>
+#include <exception>
 
 class formula_mgr
 {
@@ -65,8 +66,12 @@ public:
     auto print(std::ostream& out, const variables_evaluations_block& block) const -> std::ostream&;
     auto print(std::ostream& out, const variables_mask_t& variables_mask) const -> std::ostream&;
 
-	// throws an exception. TODO: make custom exception, etc...
-	void terminate_if_need() const;
+    class TerminationException : public std::exception
+    {
+        const char* what() const noexcept override { return "Termination exception"; }
+    };
+    // If thermiate is requested throws TerminationException.
+    void is_terminate_requested() const;
 
 private:
     void move(formula_mgr&& rhs) noexcept;

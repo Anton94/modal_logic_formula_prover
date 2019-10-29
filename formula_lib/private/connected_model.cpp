@@ -71,7 +71,7 @@ void connected_model::construct_all_valid_unique_points(const formulas_t& contac
 
     do
     {
-		mgr_->terminate_if_need();
+		mgr_->is_terminate_requested();
 		
 		//if (mgr_->is_terminated())
 		//{
@@ -132,7 +132,7 @@ auto connected_model::is_zero_terms_F_rule_satisfied(const terms_t& zero_terms_F
 {
     for(const auto& z : zero_terms_F)
     {
-		mgr_->terminate_if_need();
+		mgr_->is_terminate_requested();
 		//if (mgr_->is_terminated())
 		//{
 		//	info() << "The process was terminated in connected model's checking of non-zero terms if they are satisfied.";
@@ -166,7 +166,7 @@ auto connected_model::is_contacts_T_rule_satisfied(const formulas_t& contacts_T)
     // C(a,b)
     for(const auto& c : contacts_T)
     {
-		mgr_->terminate_if_need();
+		mgr_->is_terminate_requested();
 		//if (mgr_->is_terminated())
 		//{
 		//	info() << "The process was terminated in connected model's checking if all T contacts are satisfied.";
@@ -224,7 +224,7 @@ auto connected_model::build_contact_relations_matrix(const formulas_t& contacts_
     // ~C(a,b)
     for(const auto& c : contacts_F)
     {
-		mgr_->terminate_if_need();
+		mgr_->is_terminate_requested();
 		//if (mgr_->is_terminated())
 		//{
 		//	info() << "The process was terminated in connected model's building of contact relations matrix.";
@@ -258,7 +258,7 @@ auto connected_model::get_connected_components() const -> std::vector<model_poin
     size_t root_point_id = not_visited_points.find_first();
     while(root_point_id != model_points_set_t::npos)
     {
-		mgr_->terminate_if_need();
+		mgr_->is_terminate_requested();
 		//if (mgr_->is_terminated())
 		//{
 		//	info() << "The process was terminated in connected model's getting of connected components.";
@@ -284,7 +284,7 @@ auto connected_model::get_connected_component(size_t root_point_id, model_points
 
     while(!q.empty())
     {
-		mgr_->terminate_if_need();
+		mgr_->is_terminate_requested();
 		//if (mgr_->is_terminated())
 		//{
 		//	info() << "The process was terminated in connected model's getting of connected component.";
