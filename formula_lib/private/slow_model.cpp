@@ -33,6 +33,7 @@ auto slow_model::create(const formulas_t& contacts_T, const formulas_t& contacts
     while (!is_zero_term_rule_satisfied(zero_terms_T) || !is_contact_F_rule_satisfied(contacts_F) ||
            !has_solvable_system_of_inequalities(measured_less_eq_T, measured_less_eq_F))
     {
+        TERMINATE_IF_NEEDED();
         if (!generate_next())
         {
             trace() << "Unable to generate a new combination of binary var. evaluations for the model points.";
@@ -142,8 +143,6 @@ auto slow_model::is_in_contact(const term* a, const term* b) const -> bool
     auto point_in_eval_a = eval_a.find_first(); // TODO: iterate over the bitset with less set bits
     while (point_in_eval_a != model_points_set_t::npos)
     {
-        TERMINATE_IF_NEEDED();
-
         const auto& points_in_contact_with_point_in_eval_a = contact_relations_[point_in_eval_a];
         if ((points_in_contact_with_point_in_eval_a & eval_b).any())
         {
@@ -237,8 +236,6 @@ auto slow_model::generate_next_positive_evaluation(const term* t, variables_eval
 {
     do
     {
-        TERMINATE_IF_NEEDED();
-
         if (!evaluation.generate_next_evaluation()) // TODO the generation can be done smarter, e.g. when the evaluation is false, generate new variable evaluations just for the varaibles in @t.
         {
             return false;

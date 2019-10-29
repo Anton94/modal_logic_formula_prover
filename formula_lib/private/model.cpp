@@ -42,6 +42,7 @@ auto model::construct_contact_model_points(const formulas_t& contacts_T, const f
 {
     for(const auto& c : contacts_T)
     {
+        TERMINATE_IF_NEEDED();
         if(!construct_contact_points(c, contacts_F, zero_terms_T))
         {
             return false;
@@ -56,6 +57,7 @@ auto model::construct_non_zero_model_points(const terms_t& zero_terms_F, const f
 {
     for(const auto& z : zero_terms_F)
     {
+        TERMINATE_IF_NEEDED();
         // TODO: optimize by checking if there is already existing point with evaluation which evaluates the
         // term z to true
         variables_evaluations_block eval(variables_mask_t(0)); // it will be overriten if succeed
@@ -82,14 +84,9 @@ auto model::generate_next_point_evaluation(const term* t, variables_evaluations_
                                            const formulas_t& contacts_F, const terms_t& zero_terms_T) const
     -> bool
 {
+
     while(out_evaluation.generate_next_evaluation())
     {
-        TERMINATE_IF_NEEDED();
-		//if (mgr_->is_terminated())
-		//{
-		//	info() << "The process was terminated in model's generation of point evaluation.";
-		//}
-
         // TODO the generation can be done smarter, e.g. when the evaluation of 't' is false, generate new
         // variable evaluations just for the varaibles in @t.
         if(does_point_evaluation_satisfies_basic_rules(t, out_evaluation, contacts_F, zero_terms_T))

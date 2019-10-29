@@ -50,10 +50,6 @@ void tableau::clear()
 auto tableau::satisfiable_step() -> bool
 {
     TERMINATE_IF_NEEDED();
-	//if (mgr_->is_terminated())
-	//{
-	//	info() << "The process was terminated in tableau's satisfiability step";
-	//}
 
     using op_t = formula::operation_t;
 
