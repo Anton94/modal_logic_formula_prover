@@ -51,7 +51,7 @@
 		            });
 			}
 
-			function execute(algorithm_type) {
+			function create_task(algorithm_type) {
 				var formula = document.getElementById('formula');
 				var formula_filters = [];
 
@@ -86,6 +86,7 @@
 			  outline: none;
 			  font-size: 15px;
 			  transition: 0.4s;
+			  margin-left: 20px;
 			  margin-right: 20px;
 			}
 
@@ -118,13 +119,18 @@
 		</div>
 
 		<div id="algorith_buttons" style="margin: 20px;">
-			Algorithm type:<br><br>
-			<button onclick="execute('SLOW_MODEL')">SLOW MODEL</button>
-			<button onclick="is_satisfiable(document.getElementById('formula').value)">FAST MODEL</button>
-			<button onclick="is_satisfiable(document.getElementById('formula').value)">CONNECTIVITY</button>
+			Run algorithm:<br><br>
+			<button onclick="create_task('SLOW_MODEL')">SLOW MODEL</button>
+			<button onclick="create_task('FAST_MODEL')">FAST MODEL</button>
+			<button onclick="create_task('CONNECTIVITY')">CONNECTIVITY</button>
 			<!-- Add killswitch which is only for development so that this line does not be present -->
-			<button onclick="is_satisfiable(document.getElementById('formula').value)">BRUTEFORCE MODEL</button>
+			<button onclick="create_task('BRUTEFORCE_MODEL')">BRUTEFORCE MODEL</button>
 		</div>
+		<div id="algorithm_cancelations" style="margin: 20px;">
+			If the calculation takes too long, try to cancel it and it might help to optimize the input formula<br>
+			<button onclick="cancel_task('valid_op_id')">CANCEL CALCULATION</button>
+		</div>
+		
 		<div id="is_satisfied">
 			<pre id="is_satisfied_output"></pre>
 		</div>
