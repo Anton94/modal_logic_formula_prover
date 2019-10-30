@@ -4,9 +4,8 @@
 #include "parser_API.h"
 #include "visitor.h"
 
-formula_mgr::formula_mgr(const termination_callback& c)
+formula_mgr::formula_mgr()
     : f_(this)
-	, is_terminated_(c)
 {
 }
 
@@ -234,17 +233,6 @@ auto formula_mgr::print(std::ostream& out, const variables_mask_t& variables_mas
 auto formula_mgr::has_flag(const formula_refiners& flags, const formula_refiners& flag) const -> bool
 {
     return static_cast<int32_t>(flags) & static_cast<int32_t>(flag);
-}
-
-void formula_mgr::terminate_if_need() const
-{
-	if (is_terminated_)
-	{
-		if (is_terminated_())
-		{
-			throw "The process was terminated";
-		}
-	}
 }
 
 void formula_mgr::move(formula_mgr&& rhs) noexcept
