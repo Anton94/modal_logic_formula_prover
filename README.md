@@ -1,14 +1,20 @@
 [![Build Status](https://travis-ci.com/Anton94/modal_logic_formula_prover.svg?branch=master)](https://travis-ci.com/Anton94/modal_logic_formula_prover)
 [![Build status](https://ci.appveyor.com/api/projects/status/0bjq49fxgpb66jkn?svg=true)](https://ci.appveyor.com/project/Anton94/modal-logic-formula-prover)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/e0c037d7e81d4c9fadef114d0a0bb534)](https://www.codacy.com/manual/Anton94/modal_logic_formula_prover?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Anton94/modal_logic_formula_prover&amp;utm_campaign=Badge_Grade)
+![language](https://img.shields.io/badge/language-c++-blue.svg) ![c++](https://img.shields.io/badge/std-c++14-blue.svg)
+![msvc2014+](https://img.shields.io/badge/MSVC-2014+-ff69b4.svg) ![mingw-5.3+](https://img.shields.io/badge/MINGW-5.3+-ff69b4.svg) 
+![gcc-5.0+](https://img.shields.io/badge/GCC-5.0+-ff69b4.svg) ![clang-4+](https://img.shields.io/badge/CLANG-4+-ff69b4.svg)
+
+[![](https://codescene.io/projects/5855/status.svg)](https://codescene.io/projects/5855/jobs/latest-successful/results)
 
 # modal_logic_formula_prover
 TODO: Master degree project for prooving/disprooving formulas (space and probability)
 
 # Dependencies:
-- [CppRestSDK](https://github.com/microsoft/cpprestsdk) only for the web client. Note that for Unix it will require boost's System library
 - CMake 3.7 or newer
-- C++ compiler which supports cpp14 (you can check the used compilers in the builders at the top)
+- (optional) [CppRestSDK](https://github.com/microsoft/cpprestsdk) only for the web client. Note that for Unix it will require boost's System library. If CppRestSDK is not isntalled, then the rest server project will be skipped.
+
+Probably earlier compiler versions are also supported. We do not have any platfrom dependent code.
 
 # Building
 For build system, we are using CMake.
