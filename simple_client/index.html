@@ -5,7 +5,7 @@
 		<script src="./main.js"></script>
 		<script>
 			var IP_ADDRESS = "http://localhost:34567/";
-			var op_id = null;
+			var valid_op_id = null;
 
 			// since now we are only posting tasks, these requests will be fast enough and 
 			// we can make them synchronous thus returning the result as soon as it comes.
@@ -20,36 +20,50 @@
 		            });
 			}
 
-			function post_is_satisfiable(formula) {
-				document.getElementById("is_satisfied_output").innerHTML = "";
-				document.getElementById("output").innerHTML = "";
-
-				$.post(IP_ADDRESS + "satisfy", { formula: formula })
+			function post_task(formula, algorithm_type, formula_filters) {
+				var params = { 
+					formula: formula, 
+					algorithm_type: algorithm_type, 
+					formula_filters: formula_filters
+				};
+				$.post(IP_ADDRESS + "task", params)
 		            .done(function( data ) {
-		              op_id = data;
+		              valid_op_id = data;
 		            });
 			}
 
-			function check_task() {
-				document.getElementById("is_satisfied_output").innerHTML = "";
-				document.getElementById("output").innerHTML = "";
-
-				$.post(IP_ADDRESS + "check", { op_id: op_id })
+			function check_task(op_id) {
+				$.post(IP_ADDRESS + "check", { op_id: valid_op_id })
 		            .done(function( data ) {
-		            	// depending on the data return RUNNING or CANCELED or DONE...
+		            	// depending on the data return RUNNING or CANCELED or FINISHED...
 		              console.log(data);
+		              // if FINISHED maybe even if CANCELED ? or not for sure on not found op_id!!!
+		              valid_op_id = null;
 		            });
 			}
 
-			function cancel_task() {
-				document.getElementById("is_satisfied_output").innerHTML = "";
-				document.getElementById("output").innerHTML = "";
-
-				$.post(IP_ADDRESS + "cancel", { op_id: op_id })
+			function cancel_task(op_id) {
+				$.post(IP_ADDRESS + "cancel", { op_id: valid_op_id })
 		            .done(function( data ) {
 		            	// return true if success, return false if the task was already canceled
 		              console.log(data);
+		              valid_op_id = null;
 		            });
+			}
+
+			function execute(algorithm_type) {
+				var formula = document.getElementById('formula');
+				var formula_filters = [];
+
+				if (!(algorithm_type in ['SLOW_MODEL', 'FAST_MODEL', 'CONNECTIVITY', 'BRUTEFORCE_MODEL'])) {
+					console.log(algorithm_type + " not in " + ['SLOW_MODEL', 'FAST_MODEL', 'CONNECTIVITY', 'BRUTEFORCE_MODEL']);
+					return;
+				}
+
+				post_task(formula, algorithm_type, formula_filters);
+
+				// set ping on every few seconds it is best to have something like this for the ping delay [1, 2, 5, 7, 10, 10, ...
+				// on ping result FINISHED show the result probably in the output area.
 			}
 		</script>
 		<style>
@@ -60,11 +74,56 @@
 				font-size: 15px;
 			}
 		</style>
+		<style>
+			.accordion {
+			  background-color: #eee;
+			  color: #444;
+			  cursor: pointer;
+			  padding: 18px;
+			  width: 100%;
+			  border: none;
+			  text-align: left;
+			  outline: none;
+			  font-size: 15px;
+			  transition: 0.4s;
+			  margin-right: 20px;
+			}
+
+			.active, .accordion:hover {
+			  background-color: #ccc; 
+			}
+
+			.panel {
+			  padding: 0 18px;
+			  display: none;
+			  background-color: white;
+			  overflow: hidden;
+			  margin-left: 20px;
+			  margin-right: 20px;
+			}
+		</style>
 	</head>
 	<body>
-		<div id="formula_input">
-			<input id="formula"/>
-			<button onclick="is_satisfiable(document.getElementById('formula').value)">SATISFY</button>
+		<div id="formula_input" style="margin: 20px;">
+			Formula:<br>
+			<input id="formula" style="width: 100%; height: 20px;"/>
+		</div>
+
+		<div id="formula_filters" style="margin: 20px;">
+			Formula Filters:<br>
+			<input type="checkbox" id="myCheck"  onclick="myFunction()"> Filter 1<br>
+			<input type="checkbox" id="myCheck"  onclick="myFunction()"> Filter 2<br>
+			<input type="checkbox" id="myCheck"  onclick="myFunction()"> Filter 3<br>
+			<input type="checkbox" id="myCheck"  onclick="myFunction()"> Filter 4<br>
+		</div>
+
+		<div id="algorith_buttons" style="margin: 20px;">
+			Algorithm type:<br><br>
+			<button onclick="execute('SLOW_MODEL')">SLOW MODEL</button>
+			<button onclick="is_satisfiable(document.getElementById('formula').value)">FAST MODEL</button>
+			<button onclick="is_satisfiable(document.getElementById('formula').value)">CONNECTIVITY</button>
+			<!-- Add killswitch which is only for development so that this line does not be present -->
+			<button onclick="is_satisfiable(document.getElementById('formula').value)">BRUTEFORCE MODEL</button>
 		</div>
 		<div id="is_satisfied">
 			<pre id="is_satisfied_output"></pre>
@@ -72,6 +131,38 @@
 		<div id="formula_output">
 			<pre id="output"></pre>
 		</div>
+		<h2 style="margin-left: 20px;">Output</h2>
+		<button class="accordion">Result</button>
+		<div class="panel">
+		  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+		</div>
+
+		<button class="accordion">Verbose Output / Console</button>
+		<div class="panel">
+		  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+		</div>
+
+		<button class="accordion" style="margin-bottom: 20px;">Visualized Model</button>
+		<div class="panel">
+		  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+		</div>
+
+		<script>
+		var acc = document.getElementsByClassName("accordion");
+		var i;
+
+		for (i = 0; i < acc.length; i++) {
+		  acc[i].addEventListener("click", function() {
+		    this.classList.toggle("active");
+		    var panel = this.nextElementSibling;
+		    if (panel.style.display === "block") {
+		      panel.style.display = "none";
+		    } else {
+		      panel.style.display = "block";
+		    }
+		  });
+		}
+		</script>
 
 		<code>F&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/bot.png" alt="Bottom"> - </code><label>False</label><br>
 		<code>T&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/top.png" alt="Top"> - </code><label>True</label><br>
