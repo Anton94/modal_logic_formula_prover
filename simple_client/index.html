@@ -2,7 +2,9 @@
 <html>
 	<head>
 		<link rel="shortcut icon" type="image/png" href="./img/home-icon.png"/>
-		<script src="./main.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+		<script src="https://d3js.org/d3.v4.js"></script>
+
 		<script>
 			var IP_ADDRESS = "http://localhost:34567/";
 			var valid_op_id = null;
@@ -21,49 +23,184 @@
 			}
 
 			function post_task(formula, algorithm_type, formula_filters) {
-				var params = { 
-					formula: formula, 
-					algorithm_type: algorithm_type, 
-					formula_filters: formula_filters
-				};
-				$.post(IP_ADDRESS + "task", params)
+				var params =  
+					"?formula=" + formula + 
+					"&algorithm_type=" + algorithm_type +
+					"&formula_filters=" + formula_filters;
+				$.post(IP_ADDRESS + "task" + params, null)
 		            .done(function( data ) {
 		              valid_op_id = data;
 		            });
 			}
 
-			function check_task(op_id) {
-				$.post(IP_ADDRESS + "check", { op_id: valid_op_id })
+			function ping_task(op_id, timer_id) {
+				var params = "?op_id=" + valid_op_id;
+				$.post(IP_ADDRESS + "ping" + params, null)
 		            .done(function( data ) {
 		            	// depending on the data return RUNNING or CANCELED or FINISHED...
 		              console.log(data);
-		              // if FINISHED maybe even if CANCELED ? or not for sure on not found op_id!!!
-		              valid_op_id = null;
+		              var jsonified = JSON.parse(data.replace(/'/g, "\""));
+		              if (jsonified["status"] == "FINISHED" ) {
+			              clearInterval(timer_id);
+			              valid_op_id = null;
+						  document.getElementById('formula_output').innerText = "The formula is : " + jsonified["is_satisfied"];
+			              do_visualization(graph1);
+		              } else if (jsonified["status"] == "CANCELED") {
+			              clearInterval(timer_id);
+			              valid_op_id = null;
+						  document.getElementById('formula_output').innerText = "The Task was Canceled.";
+			              // populate the output that the formula was canceled
+		              } else if (jsonified["status"] == "RUNNING") {
+		              	  // populate the verbose output  
+		              }
 		            });
 			}
 
-			function cancel_task(op_id) {
-				$.post(IP_ADDRESS + "cancel", { op_id: valid_op_id })
+			function cancel_task(op_id, timer_id) {
+				var params = "?op_id=" + valid_op_id; 
+				$.post(IP_ADDRESS + "cancel" + params, null)
 		            .done(function( data ) {
 		            	// return true if success, return false if the task was already canceled
 		              console.log(data);
+		              var jsonified = JSON.parse(data.replace(/'/g, "\""));
 		              valid_op_id = null;
 		            });
 			}
 
 			function create_task(algorithm_type) {
-				var formula = document.getElementById('formula');
+				var formula = document.getElementById('formula').value;
 				var formula_filters = [];
 
-				if (!(algorithm_type in ['SLOW_MODEL', 'FAST_MODEL', 'CONNECTIVITY', 'BRUTEFORCE_MODEL'])) {
-					console.log(algorithm_type + " not in " + ['SLOW_MODEL', 'FAST_MODEL', 'CONNECTIVITY', 'BRUTEFORCE_MODEL']);
-					return;
-				}
+				// if (!(algorithm_type === 'SLOW_MODEL' || algorithm_type === 'FAST_MODEL' || algorithm_type === 'CONNECTIVITY' || algorithm_type === 'BRUTEFORCE_MODEL'])) {
+				// 	console.log(algorithm_type + " not in " + ['SLOW_MODEL', 'FAST_MODEL', 'CONNECTIVITY', 'BRUTEFORCE_MODEL']);
+				// 	return;
+				// }
 
 				post_task(formula, algorithm_type, formula_filters);
 
+				function myFunction() {
+					var timer_id = setInterval(function(){
+						ping_task(valid_op_id, timer_id);
+					}, 5000);
+				};
+				myFunction();
 				// set ping on every few seconds it is best to have something like this for the ping delay [1, 2, 5, 7, 10, 10, ...
 				// on ping result FINISHED show the result probably in the output area.
+			}
+
+			function do_visualization(graph) {
+			  var svg = d3.select("svg")
+			      .call(d3.zoom().on("zoom", function () {
+			         svg.attr("transform", d3.event.transform)
+			      })),
+			      width = +svg.attr("width"),
+			      height = +svg.attr("height");
+
+			  var simulation = d3.forceSimulation()
+			      .force("link", d3.forceLink().id(function(d) { return d.id; }))
+			      .force("charge", d3.forceManyBody().strength(-500))
+			      .force("center", d3.forceCenter(width / 2, height / 2))
+			      .force('collision', d3.forceCollide().radius(function(d) {
+			  	    return 20
+			  	  }));
+
+			  var link = svg.append("g")
+			              .style("stroke", "#aaa")
+			              .selectAll("line")
+			              .data(graph.links)
+			              .enter().append("line");
+
+			  var node = svg.append("g")
+			          .attr("class", "nodes")
+			  .selectAll("circle")
+			          .data(graph.nodes)
+			  .enter().append("circle")
+			        .attr("r", 6);
+
+			  var label = svg.append("g")
+			    .attr("class", "labels")
+			    .selectAll("text")
+			    .data(graph.nodes)
+			    .enter().append("text")
+			      .attr("class", "label")
+			      .text(function(d) { return d.name; });
+
+			  simulation
+			    .nodes(graph.nodes)
+			    .on("tick", ticked);
+
+			  simulation.force("link")
+			    .links(graph.links);
+
+			  function ticked() {
+			  	console.log("in Tick");
+			  link
+			      .attr("x1", function(d) { return d.source.x; })
+			      .attr("y1", function(d) { return d.source.y; })
+			      .attr("x2", function(d) { return d.target.x; })
+			      .attr("y2", function(d) { return d.target.y; });
+
+			  node
+			       .attr("r", 20)
+			       .style("fill", "#d9d9d9")
+			       .style("stroke", "#969696")
+			       .style("stroke-width", "1px")
+			       .attr("cx", function (d) { return d.x - 5; })
+			       .attr("cy", function(d) { return d.y - 5; });
+
+			  label
+			  		.attr("x", function(d) { return d.x - 13; })
+			          .attr("y", function (d) { return d.y; })
+			          .style("font-size", "20px").style("fill", "#4393c3");
+			  }
+			};
+
+			var graph1  = { 
+			  "nodes": [{"id": 1, "name": "A"},
+			            {"id": 2, "name": "B"},
+			            {"id": 3, "name": "C"},
+			            {"id": 4, "name": "D"},
+			            {"id": 5, "name": "E"},
+			            {"id": 6, "name": "F"},
+			            {"id": 7, "name": "G"},
+			            {"id": 8, "name": "H"},
+			            {"id": 9, "name": "I"},
+			            {"id": 10, "name": "J"},
+			            {"id": 11, "name": "A0"},
+			            {"id": 12, "name": "B0"},
+			            {"id": 13, "name": "C0"},
+			            {"id": 14, "name": "D0"},
+			            {"id": 15, "name": "E0"},
+			            {"id": 16, "name": "F0"},
+			            {"id": 17, "name": "G0"},
+			            {"id": 18, "name": "H0"},
+			            {"id": 19, "name": "I0"},
+			            {"id": 20, "name": "J0"}
+			  ],
+			  "links": [{"source": 1, "target": 2},
+			            {"source": 1, "target": 5},
+			            {"source": 1, "target": 6},
+			            {"source": 2, "target": 3},
+			            {"source": 2, "target": 7},
+			            {"source": 3, "target": 4},
+			            {"source": 8, "target": 3},
+			            {"source": 4, "target": 5},
+			            {"source": 4, "target": 9},
+			            {"source": 5, "target": 10},
+			            {"source": 11, "target": 12},
+			            {"source": 11, "target": 15},
+			            {"source": 11, "target": 16},
+			            {"source": 12, "target": 13},
+			            {"source": 12, "target": 17},
+			            {"source": 13, "target": 14},
+			            {"source": 18, "target": 13},
+			            {"source": 14, "target": 15},
+			            {"source": 14, "target": 19},
+			            {"source": 15, "target": 20},
+			            {"source": 10, "target": 20},
+			            {"source": 6, "target": 16},
+			            {"source": 3, "target": 13}
+			  ]
 			}
 		</script>
 		<style>
@@ -134,13 +271,12 @@
 		<div id="is_satisfied">
 			<pre id="is_satisfied_output"></pre>
 		</div>
-		<div id="formula_output">
-			<pre id="output"></pre>
-		</div>
 		<h2 style="margin-left: 20px;">Output</h2>
 		<button class="accordion">Result</button>
 		<div class="panel">
-		  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+			<div id="qqq">
+				<pre id="formula_output"></pre>
+			</div>
 		</div>
 
 		<button class="accordion">Verbose Output / Console</button>
@@ -150,7 +286,9 @@
 
 		<button class="accordion" style="margin-bottom: 20px;">Visualized Model</button>
 		<div class="panel">
-		  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+		 	<div id="visualization-graph">
+		  		<svg width="960" height="600"></svg>
+		 	</div>
 		</div>
 
 		<script>
