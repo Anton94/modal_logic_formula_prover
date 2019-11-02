@@ -142,36 +142,7 @@ void microservice_controller::handle_post(http_request message)
 				auto& res = op_id_to_task_result.find(op_id)->second;
 				if (res.status_code == "FINISHED")
 				{
-					std::string resulting_json = "{ 'status': '";
-					resulting_json.append(res.status_code);
-					resulting_json.append("', ");
-					resulting_json.append("'contacts': [");
-					for (int i = 0; i < res.contacts.size(); ++i) 
-					{
-						resulting_json.append("[");
-						for (int j = 0; j < res.contacts[i].count(); ++j) 
-						{
-							resulting_json.append(res.contacts[i][j] == true ? "'1'" : "'0'");
-							if (j < res.contacts[j].count() - 1)
-							{
-								resulting_json.append(",");
-							}
-						}
-						resulting_json.append("]");
-						
-						if (i < res.contacts.size() - 1)
-						{
-							resulting_json.append(",");
-						}
-					}
-					resulting_json.append("]");
-					resulting_json.append(", 'is_satisfied':");
-					resulting_json.append(res.is_satisfied ? "'1'" : "'0'");
-					resulting_json.append("}");
-
-					size_t len = res.contacts[0].count();
-
-					message.reply(status_codes::OK, resulting_json)
+					message.reply(status_codes::OK, res.to_string())
 						.then([](pplx::task<void> t) { handle_error(t); });
 					remove_op_id(op_id);
 				}
@@ -260,43 +231,54 @@ void microservice_controller::handle_post(http_request message)
 				return;
 			}
 
-			auto formula_u = query_params.find(U("formula"));
-			if (formula_u == query_params.end()) {
-				message.reply(status_codes::BadRequest, "Missing 'formula' query parameter.")
-					.then([](pplx::task<void> t) { handle_error(t); });
-				return;
-			}
-
 			auto formula_filters_u = query_params.find(U("formula_filters"));
 			if (formula_filters_u == query_params.end()) {
 				message.reply(status_codes::BadRequest, "Missing 'formula_filters' query parameter.")
 					.then([](pplx::task<void> t) { handle_error(t); });
 				return;
 			}
+			message.reply(status_codes::OK, op_id).then([](pplx::task<void> t) { handle_error(t); });
 
-			auto algorith_type = utility::conversions::to_utf8string(algorithm_type_u->second);
-			auto formula = utility::conversions::to_utf8string(formula_u->second);
+			auto algorithm_type = utility::conversions::to_utf8string(algorithm_type_u->second);
+			//auto formula = utility::conversions::to_utf8string(formula_u->second);
 			auto formula_filters = utility::conversions::to_utf8string(formula_filters_u->second);
 
 			request.extract_string(true)
 				.then([=](string_t res) {
-                // const auto f_str = utility::conversions::to_utf8string(web::uri().decode(res));
+                const auto formula = utility::conversions::to_utf8string(web::uri().decode(res));
 
                 set_termination_callback([&]() { return token.is_canceled(); }); // TODO: pass by value?
 
 				try {
-					// TODO: depending on the algorithm type choose what is going to be evaluate
-					// here.
 					formula_mgr mgr;
 					mgr.build(formula);
-					basic_bruteforce_model bbm;
-					const auto is_satisfiable = mgr.is_satisfiable(bbm);
-
+					imodel* the_model;
+					if (algorithm_type == "SLOW_MODEL")
+					{
+						the_model = new slow_model();
+					}
+					else if (algorithm_type == "FAST_MODEL")
+					{
+						the_model = new model();
+					}
+					else if (algorithm_type == "CONNECTIVITY")
+					{
+						the_model = new connected_model();
+					}
+					else if (algorithm_type == "BRUTEFORCE_MODEL")
+					{
+						the_model = new basic_bruteforce_model();
+					}
+					else {
+						// assert since this should already be checked 
+					}
+					const auto is_satisfiable = mgr.is_satisfiable(*the_model);
 					active_tasks.insert(op_id);
 					op_id_to_task_result.find(op_id)->second.status_code = "FINISHED";
 					op_id_to_task_result.find(op_id)->second.is_satisfied = is_satisfiable;
-					op_id_to_task_result.find(op_id)->second.ids = bbm.get_variables_evaluations();
-					op_id_to_task_result.find(op_id)->second.contacts = bbm.get_contact_relations();
+					op_id_to_task_result.find(op_id)->second.ids = the_model->get_variables_evaluations();
+					op_id_to_task_result.find(op_id)->second.contacts = the_model->get_contact_relations();
+					delete the_model;
 				}
                 catch (const TerminationException&) {
 					info() << "Canceled ";
@@ -326,7 +308,6 @@ void microservice_controller::handle_post(http_request message)
 				}
 			});
 		});
-		message.reply(status_codes::OK, op_id).then([](pplx::task<void> t) { handle_error(t); });
 		return;
 	}
 

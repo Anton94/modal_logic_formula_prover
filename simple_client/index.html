@@ -24,10 +24,9 @@
 
 			function post_task(formula, algorithm_type, formula_filters) {
 				var params =  
-					"?formula=" + formula + 
-					"&algorithm_type=" + algorithm_type +
+					"?algorithm_type=" + algorithm_type +
 					"&formula_filters=" + formula_filters;
-				$.post(IP_ADDRESS + "task" + params, null)
+				$.post(IP_ADDRESS + "task" + params, formula)
 		            .done(function( data ) {
 		              valid_op_id = data;
 		            });
@@ -44,7 +43,8 @@
 			              clearInterval(timer_id);
 			              valid_op_id = null;
 						  document.getElementById('formula_output').innerText = "The formula is : " + jsonified["is_satisfied"];
-			              do_visualization(graph1);
+						  graphis = transform_contacts_to_graph(jsonified["contacts"]);
+			              do_visualization(graphis);
 		              } else if (jsonified["status"] == "CANCELED") {
 			              clearInterval(timer_id);
 			              valid_op_id = null;
@@ -81,11 +81,33 @@
 				function myFunction() {
 					var timer_id = setInterval(function(){
 						ping_task(valid_op_id, timer_id);
-					}, 5000);
+					}, 2000);
 				};
 				myFunction();
 				// set ping on every few seconds it is best to have something like this for the ping delay [1, 2, 5, 7, 10, 10, ...
 				// on ping result FINISHED show the result probably in the output area.
+			}
+
+			function transform_contacts_to_graph(contacts) {
+				nodes_temp = [...Array(contacts.length).keys()]
+
+				nodes = []
+				for (x in nodes_temp) {
+					nodes.push({"id": x, "name": "A" + x});
+				}
+
+
+				links = [];
+
+				for (i = 0; i < contacts.length; ++i) {
+					for (j = 0; j < contacts[i].length && j <= i; ++j) {
+						if (contacts[i][j] == "1") { 
+							links.push({"source": i, "target": j});
+				        }
+				    }
+				}
+
+				return {"nodes" : nodes, "links": links}
 			}
 
 			function do_visualization(graph) {
@@ -154,54 +176,6 @@
 			          .style("font-size", "20px").style("fill", "#4393c3");
 			  }
 			};
-
-			var graph1  = { 
-			  "nodes": [{"id": 1, "name": "A"},
-			            {"id": 2, "name": "B"},
-			            {"id": 3, "name": "C"},
-			            {"id": 4, "name": "D"},
-			            {"id": 5, "name": "E"},
-			            {"id": 6, "name": "F"},
-			            {"id": 7, "name": "G"},
-			            {"id": 8, "name": "H"},
-			            {"id": 9, "name": "I"},
-			            {"id": 10, "name": "J"},
-			            {"id": 11, "name": "A0"},
-			            {"id": 12, "name": "B0"},
-			            {"id": 13, "name": "C0"},
-			            {"id": 14, "name": "D0"},
-			            {"id": 15, "name": "E0"},
-			            {"id": 16, "name": "F0"},
-			            {"id": 17, "name": "G0"},
-			            {"id": 18, "name": "H0"},
-			            {"id": 19, "name": "I0"},
-			            {"id": 20, "name": "J0"}
-			  ],
-			  "links": [{"source": 1, "target": 2},
-			            {"source": 1, "target": 5},
-			            {"source": 1, "target": 6},
-			            {"source": 2, "target": 3},
-			            {"source": 2, "target": 7},
-			            {"source": 3, "target": 4},
-			            {"source": 8, "target": 3},
-			            {"source": 4, "target": 5},
-			            {"source": 4, "target": 9},
-			            {"source": 5, "target": 10},
-			            {"source": 11, "target": 12},
-			            {"source": 11, "target": 15},
-			            {"source": 11, "target": 16},
-			            {"source": 12, "target": 13},
-			            {"source": 12, "target": 17},
-			            {"source": 13, "target": 14},
-			            {"source": 18, "target": 13},
-			            {"source": 14, "target": 15},
-			            {"source": 14, "target": 19},
-			            {"source": 15, "target": 20},
-			            {"source": 10, "target": 20},
-			            {"source": 6, "target": 16},
-			            {"source": 3, "target": 13}
-			  ]
-			}
 		</script>
 		<style>
 			code {
