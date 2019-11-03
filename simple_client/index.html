@@ -73,12 +73,11 @@
 
 			function create_task(algorithm_type) {
 				var formula = document.getElementById('formula').value;
-				var formula_filters = [];
+				if (!formula || !(algorithm_type == "SLOW_MODEL" || algorithm_type == "FAST_MODEL" || algorithm_type == "CONNECTIVITY" || algorithm_type == "BRUTEFORCE_MODEL")) {
+					return;
+				}
 
-				// if (!(algorithm_type === 'SLOW_MODEL' || algorithm_type === 'FAST_MODEL' || algorithm_type === 'CONNECTIVITY' || algorithm_type === 'BRUTEFORCE_MODEL'])) {
-				// 	console.log(algorithm_type + " not in " + ['SLOW_MODEL', 'FAST_MODEL', 'CONNECTIVITY', 'BRUTEFORCE_MODEL']);
-				// 	return;
-				// }
+				var formula_filters = get_formula_filters();
 
 				change_computing_components_availability(false);
 				post_task(formula, algorithm_type, formula_filters);
@@ -98,6 +97,27 @@
 				for(var i = 0; i < elems.length; i++) {
 				    elems[i].disabled = !enable;
 				}
+			}
+
+			function get_formula_filters() {
+				var x = []
+				if (document.getElementById("convert_contact_less_eq_with_same_terms").checked) {
+					x.push("convert_contact_less_eq_with_same_terms");
+				}
+				if (document.getElementById("convert_disjunction_in_contact_less_eq").checked) {
+					x.push("convert_disjunction_in_contact_less_eq");
+				}
+				if (document.getElementById("reduce_constants").checked) {
+					x.push("reduce_constants");
+				}
+				if (document.getElementById("reduce_contacts_less_eq_with_constants").checked) {
+					x.push("reduce_contacts_less_eq_with_constants");
+				}
+				if (document.getElementById("remove_double_negation").checked) {
+					x.push("remove_double_negation")
+				}
+
+				return x
 			}
 
 			function transform_contacts_to_graph(contacts) {
@@ -241,10 +261,11 @@
 
 		<div id="formula_filters" style="margin: 20px;">
 			Formula Filters:<br>
-			<input type="checkbox" id="myCheck"  onclick="myFunction()"> Filter 1<br>
-			<input type="checkbox" id="myCheck"  onclick="myFunction()"> Filter 2<br>
-			<input type="checkbox" id="myCheck"  onclick="myFunction()"> Filter 3<br>
-			<input type="checkbox" id="myCheck"  onclick="myFunction()"> Filter 4<br>
+			<input type="checkbox" id="convert_contact_less_eq_with_same_terms" checked> Convert Contacts in <=<br>
+			<input type="checkbox" id="convert_disjunction_in_contact_less_eq" checked> Split Disjunctions in Atomic Formulas<br>
+			<input type="checkbox" id="reduce_constants" checked> Reduce Contacts<br>
+			<input type="checkbox" id="reduce_contacts_less_eq_with_constants" checked> Reduce Atomic Formulas with Contacts<br>
+			<input type="checkbox" id="remove_double_negation" checked> Remove Double Negations<br>
 		</div>
 
 		<div id="algorith_buttons" style="margin: 20px;">
@@ -259,7 +280,7 @@
 			If the calculation takes too long, try to cancel it and it might help to optimize the input formula<br>
 			<button onclick="cancel_task('valid_op_id')">CANCEL CALCULATION</button>
 		</div>
-		
+
 		<div id="is_satisfied">
 			<pre id="is_satisfied_output"></pre>
 		</div>

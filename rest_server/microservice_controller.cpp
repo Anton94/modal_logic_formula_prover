@@ -251,7 +251,43 @@ void microservice_controller::handle_post(http_request message)
 
 				try {
 					formula_mgr mgr;
-					mgr.build(formula);
+                    int32_t formula_refs = 0;
+
+                    std::string s = formula_filters;
+                    size_t pos = 0;
+                    std::string token;
+                    std::vector<std::string> xxx;
+                    while ((pos = s.find(",")) != std::string::npos) {
+                        token = s.substr(0, pos);
+                        xxx.push_back(token);
+                        s.erase(0, pos + 1);
+                    }
+
+                    for (int i = 0; i < xxx.size(); ++i)
+                    {
+                        if (xxx[i] == "convert_contact_less_eq_with_same_terms")
+                        {
+                            formula_refs |= 1 << 1;//formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
+                        }
+                        else if (xxx[i] == "convert_disjunction_in_contact_less_eq")
+                        {
+                            formula_refs |= 1 << 2;//formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
+                        }
+                        else if (xxx[i] == "reduce_constants")
+                        {
+                            formula_refs |= 1 << 3;//formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
+                        }
+                        else if (xxx[i] == "reduce_contacts_less_eq_with_constants")
+                        {
+                            formula_refs |= 1 << 4;//formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
+                        }
+                        else if (xxx[i] == "remove_double_negation")
+                        {
+                            formula_refs |= 1 << 5;//formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
+                        }
+                    }
+
+                    mgr.build(formula, formula_mgr::formula_refiners::all);
 					imodel* the_model;
 					if (algorithm_type == "SLOW_MODEL")
 					{
