@@ -23,6 +23,7 @@ class system_of_inequalities
      *    (1 at position 'n' in the bitset means that the n-th variable is in this bitset and will be summed)
      *
      * Note that the operation in each row can be <= or >.
+     * Searching for a strictly positive solution! (i.e. Xi > 0 for each variable)
      */
 public:
     system_of_inequalities(size_t number_of_variables);

@@ -32,6 +32,11 @@ void check_inequalities(size_t number_of_variables, const std::vector<inequality
         const auto variables_values = system.get_variables_values();
         CHECK(variables_values.size() == number_of_variables);
 
+        //for (size_t i = 0; i < variables_values.size(); ++i)
+        //{
+        //    std::cout << "X" << i << " = " << variables_values[i] << std::endl;
+        //}
+
         auto sum_of_variables = [&](const variables_set& variables)
         {
             double sum = 0;
@@ -72,8 +77,7 @@ void check_inequalities(size_t number_of_variables, const std::vector<inequality
     }
 
     const auto& last_inequality = inequalities.back();
-    CHECK(system.add_constraint(last_inequality.lhs, last_inequality.rhs, last_inequality.op) ==
-          is_last_inequality_solvable);
+    CHECK(system.add_constraint(last_inequality.lhs, last_inequality.rhs, last_inequality.op) == is_last_inequality_solvable);
     CHECK(system.is_solvable() == is_last_inequality_solvable);
 
     if(is_last_inequality_solvable)
@@ -93,42 +97,44 @@ TEST_CASE("system_of_inequalities 1", "[system_of_inequalities]")
         i.lhs = variables_set(number_of_variables);
         i.rhs = variables_set(number_of_variables);
 
-        i.rhs.set(0);
-        i.rhs.set(1);
-        i.rhs.set(2);
-        i.rhs.set(3);
+        i.lhs.set(0);
+        i.lhs.set(1);
+        i.lhs.set(2);
+        i.lhs.set(3);
+
         // X0 + X1 + X2 + X3 <= 0
         inequalities.emplace_back(std::move(i));
     }
 
-    {
-        inequality i;
-        i.lhs = variables_set(number_of_variables);
-        i.rhs = variables_set(number_of_variables);
+    // TODO: add other tests for the rules bellow
+    //{
+    //    inequality i;
+    //    i.lhs = variables_set(number_of_variables);
+    //    i.rhs = variables_set(number_of_variables);
 
-        i.lhs.set(0);
-        i.lhs.set(1);
+    //    i.lhs.set(0);
+    //    i.lhs.set(1);
 
-        i.rhs.set(2);
-        i.rhs.set(3);
-        // X0 + X1 <= X2 + X3
-        inequalities.emplace_back(std::move(i));
-    }
+    //    i.rhs.set(2);
+    //    i.rhs.set(3);
+    //    // X0 + X1 <= X2 + X3
+    //    inequalities.emplace_back(std::move(i));
+    //}
 
-    {
-        inequality i;
-        i.lhs = variables_set(number_of_variables);
-        i.rhs = variables_set(number_of_variables);
+    //{
+    //    inequality i;
+    //    i.lhs = variables_set(number_of_variables);
+    //    i.rhs = variables_set(number_of_variables);
 
-        i.rhs.set(0);
-        i.rhs.set(1);
+    //    i.rhs.set(0);
+    //    i.rhs.set(1);
 
-        i.lhs.set(2);
-        i.lhs.set(3);
-        // X2 + X3 <= X0 + X1
-        inequalities.emplace_back(std::move(i));
-    }
-    check_inequalities(number_of_variables, inequalities);
+    //    i.lhs.set(2);
+    //    i.lhs.set(3);
+    //    // X2 + X3 <= X0 + X1
+    //    inequalities.emplace_back(std::move(i));
+    //}
+    check_inequalities(number_of_variables, inequalities, false);
 }
 
 TEST_CASE("system_of_inequalities 2", "[system_of_inequalities]")
@@ -176,21 +182,11 @@ TEST_CASE("system_of_inequalities 3", "[system_of_inequalities]")
         inequality i;
         i.lhs = variables_set(number_of_variables);
         i.rhs = variables_set(number_of_variables);
-
-        i.lhs.set(3);
-        i.lhs.set(2);
-        // X2 + X3 <= 0
-        inequalities.emplace_back(std::move(i));
-    }
-
-    {
-        inequality i;
-        i.lhs = variables_set(number_of_variables);
-        i.rhs = variables_set(number_of_variables);
-        i.op = system_of_inequalities::inequality_operation::G;
+        i.op = system_of_inequalities::inequality_operation::LE;
 
         i.lhs.set(0);
-        // X0 > 0
+        i.rhs.set(1);
+        // X0 <= X1
         inequalities.emplace_back(std::move(i));
     }
     check_inequalities(number_of_variables, inequalities);

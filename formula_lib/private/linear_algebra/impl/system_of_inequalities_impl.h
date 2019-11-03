@@ -24,6 +24,10 @@ public:
     void clear();
 
 private:
+    // Adds constraints of the type: Xi >= epsilon
+    void add_constraints_for_positive_variables();
+    void add_constraint_for_positive_variable(const kiwi::Variable& x);
+
     size_t number_of_variables_;
     bool is_solvable_;
 
