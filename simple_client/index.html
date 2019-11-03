@@ -30,6 +30,7 @@
 		            .done(function( data ) {
 		              valid_op_id = data;
 		            });
+		            // on error change_computing_components_availability
 			}
 
 			function ping_task(op_id, timer_id) {
@@ -45,10 +46,12 @@
 						  document.getElementById('formula_output').innerText = "The formula is : " + jsonified["is_satisfied"];
 						  graphis = transform_contacts_to_graph(jsonified["contacts"]);
 			              do_visualization(graphis);
+		           	      change_computing_components_availability(true)
 		              } else if (jsonified["status"] == "CANCELED") {
 			              clearInterval(timer_id);
 			              valid_op_id = null;
 						  document.getElementById('formula_output').innerText = "The Task was Canceled.";
+		           	  	  change_computing_components_availability(true)
 			              // populate the output that the formula was canceled
 		              } else if (jsonified["status"] == "RUNNING") {
 		              	  // populate the verbose output  
@@ -64,6 +67,7 @@
 		              console.log(data);
 		              var jsonified = JSON.parse(data.replace(/'/g, "\""));
 		              valid_op_id = null;
+		              change_computing_components_availability(true);
 		            });
 			}
 
@@ -76,6 +80,7 @@
 				// 	return;
 				// }
 
+				change_computing_components_availability(false);
 				post_task(formula, algorithm_type, formula_filters);
 
 				function myFunction() {
@@ -86,6 +91,13 @@
 				myFunction();
 				// set ping on every few seconds it is best to have something like this for the ping delay [1, 2, 5, 7, 10, 10, ...
 				// on ping result FINISHED show the result probably in the output area.
+			}
+
+			function change_computing_components_availability(enable) {
+				 var elems = document.getElementsByClassName("computing_element");
+				for(var i = 0; i < elems.length; i++) {
+				    elems[i].disabled = !enable;
+				}
 			}
 
 			function transform_contacts_to_graph(contacts) {
@@ -111,7 +123,13 @@
 			}
 
 			function do_visualization(graph) {
-			  var svg = d3.select("svg")
+			  d3.select("svg").empty();
+			  d3.select("#visualization-graph").select("svg").remove();
+
+			  var svg = d3.select("#visualization-graph")
+			  	  .append("svg")
+			  	  .attr('width', 1024)
+			  	  .attr('height', 840)
 			      .call(d3.zoom().on("zoom", function () {
 			         svg.attr("transform", d3.event.transform)
 			      })),
@@ -120,11 +138,11 @@
 
 			  var simulation = d3.forceSimulation()
 			      .force("link", d3.forceLink().id(function(d) { return d.id; }))
-			      .force("charge", d3.forceManyBody().strength(-500))
+			      .force("charge", d3.forceManyBody().strength(-90))
 			      .force("center", d3.forceCenter(width / 2, height / 2))
 			      .force('collision', d3.forceCollide().radius(function(d) {
-			  	    return 20
-			  	  }));
+			        return 25
+			      }));
 
 			  var link = svg.append("g")
 			              .style("stroke", "#aaa")
@@ -231,11 +249,11 @@
 
 		<div id="algorith_buttons" style="margin: 20px;">
 			Run algorithm:<br><br>
-			<button onclick="create_task('SLOW_MODEL')">SLOW MODEL</button>
-			<button onclick="create_task('FAST_MODEL')">FAST MODEL</button>
-			<button onclick="create_task('CONNECTIVITY')">CONNECTIVITY</button>
+			<button onclick="create_task('SLOW_MODEL')" class="computing_element">SLOW MODEL</button>
+			<button onclick="create_task('FAST_MODEL')" class="computing_element">FAST MODEL</button>
+			<button onclick="create_task('CONNECTIVITY')" class="computing_element">CONNECTIVITY</button>
 			<!-- Add killswitch which is only for development so that this line does not be present -->
-			<button onclick="create_task('BRUTEFORCE_MODEL')">BRUTEFORCE MODEL</button>
+			<button onclick="create_task('BRUTEFORCE_MODEL')" class="computing_element">BRUTEFORCE MODEL</button>
 		</div>
 		<div id="algorithm_cancelations" style="margin: 20px;">
 			If the calculation takes too long, try to cancel it and it might help to optimize the input formula<br>
@@ -261,7 +279,6 @@
 		<button class="accordion" style="margin-bottom: 20px;">Visualized Model</button>
 		<div class="panel">
 		 	<div id="visualization-graph">
-		  		<svg width="960" height="600"></svg>
 		 	</div>
 		</div>
 
@@ -282,6 +299,7 @@
 		}
 		</script>
 
+		<h2 style="margin-left: 20px;">Legend</h2>
 		<code>F&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/bot.png" alt="Bottom"> - </code><label>False</label><br>
 		<code>T&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/top.png" alt="Top"> - </code><label>True</label><br>
 		<code>-&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Unary Complement</label><br>
