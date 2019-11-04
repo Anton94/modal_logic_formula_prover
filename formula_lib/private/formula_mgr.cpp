@@ -230,11 +230,6 @@ auto formula_mgr::print(std::ostream& out, const variables_mask_t& variables_mas
     return out;
 }
 
-auto formula_mgr::has_flag(const formula_refiners& flags, const formula_refiners& flag) const -> bool
-{
-    return static_cast<int32_t>(flags) & static_cast<int32_t>(flag);
-}
-
 void formula_mgr::move(formula_mgr&& rhs) noexcept
 {
     variable_to_id_ = std::move(rhs.variable_to_id_);
@@ -242,6 +237,22 @@ void formula_mgr::move(formula_mgr&& rhs) noexcept
     f_ = std::move(rhs.f_);
 
     f_.change_formula_mgr(this);
+}
+
+bool has_flag(formula_mgr::formula_refiners flags, formula_mgr::formula_refiners flag)
+{
+    return static_cast<int32_t>(flags) & static_cast<int32_t>(flag);
+}
+
+formula_mgr::formula_refiners& operator|=(formula_mgr::formula_refiners& a, formula_mgr::formula_refiners b)
+{
+    a = static_cast<formula_mgr::formula_refiners>(static_cast<int32_t>(a) | static_cast<int32_t>(b));
+    return a;
+}
+
+formula_mgr::formula_refiners operator|(formula_mgr::formula_refiners a, formula_mgr::formula_refiners b)
+{
+    return a |= b;
 }
 
 std::ostream& operator<<(std::ostream& out, const formula_mgr& f)

@@ -67,13 +67,15 @@ public:
 private:
     void move(formula_mgr&& rhs) noexcept;
 
-    auto has_flag(const formula_refiners& flags, const formula_refiners& flag) const -> bool;
-
     variable_to_id_map_t variable_to_id_;
 
     variables_t variables_;
     formula f_;
     tableau t_;
 };
+
+formula_mgr::formula_refiners& operator|=(formula_mgr::formula_refiners& a, formula_mgr::formula_refiners b);
+formula_mgr::formula_refiners operator|(formula_mgr::formula_refiners a, formula_mgr::formula_refiners b);
+bool has_flag(formula_mgr::formula_refiners flags, formula_mgr::formula_refiners flag);
 
 std::ostream& operator<<(std::ostream& out, const formula_mgr& formulas);
