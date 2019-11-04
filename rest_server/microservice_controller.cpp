@@ -29,9 +29,10 @@ bool starts_with(const std::string& s, const std::string& prefix)
 }
 
 microservice_controller::microservice_controller(utility::string_t url)
-    : m_listener(url)
+	: m_listener(url)
+	, looping_thread(&microservice_controller::remove_non_aciteve, this)
 {
-    m_listener.support(methods::GET,
+    m_listener.support(methods::GET,	
                        std::bind(&microservice_controller::handle_get, this, std::placeholders::_1));
     m_listener.support(methods::POST,
                        std::bind(&microservice_controller::handle_post, this, std::placeholders::_1));
@@ -41,7 +42,11 @@ microservice_controller::microservice_controller(utility::string_t url)
                        std::bind(&microservice_controller::handle_delete, this, std::placeholders::_1));
 
 	srand(time(NULL));
+}
 
+microservice_controller::~microservice_controller()
+{
+	looping_thread.join();
 }
 
 void handle_error(pplx::task<void>& t)
@@ -544,41 +549,65 @@ void microservice_controller::remove_op_id(std::string op_id)
 
 auto microservice_controller::extract_formula_refiners(std::string formula_filters) -> formula_mgr::formula_refiners
 {
-    formula_mgr::formula_refiners formula_refs = formula_mgr::formula_refiners::none;
+	formula_mgr::formula_refiners formula_refs = formula_mgr::formula_refiners::none;
 
-    std::string s = formula_filters;
-    size_t pos = 0;
-    std::string token;
-    std::vector<std::string> xxx;
-    while ((pos = s.find(",")) != std::string::npos) {
-        token = s.substr(0, pos);
-        xxx.push_back(token);
-        s.erase(0, pos + 1);
-    }
+	std::string s = formula_filters;
+	size_t pos = 0;
+	std::string token;
+	std::vector<std::string> xxx;
+	while ((pos = s.find(",")) != std::string::npos) {
+		token = s.substr(0, pos);
+		xxx.push_back(token);
+		s.erase(0, pos + 1);
+	}
 
-    for (int i = 0; i < xxx.size(); ++i)
-    {
-        if (xxx[i] == "convert_contact_less_eq_with_same_terms")
-        {
-            formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
-        }
-        else if (xxx[i] == "convert_disjunction_in_contact_less_eq")
-        {
-            formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
-        }
-        else if (xxx[i] == "reduce_constants")
-        {
-            formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
-        }
-        else if (xxx[i] == "reduce_contacts_less_eq_with_constants")
-        {
-            formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
-        }
-        else if (xxx[i] == "remove_double_negation")
-        {
-            formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
-        }
-    }
+	for (int i = 0; i < xxx.size(); ++i)
+	{
+		if (xxx[i] == "convert_contact_less_eq_with_same_terms")
+		{
+			formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
+		}
+		else if (xxx[i] == "convert_disjunction_in_contact_less_eq")
+		{
+			formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
+		}
+		else if (xxx[i] == "reduce_constants")
+		{
+			formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
+		}
+		else if (xxx[i] == "reduce_contacts_less_eq_with_constants")
+		{
+			formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
+		}
+		else if (xxx[i] == "remove_double_negation")
+		{
+			formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
+		}
+	}
 
-    return formula_refs;
+	return formula_refs;
+}
+void microservice_controller::remove_non_aciteve()
+{
+	while (true)
+	{
+		std::this_thread::sleep_for(std::chrono::seconds(10));
+		std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
+
+		std::vector<std::string> known_op_ids;
+		for (auto& it = op_id_to_cts_.begin(); it != op_id_to_cts_.end(); ++it)
+		{
+			known_op_ids.push_back(it->first);
+		}
+		for (auto& it = known_op_ids.begin(); it != known_op_ids.end(); ++it)
+		{
+			if (active_tasks.find(*it) == active_tasks.end())
+			{
+				op_id_to_cts_[*it].cancel();
+				op_id_to_cts_.erase(*it);
+				op_id_to_task_result.erase(*it);
+			}
+		}
+		active_tasks.clear();
+	}
 }
