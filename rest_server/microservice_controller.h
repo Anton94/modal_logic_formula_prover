@@ -105,6 +105,8 @@ private:
 		}
 	};
 
+    auto extract_formula_refiners(std::string formula_filters) -> formula_mgr::formula_refiners;
+
 	std::mutex op_id_to_ctx_mutex_;
 	std::unordered_map<std::string, pplx::cancellation_token_source> op_id_to_cts_;
 	std::unordered_set<std::string> active_tasks;

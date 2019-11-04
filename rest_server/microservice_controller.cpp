@@ -251,44 +251,10 @@ void microservice_controller::handle_post(http_request message)
 
 				try {
 					formula_mgr mgr;
-                    int32_t formula_refs = 0;
+                    formula_mgr::formula_refiners formula_refs = extract_formula_refiners(formula_filters);
 
-                    std::string s = formula_filters;
-                    size_t pos = 0;
-                    std::string token;
-                    std::vector<std::string> xxx;
-                    while ((pos = s.find(",")) != std::string::npos) {
-                        token = s.substr(0, pos);
-                        xxx.push_back(token);
-                        s.erase(0, pos + 1);
-                    }
-
-                    for (int i = 0; i < xxx.size(); ++i)
-                    {
-                        if (xxx[i] == "convert_contact_less_eq_with_same_terms")
-                        {
-                            formula_refs |= 1 << 1;//formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
-                        }
-                        else if (xxx[i] == "convert_disjunction_in_contact_less_eq")
-                        {
-                            formula_refs |= 1 << 2;//formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
-                        }
-                        else if (xxx[i] == "reduce_constants")
-                        {
-                            formula_refs |= 1 << 3;//formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
-                        }
-                        else if (xxx[i] == "reduce_contacts_less_eq_with_constants")
-                        {
-                            formula_refs |= 1 << 4;//formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
-                        }
-                        else if (xxx[i] == "remove_double_negation")
-                        {
-                            formula_refs |= 1 << 5;//formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
-                        }
-                    }
-
-                    mgr.build(formula, formula_mgr::formula_refiners::all);
-					imodel* the_model;
+                    mgr.build(formula, formula_refs);
+                    imodel* the_model;
 					if (algorithm_type == "SLOW_MODEL")
 					{
 						the_model = new slow_model();
@@ -574,4 +540,45 @@ void microservice_controller::remove_op_id(std::string op_id)
 	op_id_to_cts_.erase(op_id);
 	op_id_to_task_result.erase(op_id);
 	active_tasks.erase(op_id);
+}
+
+auto microservice_controller::extract_formula_refiners(std::string formula_filters) -> formula_mgr::formula_refiners
+{
+    formula_mgr::formula_refiners formula_refs = formula_mgr::formula_refiners::none;
+
+    std::string s = formula_filters;
+    size_t pos = 0;
+    std::string token;
+    std::vector<std::string> xxx;
+    while ((pos = s.find(",")) != std::string::npos) {
+        token = s.substr(0, pos);
+        xxx.push_back(token);
+        s.erase(0, pos + 1);
+    }
+
+    for (int i = 0; i < xxx.size(); ++i)
+    {
+        if (xxx[i] == "convert_contact_less_eq_with_same_terms")
+        {
+            formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
+        }
+        else if (xxx[i] == "convert_disjunction_in_contact_less_eq")
+        {
+            formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
+        }
+        else if (xxx[i] == "reduce_constants")
+        {
+            formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
+        }
+        else if (xxx[i] == "reduce_contacts_less_eq_with_constants")
+        {
+            formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
+        }
+        else if (xxx[i] == "remove_double_negation")
+        {
+            formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
+        }
+    }
+
+    return formula_refs;
 }
