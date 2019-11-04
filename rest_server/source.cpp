@@ -13,7 +13,7 @@ using namespace web::http;            // Common HTTP functionality
 using namespace web::http::client;    // HTTP client features
 using namespace concurrency::streams; // Asynchronous streams
 
-std::unique_ptr<microservice_controller> g_http;
+static std::unique_ptr<microservice_controller> g_http;
 
 void on_init(const string_t& address)
 {
@@ -22,18 +22,15 @@ void on_init(const string_t& address)
     uri_builder uri(address);
 
     auto addr = uri.to_uri().to_string();
-    g_http = std::unique_ptr<microservice_controller>(new microservice_controller(addr));
-    g_http->open();
+    g_http = std::make_unique<microservice_controller>(addr);
+    g_http->open().wait();
 
     ucout << utility::string_t(U("Listening for requests at: ")) << addr << std::endl;
-
-    return;
 }
 
 void on_shutdown()
 {
     g_http->close().wait();
-    return;
 }
 
 int main(int argc, char* argv[])
@@ -79,6 +76,14 @@ int main(int argc, char* argv[])
     catch(const cxxopts::OptionException& e)
     {
         error() << "arg error: " << e.what();
+    }
+    catch (const std::exception & e)
+    {
+       error() << e.what();
+    }
+    catch(...)
+    {
+        error() << "Unknown error received";
     }
 
     return 0;
