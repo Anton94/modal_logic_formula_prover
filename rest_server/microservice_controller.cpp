@@ -586,19 +586,19 @@ auto microservice_controller::extract_formula_refiners(std::string formula_filte
         }
         else if(xxx[i] == "convert_disjunction_in_contact_less_eq")
         {
-            formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
+            formula_refs |= formula_mgr::formula_refiners::convert_disjunction_in_contact_less_eq;
         }
         else if(xxx[i] == "reduce_constants")
         {
-            formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
+            formula_refs |= formula_mgr::formula_refiners::reduce_constants;
         }
         else if(xxx[i] == "reduce_contacts_less_eq_with_constants")
         {
-            formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
+            formula_refs |= formula_mgr::formula_refiners::reduce_contacts_with_constants;
         }
         else if(xxx[i] == "remove_double_negation")
         {
-            formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
+            formula_refs |= formula_mgr::formula_refiners::remove_double_negation;
         }
     }
 
