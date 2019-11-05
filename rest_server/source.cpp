@@ -35,8 +35,8 @@ void on_shutdown()
 
 int main(int argc, char* argv[])
 {
-    //set_verbose_logger([](std::stringstream&& s) { std::cout << "Verbose: " << s.rdbuf() << std::endl; });
-    //set_trace_logger([](std::stringstream&& s) { std::cout << "Trace: " << s.rdbuf() << std::endl; });
+    // set_verbose_logger([](std::stringstream&& s) { std::cout << "Verbose: " << s.rdbuf() << std::endl; });
+    // set_trace_logger([](std::stringstream&& s) { std::cout << "Trace: " << s.rdbuf() << std::endl; });
     set_info_logger([](std::stringstream&& s) { std::cout << "Info: " << s.rdbuf() << std::endl; });
     set_error_logger([](std::stringstream&& s) { std::cout << "Error: " << s.rdbuf() << std::endl; });
 
@@ -61,7 +61,8 @@ int main(int argc, char* argv[])
 
         on_init(address);
 
-        while(true); // TODO: put here the main loop
+        while(true)
+            ; // TODO: put here the main loop
 
         on_shutdown();
     }
@@ -69,9 +70,9 @@ int main(int argc, char* argv[])
     {
         error() << "arg error: " << e.what();
     }
-    catch (const std::exception & e)
+    catch(const std::exception& e)
     {
-       error() << e.what();
+        error() << e.what();
     }
     catch(...)
     {
