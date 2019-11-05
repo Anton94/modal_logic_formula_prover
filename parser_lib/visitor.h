@@ -122,7 +122,8 @@ public:
 class VSplitDisjInLessEqAndContacts : public Visitor
 {
 public:
-    /// Splits the C(a + b, c) to C(a,c) | C(b,c)
+    /// Splits C(a + b, c) to C(a,c) | C(b,c)
+    /// Splits <=(a + b, c) -> <=(a,c) & <=(b,c)
     void visit(NFormula& f) override;
     void visit(NTerm&) override {}
 
