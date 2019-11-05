@@ -4,7 +4,6 @@
 
 #include <iostream>
 #include <string>
-#include <thread>
 
 #include <filesystem/filesystem.hpp>
 
@@ -595,17 +594,18 @@ void microservice_controller::remove_non_aciteve()
 		std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
 
 		std::vector<std::string> known_op_ids;
-		for (auto& it = op_id_to_cts_.begin(); it != op_id_to_cts_.end(); ++it)
+        for (const auto& op_id_ctx : op_id_to_cts_)
 		{
-			known_op_ids.push_back(it->first);
+            const auto& op_id = op_id_ctx.first;
+            known_op_ids.push_back(op_id);
 		}
-		for (auto& it = known_op_ids.begin(); it != known_op_ids.end(); ++it)
+        for (const auto& known_op_id : known_op_ids)
 		{
-			if (active_tasks.find(*it) == active_tasks.end())
+            if (active_tasks.find(known_op_id) == active_tasks.end())
 			{
-				op_id_to_cts_[*it].cancel();
-				op_id_to_cts_.erase(*it);
-				op_id_to_task_result.erase(*it);
+                op_id_to_cts_[known_op_id].cancel();
+                op_id_to_cts_.erase(known_op_id);
+                op_id_to_task_result.erase(known_op_id);
 			}
 		}
 		active_tasks.clear();

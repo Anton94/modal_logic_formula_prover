@@ -9,6 +9,7 @@
 #include <cpprest/http_listener.h>
 #include <cpprest/json.h>
 #include <cpprest/uri.h>
+#include <thread>
 
 using namespace web;
 using namespace http;
