@@ -77,6 +77,11 @@ void check_less_eq_to_eq_zero_convertion(const std::string& input_formula, const
     check<VConvertLessEqToEqZero>(input_formula, expected_formated_output, true);
 }
 
+void check_splitting_disj(const std::string& input_formula, const std::string& expected_formated_output)
+{
+    check<VSplitDisjInLessEqAndContacts, VConvertLessEqToEqZero>(input_formula, expected_formated_output, true, formula_mgr::formula_refiners::convert_disjunction_in_contact_less_eq);
+}
+
 }
 
 TEST_CASE("AST_VReduceConstants base rules", "[AST_Visitors]")
@@ -300,4 +305,37 @@ TEST_CASE("AST_VConvertLessEqToEqZero complex", "[AST_Visitors]")
 
     check_less_eq_to_eq_zero_convertion("<=m(a + -b, m) & (<=(a, b) | <=m(a, b)) | C(x,-y) & <=(e + -f, -f + -f + -f)",
                                         "((<=m((a + -b), m) & (((a * -b))=0 | <=m(a, b))) | (C(x, -y) & (((e + -f) * -((-f + -f) + -f)))=0))");
+}
+
+TEST_CASE("AST_VSplitDisjInLessEqAndContacts base rules", "[AST_Visitors]")
+{
+    check_splitting_disj("C(a + b, X)", "(C(a, X) | C(b, X))");
+    check_splitting_disj("C(X, a + b)", "(C(X, a) | C(X, b))");
+    check_splitting_disj("<=(a + b, X)", "(((a * -X))=0 & ((b * -X))=0)");
+}
+
+TEST_CASE("AST_VSplitDisjInLessEqAndContacts complex", "[AST_Visitors]")
+{
+    check_splitting_disj("C(a + b + c + d, X * (-Y + Z))",
+                         "(((C(a, (X * (-Y + Z))) | C(b, (X * (-Y + Z)))) | C(c, (X * (-Y + Z)))) | C(d, (X * (-Y + Z))))");
+    check_splitting_disj("C(X * (-Y + Z), a + b + c + d)",
+                         "(((C((X * (-Y + Z)), a) | C((X * (-Y + Z)), b)) | C((X * (-Y + Z)), c)) | C((X * (-Y + Z)), d))");
+
+    check_splitting_disj("C(a + b + c + d, X + (-Y + Z))",
+                         "((((C(a, X) | (C(a, -Y) | C(a, Z))) | (C(b, X) | (C(b, -Y) | C(b, Z)))) | (C(c, X) | (C(c, -Y) | C(c, Z)))) | (C(d, X) | (C(d, -Y) | C(d, Z))))");
+
+    check_splitting_disj("<=(a + b + c + d, X + Y * -Z)",
+                         "(((((a * -(X + (Y * -Z))))=0 & ((b * -(X + (Y * -Z))))=0) & ((c * -(X + (Y * -Z))))=0) & ((d * -(X + (Y * -Z))))=0)");
+
+    check_splitting_disj("C(a + b, c + d) & <=(e + f, x + -j)",
+                         "(((C(a, c) | C(a, d)) | (C(b, c) | C(b, d))) & (((e * -(x + -j)))=0 & ((f * -(x + -j)))=0))");
+
+    check_splitting_disj("C(X, a + b) & <=(e + f, Y) | <=m(mm + mm, --mm + -m)",
+                         "(((C(X, a) | C(X, b)) & (((e * -Y))=0 & ((f * -Y))=0)) | <=m((mm + mm), (--mm + -m)))");
+
+    check_splitting_disj("C(X, a + b) & <=(e + f, Y) | <=m(mm + mm, --mm + -m)",
+                         "(((C(X, a) | C(X, b)) & (((e * -Y))=0 & ((f * -Y))=0)) | <=m((mm + mm), (--mm + -m)))");
+
+    check_splitting_disj("C(X, a + b) & <=(e + f, Y) | <=m(mm + mm, --mm + -m) & <=(x + y, Z)",
+                         "(((C(X, a) | C(X, b)) & (((e * -Y))=0 & ((f * -Y))=0)) | (<=m((mm + mm), (--mm + -m)) & (((x * -Z))=0 & ((y * -Z))=0)))");
 }
