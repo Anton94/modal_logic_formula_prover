@@ -8,7 +8,18 @@
 namespace
 {
 
-template <typename T1, typename T2 = T1>
+class VDummy : public Visitor
+{
+public:
+    VDummy() = default;
+
+    void visit(NFormula&) override {}
+    void visit(NTerm&) override {}
+
+    ~VDummy() override = default;
+};
+
+template <typename T1, typename T2 = VDummy>
 void check(const std::string& input_formula, const std::string& expected_formated_output, bool check_formula_mgr_string_representation = true, formula_mgr::formula_refiners refines_flags = formula_mgr::formula_refiners::none)
 {
     formula_mgr f;
@@ -54,6 +65,11 @@ void check_less_eq_contact_with_equal_terms(const std::string& input_formula, co
 void check_reduce_double_negation(const std::string& input_formula, const std::string& expected_formated_output)
 {
     check<VReduceDoubleNegation>(input_formula, expected_formated_output, true, formula_mgr::formula_refiners::remove_double_negation);
+}
+
+void check_implication_equality_convertion(const std::string& input_formula, const std::string& expected_formated_output)
+{
+    check<VConvertImplicationEqualityToConjDisj>(input_formula, expected_formated_output, true);
 }
 
 }
@@ -227,4 +243,35 @@ TEST_CASE("AST_VReduceDoubleNegation complex", "[AST_Visitors]")
     check_reduce_double_negation("C(--(--(--(--x))), ---(--(--(--x))))", "C(x, -x)");
     check_reduce_double_negation("C(--(--(--(--a + --b))), ---(--(--(---a * --b + ---z))))",
                                  "C((a + b), -((-a * b) + -z))");
+}
+
+TEST_CASE("AST_VConvertImplicationEqualityToConjDisj base rules", "[AST_Visitors]")
+{
+    check_implication_equality_convertion("T -> F", "(~T | F)");
+    check_implication_equality_convertion("T <-> F", "((T & F) | (~T & ~F))");
+
+    check_implication_equality_convertion("C(a, b) -> <=m(e, f)", "(~C(a, b) | <=m(e, f))");
+    check_implication_equality_convertion("C(a, b) <-> <=m(e, f)", "((C(a, b) & <=m(e, f)) | (~C(a, b) & ~<=m(e, f)))");
+}
+
+TEST_CASE("AST_VConvertImplicationEqualityToConjDisj complex", "[AST_Visitors]")
+{
+    check_implication_equality_convertion("~F <-> ~T", "((~F & ~T) | (~~F & ~~T))");
+    check_implication_equality_convertion("~F -> ~T", "(~~F | ~T)");
+
+    check_implication_equality_convertion("<=m(b,b) | C(a, b) -> <=m(e, f) & C(x,x)",
+                                          "(~(<=m(b, b) | C(a, b)) | (<=m(e, f) & C(x, x)))");
+    check_implication_equality_convertion("<=m(b,b) -> C(a, b) -> <=m(e, f) & C(x,x)",
+                                          "(~(~<=m(b, b) | C(a, b)) | (<=m(e, f) & C(x, x)))");
+    check_implication_equality_convertion("<=m(b,b) -> C(a, b) -> <=m(e, f) & C(x,x)",
+                                          "(~(~<=m(b, b) | C(a, b)) | (<=m(e, f) & C(x, x)))");
+    check_implication_equality_convertion("<=m(b,b) | C(a, b) <-> <=m(e, f) & C(x,x)",
+                                          "(((<=m(b, b) | C(a, b)) & (<=m(e, f) & C(x, x))) | (~(<=m(b, b) | C(a, b)) & ~(<=m(e, f) & C(x, x))))");
+    check_implication_equality_convertion("(<=m(b,b) | C(a, b) <-> <=m(e, f) & C(x,x)) | (C(a,b) <-> <=m(m,m))",
+                                          "((((<=m(b, b) | C(a, b)) & (<=m(e, f) & C(x, x))) | (~(<=m(b, b) | C(a, b)) & ~(<=m(e, f) & C(x, x)))) | ((C(a, b) & <=m(m, m)) | (~C(a, b) & ~<=m(m, m))))");
+
+    check_implication_equality_convertion("<=m(b,b) -> C(a, b) <-> <=m(e, f) & C(x,x) -> C(x,x)",
+                                          "(~(((~<=m(b, b) | C(a, b)) & (<=m(e, f) & C(x, x))) | (~(~<=m(b, b) | C(a, b)) & ~(<=m(e, f) & C(x, x)))) | C(x, x))");
+    check_implication_equality_convertion("((<=m(b,b) -> C(a, b)) <-> <=m(e, f) & C(x,x)) -> C(x,x)", // above but with the additional brackets
+                                          "(~(((~<=m(b, b) | C(a, b)) & (<=m(e, f) & C(x, x))) | (~(~<=m(b, b) | C(a, b)) & ~(<=m(e, f) & C(x, x)))) | C(x, x))");
 }
