@@ -51,6 +51,11 @@ void check_less_eq_contact_with_equal_terms(const std::string& input_formula, co
     check<VConvertLessEqContactWithEqualTerms>(input_formula, expected_formated_output, true, formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms);
 }
 
+void check_reduce_double_negation(const std::string& input_formula, const std::string& expected_formated_output)
+{
+    check<VReduceDoubleNegation>(input_formula, expected_formated_output, true, formula_mgr::formula_refiners::remove_double_negation);
+}
+
 }
 
 TEST_CASE("AST_VReduceConstants base rules", "[AST_Visitors]")
@@ -185,4 +190,41 @@ TEST_CASE("AST_VConvertLessEqContactWithEqualTerms complex", "[AST_Visitors]")
                                            "(T | ~(~(1)=0 | (~~(a)=0 & ~C(a, b))))");
     check_less_eq_contact_with_equal_terms("<=(a + -b, a + -b) | ~(C(1,1) | ~C(a,a) & ~<=(1,1) | C(-b,-b))",
                                            "(T | ~((~(1)=0 | (~~(a)=0 & ~T)) | ~(-b)=0))");
+}
+
+TEST_CASE("AST_VReduceDoubleNegation base rules", "[AST_Visitors]")
+{
+    check_reduce_double_negation("C(a,b)", "C(a, b)");
+    check_reduce_double_negation("~C(a,b)", "~C(a, b)");
+    check_reduce_double_negation("~~C(a,b)", "C(a, b)");
+    check_reduce_double_negation("~~~C(a,b)", "~C(a, b)");
+    check_reduce_double_negation("~~~~C(a,b)", "C(a, b)");
+    check_reduce_double_negation("~~~~<=m(a,b)", "<=m(a, b)");
+
+    check_reduce_double_negation("~~C(-a, -b)", "C(-a, -b)");
+    check_reduce_double_negation("~~C(---a, --b)", "C(-a, b)");
+    check_reduce_double_negation("~C(----a, ---b)", "~C(a, -b)");
+    check_reduce_double_negation("~~~C(-a, --b)", "~C(-a, b)");
+
+    check_reduce_double_negation("C(--0, --1)", "C(0, 1)");
+    check_reduce_double_negation("~~~C(---0, ---1)", "~C(-0, -1)");
+}
+
+TEST_CASE("AST_VReduceDoubleNegation complex", "[AST_Visitors]")
+{
+    check_reduce_double_negation("~(~~C(-a, --a) & ~~~<=m(a + ----b, -b + --a))",
+                                 "~(C(-a, a) & ~<=m((a + b), (-b + a)))");
+    check_reduce_double_negation("~~~(~~C(-a, --a) & ~~~<=m(a + ----b, -b + --a))",
+                                 "~(C(-a, a) & ~<=m((a + b), (-b + a)))");
+    check_reduce_double_negation("~~~~(~~~C(-a, --a) & ~~<=m(a + ----b, -b + --a))",
+                                 "(~C(-a, a) & <=m((a + b), (-b + a)))");
+    check_reduce_double_negation("~C(--a, -b) | ~~<=m(-(--x + -(-y + ---z)), ---(--x * z) + --(-ab * ----z))",
+                                 "(~C(a, -b) | <=m(-(x + -(-y + -z)), (-(x * z) + (-ab * z))))");
+    check_reduce_double_negation("~C(--a * ---1, --0 + -b) | ~~<=m(-(--x + -(-y + ---z)), ---(--x * z) + --(-ab * ----z)) & ~~(~~~C(--x, --z + --y * ---x) | ~~~<=m(----m, -----m))",
+                                 "(~C((a * -1), (0 + -b)) | (<=m(-(x + -(-y + -z)), (-(x * z) + (-ab * z))) & (~C(x, (z + (y * -x))) | ~<=m(m, -m))))");
+    check_reduce_double_negation("~~~~C(--(--0 * ---x), --(--(---1 + ---0) * --z))",
+                                 "C((0 * -x), ((-1 + -0) * z))");
+    check_reduce_double_negation("C(--(--(--(--x))), ---(--(--(--x))))", "C(x, -x)");
+    check_reduce_double_negation("C(--(--(--(--a + --b))), ---(--(--(---a * --b + ---z))))",
+                                 "C((a + b), -((-a * b) + -z))");
 }
