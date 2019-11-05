@@ -44,11 +44,8 @@ void check_reduce_constants(const std::string& input_formula, const std::string&
 TEST_CASE("AST_VReduceConstants base rules", "[AST_VReduceConstants]")
 {
     check_reduce_constants("~T", "F");
-    check_reduce_constants("~~T", "T");
-    check_reduce_constants("~~~~~T", "F");
     check_reduce_constants("~F", "T");
-    check_reduce_constants("~~F", "F");
-    check_reduce_constants("~~~F", "T");
+
     check_reduce_constants("T | T", "T");
     check_reduce_constants("T | F", "T");
     check_reduce_constants("F | T", "T");
@@ -58,16 +55,17 @@ TEST_CASE("AST_VReduceConstants base rules", "[AST_VReduceConstants]")
     check_reduce_constants("F & T", "F");
     check_reduce_constants("F & F", "F");
 
-    check_reduce_constants("T & T", "T");
-    check_reduce_constants("T & F", "F");
-    check_reduce_constants("F & T", "F");
-    check_reduce_constants("F & F", "F");
+    check_reduce_constants("T | C(x,x)", "T");
+    check_reduce_constants("C(x,x) | T", "T");
+    check_reduce_constants("F | C(x,x)", "C(x, x)");
+    check_reduce_constants("C(x,x) | F", "C(x, x)");
+    check_reduce_constants("T & C(x,x)", "C(x, x)");
+    check_reduce_constants("C(x,x) & T", "C(x, x)");
+    check_reduce_constants("F & C(x,x)", "F");
+    check_reduce_constants("C(x,x) & F", "F");
 
-
-    check_reduce_constants("C(0, 0)", "F");
-    check_reduce_constants("C(0, a)", "F");
-    check_reduce_constants("C(a, 0)", "F");
-    check_reduce_constants("C(1, 1)", "T");
+    check_reduce_constants("0=0", "T");
+    check_reduce_constants("1=0", "F");
 
     check_reduce_constants("<=(0, a)", "T");
     check_reduce_constants("<=(0, 0)", "T");
@@ -75,8 +73,43 @@ TEST_CASE("AST_VReduceConstants base rules", "[AST_VReduceConstants]")
     check_reduce_constants("<=(1, 1)", "T");
     check_reduce_constants("<=(0, 1)", "T");
 
-    check_reduce_constants("0=0", "T");
-    check_reduce_constants("1=0", "F");
+    check_reduce_constants("C(0, 0)", "F");
+    check_reduce_constants("C(0, a)", "F");
+    check_reduce_constants("C(a, 0)", "F");
+    check_reduce_constants("C(1, 1)", "T");
+
+    check_reduce_constants("C(-1, X)", "F"); // C(0,X) -> F
+    check_reduce_constants("C(-0, X)", "C(1, X)");
+
+    check_reduce_constants("C(1 * 1, X)", "C(1, X)");
+    check_reduce_constants("C(1 + 1, X)", "C(1, X)");
+    check_reduce_constants("C(0 * 0, X)", "F"); // C(0,X) -> F
+    check_reduce_constants("C(0 + 0, X)", "F"); // C(0,X) -> F
+
+    check_reduce_constants("C(t * 1, X)", "C(t, X)");
+    check_reduce_constants("C(1 * t, X)", "C(t, X)");
+    check_reduce_constants("C(t * 0, X)", "F"); // C(0,X) -> F
+    check_reduce_constants("C(0 * t, X)", "F"); // C(0,X) -> F
+
+    check_reduce_constants("C(t + 1, X)", "C(1, X)");
+    check_reduce_constants("C(1 + t, X)", "C(1, X)");
+    check_reduce_constants("C(t + 0, X)", "C(t, X)");
+    check_reduce_constants("C(0 + t, X)", "C(t, X)");
+}
+
+TEST_CASE("AST_VReduceConstants complex", "[AST_VReduceConstants]")
+{
+    check_reduce_constants("~~T", "T");
+    check_reduce_constants("~~~~~T", "F");
+    check_reduce_constants("~~F", "F");
+    check_reduce_constants("~~~F", "T");
+
+    check_reduce_constants("~~~~F | ~(~~T & ~~F)", "T");
+    check_reduce_constants("~~~~F | ~(~T & ~F)", "T");
+    check_reduce_constants("~~~~F | ~(~~T & ~F)", "F");
+
+    check_reduce_constants("T & (F | T)", "T");
+    check_reduce_constants("F | (F | T)", "T");
     check_reduce_constants("(1 + 0) * (0 + 0)=0", "T");
     check_reduce_constants("(1 + 0) * (0 + 1)=0", "F");
 
@@ -84,13 +117,18 @@ TEST_CASE("AST_VReduceConstants base rules", "[AST_VReduceConstants]")
     check_reduce_constants("C(0 + (1 * 1), a)", "C(1, a)");
     check_reduce_constants("C((1 + 0) * 1, 1)", "T");
 
-    // TODO add the rest of the basic cases
-}
+    check_reduce_constants("C((1 + X) * 1, ((X + 1) * 1) * Y)", "C(1, Y)");
+    check_reduce_constants("C((1 + X) * 1, ((X + 1) * 1) * Y) & (T | C((1 + X) * 1, ((X + 1) * 1) * Y))", "C(1, Y)");
+    check_reduce_constants("C((1 + X) * 1, ((X + 1) * 1) * Y) | (T | C((1 + X) * 1, ((X + 1) * 1) * Y))", "T");
 
-TEST_CASE("AST_VReduceConstants complex", "[AST_VReduceConstants]")
-{
-    // TODO: add complex tests
+    check_reduce_constants("(<=(0, X) & T) | C(X,Y * 1) & <=m(0 + m, yZ * 1)", "T");
+    check_reduce_constants("(<=(0, X) & T) & C(X,Y * 1) & <=m(0 + m, yZ * 1)", "(C(X, Y) & <=m(m, yZ))");
+    check_reduce_constants("(<=(0, X) & F) | C(X,Y * 1) & <=m(0 + m, yZ * 1)", "(C(X, Y) & <=m(m, yZ))");
 
-    check_reduce_constants("T & (F | T)", "T");
-    check_reduce_constants("F | (F | T)", "T");
+    check_reduce_constants("(<=(0, X) & F) | C(X,Y * 1) & <=m(0 + m, yZ * 1)", "(C(X, Y) & <=m(m, yZ))");
+    check_reduce_constants("(<=(0, X) & F) | C(X,Y * 1) & <=m(0 + m, yZ + 1)", "(C(X, Y) & <=m(m, 1))");
+    check_reduce_constants("(<=(0, X) & F) | C(X,Y * 1) & <=(0 + m, yZ + 1)", "C(X, Y)");
+
+    check_reduce_constants("((<=(0, X) & F) | C(X,Y * 1) & <=(0 + m, yZ + 1)) | (1 + 0) * (0 + 1)=0", "C(X, Y)");
+    check_reduce_constants("((<=(0, X) & F) | C(X,Y * 1) & <=(0 + m, yZ + 1)) | (X + -Y) * (1 + 0) * (0 + 1)=0", "(C(X, Y) | ((X + -Y))=0)");
 }
