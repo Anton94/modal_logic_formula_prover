@@ -61,15 +61,10 @@ int main(int argc, char* argv[])
 
         on_init(address);
 
-<<<<<<< HEAD
 		while (true) {
 			std::this_thread::sleep_for(std::chrono::minutes(1));
 			g_http->remove_non_aciteve();
 		}
-=======
-        while(true)
-            ; // TODO: put here the main loop
->>>>>>> 902fa4135a472f55a2759890746366d51e18f1df
 
         on_shutdown();
     }

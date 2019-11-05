@@ -27,13 +27,7 @@ bool starts_with(const std::string& s, const std::string& prefix)
 }
 
 microservice_controller::microservice_controller(utility::string_t url)
-<<<<<<< HEAD
 	: m_listener(url)
-	//, looping_thread(&microservice_controller::remove_non_aciteve, this)
-=======
-    : m_listener(url)
-    , looping_thread(&microservice_controller::remove_non_aciteve, this)
->>>>>>> 902fa4135a472f55a2759890746366d51e18f1df
 {
     m_listener.support(methods::GET,
                        std::bind(&microservice_controller::handle_get, this, std::placeholders::_1));
@@ -611,47 +605,23 @@ auto microservice_controller::extract_formula_refiners(std::string formula_filte
 }
 void microservice_controller::remove_non_aciteve()
 {
-<<<<<<< HEAD
-	std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
+    std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
 
-	std::vector<std::string> known_op_ids;
-	for (auto& it = op_id_to_cts_.begin(); it != op_id_to_cts_.end(); ++it)
-	{
-		known_op_ids.push_back(it->first);
-	}
-	for (auto& it = known_op_ids.begin(); it != known_op_ids.end(); ++it)
-	{
-		if (active_tasks.find(*it) == active_tasks.end())
-		{
-			op_id_to_cts_[*it].cancel();
-			op_id_to_cts_.erase(*it);
-			op_id_to_task_result.erase(*it);
-		}
-	}
-	active_tasks.clear();
-=======
-    while(true)
+    std::vector<std::string> known_op_ids;
+    for(const auto& op_id_ctx : op_id_to_cts_)
     {
-        std::this_thread::sleep_for(std::chrono::seconds(10));
-        std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
-
-        std::vector<std::string> known_op_ids;
-        for(const auto& op_id_ctx : op_id_to_cts_)
-        {
-            const auto& op_id = op_id_ctx.first;
-            known_op_ids.push_back(op_id);
-        }
-
-        for(const auto& known_op_id : known_op_ids)
-        {
-            if(active_tasks.find(known_op_id) == active_tasks.end())
-            {
-                op_id_to_cts_[known_op_id].cancel();
-                op_id_to_cts_.erase(known_op_id);
-                op_id_to_task_result.erase(known_op_id);
-            }
-        }
-        active_tasks.clear();
+        const auto& op_id = op_id_ctx.first;
+        known_op_ids.push_back(op_id);
     }
->>>>>>> 902fa4135a472f55a2759890746366d51e18f1df
+
+    for(const auto& known_op_id : known_op_ids)
+    {
+        if(active_tasks.find(known_op_id) == active_tasks.end())
+        {
+            op_id_to_cts_[known_op_id].cancel();
+            op_id_to_cts_.erase(known_op_id);
+            op_id_to_task_result.erase(known_op_id);
+        }
+    }
+    active_tasks.clear();
 }
