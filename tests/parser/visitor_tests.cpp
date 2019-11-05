@@ -46,6 +46,11 @@ void check_contacts_with_constant_terms(const std::string& input_formula, const 
     check<VReduceConstants, VConvertContactsWithConstantTerms>(input_formula, expected_formated_output, true, formula_mgr::formula_refiners::reduce_contacts_with_constants | formula_mgr::formula_refiners::reduce_constants);
 }
 
+void check_less_eq_contact_with_equal_terms(const std::string& input_formula, const std::string& expected_formated_output)
+{
+    check<VConvertLessEqContactWithEqualTerms>(input_formula, expected_formated_output, true, formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms);
+}
+
 }
 
 TEST_CASE("AST_VReduceConstants base rules", "[AST_Visitors]")
@@ -119,6 +124,7 @@ TEST_CASE("AST_VReduceConstants complex", "[AST_Visitors]")
     check_reduce_constants("F | (F | T)", "T");
     check_reduce_constants("(1 + 0) * (0 + 0)=0", "T");
     check_reduce_constants("(1 + 0) * (0 + 1)=0", "F");
+    check_reduce_constants("~(1 + 0) * (0 + 1)=0", "T");
 
     check_reduce_constants("C((1 + 0) * 1, 1)", "T");
     check_reduce_constants("C(0 + (1 * 1), a)", "C(1, a)");
@@ -157,4 +163,26 @@ TEST_CASE("AST_VConvertContactsWithConstantTerms complex", "[AST_Visitors]")
     check_contacts_with_constant_terms("~C(1 + Z * 1 + 0, -X + -Z) | ~C(1, Y) & <=m(m,M)", "(~~((-X + -Z))=0 | (~~(Y)=0 & <=m(m, M)))");
     check_contacts_with_constant_terms("<=m(X, Y) & <=m(m, m) | ~(C(1, Z + V) | C(-X, 1)) & <=m(m, m) & C(-Z + X, 1)",
                                        "((<=m(X, Y) & <=m(m, m)) | ((~(~((Z + V))=0 | ~(-X)=0) & <=m(m, m)) & ~((-Z + X))=0))");
+}
+
+TEST_CASE("AST_VConvertLessEqContactWithEqualTerms base rules", "[AST_Visitors]")
+{
+    check_less_eq_contact_with_equal_terms("<=(a,a)", "T");
+    check_less_eq_contact_with_equal_terms("<=(0,0)", "T");
+    check_less_eq_contact_with_equal_terms("<=(1,1)", "T");
+    check_less_eq_contact_with_equal_terms("<=(-Z + 1, -Z + 1)", "T");
+
+    check_less_eq_contact_with_equal_terms("C(a,a)", "~(a)=0");
+    check_less_eq_contact_with_equal_terms("C(0,0)", "~(0)=0");
+    check_less_eq_contact_with_equal_terms("C(1,1)", "~(1)=0");
+}
+
+TEST_CASE("AST_VConvertLessEqContactWithEqualTerms complex", "[AST_Visitors]")
+{
+    check_less_eq_contact_with_equal_terms("<=m(x,z) | (C(1,1) | C(a,a) & C(a,b))",
+                                           "(<=m(x, z) | (~(1)=0 | (~(a)=0 & C(a, b))))");
+    check_less_eq_contact_with_equal_terms("<=(a + -b, a + -b) | ~(C(1,1) | ~C(a,a) & ~C(a,b))",
+                                           "(T | ~(~(1)=0 | (~~(a)=0 & ~C(a, b))))");
+    check_less_eq_contact_with_equal_terms("<=(a + -b, a + -b) | ~(C(1,1) | ~C(a,a) & ~<=(1,1) | C(-b,-b))",
+                                           "(T | ~((~(1)=0 | (~~(a)=0 & ~T)) | ~(-b)=0))");
 }
