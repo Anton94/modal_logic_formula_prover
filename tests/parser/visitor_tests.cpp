@@ -72,6 +72,11 @@ void check_implication_equality_convertion(const std::string& input_formula, con
     check<VConvertImplicationEqualityToConjDisj>(input_formula, expected_formated_output, true);
 }
 
+void check_less_eq_to_eq_zero_convertion(const std::string& input_formula, const std::string& expected_formated_output)
+{
+    check<VConvertLessEqToEqZero>(input_formula, expected_formated_output, true);
+}
+
 }
 
 TEST_CASE("AST_VReduceConstants base rules", "[AST_Visitors]")
@@ -274,4 +279,25 @@ TEST_CASE("AST_VConvertImplicationEqualityToConjDisj complex", "[AST_Visitors]")
                                           "(~(((~<=m(b, b) | C(a, b)) & (<=m(e, f) & C(x, x))) | (~(~<=m(b, b) | C(a, b)) & ~(<=m(e, f) & C(x, x)))) | C(x, x))");
     check_implication_equality_convertion("((<=m(b,b) -> C(a, b)) <-> <=m(e, f) & C(x,x)) -> C(x,x)", // above but with the additional brackets
                                           "(~(((~<=m(b, b) | C(a, b)) & (<=m(e, f) & C(x, x))) | (~(~<=m(b, b) | C(a, b)) & ~(<=m(e, f) & C(x, x)))) | C(x, x))");
+}
+
+TEST_CASE("AST_VConvertLessEqToEqZero base rules", "[AST_Visitors]")
+{
+    check_less_eq_to_eq_zero_convertion("<=(a, b)", "((a * -b))=0");
+    check_less_eq_to_eq_zero_convertion("<=(0, 1)", "((0 * -1))=0");
+    check_less_eq_to_eq_zero_convertion("<=(1, 1)", "((1 * -1))=0");
+    check_less_eq_to_eq_zero_convertion("<=(1, 0)", "((1 * -0))=0");
+    check_less_eq_to_eq_zero_convertion("<=(1, 1)", "((1 * -1))=0");
+}
+
+TEST_CASE("AST_VConvertLessEqToEqZero complex", "[AST_Visitors]")
+{
+    check_less_eq_to_eq_zero_convertion("<=(a + -b * -0, -1 * X42 + -Y)",
+                                        "(((a + (-b * -0)) * -((-1 * X42) + -Y)))=0");
+
+    check_less_eq_to_eq_zero_convertion("<=(a, b) | <=m(a, b) | C(x,-y) & <=(e + -f, --g)",
+                                        "((((a * -b))=0 | <=m(a, b)) | (C(x, -y) & (((e + -f) * ---g))=0))");
+
+    check_less_eq_to_eq_zero_convertion("<=m(a + -b, m) & (<=(a, b) | <=m(a, b)) | C(x,-y) & <=(e + -f, -f + -f + -f)",
+                                        "((<=m((a + -b), m) & (((a * -b))=0 | <=m(a, b))) | (C(x, -y) & (((e + -f) * -((-f + -f) + -f)))=0))");
 }
