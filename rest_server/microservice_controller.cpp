@@ -30,7 +30,7 @@ bool starts_with(const std::string& s, const std::string& prefix)
 
 microservice_controller::microservice_controller(utility::string_t url)
 	: m_listener(url)
-	, looping_thread(&microservice_controller::remove_non_aciteve, this)
+	//, looping_thread(&microservice_controller::remove_non_aciteve, this)
 {
     m_listener.support(methods::GET,	
                        std::bind(&microservice_controller::handle_get, this, std::placeholders::_1));
@@ -589,25 +589,21 @@ auto microservice_controller::extract_formula_refiners(std::string formula_filte
 }
 void microservice_controller::remove_non_aciteve()
 {
-	while (true)
-	{
-		std::this_thread::sleep_for(std::chrono::seconds(10));
-		std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
+	std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
 
-		std::vector<std::string> known_op_ids;
-		for (auto& it = op_id_to_cts_.begin(); it != op_id_to_cts_.end(); ++it)
-		{
-			known_op_ids.push_back(it->first);
-		}
-		for (auto& it = known_op_ids.begin(); it != known_op_ids.end(); ++it)
-		{
-			if (active_tasks.find(*it) == active_tasks.end())
-			{
-				op_id_to_cts_[*it].cancel();
-				op_id_to_cts_.erase(*it);
-				op_id_to_task_result.erase(*it);
-			}
-		}
-		active_tasks.clear();
+	std::vector<std::string> known_op_ids;
+	for (auto& it = op_id_to_cts_.begin(); it != op_id_to_cts_.end(); ++it)
+	{
+		known_op_ids.push_back(it->first);
 	}
+	for (auto& it = known_op_ids.begin(); it != known_op_ids.end(); ++it)
+	{
+		if (active_tasks.find(*it) == active_tasks.end())
+		{
+			op_id_to_cts_[*it].cancel();
+			op_id_to_cts_.erase(*it);
+			op_id_to_task_result.erase(*it);
+		}
+	}
+	active_tasks.clear();
 }

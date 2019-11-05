@@ -30,6 +30,8 @@ public:
         return m_listener.close();
     }
 
+	void remove_non_aciteve();
+
 private:
     void handle_get(http_request message);
     void handle_post(http_request message);
@@ -104,8 +106,6 @@ private:
 	};
 
     auto extract_formula_refiners(std::string formula_filters) -> formula_mgr::formula_refiners;
-
-	void remove_non_aciteve();
 
 	std::mutex op_id_to_ctx_mutex_;
 	std::unordered_map<std::string, pplx::cancellation_token_source> op_id_to_cts_;
