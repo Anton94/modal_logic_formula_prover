@@ -8,7 +8,7 @@
 namespace
 {
 
-template <typename T>
+template <typename T1, typename T2 = T1>
 void check(const std::string& input_formula, const std::string& expected_formated_output, bool check_formula_mgr_string_representation = true, formula_mgr::formula_refiners refines_flags = formula_mgr::formula_refiners::none)
 {
     formula_mgr f;
@@ -16,8 +16,10 @@ void check(const std::string& input_formula, const std::string& expected_formate
     auto ast = parse_from_input_string(input_formula.c_str(), e);
     CHECK(ast);
 
-    T visitor;
-    ast->accept(visitor);
+    T1 visitor1;
+    ast->accept(visitor1);
+    T2 visitor2;
+    ast->accept(visitor2);
 
     std::stringstream ast_printed;
     VPrinter printer(ast_printed);
@@ -39,9 +41,14 @@ void check_reduce_constants(const std::string& input_formula, const std::string&
     check<VReduceConstants>(input_formula, expected_formated_output, true, formula_mgr::formula_refiners::reduce_constants);
 }
 
+void check_contacts_with_constant_terms(const std::string& input_formula, const std::string& expected_formated_output)
+{
+    check<VReduceConstants, VConvertContactsWithConstantTerms>(input_formula, expected_formated_output, true, formula_mgr::formula_refiners::reduce_contacts_with_constants | formula_mgr::formula_refiners::reduce_constants);
 }
 
-TEST_CASE("AST_VReduceConstants base rules", "[AST_VReduceConstants]")
+}
+
+TEST_CASE("AST_VReduceConstants base rules", "[AST_Visitors]")
 {
     check_reduce_constants("~T", "F");
     check_reduce_constants("~F", "T");
@@ -97,7 +104,7 @@ TEST_CASE("AST_VReduceConstants base rules", "[AST_VReduceConstants]")
     check_reduce_constants("C(0 + t, X)", "C(t, X)");
 }
 
-TEST_CASE("AST_VReduceConstants complex", "[AST_VReduceConstants]")
+TEST_CASE("AST_VReduceConstants complex", "[AST_Visitors]")
 {
     check_reduce_constants("~~T", "T");
     check_reduce_constants("~~~~~T", "F");
@@ -131,4 +138,23 @@ TEST_CASE("AST_VReduceConstants complex", "[AST_VReduceConstants]")
 
     check_reduce_constants("((<=(0, X) & F) | C(X,Y * 1) & <=(0 + m, yZ + 1)) | (1 + 0) * (0 + 1)=0", "C(X, Y)");
     check_reduce_constants("((<=(0, X) & F) | C(X,Y * 1) & <=(0 + m, yZ + 1)) | (X + -Y) * (1 + 0) * (0 + 1)=0", "(C(X, Y) | ((X + -Y))=0)");
+}
+
+TEST_CASE("AST_VConvertContactsWithConstantTerms base rules", "[AST_Visitors]")
+{
+    check_contacts_with_constant_terms("C(a, 1)", "~(a)=0");
+    check_contacts_with_constant_terms("C(1, a)", "~(a)=0");
+
+    check_contacts_with_constant_terms("C(a + b * -z, 1)", "~((a + (b * -z)))=0");
+    check_contacts_with_constant_terms("C(1, -X + -Z)", "~((-X + -Z))=0");
+}
+
+TEST_CASE("AST_VConvertContactsWithConstantTerms complex", "[AST_Visitors]")
+{
+    check_contacts_with_constant_terms("C(a + b * -z, 1 + Z * 1 + 1)", "~((a + (b * -z)))=0");
+    check_contacts_with_constant_terms("C(1 + Z * 1 + 0, -X + -Z)", "~((-X + -Z))=0");
+
+    check_contacts_with_constant_terms("~C(1 + Z * 1 + 0, -X + -Z) | ~C(1, Y) & <=m(m,M)", "(~~((-X + -Z))=0 | (~~(Y)=0 & <=m(m, M)))");
+    check_contacts_with_constant_terms("<=m(X, Y) & <=m(m, m) | ~(C(1, Z + V) | C(-X, 1)) & <=m(m, m) & C(-Z + X, 1)",
+                                       "((<=m(X, Y) & <=m(m, m)) | ((~(~((Z + V))=0 | ~(-X)=0) & <=m(m, m)) & ~((-Z + X))=0))");
 }
