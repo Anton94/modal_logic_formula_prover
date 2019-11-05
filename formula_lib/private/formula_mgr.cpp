@@ -100,7 +100,7 @@ auto formula_mgr::build(const std::string& f, const formula_refiners& refiners_f
         info_buff << "\n";
     }
 
-    if(has_flag(refiners_flags, formula_refiners::reduce_contacts_less_eq_with_constants))
+    if(has_flag(refiners_flags, formula_refiners::reduce_contacts_with_constants))
     {
         VConvertContactsWithConstantTerms contacts_with_constant_as_term_convertor;
         formula_AST->accept(contacts_with_constant_as_term_convertor);
