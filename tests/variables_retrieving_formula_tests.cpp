@@ -1,10 +1,12 @@
 #include "catch/catch.hpp"
 
 #include "library.h"
+#include "visitor.h"
+#include "parser_API.h"
 #include <string>
 #include <unordered_set>
 
-void variables_check(const std::string& f_str, const variables_set_t& expected_variables, const formula_mgr::formula_refiners& flags = formula_mgr::formula_refiners::all)
+void variables_check(const std::string& f_str, const variables_set_t& expected_variables, const formula_mgr::formula_refiners& flags = formula_mgr::formula_refiners::all, bool check_variables_visitor = true)
 {
     formula_mgr f;
     CHECK(f.build(f_str, flags));
@@ -13,6 +15,25 @@ void variables_check(const std::string& f_str, const variables_set_t& expected_v
     const auto variables = f.get_variables();
     CHECK(variables.size() == expected_variables.size());
     for(const auto& variable : variables)
+    {
+        CHECK(expected_variables.find(variable) != expected_variables.end());
+    }
+
+    if(!check_variables_visitor)
+    {
+        return;
+    }
+
+    parser_error_info e;
+    auto ast = parse_from_input_string(f_str.c_str(), e);
+    CHECK(ast);
+
+    VVariablesGetter::variables_set_t visitor_variables;
+    VVariablesGetter variables_getter(visitor_variables);
+    ast->accept(variables_getter);
+
+    CHECK(variables.size() == visitor_variables.size());
+    for(const auto& variable : visitor_variables)
     {
         CHECK(expected_variables.find(variable) != expected_variables.end());
     }
@@ -36,7 +57,7 @@ TEST_CASE("variables_check 2.1", "[variables_check_formula_mgr]")
 TEST_CASE("variables_check 2.2", "[variables_check_formula_mgr]")
 {
     variables_check("<=(axxa, axxa)", {"axxa"}, formula_mgr::formula_refiners::none);
-    variables_check("<=(axxa, axxa)", {}); // <=(X,X) -> T
+    variables_check("<=(axxa, axxa)", {}, formula_mgr::formula_refiners::all, false); // <=(X,X) -> T
 }
 
 TEST_CASE("variables_check 2.3", "[variables_check_formula_mgr]")
