@@ -40,7 +40,6 @@ int main(int argc, char* argv[])
     set_info_logger([](std::stringstream&& s) { std::cout << "Info: " << s.rdbuf() << std::endl; });
     set_error_logger([](std::stringstream&& s) { std::cout << "Error: " << s.rdbuf() << std::endl; });
 
-    error();
     try
     {
         cxxopts::Options options("FormulaProover", "One line description of MyProgram");

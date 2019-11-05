@@ -1,0 +1,29 @@
+>sudo apt install git
+
+// Backend
+>sudo apt install cmake
+>sudo apt-get install libboost-all-dev
+
+
+// Backend Rest Server
+// cpprest isntallaton
+>sudo apt-get install g++ git libboost-atomic-dev libboost-thread-dev libboost-system-dev libboost-date-time-dev libboost-regex-dev libboost-filesystem-dev libboost-random-dev libboost-chrono-dev libboost-serialization-dev libwebsocketpp-dev openssl libssl-dev ninja-build
+
+>sudo apt-get install libcpprest-dev
+
+// config for the cpprest lib
+>export cpprestsdk_DIR=/usr/lib/x86_64-linux-gnu/cmake/
+
+
+// UI Client This will NOT WORK since
+// https://unix.stackexchange.com/questions/408425/trying-to-install-debian-package-npm-makes-apt-get-to-remove-libssl-dev
+>sudo apt install nodejs
+>sudo apt install npm
+
+// so use 
+>curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | bash
+or 
+>wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.0/install.sh | bash
+
+then close the terminal and open new one and run
+>nvm install node

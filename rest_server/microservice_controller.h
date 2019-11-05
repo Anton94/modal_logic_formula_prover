@@ -52,6 +52,7 @@ private:
         bool is_satisfied;
         contacts_t contacts;
         variable_id_to_points_t ids;
+        std::string output;
 
         std::string to_string()
         {
@@ -60,6 +61,7 @@ private:
             result[U("is_satisfied")] = json::value(is_satisfied);
             result[U("contacts")] = json_contants();
             result[U("ids")] = json_ids();
+            result[U("output")] = json::value(utility::conversions::to_string_t(output));
 
             try
             {

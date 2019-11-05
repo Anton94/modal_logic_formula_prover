@@ -263,6 +263,11 @@ void microservice_controller::handle_post(http_request message)
 
                         try
                         {
+                            std::stringstream info_output;
+                            //set_verbose_logger([](std::stringstream&& s) { std::cout << "Verbose: " << s.rdbuf() << std::endl; });
+                            //set_trace_logger([](std::stringstream&& s) { std::cout << "Trace: " << s.rdbuf() << std::endl; });
+                            set_info_logger([&](std::stringstream&& s) { info_output << "Info: " << s.rdbuf() << "\n"; });
+                            //set_error_logger([](std::stringstream&& s) { std::cout << "Error: " << s.rdbuf() << std::endl; });
                             formula_mgr mgr;
                             formula_mgr::formula_refiners formula_refs =
                                 extract_formula_refiners(formula_filters);
@@ -291,12 +296,16 @@ void microservice_controller::handle_post(http_request message)
                             }
                             const auto is_satisfiable = mgr.is_satisfiable(*the_model);
                             active_tasks.insert(op_id);
-                            op_id_to_task_result.find(op_id)->second.status_code = "FINISHED";
-                            op_id_to_task_result.find(op_id)->second.is_satisfied = is_satisfiable;
-                            op_id_to_task_result.find(op_id)->second.ids =
-                                the_model->get_variables_evaluations();
-                            op_id_to_task_result.find(op_id)->second.contacts =
-                                the_model->get_contact_relations();
+
+                            // check this find here for not present
+                            std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
+                            auto& final_result = op_id_to_task_result.find(op_id)->second;
+                            final_result.status_code = "FINISHED";
+                            final_result.is_satisfied = is_satisfiable;
+                            final_result.ids = the_model->get_variables_evaluations();
+                            final_result.contacts = the_model->get_contact_relations();
+                            final_result.output = info_output.str();
+
                             delete the_model;
                         }
                         catch(const TerminationException&)
