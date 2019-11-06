@@ -400,10 +400,3 @@ TEST_CASE("not satisfiable with 10 variables", "[satisfiability]")
     is_satisfiable("C(a,b) & C(b,c) & <=(b,a) & ~C(a,c) & C(d, e) & C(f,g) & C(h, i) & C(h, j)", false, false,
                    false);
 }
-
-// hiden because in debug takes too much time
-TEST_CASE("not satisfiable with 13 variables", "[!hide][satisfiability]")
-{
-    is_satisfiable("C(a,b) & C(b,c) & <=(b,a) & ~C(a,c) & C(d, e) & C(f,g) & C(h, i) & C(j, k) & C(l, m)",
-                   false, false, false);
-}
