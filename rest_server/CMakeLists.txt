@@ -23,7 +23,7 @@ if(UNIX)
 endif()
 
 
-add_executable(rest_server source.cpp microservice_controller.cpp microservice_controller.h task_result.cpp task_result.h)
+add_executable(rest_server source.cpp microservice_controller.cpp microservice_controller.h task_result.cpp task_result.h task_info.cpp task_info.h)
 target_link_libraries(rest_server formula_lib cpprestsdk::cpprest)
 
 if(UNIX)

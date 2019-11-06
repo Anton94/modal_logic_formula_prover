@@ -41,11 +41,6 @@ microservice_controller::microservice_controller(utility::string_t url)
     srand(time(NULL));
 }
 
-microservice_controller::~microservice_controller()
-{
-    looping_thread.join();
-}
-
 void handle_error(pplx::task<void>& t)
 {
     try
@@ -133,9 +128,9 @@ void microservice_controller::handle_post(http_request message)
             }
 
             auto op_id = utility::conversions::to_utf8string(op_id_u->second);
-            std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
+            std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
 
-            if(op_id_to_cts_.find(op_id) == op_id_to_cts_.end())
+            if(op_id_to_task_info_.find(op_id) == op_id_to_task_info_.end())
             {
                 message.reply(status_codes::BadRequest, "no such op_id.").then([](pplx::task<void> t) {
                     handle_error(t);
@@ -143,7 +138,8 @@ void microservice_controller::handle_post(http_request message)
             }
             else
             {
-                auto& res = op_id_to_task_result.find(op_id)->second;
+                auto& info = op_id_to_task_info_.find(op_id)->second;
+                auto& res = info.result_;
                 if(res.status_code == "FINISHED")
                 {
                     message.reply(status_codes::OK, res.to_string()).then([](pplx::task<void> t) {
@@ -153,7 +149,7 @@ void microservice_controller::handle_post(http_request message)
                 }
                 else
                 {
-                    active_tasks.insert(op_id);
+                    info.activate();
                     std::string resulting_json = "{ 'status': '";
                     resulting_json.append(res.status_code);
                     resulting_json.append("' }");
@@ -180,16 +176,15 @@ void microservice_controller::handle_post(http_request message)
 
             auto op_id = utility::conversions::to_utf8string(op_id_u->second);
 
-            std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
-            auto it = op_id_to_cts_.find(op_id);
+            std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
+            auto it = op_id_to_task_info_.find(op_id);
             bool was_removed = false;
-            if(it != op_id_to_cts_.end() &&
-               op_id_to_task_result.find(op_id)->second.status_code != "FINISHED")
+            if(it != op_id_to_task_info_.end() &&
+               it->second.result_.status_code != "FINISHED")
             {
                 it->second.cancel();
-                op_id_to_cts_.erase(it);
-                active_tasks.insert(op_id);
-                op_id_to_task_result.find(op_id)->second.status_code = "CANCELED";
+                it->second.activate();
+                it->second.result_.status_code = "CANCELED";
 
                 was_removed = true;
             }
@@ -210,19 +205,16 @@ void microservice_controller::handle_post(http_request message)
             pplx::cancellation_token token;
         };
         auto generate_new_op_id_and_token = [&]() -> id_token {
-            std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
+            std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
             while(true)
             {
                 std::string op_id = generate_random_op_id(10);
-                if(op_id_to_cts_.find(op_id) != op_id_to_cts_.end())
+                if(op_id_to_task_info_.find(op_id) != op_id_to_task_info_.end())
                 {
                     continue;
                 }
-                active_tasks.insert(op_id);
-                auto& task_res = op_id_to_task_result[op_id];
-                task_res.status_code = "RUNNING";
 
-                return {op_id, op_id_to_cts_[op_id].get_token()};
+                return {op_id, op_id_to_task_info_[op_id].get_token()};
             }
         };
 
@@ -295,11 +287,10 @@ void microservice_controller::handle_post(http_request message)
                                 // assert since this should already be checked
                             }
                             const auto is_satisfiable = mgr.is_satisfiable(*the_model);
-                            active_tasks.insert(op_id);
 
                             // check this find here for not present
-                            std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
-                            auto& final_result = op_id_to_task_result.find(op_id)->second;
+                            std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
+                            auto& final_result = op_id_to_task_info_.find(op_id)->second.result_;
                             final_result.status_code = "FINISHED";
                             final_result.is_satisfied = is_satisfiable;
                             final_result.ids = the_model->get_variables_evaluations();
@@ -565,9 +556,7 @@ std::string microservice_controller::generate_random_op_id(size_t length)
 
 void microservice_controller::remove_op_id(std::string op_id)
 {
-    op_id_to_cts_.erase(op_id);
-    op_id_to_task_result.erase(op_id);
-    active_tasks.erase(op_id);
+    op_id_to_task_info_.erase(op_id);
 }
 
 auto microservice_controller::extract_formula_refiners(std::string formula_filters)
@@ -612,25 +601,23 @@ auto microservice_controller::extract_formula_refiners(std::string formula_filte
 
     return formula_refs;
 }
+
 void microservice_controller::remove_non_aciteve()
 {
-    std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_ctx_mutex_);
+    std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
 
-    std::vector<std::string> known_op_ids;
-    for(const auto& op_id_ctx : op_id_to_cts_)
+    std::vector<std::string> op_ids_to_remove;
+    for(auto& op_id_ctx : op_id_to_task_info_)
     {
-        const auto& op_id = op_id_ctx.first;
-        known_op_ids.push_back(op_id);
-    }
-
-    for(const auto& known_op_id : known_op_ids)
-    {
-        if(active_tasks.find(known_op_id) == active_tasks.end())
+        if (!op_id_ctx.second.is_active())
         {
-            op_id_to_cts_[known_op_id].cancel();
-            op_id_to_cts_.erase(known_op_id);
-            op_id_to_task_result.erase(known_op_id);
+            op_ids_to_remove.push_back(op_id_ctx.first);
         }
+        op_id_ctx.second.deactivate();
     }
-    active_tasks.clear();
+
+    for(const auto& op_id : op_ids_to_remove)
+    {
+        op_id_to_task_info_.erase(op_id);
+    }
 }

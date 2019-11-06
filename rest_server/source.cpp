@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
 
 		while (true) {
 			std::this_thread::sleep_for(std::chrono::minutes(1));
-			g_http->remove_non_aciteve();
+			g_http->remove_non_active();
 		}
 
         on_shutdown();
