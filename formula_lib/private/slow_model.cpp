@@ -224,7 +224,9 @@ auto slow_model::construct_non_zero_model_points(const terms_t& non_zero_terms) 
 
 auto slow_model::construct_non_zero_term_evaluation(const term* t, variables_evaluations_block& out_evaluation) const -> bool
 {
-    out_evaluation = variables_evaluations_block(used_variables_);
+    const auto variables_in_t = t->get_variables();
+    const auto used_variables_without_variables_in_t = used_variables_ & ~variables_in_t;
+    out_evaluation = variables_evaluations_block(variables_in_t, used_variables_without_variables_in_t);
 
     // the evaluation of the term should be the constant true, i.e.
     // for t != 0 : the evaluation of 't' with the given @evaluation should be non-zero
@@ -234,14 +236,34 @@ auto slow_model::construct_non_zero_term_evaluation(const term* t, variables_eva
 
 auto slow_model::generate_next_positive_evaluation(const term* t, variables_evaluations_block& evaluation) const -> bool
 {
-    do
+    /*
+     * We need to generate a new evaluation which evaluates @t to true.
+     * The basic solution is to generate the next evaluation in the sequence and to check if it evaluates @t to true.
+     * One optimization is to generate an evaluation for @t which evaluates it to true and fix it, then generate new evaluation only on the variables which are not in @t
+     * and when all such evaluations are generated, then we generate a new evaluation over the variables in @t and repeat...
+     * We have two separate sets of varaibles, the variables in @t and the rest
+     * The variables in @t are the once in evaluation's A set, and the rest are B set.
+     * If the current evaluation is true, then we can try to generate next evaluation only on the vars in B (and that will keep the evaluation of @t to be true).
+     * Otherwise, we need to generate evaluation on the variables in @t (i.e. in A) which evaluates @t to true and don't forget to reset the evaluation of B
+     *
+     */
+    if(t->evaluate(evaluation).is_constant_true())
     {
-        if (!evaluation.generate_next_evaluation_over_A()) // TODO the generation can be done smarter, e.g. when the evaluation is false, generate new variable evaluations just for the varaibles in @t.
+        if(evaluation.generate_next_evaluation_over_B())
         {
-            return false;
+            return true;
         }
-    } while (!t->evaluate(evaluation).is_constant_true());
-    return true;
+        evaluation.reset_evaluations_of_B();
+    }
+
+    while(evaluation.generate_next_evaluation_over_A())
+    {
+        if(t->evaluate(evaluation).is_constant_true())
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 void slow_model::calculate_the_model_evaluation_of_each_variable()
