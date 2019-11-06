@@ -8,10 +8,10 @@ TEST_CASE("evaluation block of empty mask of variables", "[variables_evaluations
     variables_mask_t variables;
     variables_evaluations_block var_ev_block(variables);
 
-    CHECK(var_ev_block.get_variables() == variables);
-    CHECK(var_ev_block.get_set_variables_ids().empty());
+    CHECK(var_ev_block.get_variables_A() == variables);
+    CHECK(var_ev_block.get_set_variables_ids_A().empty());
     CHECK(var_ev_block.get_evaluations().empty());
-    CHECK(!var_ev_block.generate_next_evaluation());
+    CHECK(!var_ev_block.generate_next_evaluation_over_A());
 }
 
 TEST_CASE("evaluation block of mask with no set variables", "[variables_evaluations_block]")
@@ -19,11 +19,11 @@ TEST_CASE("evaluation block of mask with no set variables", "[variables_evaluati
     variables_mask_t variables(42, false);
     variables_evaluations_block var_ev_block(variables);
 
-    CHECK(var_ev_block.get_variables() == variables);
-    CHECK(var_ev_block.get_set_variables_ids().empty());
+    CHECK(var_ev_block.get_variables_A() == variables);
+    CHECK(var_ev_block.get_set_variables_ids_A().empty());
     CHECK(var_ev_block.get_evaluations().size() == variables.size());
     CHECK(var_ev_block.get_evaluations().count() == 0);
-    CHECK(!var_ev_block.generate_next_evaluation());
+    CHECK(!var_ev_block.generate_next_evaluation_over_A());
 
     // Checks that the evaluation is not broken after the failed generation
     CHECK(var_ev_block.get_evaluations().size() == variables.size());
@@ -44,15 +44,15 @@ TEST_CASE("evaluation block of mask with one set variable", "[variables_evaluati
             variables.set(set_var_id);
             variables_evaluations_block var_ev_block(variables);
 
-            CHECK(var_ev_block.get_variables() == variables);
-            CHECK(var_ev_block.get_set_variables_ids() == variables_evaluations_block::set_variables_ids_t{ set_var_id });
+            CHECK(var_ev_block.get_variables_A() == variables);
+            CHECK(var_ev_block.get_set_variables_ids_A() == variables_evaluations_block::set_variables_ids_t{ set_var_id });
             CHECK(var_ev_block.get_evaluations().size() == variables.size());
             CHECK(var_ev_block.get_evaluations().count() == 0);
-            CHECK(var_ev_block.generate_next_evaluation());
+            CHECK(var_ev_block.generate_next_evaluation_over_A());
 
             CHECK(var_ev_block.get_evaluations().count() == 1);
             CHECK(var_ev_block.get_evaluations()[set_var_id]);
-            CHECK(!var_ev_block.generate_next_evaluation());
+            CHECK(!var_ev_block.generate_next_evaluation_over_A());
 
             // Checks that the evaluation is not broken after the failed generation
             CHECK(var_ev_block.get_evaluations().count() == 1);
@@ -81,33 +81,33 @@ TEST_CASE("evaluation block of mask with two set variables", "[variables_evaluat
                 variables.set(second_var_id);
                 variables_evaluations_block var_ev_block(variables);
 
-                CHECK(var_ev_block.get_variables() == variables);
-                CHECK(var_ev_block.get_set_variables_ids() == variables_evaluations_block::set_variables_ids_t{ second_var_id, first_var_id });
+                CHECK(var_ev_block.get_variables_A() == variables);
+                CHECK(var_ev_block.get_set_variables_ids_A() == variables_evaluations_block::set_variables_ids_t{ second_var_id, first_var_id });
                 CHECK(var_ev_block.get_evaluations().size() == variables.size());
 
                 // ..0..0..
                 CHECK(var_ev_block.get_evaluations().count() == 0);
                 CHECK(!var_ev_block.get_evaluations()[first_var_id]);
                 CHECK(!var_ev_block.get_evaluations()[second_var_id]);
-                CHECK(var_ev_block.generate_next_evaluation());
+                CHECK(var_ev_block.generate_next_evaluation_over_A());
 
                 // ..0..1..
                 CHECK(var_ev_block.get_evaluations().count() == 1);
                 CHECK(!var_ev_block.get_evaluations()[first_var_id]);
                 CHECK(var_ev_block.get_evaluations()[second_var_id]);
-                CHECK(var_ev_block.generate_next_evaluation());
+                CHECK(var_ev_block.generate_next_evaluation_over_A());
 
                 // ..1..0..
                 CHECK(var_ev_block.get_evaluations().count() == 1);
                 CHECK(var_ev_block.get_evaluations()[first_var_id]);
                 CHECK(!var_ev_block.get_evaluations()[second_var_id]);
-                CHECK(var_ev_block.generate_next_evaluation());
+                CHECK(var_ev_block.generate_next_evaluation_over_A());
 
                 // ..1..1..
                 CHECK(var_ev_block.get_evaluations().count() == 2);
                 CHECK(var_ev_block.get_evaluations()[first_var_id]);
                 CHECK(var_ev_block.get_evaluations()[second_var_id]);
-                CHECK(!var_ev_block.generate_next_evaluation());
+                CHECK(!var_ev_block.generate_next_evaluation_over_A());
 
                 // Checks that the evaluation is not broken after the failed generation
                 CHECK(var_ev_block.get_evaluations().count() == 2);
@@ -141,8 +141,8 @@ TEST_CASE("evaluation block of mask with three set variables", "[variables_evalu
                     variables.set(third_var_id);
                     variables_evaluations_block var_ev_block(variables);
 
-                    CHECK(var_ev_block.get_variables() == variables);
-                    CHECK(var_ev_block.get_set_variables_ids() == variables_evaluations_block::set_variables_ids_t{ third_var_id, second_var_id, first_var_id });
+                    CHECK(var_ev_block.get_variables_A() == variables);
+                    CHECK(var_ev_block.get_set_variables_ids_A() == variables_evaluations_block::set_variables_ids_t{ third_var_id, second_var_id, first_var_id });
                     CHECK(var_ev_block.get_evaluations().size() == variables.size());
 
                     // ..0..0..0..
@@ -150,56 +150,56 @@ TEST_CASE("evaluation block of mask with three set variables", "[variables_evalu
                     CHECK(!var_ev_block.get_evaluations()[first_var_id]);
                     CHECK(!var_ev_block.get_evaluations()[second_var_id]);
                     CHECK(!var_ev_block.get_evaluations()[third_var_id]);
-                    CHECK(var_ev_block.generate_next_evaluation());
+                    CHECK(var_ev_block.generate_next_evaluation_over_A());
 
                     // ..0..0..1..
                     CHECK(var_ev_block.get_evaluations().count() == 1);
                     CHECK(!var_ev_block.get_evaluations()[first_var_id]);
                     CHECK(!var_ev_block.get_evaluations()[second_var_id]);
                     CHECK(var_ev_block.get_evaluations()[third_var_id]);
-                    CHECK(var_ev_block.generate_next_evaluation());
+                    CHECK(var_ev_block.generate_next_evaluation_over_A());
 
                     // ..0..1..0..
                     CHECK(var_ev_block.get_evaluations().count() == 1);
                     CHECK(!var_ev_block.get_evaluations()[first_var_id]);
                     CHECK(var_ev_block.get_evaluations()[second_var_id]);
                     CHECK(!var_ev_block.get_evaluations()[third_var_id]);
-                    CHECK(var_ev_block.generate_next_evaluation());
+                    CHECK(var_ev_block.generate_next_evaluation_over_A());
 
                     // ..0..1..1..
                     CHECK(var_ev_block.get_evaluations().count() == 2);
                     CHECK(!var_ev_block.get_evaluations()[first_var_id]);
                     CHECK(var_ev_block.get_evaluations()[second_var_id]);
                     CHECK(var_ev_block.get_evaluations()[third_var_id]);
-                    CHECK(var_ev_block.generate_next_evaluation());
+                    CHECK(var_ev_block.generate_next_evaluation_over_A());
 
                     // ..1..0..0..
                     CHECK(var_ev_block.get_evaluations().count() == 1);
                     CHECK(var_ev_block.get_evaluations()[first_var_id]);
                     CHECK(!var_ev_block.get_evaluations()[second_var_id]);
                     CHECK(!var_ev_block.get_evaluations()[third_var_id]);
-                    CHECK(var_ev_block.generate_next_evaluation());
+                    CHECK(var_ev_block.generate_next_evaluation_over_A());
 
                     // ..1..0..1..
                     CHECK(var_ev_block.get_evaluations().count() == 2);
                     CHECK(var_ev_block.get_evaluations()[first_var_id]);
                     CHECK(!var_ev_block.get_evaluations()[second_var_id]);
                     CHECK(var_ev_block.get_evaluations()[third_var_id]);
-                    CHECK(var_ev_block.generate_next_evaluation());
+                    CHECK(var_ev_block.generate_next_evaluation_over_A());
 
                     // ..1..1..0..
                     CHECK(var_ev_block.get_evaluations().count() == 2);
                     CHECK(var_ev_block.get_evaluations()[first_var_id]);
                     CHECK(var_ev_block.get_evaluations()[second_var_id]);
                     CHECK(!var_ev_block.get_evaluations()[third_var_id]);
-                    CHECK(var_ev_block.generate_next_evaluation());
+                    CHECK(var_ev_block.generate_next_evaluation_over_A());
 
                     // ..1..1..1..
                     CHECK(var_ev_block.get_evaluations().count() == 3);
                     CHECK(var_ev_block.get_evaluations()[first_var_id]);
                     CHECK(var_ev_block.get_evaluations()[second_var_id]);
                     CHECK(var_ev_block.get_evaluations()[third_var_id]);
-                    CHECK(!var_ev_block.generate_next_evaluation());
+                    CHECK(!var_ev_block.generate_next_evaluation_over_A());
 
                     // Checks that the evaluation is not broken after the failed generation
                     CHECK(var_ev_block.get_evaluations().count() == 3);

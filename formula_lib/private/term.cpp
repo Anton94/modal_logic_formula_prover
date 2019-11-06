@@ -241,7 +241,7 @@ auto term::evaluate(const variables_evaluations_block& evaluation_block, bool sk
         }
         case operation_t::variable:
         {
-            const auto& block_variables = evaluation_block.get_variables();
+            const auto& block_variables = evaluation_block.get_variables_A();
             assert(variable_id_ < block_variables.size());
             if(block_variables[variable_id_]) // if the variable_id is participating in that block evaluation
             {

@@ -236,7 +236,7 @@ auto slow_model::generate_next_positive_evaluation(const term* t, variables_eval
 {
     do
     {
-        if (!evaluation.generate_next_evaluation()) // TODO the generation can be done smarter, e.g. when the evaluation is false, generate new variable evaluations just for the varaibles in @t.
+        if (!evaluation.generate_next_evaluation_over_A()) // TODO the generation can be done smarter, e.g. when the evaluation is false, generate new variable evaluations just for the varaibles in @t.
         {
             return false;
         }

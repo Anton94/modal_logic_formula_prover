@@ -64,7 +64,7 @@ auto variables_evaluations_block_stack::generate_evaluation() -> bool
 
     auto& top_block = block_stack_.top();
 
-    if(!top_block.generate_next_evaluation())
+    if(!top_block.generate_next_evaluation_over_A())
     {
         return false;
     }
@@ -85,7 +85,7 @@ auto variables_evaluations_block_stack::generate_evaluation() -> bool
     ----------------------------------------add the new evals to the combined evaluation->
     -> combined_evaluations_ = 0 0 0 0 1 0
     */
-    const auto combined_vars_without_top_block_vars = combined_variables_ & ~top_block.get_variables();
+    const auto combined_vars_without_top_block_vars = combined_variables_ & ~top_block.get_variables_A();
     combined_evaluations_ &= combined_vars_without_top_block_vars;
 
     combined_evaluations_ |= top_block.get_evaluations();
@@ -98,20 +98,20 @@ void variables_evaluations_block_stack::update_combined_after_push()
 {
     assert(!block_stack_.empty());
     const auto& pushed_block = block_stack_.top();
-    if((combined_evaluations_ & pushed_block.get_variables()).any())
+    if((combined_evaluations_ & pushed_block.get_variables_A()).any())
     {
         error()
             << "Adding variables evaluations block with set variable ids which are alredy there. Ambiguous.";
         pop();
     }
 
-    if(pushed_block.get_variables().size() != combined_variables_.size())
+    if(pushed_block.get_variables_A().size() != combined_variables_.size())
     {
         error() << "Adding a block with different size.";
         pop();
     }
 
-    combined_variables_ |= pushed_block.get_variables();
+    combined_variables_ |= pushed_block.get_variables_A();
     combined_evaluations_ |= pushed_block.get_evaluations();
 
     assert(combined_variables_.size() == combined_evaluations_.size());
@@ -140,7 +140,7 @@ void variables_evaluations_block_stack::update_combined_before_pop()
            combined_variables_   = 1 0 0 1 1 0
         -> combined_evaluations_ = 0 0 0 0 1 0
     */
-    combined_variables_ &= ~block_to_pop.get_variables();
+    combined_variables_ &= ~block_to_pop.get_variables_A();
     combined_evaluations_ &= combined_variables_;
 
     assert(combined_variables_.size() == combined_evaluations_.size());

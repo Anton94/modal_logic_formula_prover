@@ -85,7 +85,7 @@ auto model::generate_next_point_evaluation(const term* t, variables_evaluations_
     -> bool
 {
 
-    while(out_evaluation.generate_next_evaluation())
+    while(out_evaluation.generate_next_evaluation_over_A())
     {
         // TODO the generation can be done smarter, e.g. when the evaluation of 't' is false, generate new
         // variable evaluations just for the varaibles in @t.

@@ -84,7 +84,7 @@ void connected_model::construct_all_valid_unique_points(const formulas_t& contac
         {
             points_.push_back(evaluation);
         }
-    } while(evaluation.generate_next_evaluation());
+    } while(evaluation.generate_next_evaluation_over_A());
 }
 
 auto connected_model::get_model_points() const -> const points_t&
