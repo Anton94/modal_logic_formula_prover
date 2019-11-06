@@ -35,11 +35,11 @@ TEST_CASE(name" - slow_model - Enabled["#run_slow_model"] " , "[!hide][performan
 }
 
 PERF_TEST_CASE("not satisfiable with 6 variables 4 atomic formulas",
-               "C(a * x, b * y) & C(b * y, c * z) & <=(b * y, a * x * v) & ~C(a * x, c * z)",
+               "C(a * x, b * y) & C(b * y, c * z) & <=(b * y, a * x) & ~C(a * x, c * z)",
                false, false, true, false);
 
-PERF_TEST_CASE("not satisfiable with 7 variables 4 atomic formulas",
-               "C(a * x, b * y) & C(b * y, c * z * t) & <=(b * y, a * x * v) & ~C(a * x, c * z * t)",
+PERF_TEST_CASE("not satisfiable with 8 variables 4 atomic formulas",
+               "C(a * x1 * x2, b * y) & C(b * y, c * z * t) & <=(b * y, a * x1 * x2) & ~C(a * x1 * x2, c * z * t)",
                false, false, true, false);
 
 PERF_TEST_CASE("not satisfiable with 10 variables 8 atomic formulas",
