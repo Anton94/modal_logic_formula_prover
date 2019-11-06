@@ -211,3 +211,156 @@ TEST_CASE("evaluation block of mask with three set variables", "[variables_evalu
         }
     }
 }
+
+TEST_CASE("evaluation block of mask with two sets 1", "[variables_evaluations_block]")
+{
+    const auto variables_size = 20;
+    variables_mask_t variables_A(variables_size);
+    variables_mask_t variables_B(variables_size);
+    variables_A.set(2);
+    variables_A.set(8);
+    variables_A.set(16);
+    variables_B.set(7);
+    variables_B.set(17);
+
+    variables_evaluations_block var_ev_block(variables_A, variables_B);
+
+    CHECK(var_ev_block.get_variables_A() == variables_A);
+    CHECK(var_ev_block.get_variables_B() == variables_B);
+    CHECK(var_ev_block.get_set_variables_ids_A() == variables_evaluations_block::set_variables_ids_t{ 16, 8, 2 });
+    CHECK(var_ev_block.get_set_variables_ids_B() == variables_evaluations_block::set_variables_ids_t{ 17, 7 });
+    CHECK(var_ev_block.get_evaluations().size() == variables_size);
+    CHECK(var_ev_block.get_evaluations().count() == 0);
+
+    CHECK(var_ev_block.generate_next_evaluation_over_A());
+    CHECK(var_ev_block.get_evaluations().count() == 1);
+    CHECK(var_ev_block.get_evaluations()[16]);
+
+    CHECK(var_ev_block.generate_next_evaluation_over_B());
+    CHECK(var_ev_block.get_evaluations().count() == 2);
+    CHECK(var_ev_block.get_evaluations()[16]);
+    CHECK(var_ev_block.get_evaluations()[17]);
+
+    CHECK(var_ev_block.generate_next_evaluation_over_B());
+    CHECK(var_ev_block.get_evaluations().count() == 2);
+    CHECK(var_ev_block.get_evaluations()[16]);
+    CHECK(var_ev_block.get_evaluations()[7]);
+
+    CHECK(var_ev_block.generate_next_evaluation_over_B());
+    CHECK(var_ev_block.get_evaluations().count() == 3);
+    CHECK(var_ev_block.get_evaluations()[16]);
+    CHECK(var_ev_block.get_evaluations()[7]);
+    CHECK(var_ev_block.get_evaluations()[17]);
+
+    CHECK(var_ev_block.generate_next_evaluation_over_A());
+    CHECK(var_ev_block.get_evaluations().count() == 3);
+    CHECK(var_ev_block.get_evaluations()[8]);
+    CHECK(var_ev_block.get_evaluations()[7]);
+    CHECK(var_ev_block.get_evaluations()[17]);
+
+    CHECK(var_ev_block.generate_next_evaluation_over_A());
+    CHECK(var_ev_block.get_evaluations().count() == 4);
+    CHECK(var_ev_block.get_evaluations()[8]);
+    CHECK(var_ev_block.get_evaluations()[16]);
+    CHECK(var_ev_block.get_evaluations()[7]);
+    CHECK(var_ev_block.get_evaluations()[17]);
+
+    CHECK(!var_ev_block.generate_next_evaluation_over_B());
+    CHECK(var_ev_block.get_evaluations().count() == 4);
+    CHECK(var_ev_block.get_evaluations()[8]);
+    CHECK(var_ev_block.get_evaluations()[16]);
+    CHECK(var_ev_block.get_evaluations()[7]);
+    CHECK(var_ev_block.get_evaluations()[17]);
+
+    var_ev_block.reset_evaluations_of_B();
+    CHECK(var_ev_block.get_evaluations().count() == 2);
+    CHECK(var_ev_block.get_evaluations()[8]);
+    CHECK(var_ev_block.get_evaluations()[16]);
+
+    CHECK(var_ev_block.generate_next_evaluation_over_A());
+    CHECK(var_ev_block.get_evaluations().count() == 1);
+    CHECK(var_ev_block.get_evaluations()[2]);
+
+    CHECK(var_ev_block.generate_next_evaluation_over_A());
+    CHECK(var_ev_block.get_evaluations().count() == 2);
+    CHECK(var_ev_block.get_evaluations()[2]);
+    CHECK(var_ev_block.get_evaluations()[16]);
+
+    CHECK(var_ev_block.generate_next_evaluation_over_A());
+    CHECK(var_ev_block.get_evaluations().count() == 2);
+    CHECK(var_ev_block.get_evaluations()[2]);
+    CHECK(var_ev_block.get_evaluations()[8]);
+
+    CHECK(var_ev_block.generate_next_evaluation_over_B());
+    CHECK(var_ev_block.get_evaluations().count() == 3);
+    CHECK(var_ev_block.get_evaluations()[2]);
+    CHECK(var_ev_block.get_evaluations()[8]);
+    CHECK(var_ev_block.get_evaluations()[17]);
+
+    CHECK(var_ev_block.generate_next_evaluation_over_B());
+    CHECK(var_ev_block.get_evaluations().count() == 3);
+    CHECK(var_ev_block.get_evaluations()[2]);
+    CHECK(var_ev_block.get_evaluations()[8]);
+    CHECK(var_ev_block.get_evaluations()[7]);
+
+    CHECK(var_ev_block.generate_next_evaluation_over_A());
+    CHECK(var_ev_block.get_evaluations().count() == 4);
+    CHECK(var_ev_block.get_evaluations()[2]);
+    CHECK(var_ev_block.get_evaluations()[8]);
+    CHECK(var_ev_block.get_evaluations()[16]);
+    CHECK(var_ev_block.get_evaluations()[7]);
+
+    CHECK(!var_ev_block.generate_next_evaluation_over_A());
+    CHECK(var_ev_block.get_evaluations().count() == 4);
+    CHECK(var_ev_block.get_evaluations()[2]);
+    CHECK(var_ev_block.get_evaluations()[8]);
+    CHECK(var_ev_block.get_evaluations()[16]);
+    CHECK(var_ev_block.get_evaluations()[7]);
+
+    var_ev_block.reset_evaluations_of_A();
+    CHECK(var_ev_block.get_evaluations().count() == 1);
+    CHECK(var_ev_block.get_evaluations()[7]);
+
+    CHECK(var_ev_block.generate_next_evaluation_over_A());
+    CHECK(var_ev_block.get_evaluations().count() == 2);
+    CHECK(var_ev_block.get_evaluations()[16]);
+    CHECK(var_ev_block.get_evaluations()[7]);
+
+    CHECK(var_ev_block.generate_next_evaluation_over_A());
+    CHECK(var_ev_block.get_evaluations().count() == 2);
+    CHECK(var_ev_block.get_evaluations()[8]);
+    CHECK(var_ev_block.get_evaluations()[7]);
+
+    CHECK(var_ev_block.generate_next_evaluation_over_A());
+    CHECK(var_ev_block.get_evaluations().count() == 3);
+    CHECK(var_ev_block.get_evaluations()[8]);
+    CHECK(var_ev_block.get_evaluations()[16]);
+    CHECK(var_ev_block.get_evaluations()[7]);
+
+    CHECK(var_ev_block.generate_next_evaluation_over_A());
+    CHECK(var_ev_block.get_evaluations().count() == 2);
+    CHECK(var_ev_block.get_evaluations()[2]);
+    CHECK(var_ev_block.get_evaluations()[7]);
+
+    var_ev_block.reset_evaluations_of_B();
+    CHECK(var_ev_block.get_evaluations().count() == 1);
+    CHECK(var_ev_block.get_evaluations()[2]);
+
+    CHECK(var_ev_block.generate_next_evaluation_over_A());
+    CHECK(var_ev_block.get_evaluations().count() == 2);
+    CHECK(var_ev_block.get_evaluations()[2]);
+    CHECK(var_ev_block.get_evaluations()[16]);
+
+    CHECK(var_ev_block.generate_next_evaluation_over_A());
+    CHECK(var_ev_block.get_evaluations().count() == 2);
+    CHECK(var_ev_block.get_evaluations()[2]);
+    CHECK(var_ev_block.get_evaluations()[8]);
+
+    CHECK(var_ev_block.generate_next_evaluation_over_B());
+    CHECK(var_ev_block.get_evaluations().count() == 3);
+    CHECK(var_ev_block.get_evaluations()[2]);
+    CHECK(var_ev_block.get_evaluations()[8]);
+    CHECK(var_ev_block.get_evaluations()[17]);
+
+}
+
