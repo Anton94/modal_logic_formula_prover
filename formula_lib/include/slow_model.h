@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../private/variables_evaluations_block.h"
+#include "../private/variables_evaluations_block_for_positive_term.h"
 #include "../private/linear_algebra/system_of_inequalities.h" // TODO: not pretty, refactor
 #include "types.h"
 #include "imodel.h"
@@ -45,7 +45,7 @@ struct slow_model : public imodel
     struct point_info
     {
         const term* t;
-        variables_evaluations_block evaluation;
+        variables_evaluations_block_for_positive_term evaluation;
     };
     using points_t = std::vector<point_info>;
 
@@ -65,10 +65,10 @@ private:
     auto construct_contact_model_points(const formulas_t& contacts) -> bool;
     auto construct_non_zero_model_points(const terms_t& non_zero_terms) -> bool;
 
-    auto construct_non_zero_term_evaluation(const term* t, variables_evaluations_block& out_evaluation) const -> bool;
+    auto construct_non_zero_term_evaluation(const term* t, variables_evaluations_block_for_positive_term& out_evaluation) const -> bool;
 
     // Generates new evaluation until @t evalautes to constant true with it
-    auto generate_next_positive_evaluation(const term* t, variables_evaluations_block& evaluation) const -> bool;
+    auto generate_next_positive_evaluation(const term* t, variables_evaluations_block_for_positive_term& evaluation) const -> bool;
 
     // Generates a new model
     auto generate_next() -> bool;

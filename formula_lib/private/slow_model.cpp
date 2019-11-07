@@ -52,7 +52,7 @@ auto slow_model::generate_next() -> bool
     // simulation of +1 operation from left to right but not just 0/1 bits but all combinations per element
     for (auto& point : points_)
     {
-        if (generate_next_positive_evaluation(point.t, point.evaluation))
+        if (point.evaluation.generate_next_evaluation())
         {
             // TODO: this maybe can be done smarter and not just whole new calculation
             calculate_the_model_evaluation_of_each_variable();
@@ -190,10 +190,10 @@ auto slow_model::construct_contact_model_points(const formulas_t& contacts) -> b
     // For each contact term it will generate an evaluation of all used variables which evaluates it to the constant_true
     for (const auto& c : contacts)
     {
-        variables_evaluations_block left_evaluation(variables_mask_t(0)); // it will be overriten if succeed
-        variables_evaluations_block right_evaluation(variables_mask_t(0));
         const term* left = c->get_left_child_term();
         const term* right = c->get_right_child_term();
+        variables_evaluations_block_for_positive_term left_evaluation(*left, used_variables_); // it will be overriten if succeed
+        variables_evaluations_block_for_positive_term right_evaluation(*right, used_variables_);
         if (!construct_non_zero_term_evaluation(left, left_evaluation) ||
             !construct_non_zero_term_evaluation(right, right_evaluation))
         {
@@ -211,7 +211,7 @@ auto slow_model::construct_non_zero_model_points(const terms_t& non_zero_terms) 
     // For each non-zero term it will generate an evaluation of all used variables which evaluates it to the constant_true
     for (const auto& z : non_zero_terms)
     {
-        variables_evaluations_block eval(variables_mask_t(0)); // it will be overriten if succeed
+        variables_evaluations_block_for_positive_term eval(*z, used_variables_); // it will be overriten if succeed
         if (!construct_non_zero_term_evaluation(z, eval))
         {
             return false;
@@ -222,48 +222,12 @@ auto slow_model::construct_non_zero_model_points(const terms_t& non_zero_terms) 
     return true;
 }
 
-auto slow_model::construct_non_zero_term_evaluation(const term* t, variables_evaluations_block& out_evaluation) const -> bool
+auto slow_model::construct_non_zero_term_evaluation(const term* t, variables_evaluations_block_for_positive_term& out_evaluation) const -> bool
 {
-    const auto variables_in_t = t->get_variables();
-    const auto used_variables_without_variables_in_t = used_variables_ & ~variables_in_t;
-    out_evaluation = variables_evaluations_block(variables_in_t, used_variables_without_variables_in_t);
-
     // the evaluation of the term should be the constant true, i.e.
     // for t != 0 : the evaluation of 't' with the given @evaluation should be non-zero
-    return t->evaluate(out_evaluation).is_constant_true() ||
-        generate_next_positive_evaluation(t, out_evaluation);
-}
-
-auto slow_model::generate_next_positive_evaluation(const term* t, variables_evaluations_block& evaluation) const -> bool
-{
-    /*
-     * We need to generate a new evaluation which evaluates @t to true.
-     * The basic solution is to generate the next evaluation in the sequence and to check if it evaluates @t to true.
-     * One optimization is to generate an evaluation for @t which evaluates it to true and fix it, then generate new evaluation only on the variables which are not in @t
-     * and when all such evaluations are generated, then we generate a new evaluation over the variables in @t and repeat...
-     * We have two separate sets of varaibles, the variables in @t and the rest
-     * The variables in @t are the once in evaluation's A set, and the rest are B set.
-     * If the current evaluation is true, then we can try to generate next evaluation only on the vars in B (and that will keep the evaluation of @t to be true).
-     * Otherwise, we need to generate evaluation on the variables in @t (i.e. in A) which evaluates @t to true and don't forget to reset the evaluation of B
-     *
-     */
-    if(t->evaluate(evaluation).is_constant_true())
-    {
-        if(evaluation.generate_next_evaluation_over_B())
-        {
-            return true;
-        }
-        evaluation.reset_evaluations_of_B();
-    }
-
-    while(evaluation.generate_next_evaluation_over_A())
-    {
-        if(t->evaluate(evaluation).is_constant_true())
-        {
-            return true;
-        }
-    }
-    return false;
+    return t->evaluate(out_evaluation.get_evaluations_block()).is_constant_true() ||
+        out_evaluation.generate_next_evaluation();
 }
 
 void slow_model::calculate_the_model_evaluation_of_each_variable()
@@ -276,7 +240,7 @@ void slow_model::calculate_the_model_evaluation_of_each_variable()
     // v(Pi) = { point | point_evaluation[Pi] == 1 } , i.e. the evaluation of variable with id Pi is 1, i.e. the bit at position Pi is 1
     for (size_t point = 0; point < points_size; ++point)
     {
-        const auto& point_evaluation = points_[point].evaluation.get_evaluations();
+        const auto& point_evaluation = points_[point].evaluation.get_evaluations_block().get_evaluations();
 
         // iterate only set bits(1s)
         auto Pi = point_evaluation.find_first();
@@ -313,7 +277,7 @@ auto slow_model::print(std::ostream& out) const -> std::ostream&
     for(size_t i = 0; i < points_size; ++i)
     {
         out << std::to_string(i) << " : ";
-        mgr_->print(out, points_[i].evaluation);
+        mgr_->print(out, points_[i].evaluation.get_evaluations_block());
         out << "\n";
     }
 
