@@ -41,3 +41,6 @@ elseif(${ENABLE_ADDRESS_UB_LEAK_SANITIZERS})
 endif()
 
 include(ECMEnableSanitizers)
+
+file(COPY simple_client/ DESTINATION client/dist)
+
