@@ -40,12 +40,16 @@ private:
     void handle_put(http_request message);
     void handle_delete(http_request message);
 
-    http_listener m_listener;
+    void handle_task(http_request message);
+    void handle_cancel(http_request message);
+    void handle_ping(http_request message);
 
     std::string generate_random_op_id(size_t length);
     void remove_op_id(std::string op_id);
 
     auto extract_formula_refiners(std::string formula_filters) -> formula_mgr::formula_refiners;
+
+    http_listener m_listener;
 
     std::mutex op_id_to_task_info_mutex_;
     std::unordered_map<std::string, task_info> op_id_to_task_info_;

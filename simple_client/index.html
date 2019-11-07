@@ -35,7 +35,7 @@
 
 			function ping_task(op_id, timer_id) {
 				var params = "?op_id=" + valid_op_id;
-				$.post(IP_ADDRESS + "ping" + params, null)
+				$.get(IP_ADDRESS + "rest/ping" + params, null)
 		            .done(function( data ) {
 		            	// depending on the data return RUNNING or CANCELED or FINISHED...
 		              console.log(data);
@@ -61,7 +61,7 @@
 
 			function cancel_task(op_id, timer_id) {
 				var params = "?op_id=" + valid_op_id; 
-				$.post(IP_ADDRESS + "cancel" + params, null)
+				$.get(IP_ADDRESS + "rest/cancel" + params, null)
 		            .done(function( data ) {
 		            	// return true if success, return false if the task was already canceled
 		              console.log(data);
@@ -372,7 +372,5 @@
 		<code>~&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/not.png" alt="Not"> - </code><label>Negation</label><br>
 		<code>-&gt;&nbsp;&nbsp;-&nbsp;</code><label>Implication</label><br>
 		<code>&lt;-&gt;&nbsp;-&nbsp;</code><label>Equivalence</label><br>
-
-
 	</body>
 </html>
