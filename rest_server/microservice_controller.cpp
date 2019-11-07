@@ -602,7 +602,7 @@ auto microservice_controller::extract_formula_refiners(std::string formula_filte
     return formula_refs;
 }
 
-void microservice_controller::remove_non_aciteve()
+void microservice_controller::remove_non_active()
 {
     std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
 
