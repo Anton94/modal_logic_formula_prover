@@ -45,3 +45,7 @@ PERF_TEST_CASE("not satisfiable with 8 variables 4 atomic formulas",
 PERF_TEST_CASE("not satisfiable with 10 variables 8 atomic formulas",
                "C(a,b) & C(b,c) & <=(b,a) & ~C(a,c) & C(d, e) & C(f,g) & C(h, i) & C(h, j)",
                false, false, false, false);
+
+PERF_TEST_CASE("not satisfiable with 4 variables 9 atomic formulas, transitive property variant 0",
+               "C(a,b) & C(b,c) => C(a,c) & C(a,x) & C(x,c) => C(a,c) & ~(C(b,c) & C(c,x) => C(b,x))",
+               false, false, true, false)
