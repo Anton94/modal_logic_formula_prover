@@ -9,6 +9,7 @@ class task_result
 {
 public:
     std::string status_code; // enum "RUNNING", "CANCELED", "FINISHED", ...
+    bool is_parsed;
     bool is_satisfied;
     contacts_t contacts;
     variable_id_to_points_t ids;

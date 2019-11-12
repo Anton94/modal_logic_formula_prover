@@ -215,7 +215,7 @@ void microservice_controller::handle_task(http_request message)
                         formula_mgr::formula_refiners formula_refs =
                             extract_formula_refiners(formula_filters);
 
-                        mgr.build(formula, formula_refs);
+                        bool is_parsed = mgr.build(formula, formula_refs);
                         imodel* the_model;
                         if(algorithm_type == "SLOW_MODEL")
                         {
@@ -237,16 +237,21 @@ void microservice_controller::handle_task(http_request message)
                         {
                             // assert since this should already be checked
                         }
-                        const auto is_satisfiable = mgr.is_satisfiable(*the_model);
+                        const auto is_satisfiable = (is_parsed) ? mgr.is_satisfiable(*the_model) : false;
 
                         // check this find here for not present
                         std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
                         auto& final_result = op_id_to_task_info_.find(op_id)->second.result_;
                         final_result.status_code = "FINISHED";
+                        final_result.is_parsed = is_parsed;
                         final_result.is_satisfied = is_satisfiable;
-                        final_result.ids = the_model->get_variables_evaluations();
-                        final_result.contacts = the_model->get_contact_relations();
                         final_result.output = info_output.str();
+
+                        if (is_parsed && is_satisfiable)
+                        {
+                            final_result.ids = the_model->get_variables_evaluations();
+                            final_result.contacts = the_model->get_contact_relations();
+                        }
 
                         delete the_model;
                     }
