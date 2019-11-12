@@ -44,6 +44,7 @@
 			              clearInterval(timer_id);
 			              valid_op_id = null;
 						  document.getElementById('formula_output').innerText = "The formula is : " + jsonified["is_satisfied"];
+						  document.getElementById('verbose_output').innerText = jsonified["output"];
 						  graphis = transform_contacts_to_graph(jsonified["contacts"]);
 			              do_visualization(graphis, 2000, 800);
 		           	      change_computing_components_availability(true)
@@ -80,6 +81,10 @@
 				var formula_filters = get_formula_filters();
 
 				change_computing_components_availability(false);
+				document.getElementById("formula_output").innerText = "";
+				document.getElementById("verbose_output").innerText = "";
+			  	d3.select("svg").empty();
+			  	d3.select("#visualization-graph").select("svg").remove();
 				post_task(formula, algorithm_type, formula_filters);
 
 				function myFunction() {
@@ -333,7 +338,7 @@
 
 		<button class="accordion">Verbose Output / Console</button>
 		<div class="panel">
-		  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+		  <pre id="verbose_output"></pre>
 		</div>
 
 		<button class="accordion" style="margin-bottom: 20px;">Visualized Model</button>
