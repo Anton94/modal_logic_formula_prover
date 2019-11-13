@@ -27,7 +27,13 @@ bool starts_with(const std::string& s, const std::string& prefix)
 }
 
 microservice_controller::microservice_controller(utility::string_t url)
+	: microservice_controller(url, 1000)
+{
+}
+
+microservice_controller::microservice_controller(utility::string_t url, size_t requests_limit)
 	: m_listener(url)
+	, requests_limit_(requests_limit)
 {
     m_listener.support(methods::GET,
                        std::bind(&microservice_controller::handle_get, this, std::placeholders::_1));
@@ -150,6 +156,14 @@ void microservice_controller::handle_delete(http_request message)
 
 void microservice_controller::handle_task(http_request message)
 {
+	// TODO: do we need a mutex lock for this ? 
+	if (op_id_to_task_info_.size() > requests_limit_)
+	{
+		message.reply(status_codes::TooManyRequests, "There are too many requests, try again later.")
+			.then([](pplx::task<void> t) { handle_error(t); });
+		return;
+	}
+
     struct id_token
     {
         std::string id;
@@ -193,7 +207,6 @@ void microservice_controller::handle_task(http_request message)
         message.reply(status_codes::OK, op_id).then([](pplx::task<void> t) { handle_error(t); });
 
         auto algorithm_type = utility::conversions::to_utf8string(algorithm_type_u->second);
-        // auto formula = utility::conversions::to_utf8string(formula_u->second);
         auto formula_filters = utility::conversions::to_utf8string(formula_filters_u->second);
 
         request.extract_string(true)
