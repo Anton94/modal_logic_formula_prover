@@ -26,10 +26,7 @@
 				var params =  
 					"?algorithm_type=" + algorithm_type +
 					"&formula_filters=" + formula_filters;
-				$.post(IP_ADDRESS + "task" + params, formula)
-		            .done(function( data ) {
-		              valid_op_id = data;
-		            });
+				return $.post(IP_ADDRESS + "task" + params, formula)
 		            // on error change_computing_components_availability
 			}
 
@@ -80,19 +77,28 @@
 
 				var formula_filters = get_formula_filters();
 
-				change_computing_components_availability(false);
 				document.getElementById("formula_output").innerText = "";
 				document.getElementById("verbose_output").innerText = "";
 			  	d3.select("svg").empty();
 			  	d3.select("#visualization-graph").select("svg").remove();
-				post_task(formula, algorithm_type, formula_filters);
 
-				function myFunction() {
-					var timer_id = setInterval(function(){
-						ping_task(valid_op_id, timer_id);
-					}, 2000);
-				};
-				myFunction();
+				post_task(formula, algorithm_type, formula_filters)
+		            .done(function( data ) {
+						change_computing_components_availability(false);
+		              	valid_op_id = data;
+					  	function myFunction() {
+					  		var timer_id = setInterval(function(){
+					  			ping_task(valid_op_id, timer_id);
+					  		}, 2000);
+					  	};
+					  	myFunction();
+		            })
+		            .fail(function ( data, xx, yyy) {
+		            	if (data.status === 429) {
+		            		document.getElementById("formula_output").innerText = "There are too many requests right now, please try again later.";	
+		            	}
+		            });
+
 				// set ping on every few seconds it is best to have something like this for the ping delay [1, 2, 5, 7, 10, 10, ...
 				// on ping result FINISHED show the result probably in the output area.
 			}
@@ -303,6 +309,22 @@
 			<input id="formula" style="width: 100%; height: 20px;"/>
 		</div>
 
+		<div id="legend" style="float: right">
+			<h2 style="margin-left: 20px;">Legend</h2>
+			<code>F&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/bot.png" alt="Bottom"> - </code><label>False</label><br>
+			<code>T&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/top.png" alt="Top"> - </code><label>True</label><br>
+			<code>-&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Unary Complement</label><br>
+			<code>*&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Boolean Intersection</label><br>
+			<code>+&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Boolean Union</label><br>
+			<code>C&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Contact, syntax:</label><code>&nbsp;C(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
+			<code>&lt;=&nbsp;&nbsp;-&nbsp;≤ - </code><label>Part Of</label><br>
+			<code>&amp;&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/and.png" alt="And"> - </code><label>Conjunction</label><br>
+			<code>|&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/or.png" alt="Or"> - </code><label>Disjunction</label><br>
+			<code>~&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/not.png" alt="Not"> - </code><label>Negation</label><br>
+			<code>-&gt;&nbsp;&nbsp;-&nbsp;</code><label>Implication</label><br>
+			<code>&lt;-&gt;&nbsp;-&nbsp;</code><label>Equivalence</label><br>
+		</div>
+
 		<div id="formula_filters" style="margin: 20px;">
 			Formula Filters:<br>
 			<input type="checkbox" id="convert_contact_less_eq_with_same_terms" checked> Convert Contacts in <=<br>
@@ -329,24 +351,25 @@
 			<pre id="is_satisfied_output"></pre>
 		</div>
 		<h2 style="margin-left: 20px;">Output</h2>
-		<button class="accordion">Result</button>
-		<div class="panel">
-			<div id="qqq">
-				<pre id="formula_output"></pre>
+		<div style="width: 50%; float: left">
+			<button class="accordion">Result</button>
+			<div class="panel">
+				<div id="qqq">
+					<pre id="formula_output"></pre>
+				</div>
+			</div>
+
+			<button class="accordion">Verbose Output / Console</button>
+			<div class="panel">
+			  <pre id="verbose_output"></pre>
+			</div>
+
+			<button class="accordion" style="margin-bottom: 20px;">Visualized Model</button>
+			<div class="panel">
+			 	<div id="visualization-graph">
+			 	</div>
 			</div>
 		</div>
-
-		<button class="accordion">Verbose Output / Console</button>
-		<div class="panel">
-		  <pre id="verbose_output"></pre>
-		</div>
-
-		<button class="accordion" style="margin-bottom: 20px;">Visualized Model</button>
-		<div class="panel">
-		 	<div id="visualization-graph">
-		 	</div>
-		</div>
-
 		<script>
 		var acc = document.getElementsByClassName("accordion");
 		var i;
@@ -363,19 +386,5 @@
 		  });
 		}
 		</script>
-
-		<h2 style="margin-left: 20px;">Legend</h2>
-		<code>F&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/bot.png" alt="Bottom"> - </code><label>False</label><br>
-		<code>T&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/top.png" alt="Top"> - </code><label>True</label><br>
-		<code>-&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Unary Complement</label><br>
-		<code>*&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Boolean Intersection</label><br>
-		<code>+&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Boolean Union</label><br>
-		<code>C&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Contact, syntax:</label><code>&nbsp;C(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
-		<code>&lt;=&nbsp;&nbsp;-&nbsp;≤ - </code><label>Part Of</label><br>
-		<code>&amp;&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/and.png" alt="And"> - </code><label>Conjunction</label><br>
-		<code>|&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/or.png" alt="Or"> - </code><label>Disjunction</label><br>
-		<code>~&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/not.png" alt="Not"> - </code><label>Negation</label><br>
-		<code>-&gt;&nbsp;&nbsp;-&nbsp;</code><label>Implication</label><br>
-		<code>&lt;-&gt;&nbsp;-&nbsp;</code><label>Equivalence</label><br>
 	</body>
 </html>
