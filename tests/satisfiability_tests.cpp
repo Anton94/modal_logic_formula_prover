@@ -400,3 +400,38 @@ TEST_CASE("not satisfiable with 10 variables", "[satisfiability]")
     is_satisfiable("C(a,b) & C(b,c) & <=(b,a) & ~C(a,c) & C(d, e) & C(f,g) & C(h, i) & C(h, j)", false, false,
                    true, false);
 }
+
+TEST_CASE("<=m to check the formula's evaluate correctnes when right child is with <=m 1", "[satisfiability]")
+{
+    is_satisfiable("C(a,b) & ~C(a,b) | ~<=m(b,c + a)", true, true, true);
+}
+
+TEST_CASE("<=m to check the formula's evaluate correctnes when right child is with <=m 2", "[satisfiability]")
+{
+    is_satisfiable("C(a,b) & ~C(a,b) | <=m(b,c + a)", true, true, true);
+}
+
+TEST_CASE("<=m to check the formula's evaluate correctnes when right child is with <=m 3", "[satisfiability]")
+{
+    is_satisfiable("C(a,b) & <=(b,c) & C(a,c) & <=m(a,b) & ~<=m(b,c + a)", true, true, false);
+}
+
+TEST_CASE("<=m to check the formula's evaluate correctnes when right child is with <=m 4", "[satisfiability]")
+{
+    is_satisfiable("C(a,b) & <=(b,c) & C(a,c) & <=m(a,b) & <=m(b,c + a)", true, true, true);
+}
+
+TEST_CASE("<=m to check the formula's evaluate correctnes when right child is with <=m 5", "[satisfiability]")
+{
+    is_satisfiable("C(a,b) & <=(b,c) & C(a,c) & ~(<=m(a,b) & <=m(b,c + a))", true, true, true);
+}
+
+TEST_CASE("not satisfiable system 1", "[satisfiability]")
+{
+    is_satisfiable("C(a,b) & <=(b,c) & ~<=m(b,c + a)", true, true, false);
+}
+
+TEST_CASE("not satisfiable system 2", "[satisfiability]")
+{
+    is_satisfiable("C(a,b) & <=(b,c) & C(a,c) | <=m(a,b) & ~<=m(b,c + a)", true, true, true);
+}
