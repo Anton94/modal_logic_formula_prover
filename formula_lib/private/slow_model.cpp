@@ -8,8 +8,11 @@
 
 slow_model::slow_model()
     : system_(0)
+    , constant_true_(nullptr)
 {
 }
+
+slow_model::~slow_model() = default;
 
 auto slow_model::create(const formulas_t& contacts_T, const formulas_t& contacts_F, const terms_t& zero_terms_T,
             const terms_t& zero_terms_F, const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F, const variables_mask_t& used_variables, const formula_mgr* mgr)
@@ -23,7 +26,18 @@ auto slow_model::create(const formulas_t& contacts_T, const formulas_t& contacts
     measured_less_eq_T_ = measured_less_eq_T;
     measured_less_eq_F_ = measured_less_eq_F;
 
-    if (!construct_contact_model_points(contacts_T) || !construct_non_zero_model_points(zero_terms_F))
+    auto local_zero_terms_F = zero_terms_F;
+
+    // Add at least one point in the model
+    if(contacts_T.empty() && zero_terms_F.empty())
+    {
+        info() << "No atomic formulas to construct points. Creating one of type: '1 != 0' in order to have at least something in the world";
+        constant_true_ = std::make_unique<term>(mgr_);
+        constant_true_->construct_constant(true);
+        local_zero_terms_F.insert(constant_true_.get());
+    }
+
+    if (!construct_contact_model_points(contacts_T) || !construct_non_zero_model_points(local_zero_terms_F))
     {
         trace() << "Unable to construct the model points with binary var. evaluations which evaluates the contact & non-zero terms to 1";
         return false;
@@ -129,6 +143,8 @@ auto slow_model::has_solvable_system_of_inequalities() -> bool
             return false;
         }
     }
+
+    trace() << "Found a solution for the system:\n" << *static_cast<imodel* const>(this);
     return true;
 }
 
@@ -182,6 +198,7 @@ void slow_model::clear()
 {
     used_variables_.clear();
     number_of_contacts_ = 0;
+    constant_true_.reset();
     points_.clear();
     measured_less_eq_T_.clear();
     measured_less_eq_F_.clear();

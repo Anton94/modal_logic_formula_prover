@@ -11,7 +11,7 @@ class NTerm;
 class term
 {
 public:
-    term(formula_mgr* mgr);
+    term(const formula_mgr* mgr);
     ~term();
     term(const term&) = delete;
     term& operator=(const term&) = delete;
@@ -78,6 +78,9 @@ public:
     };
     using operation_t = operation_type;
 
+    /// Creates a constant term
+    void construct_constant(bool constant_type);
+
     auto get_operation_type() const -> operation_t;
     auto get_hash() const -> std::size_t;
     auto get_variable() const -> std::string;
@@ -119,7 +122,7 @@ private:
     void free();
 
     operation_t op_;
-    formula_mgr* formula_mgr_;
+    const formula_mgr* formula_mgr_;
 
     variables_mask_t variables_; // TODO: alternative is to calculate the used variables each time when we
                                  // need them. would it be better?

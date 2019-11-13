@@ -5,8 +5,9 @@
 #include "types.h"
 #include "imodel.h"
 
+#include <memory>
+
 class formula_mgr;
-class term;
 class formula;
 
 struct slow_model : public imodel
@@ -61,7 +62,7 @@ struct slow_model : public imodel
 
     void clear() override;
 
-    ~slow_model() override = default;
+    ~slow_model() override;
 
 private:
     auto construct_contact_model_points(const formulas_t& contacts) -> bool;
@@ -98,6 +99,7 @@ private:
     variables_mask_t used_variables_{};
     size_t number_of_contacts_{};
 
+    std::unique_ptr<term> constant_true_;
     points_t points_;
 
     formulas_t measured_less_eq_T_;

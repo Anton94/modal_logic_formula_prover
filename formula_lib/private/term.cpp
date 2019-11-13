@@ -5,7 +5,7 @@
 
 #include <cassert>
 
-term::term(formula_mgr* mgr)
+term::term(const formula_mgr* mgr)
     : op_(operation_t::invalid)
     , formula_mgr_(mgr)
     , childs_{nullptr, nullptr}
@@ -266,6 +266,15 @@ void term::clear()
     op_ = operation_t::invalid;
     childs_ = {nullptr, nullptr};
     hash_ = 0;
+}
+
+void term::construct_constant(bool constant_type)
+{
+    clear();
+    op_ = constant_type ? operation_t::constant_true : operation_t::constant_false;
+
+    construct_hash();
+    construct_variables();
 }
 
 auto term::get_operation_type() const -> operation_t
