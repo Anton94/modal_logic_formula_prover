@@ -28,6 +28,11 @@ auto variables_evaluations_block::operator!=(const variables_evaluations_block& 
     return !operator==(rhs);
 }
 
+auto variables_evaluations_block::get_variables() const -> variables_mask_t
+{
+    return get_variables_A() | get_variables_B();
+}
+
 auto variables_evaluations_block::get_variables_A() const -> const variables_mask_t&
 {
     return variables_A_;

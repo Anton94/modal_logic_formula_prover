@@ -61,6 +61,8 @@ struct slow_model : public imodel
 
     void clear() override;
 
+    ~slow_model() override = default;
+
 private:
     auto construct_contact_model_points(const formulas_t& contacts) -> bool;
     auto construct_non_zero_model_points(const terms_t& non_zero_terms) -> bool;
@@ -75,7 +77,7 @@ private:
 
     auto is_contact_F_rule_satisfied(const formulas_t& contacts_F) const -> bool;
     auto is_zero_term_rule_satisfied(const terms_t& zero_terms_T) const -> bool;
-    auto has_solvable_system_of_inequalities(const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F) -> bool;
+    auto has_solvable_system_of_inequalities() -> bool;
 
     // Return true if there is a contact between the v(a) and v(b). Note that v(X) is a set of model points and there is a contact between the two sets iff
     // exist x from v(a), exist y from v(b) and xRy.
@@ -89,6 +91,7 @@ private:
     void calculate_the_model_evaluation_of_each_variable();
 
     auto print_system_sum_variables(std::ostream& out, const model_points_set_t& variables) const -> std::ostream&;
+    auto print_system(std::ostream& out) const -> std::ostream&;
 
     friend std::ostream& operator<<(std::ostream& out, const slow_model& m);
 

@@ -106,11 +106,11 @@ void system_of_inequalities_impl::clear()
 {
     is_solvable_ = true;
 
+    solver_.reset();
     variables_.clear();
     variables_.resize(number_of_variables_); // TODO: maybe we can 'reset' the variables in another way?
-    add_constraints_for_positive_variables();
 
-    solver_.reset();
+    add_constraints_for_positive_variables();
 }
 
 void system_of_inequalities_impl::add_constraints_for_positive_variables()

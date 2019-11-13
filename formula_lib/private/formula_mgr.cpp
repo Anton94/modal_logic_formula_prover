@@ -206,8 +206,8 @@ auto formula_mgr::get_internal_formula() const -> const formula*
 
 auto formula_mgr::print(std::ostream& out, const variables_evaluations_block& block) const -> std::ostream&
 {
-    const auto& variables = block.get_variables_A();
     const auto& evaluations = block.get_evaluations();
+    const auto variables = block.get_variables();
     for(size_t i = 0; i < variables.size(); ++i)
     {
         if(variables[i])

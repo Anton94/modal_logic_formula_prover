@@ -10,7 +10,7 @@ namespace
 void check_evaluation_blocks(const std::vector<variables_evaluations_block>& original_blocks)
 {
     assert(!original_blocks.empty());
-    const auto variables_size = original_blocks.front().get_variables_A().size();
+    const auto variables_size = original_blocks.front().get_variables().size();
     variables_evaluations_block_stack stack(variables_size);
 
     auto control_blocks = original_blocks;
@@ -28,7 +28,7 @@ void check_evaluation_blocks(const std::vector<variables_evaluations_block>& ori
         variables_mask_t control_variables(variables_size, false);
         for(const auto& block : control_blocks)
         {
-            control_variables |= block.get_variables_A();
+            control_variables |= block.get_variables();
         }
         return control_variables;
     };
@@ -37,7 +37,7 @@ void check_evaluation_blocks(const std::vector<variables_evaluations_block>& ori
         trace() << "Running test with control blocks(bottom to top and combined):";
         for(const auto& block : control_blocks)
         {
-            trace() << "\t" << block.get_variables_A() << "\n\t" << block.get_evaluations()
+            trace() << "\t" << block.get_variables() << "\n\t" << block.get_evaluations()
                     << "\n\t----------------------------------------------------";
         }
         trace() << "\tCombined:\n\t" << get_control_variables() << "\n\t" << get_control_evaluations();

@@ -26,6 +26,7 @@ public:
     auto operator==(const variables_evaluations_block& rhs) const -> bool;
     auto operator!=(const variables_evaluations_block& rhs) const -> bool;
 
+    auto get_variables() const -> variables_mask_t;
     auto get_variables_A() const -> const variables_mask_t&;
     auto get_variables_B() const -> const variables_mask_t&;
     auto get_evaluations() -> variables_evaluations_t&;

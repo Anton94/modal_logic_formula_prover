@@ -20,6 +20,9 @@ auto slow_model::create(const formulas_t& contacts_T, const formulas_t& contacts
     used_variables_ = used_variables;
     number_of_contacts_ = contacts_T.size();
 
+    measured_less_eq_T_ = measured_less_eq_T;
+    measured_less_eq_F_ = measured_less_eq_F;
+
     if (!construct_contact_model_points(contacts_T) || !construct_non_zero_model_points(zero_terms_F))
     {
         trace() << "Unable to construct the model points with binary var. evaluations which evaluates the contact & non-zero terms to 1";
@@ -31,7 +34,7 @@ auto slow_model::create(const formulas_t& contacts_T, const formulas_t& contacts
 
     system_ = system_of_inequalities(points_.size());
     while (!is_zero_term_rule_satisfied(zero_terms_T) || !is_contact_F_rule_satisfied(contacts_F) ||
-           !has_solvable_system_of_inequalities(measured_less_eq_T, measured_less_eq_F))
+           !has_solvable_system_of_inequalities())
     {
         TERMINATE_IF_NEEDED();
         if (!generate_next())
@@ -40,8 +43,6 @@ auto slow_model::create(const formulas_t& contacts_T, const formulas_t& contacts
             return false;
         }
     }
-    measured_less_eq_T_ = measured_less_eq_T;
-    measured_less_eq_F_ = measured_less_eq_F;
 
     return true;
 }
@@ -94,7 +95,7 @@ auto slow_model::is_zero_term_rule_satisfied(const terms_t& zero_terms_T) const 
     return true;
 }
 
-auto slow_model::has_solvable_system_of_inequalities(const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F) -> bool
+auto slow_model::has_solvable_system_of_inequalities() -> bool
 {
     // For each <=m(a,b) calculate v(a) and v(b), then we will create
     // an inequality of the following type: SUM_I Xi <= SUM_J Xj, where I and J are set v(a) and v(b).
@@ -105,22 +106,26 @@ auto slow_model::has_solvable_system_of_inequalities(const formulas_t& measured_
     const auto points_size = points_.size();
     system_.clear();
 
-    for(const auto& m : measured_less_eq_T)
+    for(const auto& m : measured_less_eq_T_)
     {
         const auto v_a = m->get_left_child_term()->evaluate(variable_evaluations_, points_size);
         const auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
         if (!system_.add_constraint(v_a, v_b, system_of_inequalities::inequality_operation::LE))
         {
+            trace() << "Unable to find a solution for the system when adding the constraint for " << *m << "\n" << *static_cast<imodel* const>(this); // TODO: why not able to call directly *this??? why unresolved ???
             return false;
         }
     }
 
-    for(const auto& m : measured_less_eq_F)
+    for(const auto& m : measured_less_eq_F_)
     {
         const auto v_a = m->get_left_child_term()->evaluate(variable_evaluations_, points_size);
         const auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
         if (!system_.add_constraint(v_a, v_b, system_of_inequalities::inequality_operation::G))
         {
+            std::stringstream out;
+            print_system(out);
+            trace() << "Unable to find a solution for the system when adding the constraint for ~" << *m << "\n" << *static_cast<imodel* const>(this);
             return false;
         }
     }
@@ -257,6 +262,12 @@ auto slow_model::print_system_sum_variables(std::ostream& out, const model_point
     // iterate only set bits(1s)
     auto var_id = variables.find_first();
     bool has_printed_first = false;
+    if(var_id == variables_evaluations_t::npos)
+    {
+        out << "0";
+        return out;
+    }
+
     while (var_id != variables_evaluations_t::npos)
     {
         if(has_printed_first)
@@ -266,6 +277,35 @@ auto slow_model::print_system_sum_variables(std::ostream& out, const model_point
         out << "X" << var_id;
         has_printed_first = true;
         var_id = variables.find_next(var_id);
+    }
+    return out;
+}
+
+auto slow_model::print_system(std::ostream& out) const -> std::ostream&
+{
+    const auto points_size = points_.size();
+    out << "System:\n";
+    for(const auto& m : measured_less_eq_T_) // <=m(a,b)
+    {
+        const auto v_a = m->get_left_child_term()->evaluate(variable_evaluations_, points_size);
+        const auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
+
+        out << "| ";
+        print_system_sum_variables(out, v_a);
+        out << " <= ";
+        print_system_sum_variables(out, v_b);
+        out << " # " << *m << "\n";
+    }
+    for(const auto& m : measured_less_eq_F_) // ~<=m(a,b)
+    {
+        const auto v_a = m->get_left_child_term()->evaluate(variable_evaluations_, points_size);
+        const auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
+
+        out << "| ";
+        print_system_sum_variables(out, v_a);
+        out << " > ";
+        print_system_sum_variables(out, v_b);
+        out << " # ~" << *m << "\n";
     }
     return out;
 }
@@ -281,38 +321,28 @@ auto slow_model::print(std::ostream& out) const -> std::ostream&
         out << "\n";
     }
 
+    if(measured_less_eq_T_.empty() && measured_less_eq_F_.empty())
+    {
+        return out;
+    }
     out << "Measured  : " << measured_less_eq_T_ << "\n";
     out << "Measured ~: " << measured_less_eq_F_ << "\n";
-    out << "System:\n";
-    for(const auto m : measured_less_eq_T_) // <=m(a,b)
-    {
-        const auto v_a = m->get_left_child_term()->evaluate(variable_evaluations_, points_size);
-        const auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
 
-        out << "| ";
-        print_system_sum_variables(out, v_a);
-        out << " <= ";
-        print_system_sum_variables(out, v_b);
-        out << " # " << *m << "\n";
+    print_system(out);
+
+    if(system_.is_solvable())
+    {
+        out << "Solution:\n";
+        auto variables_values = system_.get_variables_values();
+        assert(variables_values.size() == points_size);
+        for(size_t i = 0; i < points_size; ++i)
+        {
+            out << "X" << i << " = " << variables_values[i] << "\n";
+        }
     }
-    for(const auto m : measured_less_eq_F_) // ~<=m(a,b)
+    else
     {
-        const auto v_a = m->get_left_child_term()->evaluate(variable_evaluations_, points_size);
-        const auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
-
-        out << "| ";
-        print_system_sum_variables(out, v_a);
-        out << " > ";
-        print_system_sum_variables(out, v_b);
-        out << " # ~" << *m << "\n";
-    }
-
-    out << "Solution:\n";
-    auto variables_values = system_.get_variables_values();
-    assert(variables_values.size() == points_size);
-    for(size_t i = 0; i < points_size; ++i)
-    {
-        out << "X" << i << " = " << variables_values[i] << "\n";
+        out << "No solution!\n";
     }
 
     return out;
