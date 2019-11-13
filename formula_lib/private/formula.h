@@ -83,7 +83,6 @@ private:
     {
         bool evaluated_value;
         bool is_used_only_less_eq_measured_as_atomic; // only the atomic <=m participates in the subformula evaluations
-        constexpr static const bool no_evaluation{};
     };
 
     auto evaluate(const variable_id_to_points_t& evals, int R, int P, bool neutral_value) const -> bool;

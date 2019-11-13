@@ -222,7 +222,11 @@ auto formula::evaluate_internal(const variable_id_to_points_t& evals, const cont
                 return {false, false}; // left branch uses something other than just <=m and evaluates to false, so skip the right branch
             }
             auto res_right = child_f_.right->evaluate_internal(evals, contact_relations);
-            return {res_right.evaluated_value, res_left.is_used_only_less_eq_measured_as_atomic && res_right.is_used_only_less_eq_measured_as_atomic};
+            if(!res_right.is_used_only_less_eq_measured_as_atomic && !res_right.evaluated_value)
+            {
+                return {false, false}; // left branch uses something other than just <=m and evaluates to false
+            }
+            return {true, res_left.is_used_only_less_eq_measured_as_atomic && res_right.is_used_only_less_eq_measured_as_atomic};
         }
         case formula::operation_t::disjunction:
         {
@@ -233,7 +237,11 @@ auto formula::evaluate_internal(const variable_id_to_points_t& evals, const cont
                 return {true, false}; // left branch uses something other than just <=m and evaluates to true, so skip the right branch
             }
             auto res_right = child_f_.right->evaluate_internal(evals, contact_relations);
-            return {res_right.evaluated_value, res_left.is_used_only_less_eq_measured_as_atomic && res_right.is_used_only_less_eq_measured_as_atomic};
+            if(!res_right.is_used_only_less_eq_measured_as_atomic && !res_right.evaluated_value)
+            {
+                return {false, false}; // left branch uses something other than just <=m and evaluates to true, so skip the right branch
+            }
+            return {true, res_left.is_used_only_less_eq_measured_as_atomic && res_right.is_used_only_less_eq_measured_as_atomic};
         }
         case formula::operation_t::negation:
         {
@@ -249,7 +257,7 @@ auto formula::evaluate_internal(const variable_id_to_points_t& evals, const cont
             return {child_t_.left->evaluate(evals, number_of_points).none(), false};
         }
         case formula::operation_t::measured_less_eq:
-            return {internal_evaluation_result::no_evaluation, true};
+            return {true/*dummy evaluation*/, true};
         case formula::operation_t::c:
         {
             assert(child_t_.left && child_t_.right);
