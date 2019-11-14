@@ -8,7 +8,6 @@
 
 slow_model::slow_model()
     : system_(0)
-    , constant_true_(nullptr)
 {
 }
 
@@ -26,21 +25,23 @@ auto slow_model::create(const formulas_t& contacts_T, const formulas_t& contacts
     measured_less_eq_T_ = measured_less_eq_T;
     measured_less_eq_F_ = measured_less_eq_F;
 
-    auto local_zero_terms_F = zero_terms_F;
-
-    // Add at least one point in the model
-    if(contacts_T.empty() && zero_terms_F.empty())
-    {
-        info() << "No atomic formulas to construct points. Creating one of type: '1 != 0' in order to have at least something in the world";
-        constant_true_ = std::make_unique<term>(mgr_);
-        constant_true_->construct_constant(true);
-        local_zero_terms_F.insert(constant_true_.get());
-    }
-
-    if (!construct_contact_model_points(contacts_T) || !construct_non_zero_model_points(local_zero_terms_F))
+    if (!construct_contact_model_points(contacts_T) || !construct_non_zero_model_points(zero_terms_F))
     {
         trace() << "Unable to construct the model points with binary var. evaluations which evaluates the contact & non-zero terms to 1";
         return false;
+    }
+
+    // We need at least K points in the model, where K is the number of <=m / ~<=m atomics multiplied by 2
+    // TODO: explain why and prove that it is enough TODO: check it only ~<=m requies new points?
+    const auto measured_less_eq_minimal_points = (measured_less_eq_T.size() + measured_less_eq_F.size()) * 2;
+    if(points_.size() < measured_less_eq_minimal_points)
+    {
+        const auto number_of_points_to_add = measured_less_eq_minimal_points - points_.size();
+        info() << "Adding additional " << number_of_points_to_add << " points because of the <=m/~<=m atomics. "
+                  "We need a potential one model point for each side of each inequality in the system.";
+        constant_true_ = std::make_unique<term>(mgr_);
+        constant_true_->construct_constant(true);
+        points_.insert(points_.end(), number_of_points_to_add, {constant_true_.get(), variables_evaluations_block_for_positive_term(*constant_true_, used_variables_)});
     }
 
     create_contact_relations_first_2k_in_contact(points_.size(), contacts_T.size());
@@ -125,7 +126,7 @@ auto slow_model::has_solvable_system_of_inequalities() -> bool
         const auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
         if (!system_.add_constraint(v_a, v_b, system_of_inequalities::inequality_operation::LE))
         {
-            trace() << "Unable to find a solution for the system when adding the constraint for " << *m << "\n" << *static_cast<imodel* const>(this); // TODO: why not able to call directly *this??? why unresolved ???
+            verbose() << "Unable to find a solution for the system when adding the constraint for " << *m << "\n" << *static_cast<imodel* const>(this); // TODO: why not able to call directly *this??? why unresolved ???
             return false;
         }
     }
@@ -138,12 +139,12 @@ auto slow_model::has_solvable_system_of_inequalities() -> bool
         {
             std::stringstream out;
             print_system(out);
-            trace() << "Unable to find a solution for the system when adding the constraint for ~" << *m << "\n" << *static_cast<imodel* const>(this);
+            verbose() << "Unable to find a solution for the system when adding the constraint for ~" << *m << "\n" << *static_cast<imodel* const>(this);
             return false;
         }
     }
 
-    trace() << "Found a solution for the system:\n" << *static_cast<imodel* const>(this);
+    info() << "Found a solution for the system:\n" << *static_cast<imodel* const>(this);
     return true;
 }
 
