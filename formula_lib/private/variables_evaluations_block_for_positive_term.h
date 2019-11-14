@@ -31,6 +31,9 @@ public:
     /// Generates the next evaluation, which evaluates @t to true
     auto generate_next_evaluation() -> bool;
 
+    /// Resets the evaluation to the 'first' which makes @t to true
+    auto reset() -> bool;
+
 private:
     std::reference_wrapper<const term> term_;
     variables_evaluations_block evaluation_block_;

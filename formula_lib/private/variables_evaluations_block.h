@@ -39,6 +39,7 @@ public:
     auto generate_next_evaluation_over_A() -> bool;
     auto generate_next_evaluation_over_B() -> bool;
 
+    void reset_evaluations();
     void reset_evaluations_of_A();
     void reset_evaluations_of_B();
 

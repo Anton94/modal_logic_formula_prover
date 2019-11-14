@@ -74,8 +74,7 @@ auto slow_model::generate_next() -> bool
             return true;
         }
 
-        // resetting the evaluation for that point, by constructing it again
-        const auto is_reset = construct_non_zero_term_evaluation(point.t, point.evaluation);
+        const auto is_reset = point.evaluation.reset();
         assert(is_reset);
         (void)is_reset;
     }
@@ -216,8 +215,7 @@ auto slow_model::construct_contact_model_points(const formulas_t& contacts) -> b
         const term* right = c->get_right_child_term();
         variables_evaluations_block_for_positive_term left_evaluation(*left, used_variables_); // it will be overriten if succeed
         variables_evaluations_block_for_positive_term right_evaluation(*right, used_variables_);
-        if (!construct_non_zero_term_evaluation(left, left_evaluation) ||
-            !construct_non_zero_term_evaluation(right, right_evaluation))
+        if (!left_evaluation.reset() || !right_evaluation.reset())
         {
             return false;
         }
@@ -234,7 +232,7 @@ auto slow_model::construct_non_zero_model_points(const terms_t& non_zero_terms) 
     for (const auto& z : non_zero_terms)
     {
         variables_evaluations_block_for_positive_term eval(*z, used_variables_); // it will be overriten if succeed
-        if (!construct_non_zero_term_evaluation(z, eval))
+        if (!eval.reset())
         {
             return false;
         }
@@ -242,14 +240,6 @@ auto slow_model::construct_non_zero_model_points(const terms_t& non_zero_terms) 
     }
 
     return true;
-}
-
-auto slow_model::construct_non_zero_term_evaluation(const term* t, variables_evaluations_block_for_positive_term& out_evaluation) const -> bool
-{
-    // the evaluation of the term should be the constant true, i.e.
-    // for t != 0 : the evaluation of 't' with the given @evaluation should be non-zero
-    return t->evaluate(out_evaluation.get_evaluations_block()).is_constant_true() ||
-        out_evaluation.generate_next_evaluation();
 }
 
 void slow_model::calculate_the_model_evaluation_of_each_variable()

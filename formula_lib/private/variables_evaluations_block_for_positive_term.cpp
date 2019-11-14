@@ -4,7 +4,7 @@
 #include <cassert>
 
 variables_evaluations_block_for_positive_term::variables_evaluations_block_for_positive_term(const term& t, const variables_mask_t& variables)
-    : term_(t)
+    : term_(std::cref(t))
     , evaluation_block_({})
 {
     auto& variables_in_t = t.get_variables();
@@ -63,4 +63,13 @@ auto variables_evaluations_block_for_positive_term::generate_next_evaluation() -
         }
     }
     return false;
+}
+
+auto variables_evaluations_block_for_positive_term::reset() -> bool
+{
+    evaluation_block_.reset_evaluations();
+
+    // the evaluation of the term should be the constant true, i.e.
+    // for t != 0 : the evaluation of 't' with the given @evaluation should be non-zero
+    return term_.get().evaluate(get_evaluations_block()).is_constant_true() || generate_next_evaluation();
 }

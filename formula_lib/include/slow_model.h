@@ -68,8 +68,6 @@ private:
     auto construct_contact_model_points(const formulas_t& contacts) -> bool;
     auto construct_non_zero_model_points(const terms_t& non_zero_terms) -> bool;
 
-    auto construct_non_zero_term_evaluation(const term* t, variables_evaluations_block_for_positive_term& out_evaluation) const -> bool;
-
     // Generates new evaluation until @t evalautes to constant true with it
     auto generate_next_positive_evaluation(const term* t, variables_evaluations_block_for_positive_term& evaluation) const -> bool;
 

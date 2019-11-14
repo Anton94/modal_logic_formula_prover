@@ -73,6 +73,12 @@ auto variables_evaluations_block::generate_next_evaluation_over_B() -> bool
     return generate_next_evaluation(variables_B_, set_variables_ids_B_);
 }
 
+void variables_evaluations_block::reset_evaluations()
+{
+    reset_evaluations_of_A();
+    reset_evaluations_of_B();
+}
+
 void variables_evaluations_block::reset_evaluations_of_A()
 {
     reset_evaluations(variables_A_);
