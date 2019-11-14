@@ -32,6 +32,6 @@ public:
     auto generate_next_evaluation() -> bool;
 
 private:
-    const term& term_;
+    std::reference_wrapper<const term> term_;
     variables_evaluations_block evaluation_block_;
 };

@@ -46,7 +46,7 @@ auto variables_evaluations_block_for_positive_term::generate_next_evaluation() -
      * Otherwise, we need to generate evaluation on the variables in @t (i.e. in A) which evaluates @t to true and don't forget to reset the evaluation of B
      *
      */
-    if(term_.evaluate(evaluation_block_).is_constant_true())
+    if(term_.get().evaluate(evaluation_block_).is_constant_true())
     {
         if(evaluation_block_.generate_next_evaluation_over_B())
         {
@@ -57,7 +57,7 @@ auto variables_evaluations_block_for_positive_term::generate_next_evaluation() -
 
     while(evaluation_block_.generate_next_evaluation_over_A())
     {
-        if(term_.evaluate(evaluation_block_).is_constant_true())
+        if(term_.get().evaluate(evaluation_block_).is_constant_true())
         {
             return true;
         }
