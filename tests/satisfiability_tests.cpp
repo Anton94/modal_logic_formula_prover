@@ -401,6 +401,11 @@ TEST_CASE("not satisfiable with 10 variables", "[satisfiability]")
                    true, false);
 }
 
+TEST_CASE("satisfiable but resetting in slow_model functionality", "[satisfiability]")
+{
+    is_satisfiable("~<=m(a * b, 0) & ~<=(a,b)", true, true, true);
+}
+
 TEST_CASE("<=m to check the formula's evaluate correctnes when right child is with <=m 1", "[satisfiability]")
 {
     is_satisfiable("C(a,b) & ~C(a,b) | ~<=m(b,c + a)", true, true, true);
@@ -434,4 +439,19 @@ TEST_CASE("not satisfiable system 1", "[satisfiability]")
 TEST_CASE("not satisfiable system 2", "[satisfiability]")
 {
     is_satisfiable("C(a,b) & <=(b,c) & C(a,c) | <=m(a,b) & ~<=m(b,c + a)", true, true, true);
+}
+
+TEST_CASE("slow_model additional points 1", "[satisfiability]")
+{
+    is_satisfiable("~<=m(a,0)", true, true, true);
+}
+
+TEST_CASE("slow_model additional points 2", "[satisfiability]")
+{
+    is_satisfiable("~<=m(a,b)", true, true, true);
+}
+
+TEST_CASE("slow_model additional points 3", "[satisfiability]")
+{
+    is_satisfiable("~<=m(a * b, 0) & ~<=m(a,b)", true, true, true);
 }
