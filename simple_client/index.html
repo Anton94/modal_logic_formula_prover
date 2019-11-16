@@ -4,6 +4,46 @@
 		<link rel="shortcut icon" type="image/png" href="./img/home-icon.png"/>
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 		<script src="https://d3js.org/d3.v4.js"></script>
+	    <style>
+		    body {
+		      font-family: "Lato", sans-serif;
+		    }
+
+		    .sidenav {
+		      height: 100%;
+		      width: 200px;
+		      position: fixed;
+		      z-index: 1;
+		      top: 0;
+		      left: 0;
+		      background-color: #d6d6f5;
+		      overflow-x: hidden;
+		      padding-top: 20px;
+		    }
+
+		    .sidenav a {
+		      padding: 6px 8px 6px 16px;
+		      text-decoration: none;
+		      font-size: 25px;
+		      color: #818181;
+		      display: block;
+		    }
+
+		    .sidenav a:hover {
+		      color: #f1f1f1;
+		    }
+
+		    .main {
+		      margin-left: 200px; /* Same as the width of the sidenav */
+		      /* font-size: 28px;  Increased text to enable scrolling */
+		      padding: 0px 10px;
+		    }
+
+		    @media screen and (max-height: 450px) {
+		      .sidenav {padding-top: 15px;}
+		      .sidenav a {font-size: 18px;}
+		    }
+	    </style>
 
 		<script>
 			var IP_ADDRESS = "http://localhost:34567/";
@@ -304,87 +344,98 @@
 		</style>
 	</head>
 	<body>
-		<div id="formula_input" style="margin: 20px;">
-			Formula:<br>
-			<input id="formula" style="width: 100%; height: 20px;"/>
-		</div>
 
-		<div id="legend" style="float: right">
-			<h2 style="margin-left: 20px;">Legend</h2>
-			<code>F&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/bot.png" alt="Bottom"> - </code><label>False</label><br>
-			<code>T&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/top.png" alt="Top"> - </code><label>True</label><br>
-			<code>-&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Unary Complement</label><br>
-			<code>*&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Boolean Intersection</label><br>
-			<code>+&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Boolean Union</label><br>
-			<code>C&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Contact, syntax:</label><code>&nbsp;C(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
-			<code>&lt;=&nbsp;&nbsp;-&nbsp;≤ - </code><label>Part Of</label><br>
-			<code>&amp;&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/and.png" alt="And"> - </code><label>Conjunction</label><br>
-			<code>|&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/or.png" alt="Or"> - </code><label>Disjunction</label><br>
-			<code>~&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/not.png" alt="Not"> - </code><label>Negation</label><br>
-			<code>-&gt;&nbsp;&nbsp;-&nbsp;</code><label>Implication</label><br>
-			<code>&lt;-&gt;&nbsp;-&nbsp;</code><label>Equivalence</label><br>
-		</div>
 
-		<div id="formula_filters" style="margin: 20px;">
-			Formula Filters:<br>
-			<input type="checkbox" id="convert_contact_less_eq_with_same_terms" checked> Convert Contacts in <=<br>
-			<input type="checkbox" id="convert_disjunction_in_contact_less_eq" checked> Split Disjunctions in Atomic Formulas<br>
-			<input type="checkbox" id="reduce_constants" checked> Reduce Contacts<br>
-			<input type="checkbox" id="reduce_contacts_less_eq_with_constants" checked> Reduce Atomic Formulas with Contacts<br>
-			<input type="checkbox" id="remove_double_negation" checked> Remove Double Negations<br>
-		</div>
+	    <div class="sidenav">
+	      <a href="./home.html">Home</a>
+	      <a href="./index.html">App</a>
+	      <a href="./samples.html">Samples</a>
+	      <a href="./docs.html">Documentation</a>
+	    </div>
 
-		<div id="algorith_buttons" style="margin: 20px;">
-			Run algorithm:<br><br>
-			<button onclick="create_task('SLOW_MODEL')" class="computing_element">SLOW MODEL</button>
-			<button onclick="create_task('FAST_MODEL')" class="computing_element">FAST MODEL</button>
-			<button onclick="create_task('CONNECTIVITY')" class="computing_element">CONNECTIVITY</button>
-			<!-- Add killswitch which is only for development so that this line does not be present -->
-			<button onclick="create_task('BRUTEFORCE_MODEL')" class="computing_element">BRUTEFORCE MODEL</button>
-		</div>
-		<div id="algorithm_cancelations" style="margin: 20px;">
-			If the calculation takes too long, try to cancel it and it might help to optimize the input formula<br>
-			<button onclick="cancel_task('valid_op_id')">CANCEL CALCULATION</button>
-		</div>
+	    <div class="main">
+			<div id="formula_input" style="margin: 20px;">
+				Formula:<br>
+				<input id="formula" style="width: 100%; height: 20px;"/>
+			</div>
 
-		<div id="is_satisfied">
-			<pre id="is_satisfied_output"></pre>
-		</div>
-		<h2 style="margin-left: 20px;">Output</h2>
-		<div style="width: 50%; float: left">
-			<button class="accordion">Result</button>
-			<div class="panel">
-				<div id="qqq">
-					<pre id="formula_output"></pre>
+			<div id="legend" style="float: right">
+				<h2 style="margin-left: 20px;">Legend</h2>
+				<code>F&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/bot.png" alt="Bottom"> - </code><label>False</label><br>
+				<code>T&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/top.png" alt="Top"> - </code><label>True</label><br>
+				<code>-&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Unary Complement</label><br>
+				<code>*&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Boolean Intersection</label><br>
+				<code>+&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Boolean Union</label><br>
+				<code>C&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Contact, syntax:</label><code>&nbsp;C(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
+				<code>&lt;=&nbsp;&nbsp;-&nbsp;≤ - </code><label>Part Of</label><br>
+				<code>&amp;&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/and.png" alt="And"> - </code><label>Conjunction</label><br>
+				<code>|&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/or.png" alt="Or"> - </code><label>Disjunction</label><br>
+				<code>~&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/not.png" alt="Not"> - </code><label>Negation</label><br>
+				<code>-&gt;&nbsp;&nbsp;-&nbsp;</code><label>Implication</label><br>
+				<code>&lt;-&gt;&nbsp;-&nbsp;</code><label>Equivalence</label><br>
+			</div>
+
+			<div id="formula_filters" style="margin: 20px;">
+				Formula Filters:<br>
+				<input type="checkbox" id="convert_contact_less_eq_with_same_terms" checked> Convert Contacts in <=<br>
+				<input type="checkbox" id="convert_disjunction_in_contact_less_eq" checked> Split Disjunctions in Atomic Formulas<br>
+				<input type="checkbox" id="reduce_constants" checked> Reduce Contacts<br>
+				<input type="checkbox" id="reduce_contacts_less_eq_with_constants" checked> Reduce Atomic Formulas with Contacts<br>
+				<input type="checkbox" id="remove_double_negation" checked> Remove Double Negations<br>
+			</div>
+
+			<div id="algorith_buttons" style="margin: 20px;">
+				Run algorithm:<br><br>
+				<button onclick="create_task('SLOW_MODEL')" class="computing_element">SLOW MODEL</button>
+				<button onclick="create_task('FAST_MODEL')" class="computing_element">FAST MODEL</button>
+				<button onclick="create_task('CONNECTIVITY')" class="computing_element">CONNECTIVITY</button>
+				<!-- Add killswitch which is only for development so that this line does not be present -->
+				<button onclick="create_task('BRUTEFORCE_MODEL')" class="computing_element">BRUTEFORCE MODEL</button>
+			</div>
+			<div id="algorithm_cancelations" style="margin: 20px;">
+				If the calculation takes too long, try to cancel it and it might help to optimize the input formula<br>
+				<button onclick="cancel_task('valid_op_id')">CANCEL CALCULATION</button>
+			</div>
+
+			<div id="is_satisfied">
+				<pre id="is_satisfied_output"></pre>
+			</div>
+			<h2 style="margin-left: 20px;">Output</h2>
+			<div style="width: 50%; float: left">
+				<button class="accordion">Result</button>
+				<div class="panel">
+					<div id="qqq">
+						<pre id="formula_output"></pre>
+					</div>
 				</div>
-			</div>
 
-			<button class="accordion">Verbose Output / Console</button>
-			<div class="panel">
-			  <pre id="verbose_output"></pre>
-			</div>
+				<button class="accordion">Verbose Output / Console</button>
+				<div class="panel">
+				  <pre id="verbose_output"></pre>
+				</div>
 
-			<button class="accordion" style="margin-bottom: 20px;">Visualized Model</button>
-			<div class="panel">
-			 	<div id="visualization-graph">
-			 	</div>
+				<button class="accordion" style="margin-bottom: 20px;">Visualized Model</button>
+				<div class="panel">
+				 	<div id="visualization-graph">
+				 	</div>
+				</div>
 			</div>
 		</div>
 		<script>
-		var acc = document.getElementsByClassName("accordion");
-		var i;
+			var acc = document.getElementsByClassName("accordion");
+			var i;
 
-		for (i = 0; i < acc.length; i++) {
-		  acc[i].addEventListener("click", function() {
-		    this.classList.toggle("active");
-		    var panel = this.nextElementSibling;
-		    if (panel.style.display === "block") {
-		      panel.style.display = "none";
-		    } else {
-		      panel.style.display = "block";
-		    }
-		  });
-		}
+			for (i = 0; i < acc.length; i++) {
+			  acc[i].addEventListener("click", function() {
+			    this.classList.toggle("active");
+			    var panel = this.nextElementSibling;
+			    if (panel.style.display === "block") {
+			      panel.style.display = "none";
+			    } else {
+			      panel.style.display = "block";
+			    }
+			  });
+			}
 		</script>
 	</body>
 </html>
