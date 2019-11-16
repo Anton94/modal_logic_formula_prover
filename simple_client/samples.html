@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="shortcut icon" type="image/png" href="./img/home-icon.png"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
     body {
@@ -51,7 +52,11 @@
     <script>
       const sample_formulas = [
         "C(a, b) & C(c, b)",
-        "C(a,b) & <=(a,c) & ~C(b,c)"
+        "C(a,b) & <=(a,c) & ~C(b,c)",
+        "T & F",
+        "C(a,b) & C(b, c) & ~C(a, c)",
+        "C(a,b) & <=(a,c) | C(a, c) & <=(c, a)",
+        "C(a,b) & C(b, c) => C(a, c)"
       ];
 
       function initialize_samples() {
