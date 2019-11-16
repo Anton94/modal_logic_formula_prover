@@ -342,8 +342,18 @@
 			  margin-right: 20px;
 			}
 		</style>
+		<script>
+			function pre_init() {
+				var loc = window.location.href;
+				var url = new URL(loc);
+				preset_formula = url.searchParams.get("formula");
+				if (preset_formula) {
+					document.getElementById("formula").value = preset_formula;
+				}
+			}
+		</script>
 	</head>
-	<body>
+	<body onload="pre_init();">
 
 
 	    <div class="sidenav">

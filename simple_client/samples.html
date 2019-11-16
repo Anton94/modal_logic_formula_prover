@@ -41,9 +41,46 @@
       .sidenav {padding-top: 15px;}
       .sidenav a {font-size: 18px;}
     }
+
+    .sample_link {
+      font-size: 15px;
+      text-decoration: none;
+      color: black;
+    }
     </style>
+    <script>
+      const sample_formulas = [
+        "C(a, b) & C(c, b)",
+        "C(a,b) & <=(a,c) & ~C(b,c)"
+      ];
+
+      function initialize_samples() {
+        // create code tags
+        sample_tags = sample_formulas.map(f => {
+          code = document.createElement("CODE");
+          
+          var attr = document.createAttribute("href", )
+          attr.value = "./index.html?formula=" + encodeURIComponent(f);
+
+          var text = document.createTextNode(f);
+
+          a_tag = document.createElement("A");
+          a_tag.setAttributeNode(attr);
+          a_tag.appendChild(text);
+          code.appendChild(a_tag);
+          return code;
+        });
+        
+        sample_tags.forEach(code => {
+          document.getElementById("samples").appendChild(code);
+          document.getElementById("samples").appendChild(document.createElement("HR"));
+        });
+      }
+
+      
+    </script>
   </head>
-  <body>
+  <body onload="initialize_samples();">
 
     <div class="sidenav">
       <a href="./home.html">Home</a>
@@ -54,7 +91,8 @@
 
     <div class="main">
       <h2>Samples</h2>
-      <p>Application used to calculate satisfiability of a modal logic.</p>
+      <div id="samples" style="font-size:18px;">
+      </div>
     </div>
        
   </body>
