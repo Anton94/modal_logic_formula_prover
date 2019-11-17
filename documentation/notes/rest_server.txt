@@ -1,0 +1,28 @@
+Rest Server
+
+The Web server is used to server:
+	- Rest APIs 
+	- Resources
+
+The Rest APIs are used to check fo satisfiability, connectivity models.
+The Resources contains html pages, images and Javascript code.
+
+The Web Interface is easy to use, contains only the needed information and from there 
+can be executed all of the described satisfiability algorithms.
+
+One client can execute only one algorithmic program at a time. 
+This way it is ensured that there are not a lot of simultaneous executing programs by the server.
+
+If the program execution time gets too long the client has the possibility to terminate the execution 
+of the current program by server. This will re-enable the client to execute another program and will remove 
+the execution load from the server.
+
+The output of the program is separated in three modules:
+	Resulting output - indicates what was the final result of the execution.
+		For example: The formula is satisfiable.
+
+	Verbose output - This is the output which contains the full proof of the formula execution.
+		This output is printed though the whole execution.
+
+	Visualized graph - This is the end result of the model, if such model exists
+		The visualization is done with a JavaScript third party library for drawing graphs.
