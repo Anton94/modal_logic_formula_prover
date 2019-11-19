@@ -1,0 +1,224 @@
+We are using Flex and Bison to generate a parser with our modal logic grammar.
+We can think of Flex as the tokenizer and Bison as the parser.
+
+We have two types of building elements in the modal logic formula - formulas and terms.
+We have 6 types of atomic formulas:
+    - T
+    - F
+    - C(t1, t2)
+    - <=(t1, t2)
+    - <=m(t1, t2)
+    - (t1)=0
+where t1, t2 are terms.
+Formula's operations are the standard one: & | ~ -> <-> and brackets
+We have 3 types of atomic terms:
+    - 0
+    - 1
+    - variable - string
+Term's operations are:
+    - '*' intersection
+    - '+' union
+    - '~' complement
+    - brackets
+
+The tokenizer's grammar is pretty simple:
+    [ \t\n]            ; // Returns nothing, ignore all whitespace
+    [,TF01()C&|~*+-]   {return yytext[0];} // all single charecter tokens will be passed as their ASCIIs for an easier use in bison (in my opinion, better readability)
+    "<="               {return T_LESS_EQ;} // Returns a special literal which maps the '<=' sequence
+    "<=m"              {return T_MEASURED_LESS_EQ;}
+    "=0"               {return T_EQ_ZERO;}
+    "= 0"              {return T_EQ_ZERO;}
+    "->"               {return T_FORMULA_OP_IMPLICATION;}
+    "<->"              {return T_FORMULA_OP_EQUALITY;}
+    [a-zA-Z0-9]+       {yylval->T_STRING = custom_strdup(yytext, yyleng); return T_STRING;} // Returns T_STRING literal and the string value is written to yylval which can be later accessed from the parser
+    .                  {return yytext[0];} // bison will trigger an error if it's unrecognized symbol
+
+For the parser, firslty define the literals for the multi character tokens
+%token <const char*> T_STRING   "string"     // "XXX" is a syntax suggar to not write the ugly T_STRING in the grammar
+%token T_LESS_EQ                "<="
+%token T_MEASURED_LESS_EQ       "<=m"
+%token T_EQ_ZERO                "=0"
+%token T_FORMULA_OP_IMPLICATION "->"
+%token T_FORMULA_OP_EQUALITY    "<->"
+
+Then, define priority and associativity of the operation tokens. The priority is from low to hight (w.r.t. the order (by line) in which they are defined)
+%left T_FORMULA_OP_IMPLICATION T_FORMULA_OP_EQUALITY
+%left '|' '+'
+%left '&' '*'
+%right '~' '-'
+%nonassoc '(' ')'
+
+While parsing the formula we are building it's Abstract Syntax Tree(AST) which later will be used to make modifications on the formula, e.g. converting X -> Y to ~X | Y
+
+The grammar:
+
+NB: create_formula_node and create_term_node and helper function which constructs AST nodes
+
+modal_logic_formula               // The start non-terminal
+    : formula {                   // Trying to match 'formula' non-terminal, which is defined bellow
+        parsed_formula.reset($1); // $1 gives the matched formula and we write it in a 'global' variable parsed_formula
+    }
+  ;
+formula                                            // 'formula' non-terminal
+    : 'T' {                                        // trying to match token 'T'
+        $$ = create_formula_node(constant_true);   // think of $$ as return value to the 'parent' who can use the matched subsequence
+    }
+    | 'F' {                                        // OR tries to match token 'F'
+        $$ = create_formula_node(constant_false);
+    }
+    | 'C' '(' term ',' term ')' {                  // Try to march 'C(' followed by a term sequence, followed by ',', followed by another term sequence and lastly ')'
+        $$ = create_formula_node(contact, $3, $5); // $3 and $5 gives the 'values' for the two matched terms (3 and 5 are their positions) and construct a contact node with them
+    }
+    | "<=" '(' term ',' term ')' {
+        $$ = create_formula_node(less_eq, $3, $5);
+    }
+    | "<=m" '(' term ',' term ')' {
+        $$ = create_formula_node(measured_less_eq, $3, $5);
+    }
+    | term "=0" {
+        $$ = create_formula_node(eq_zero, $1);
+    }
+    | '(' formula '&' formula ')' {
+        $$ = create_formula_node(conjunction, $2, $4);
+    }
+    | formula '&' formula {
+        $$ = create_formula_node(conjunction, $1, $3);
+    }
+    | '(' formula '|' formula ')' {
+        $$ = create_formula_node(disjunction, $2, $4);
+    }
+    | formula '|' formula {
+        $$ = create_formula_node(disjunction, $1, $3);
+    }
+    | '~' formula {
+        $$ = create_formula_node(negation, $2);
+    }
+    | '(' formula "->" formula ')' {
+        $$ = create_formula_node(implication, $2, $4);
+    }
+    | formula "->" formula {
+        $$ = create_formula_node(implication, $1, $3);
+    }
+    | '(' formula "<->" formula ')' {
+        $$ = create_formula_node(equality, $2, $4);
+    }
+    | formula "<->" formula {
+        $$ = create_formula_node(equality, $1, $3);
+    }
+    | '(' formula ')' {
+        $$ = $2;
+    }
+  ;
+term
+    : '1' {
+        $$ = create_term_node(constant_true);
+    }
+    | '0' {
+        $$ = create_term_node(constant_false);
+    }
+    | "string" {
+        $$ = create_term_node(variable);
+        $$->variable = $1;
+        free((void*)$1); // the string is allocated from the tokenizer and we need to free it
+    }
+    | '(' term '*' term ')' {
+        $$ = create_term_node(intersection, $2, $4);
+    }
+    | term '*' term {
+        $$ = create_term_node(intersection, $1, $3);
+    }
+    | '(' term '+' term ')' {
+        $$ = create_term_node(union_, $2, $4);
+    }
+    | term '+' term {
+        $$ = create_term_node(union_, $1, $3);
+    }
+    | '-' term {
+        $$ = create_term_node(complement, $2);
+    }
+    | '(' term ')' {
+        $$ = $2;
+    }
+  ;
+
+We are using the visitor pattern to modify the formula(it's AST tree).
+The visitor pattern uses double virtual dispatching.
+
+
+The AST tree has the following structure:
+
+Node types:
+enum class formula_operation_t
+{
+    constant_true,
+    constant_false,
+    conjunction,
+    disjunction,
+    negation,
+    implication,
+    equality,
+    contact,
+    less_eq,
+    measured_less_eq,
+    eq_zero
+};
+
+enum class term_operation_t
+{
+    constant_true,
+    constant_false,
+    union_, // union is a keyword
+    intersection,
+    complement,
+    variable
+};
+
+class Node
+{
+public:
+    virtual void accept(Visitor& v) = 0;
+};
+
+class NFormula : public Node
+{
+public:
+    NFormula(formula_operation_t op, Node* left = nullptr, Node* right = nullptr);
+
+    void accept(Visitor& v) override { v.visit(*this); }
+
+    formula_operation_t op;
+    Node* left;
+    Node* right;
+};
+
+class NTerm : public Node
+{
+public:
+    NTerm(term_operation_t op, NTerm* left = nullptr, NTerm* right = nullptr);
+
+    void accept(Visitor& v) override { v.visit(*this); }
+
+    term_operation_t op;
+    NTerm* left;
+    NTerm* right;
+    std::string variable;
+};
+
+The visitor has the following structure:
+
+class Visitor
+{
+public:
+    virtual void visit(NFormula& f) = 0;
+    virtual void visit(NTerm& t) = 0;
+};
+
+class VPrinter : public Visitor
+{
+public:
+    void visit(NFormula& f) override { // Here it prints the formula node information }
+    void visit(NTerm& t) override { // Here it prints the term node information }
+};
+
+The visitor pattern gives us the ability to add new visitors in a very simple manner.
+The new visitor should override the two visit methods and do whatever it wants with the ast nodes.
