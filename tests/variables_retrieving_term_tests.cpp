@@ -59,7 +59,7 @@ TEST_CASE("complex term's variables", "[variables_check_term]")
     check_term_varibles_mask(*t_r, formula_mgr, { "e", "f", "g" });
 
     // (-a + b) * (c + -d)
-    CHECK(t_l->get_operation_type() == term::operation_t::intersaction);
+    CHECK(t_l->get_operation_type() == term::operation_t::intersection);
     auto t_l_l = t_l->get_left_child(); // -a + b
     auto t_l_r = t_l->get_right_child(); // c + -d
     check_term_varibles_mask(*t_l_l, formula_mgr, { "a", "b"});
@@ -97,7 +97,7 @@ TEST_CASE("complex term's variables", "[variables_check_term]")
     auto t_r_l = t_r->get_left_child(); // e * (f + g)
     check_term_varibles_mask(*t_r_l, formula_mgr, { "e", "f", "g" });
 
-    CHECK(t_r_l->get_operation_type() == term::operation_t::intersaction);
+    CHECK(t_r_l->get_operation_type() == term::operation_t::intersection);
     auto t_r_l_l = t_r_l->get_left_child(); // e
     auto t_r_l_r = t_r_l->get_right_child(); // f + g
     CHECK(t_r_l_l->get_operation_type() == term::operation_t::variable);

@@ -86,8 +86,8 @@ auto term::build(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> 
         case term_operation_t::union_:
             is_constructed = construct_binary_operation(t, operation_t::union_, variable_to_id);
             break;
-        case term_operation_t::intersaction:
-            is_constructed = construct_binary_operation(t, operation_t::intersaction, variable_to_id);
+        case term_operation_t::intersection:
+            is_constructed = construct_binary_operation(t, operation_t::intersection, variable_to_id);
             break;
         case term_operation_t::complement:
             is_constructed = construct_complement_operation(t, variable_to_id);
@@ -124,7 +124,7 @@ auto term::evaluate(const variable_id_to_points_t& variable_evaluations, const s
             assert(childs_.left && childs_.right);
             return childs_.left->evaluate(variable_evaluations, elements_count) |
                    childs_.right->evaluate(variable_evaluations, elements_count);
-        case operation_t::intersaction:
+        case operation_t::intersection:
             assert(childs_.left && childs_.right);
             return childs_.left->evaluate(variable_evaluations, elements_count) &
                    childs_.right->evaluate(variable_evaluations, elements_count);
@@ -187,7 +187,7 @@ auto term::evaluate(const variables_evaluations_block& evaluation_block, bool sk
                 create_internal_node(op_, skip_subterm_creation, res_left.release(), res_right.release());
             return {res_type::term, t};
         }
-        case operation_t::intersaction:
+        case operation_t::intersection:
         {
             auto res_left = childs_.left->evaluate(evaluation_block, skip_subterm_creation);
             if(res_left.is_constant_false())
@@ -310,7 +310,7 @@ auto term::get_right_child() const -> const term*
 
 auto term::is_binary_operaton() const -> bool
 {
-    return op_ == operation_t::union_ || op_ == operation_t::intersaction;
+    return op_ == operation_t::union_ || op_ == operation_t::intersection;
 }
 
 auto term::is_constant() const -> bool
@@ -326,7 +326,7 @@ void term::change_formula_mgr(formula_mgr* new_mgr)
     switch(get_operation_type())
     {
         case operation_t::union_:
-        case operation_t::intersaction:
+        case operation_t::intersection:
             childs_.left->change_formula_mgr(new_mgr);
             childs_.right->change_formula_mgr(new_mgr);
             break;
@@ -351,7 +351,7 @@ std::ostream& operator<<(std::ostream& out, const term& t)
         case term::operation_t::union_:
             out << "(" << *t.get_left_child() << " + " << *t.get_right_child() << ")";
             break;
-        case term::operation_t::intersaction:
+        case term::operation_t::intersection:
             out << "(" << *t.get_left_child() << " * " << *t.get_right_child() << ")";
             break;
         case term::operation_t::complement:
@@ -459,7 +459,7 @@ void term::construct_hash()
         case operation_t::constant_false:
             break;
         case operation_t::union_:
-        case operation_t::intersaction:
+        case operation_t::intersection:
             hash_ = ((childs_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
                     ((childs_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
             break;
@@ -487,7 +487,7 @@ void term::construct_variables()
             variables_.resize(formula_mgr_->get_variables().size());
             break;
         case operation_t::union_:
-        case operation_t::intersaction:
+        case operation_t::intersection:
             variables_ = childs_.left->variables_ | childs_.right->variables_;
             break;
         case operation_t::complement:
@@ -509,7 +509,7 @@ void term::construct_variables()
 auto term::create_internal_node(operation_t op, bool skip_subterm_creation, term* left, term* right) const
     -> term*
 {
-    assert(op == operation_t::complement || op == operation_t::union_ || op == operation_t::intersaction);
+    assert(op == operation_t::complement || op == operation_t::union_ || op == operation_t::intersection);
 
     if(skip_subterm_creation)
     {

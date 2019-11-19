@@ -70,7 +70,7 @@ public:
         constant_false,
 
         union_,
-        intersaction,
+        intersection,
         complement,
         variable,
 

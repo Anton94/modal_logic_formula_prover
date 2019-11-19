@@ -113,10 +113,10 @@ term
         free((void*)$1);
     }
     | '(' term '*' term ')' {
-        $$ = create_term_node(term_operation_t::intersaction, $2, $4);
+        $$ = create_term_node(term_operation_t::intersection, $2, $4);
     }
     | term '*' term {
-        $$ = create_term_node(term_operation_t::intersaction, $1, $3);
+        $$ = create_term_node(term_operation_t::intersection, $1, $3);
     }
     | '(' term '+' term ')' {
         $$ = create_term_node(term_operation_t::union_, $2, $4);

@@ -52,7 +52,7 @@ TEST_CASE("atomic contact with complex terms", "[AST_structure]")
     CHECK(left->right->left->variable == "x");
 
     auto right = static_cast<NTerm*>(ast->right);
-    CHECK(right->op == term_operation_t::intersaction);
+    CHECK(right->op == term_operation_t::intersection);
     CHECK(right->left->op == term_operation_t::complement);
     CHECK(right->left->left->op == term_operation_t::variable);
     CHECK(right->left->left->variable == "y");
@@ -88,7 +88,7 @@ TEST_CASE("atomic less eq with complex terms", "[AST_structure]")
     CHECK(left->right->left->variable == "x42");
 
     auto right = static_cast<NTerm*>(ast->right);
-    CHECK(right->op == term_operation_t::intersaction); // m * (-mx + -42x)
+    CHECK(right->op == term_operation_t::intersection); // m * (-mx + -42x)
     CHECK(right->left->op == term_operation_t::variable);
     CHECK(right->left->variable == "m");
     CHECK(right->right->op == term_operation_t::union_); // (-mx + -42x)
@@ -127,7 +127,7 @@ TEST_CASE("atomic measured less eq with complex terms", "[AST_structure]")
     CHECK(left->right->left->variable == "x42");
 
     auto right = static_cast<NTerm*>(ast->right);
-    CHECK(right->op == term_operation_t::intersaction); // m * (-mx + -42x)
+    CHECK(right->op == term_operation_t::intersection); // m * (-mx + -42x)
     CHECK(right->left->op == term_operation_t::variable);
     CHECK(right->left->variable == "m");
     CHECK(right->right->op == term_operation_t::union_); // (-mx + -42x)
@@ -155,7 +155,7 @@ TEST_CASE("atomic eq zero with complex term", "[AST_structure]")
     CHECK(ast.get() != nullptr);
     CHECK(ast->op == formula_operation_t::eq_zero);
     auto left = static_cast<NTerm*>(ast->left);
-    CHECK(left->op == term_operation_t::intersaction);
+    CHECK(left->op == term_operation_t::intersection);
     CHECK(left->left->op == term_operation_t::union_);
     CHECK(left->left->left->op == term_operation_t::variable);
     CHECK(left->left->left->variable == "ax");
@@ -193,7 +193,7 @@ TEST_CASE("atomic formula with term constant 3", "[AST_structure]")
     CHECK(left->op == term_operation_t::variable);
     CHECK(left->variable == "a");
     auto right = static_cast<NTerm*>(ast->right);
-    CHECK(right->op == term_operation_t::intersaction); // (0 + -1) * a
+    CHECK(right->op == term_operation_t::intersection); // (0 + -1) * a
     CHECK(right->left->op == term_operation_t::union_); // (0 + -1)
     CHECK(right->left->left->op == term_operation_t::constant_false);
     CHECK(right->left->right->op == term_operation_t::complement);
@@ -213,7 +213,7 @@ TEST_CASE("complex formulas", "[AST_structure]")
     CHECK(left_left->op == term_operation_t::variable);
     CHECK(left_left->variable == "a");
     auto left_right = static_cast<NTerm*>(left->right);
-    CHECK(left_right->op == term_operation_t::intersaction); // (0 + -1) * a
+    CHECK(left_right->op == term_operation_t::intersection); // (0 + -1) * a
     CHECK(left_right->left->op == term_operation_t::union_); // (0 + -1)
     CHECK(left_right->left->left->op == term_operation_t::constant_false);
     CHECK(left_right->left->right->op == term_operation_t::complement);
@@ -224,7 +224,7 @@ TEST_CASE("complex formulas", "[AST_structure]")
     auto right = static_cast<NFormula*>(ast->right); // (ax + bx) * -cz = 0
     CHECK(right->op == formula_operation_t::eq_zero);
     auto right_left = static_cast<NTerm*>(right->left);
-    CHECK(right_left->op == term_operation_t::intersaction);
+    CHECK(right_left->op == term_operation_t::intersection);
     CHECK(right_left->left->op == term_operation_t::union_);
     CHECK(right_left->left->left->op == term_operation_t::variable);
     CHECK(right_left->left->left->variable == "ax");

@@ -178,7 +178,7 @@ auto NTerm::operator==(const NTerm& rhs) const -> bool
         case term_operation_t::variable:
             return op == rhs.op && variable == rhs.variable;
         case term_operation_t::union_:
-        case term_operation_t::intersaction:
+        case term_operation_t::intersection:
             return op == rhs.op && *left == *rhs.left && *right == *rhs.right;
         case term_operation_t::complement:
             return op == rhs.op && *left == *rhs.left;
@@ -212,7 +212,7 @@ auto NTerm::deep_copy() const -> NTerm*
             return copy;
         }
         case term_operation_t::union_:
-        case term_operation_t::intersaction:
+        case term_operation_t::intersection:
             return new NTerm(op, left->deep_copy(), right->deep_copy());
         case term_operation_t::complement:
             return new NTerm(op, left->deep_copy());

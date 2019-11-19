@@ -28,7 +28,7 @@ enum class term_operation_t
     constant_false,
 
     union_, // union is a keyword
-    intersaction,
+    intersection,
     complement,
     variable,
 

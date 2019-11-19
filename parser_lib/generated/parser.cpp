@@ -1558,7 +1558,7 @@ yyreduce:
   case 22:
 #line 115 "parser.y" /* yacc.c:1646  */
     {
-        (*(NTerm**)(&yyval)) = create_term_node(term_operation_t::intersaction, (*(NTerm**)(&yyvsp[-3])), (*(NTerm**)(&yyvsp[-1])));
+        (*(NTerm**)(&yyval)) = create_term_node(term_operation_t::intersection, (*(NTerm**)(&yyvsp[-3])), (*(NTerm**)(&yyvsp[-1])));
     }
 #line 1564 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;
@@ -1566,7 +1566,7 @@ yyreduce:
   case 23:
 #line 118 "parser.y" /* yacc.c:1646  */
     {
-        (*(NTerm**)(&yyval)) = create_term_node(term_operation_t::intersaction, (*(NTerm**)(&yyvsp[-2])), (*(NTerm**)(&yyvsp[0])));
+        (*(NTerm**)(&yyval)) = create_term_node(term_operation_t::intersection, (*(NTerm**)(&yyvsp[-2])), (*(NTerm**)(&yyvsp[0])));
     }
 #line 1572 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp" /* yacc.c:1646  */
     break;

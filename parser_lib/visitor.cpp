@@ -130,7 +130,7 @@ void VPrinter::visit(NTerm& t)
             out_ << ")";
             break;
         }
-        case term_operation_t::intersaction:
+        case term_operation_t::intersection:
         {
             assert(t.left && t.right);
             out_ << "(";
@@ -497,7 +497,7 @@ void VReduceConstants::visit(NTerm& t)
 
             break;
         }
-        case term_operation_t::intersaction:
+        case term_operation_t::intersection:
         {
             assert(t.left && t.right);
             t.left->accept(*this);
@@ -682,7 +682,7 @@ void VReduceDoubleNegation::visit(NTerm& t)
         case term_operation_t::variable:
             break;
         case term_operation_t::union_:
-        case term_operation_t::intersaction:
+        case term_operation_t::intersection:
         {
             assert(t.left && t.right);
             t.left->accept(*this);
@@ -793,7 +793,7 @@ void VConvertLessEqToEqZero::visit(NFormula& f)
             assert(f.left && f.right);
             //<=(l,r) -> (l * -r) = 0
             auto neg_r = new NTerm(term_operation_t::complement, static_cast<NTerm*>(f.right));
-            auto intersection = new NTerm(term_operation_t::intersaction, static_cast<NTerm*>(f.left), neg_r);
+            auto intersection = new NTerm(term_operation_t::intersection, static_cast<NTerm*>(f.left), neg_r);
 
             f.op = formula_operation_t::eq_zero;
             f.left = intersection;
@@ -970,7 +970,7 @@ void VVariablesGetter::visit(NTerm& t)
             variables.insert(t.variable);
             break;
         case term_operation_t::union_:
-        case term_operation_t::intersaction:
+        case term_operation_t::intersection:
         {
             assert(t.left && t.right);
             t.left->accept(*this);
