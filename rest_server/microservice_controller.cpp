@@ -230,7 +230,7 @@ void microservice_controller::handle_task(http_request message)
 
                         bool is_parsed = mgr.build(formula, formula_refs);
                         imodel* the_model;
-                        if(algorithm_type == "SLOW_MODEL")
+                        if(algorithm_type == "MEASURED_MODEL")
                         {
                             the_model = new measured_model();
                         }
