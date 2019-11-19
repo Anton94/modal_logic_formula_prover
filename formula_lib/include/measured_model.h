@@ -10,7 +10,7 @@
 class formula_mgr;
 class formula;
 
-struct slow_model : public imodel
+struct measured_model : public imodel
 {
     /*
      * The main difference between this model and 'model.h' is that this one generates new points and checks some conditions
@@ -41,7 +41,7 @@ struct slow_model : public imodel
         a != 0 & a != 1 -> C(a,a*)
         in our case, we evaluate each point's term (i.e., v(a)) and if it's not the whole set of points, we will create a contact relation with an element from v(a*)
     */
-    slow_model();
+    measured_model();
 
     struct point_info
     {
@@ -62,7 +62,7 @@ struct slow_model : public imodel
 
     void clear() override;
 
-    ~slow_model() override;
+    ~measured_model() override;
 
 private:
     auto construct_contact_model_points(const formulas_t& contacts) -> bool;
@@ -92,7 +92,7 @@ private:
     auto print_system_sum_variables(std::ostream& out, const model_points_set_t& variables) const -> std::ostream&;
     auto print_system(std::ostream& out) const -> std::ostream&;
 
-    friend std::ostream& operator<<(std::ostream& out, const slow_model& m);
+    friend std::ostream& operator<<(std::ostream& out, const measured_model& m);
 
     variables_mask_t used_variables_{};
     size_t number_of_contacts_{};

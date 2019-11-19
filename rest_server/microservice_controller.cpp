@@ -232,7 +232,7 @@ void microservice_controller::handle_task(http_request message)
                         imodel* the_model;
                         if(algorithm_type == "SLOW_MODEL")
                         {
-                            the_model = new slow_model();
+                            the_model = new measured_model();
                         }
                         else if(algorithm_type == "FAST_MODEL")
                         {

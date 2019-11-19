@@ -1,4 +1,4 @@
-#include "slow_model.h"
+#include "measured_model.h"
 #include "formula.h"
 #include "formula_mgr.h"
 #include "term.h"
@@ -6,14 +6,14 @@
 
 #include <cassert>
 
-slow_model::slow_model()
+measured_model::measured_model()
     : system_(0)
 {
 }
 
-slow_model::~slow_model() = default;
+measured_model::~measured_model() = default;
 
-auto slow_model::create(const formulas_t& contacts_T, const formulas_t& contacts_F, const terms_t& zero_terms_T,
+auto measured_model::create(const formulas_t& contacts_T, const formulas_t& contacts_F, const terms_t& zero_terms_T,
             const terms_t& zero_terms_F, const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F, const variables_mask_t& used_variables, const formula_mgr* mgr)
     -> bool
 {
@@ -62,7 +62,7 @@ auto slow_model::create(const formulas_t& contacts_T, const formulas_t& contacts
     return true;
 }
 
-auto slow_model::generate_next() -> bool
+auto measured_model::generate_next() -> bool
 {
     // TODO: maybe cache the valid evaluations per term
     // simulation of +1 operation from left to right but not just 0/1 bits but all combinations per element
@@ -82,7 +82,7 @@ auto slow_model::generate_next() -> bool
     return false;
 }
 
-auto slow_model::is_contact_F_rule_satisfied(const formulas_t& contacts_F) const -> bool
+auto measured_model::is_contact_F_rule_satisfied(const formulas_t& contacts_F) const -> bool
 {
     for (const auto& c : contacts_F)
     {
@@ -94,7 +94,7 @@ auto slow_model::is_contact_F_rule_satisfied(const formulas_t& contacts_F) const
     return true;
 }
 
-auto slow_model::is_zero_term_rule_satisfied(const terms_t& zero_terms_T) const -> bool
+auto measured_model::is_zero_term_rule_satisfied(const terms_t& zero_terms_T) const -> bool
 {
     // The zero term, i.e. the <=(a,b) operation which is translated to (a * -b = 0),
     // has the following semantic: <=(a,b) is satisfied iif v(a * -b) = empty_set which is a bitset of only zeros
@@ -109,7 +109,7 @@ auto slow_model::is_zero_term_rule_satisfied(const terms_t& zero_terms_T) const 
     return true;
 }
 
-auto slow_model::has_solvable_system_of_inequalities() -> bool
+auto measured_model::has_solvable_system_of_inequalities() -> bool
 {
     // For each <=m(a,b) calculate v(a) and v(b), then we will create
     // an inequality of the following type: SUM_I Xi <= SUM_J Xj, where I and J are set v(a) and v(b).
@@ -148,7 +148,7 @@ auto slow_model::has_solvable_system_of_inequalities() -> bool
     return true;
 }
 
-auto slow_model::is_in_contact(const term* a, const term* b) const -> bool
+auto measured_model::is_in_contact(const term* a, const term* b) const -> bool
 {
     const auto eval_a = a->evaluate(variable_evaluations_, points_.size());
     const auto eval_b = b->evaluate(variable_evaluations_, points_.size());
@@ -174,27 +174,27 @@ auto slow_model::is_in_contact(const term* a, const term* b) const -> bool
     return false;
 }
 
-auto slow_model::is_not_in_contact(const term* a, const term* b) const -> bool
+auto measured_model::is_not_in_contact(const term* a, const term* b) const -> bool
 {
     return !is_in_contact(a, b);
 }
 
-auto slow_model::is_empty_set(const term* a) const -> bool
+auto measured_model::is_empty_set(const term* a) const -> bool
 {
     return a->evaluate(variable_evaluations_, points_.size()).none();
 }
 
-auto slow_model::is_not_empty_set(const term* a) const -> bool
+auto measured_model::is_not_empty_set(const term* a) const -> bool
 {
     return !is_empty_set(a);
 }
 
-auto slow_model::get_model_points() const -> const points_t&
+auto measured_model::get_model_points() const -> const points_t&
 {
     return points_;
 }
 
-void slow_model::clear()
+void measured_model::clear()
 {
     used_variables_.clear();
     number_of_contacts_ = 0;
@@ -207,7 +207,7 @@ void slow_model::clear()
     imodel::clear();
 }
 
-auto slow_model::construct_contact_model_points(const formulas_t& contacts) -> bool
+auto measured_model::construct_contact_model_points(const formulas_t& contacts) -> bool
 {
     // For each contact term it will generate an evaluation of all used variables which evaluates it to the constant_true
     for (const auto& c : contacts)
@@ -227,7 +227,7 @@ auto slow_model::construct_contact_model_points(const formulas_t& contacts) -> b
     return true;
 }
 
-auto slow_model::construct_non_zero_model_points(const terms_t& non_zero_terms) -> bool
+auto measured_model::construct_non_zero_model_points(const terms_t& non_zero_terms) -> bool
 {
     // For each non-zero term it will generate an evaluation of all used variables which evaluates it to the constant_true
     for (const auto& z : non_zero_terms)
@@ -243,7 +243,7 @@ auto slow_model::construct_non_zero_model_points(const terms_t& non_zero_terms) 
     return true;
 }
 
-void slow_model::calculate_the_model_evaluation_of_each_variable()
+void measured_model::calculate_the_model_evaluation_of_each_variable()
 {
     const auto points_size = points_.size();
     variable_evaluations_.clear();
@@ -265,7 +265,7 @@ void slow_model::calculate_the_model_evaluation_of_each_variable()
     }
 }
 
-auto slow_model::print_system_sum_variables(std::ostream& out, const model_points_set_t& variables) const -> std::ostream&
+auto measured_model::print_system_sum_variables(std::ostream& out, const model_points_set_t& variables) const -> std::ostream&
 {
     // iterate only set bits(1s)
     auto var_id = variables.find_first();
@@ -289,7 +289,7 @@ auto slow_model::print_system_sum_variables(std::ostream& out, const model_point
     return out;
 }
 
-auto slow_model::print_system(std::ostream& out) const -> std::ostream&
+auto measured_model::print_system(std::ostream& out) const -> std::ostream&
 {
     const auto points_size = points_.size();
     out << "System:\n";
@@ -318,7 +318,7 @@ auto slow_model::print_system(std::ostream& out) const -> std::ostream&
     return out;
 }
 
-auto slow_model::print(std::ostream& out) const -> std::ostream&
+auto measured_model::print(std::ostream& out) const -> std::ostream&
 {
     out << "Model points: \n";
     const auto points_size = points_.size();

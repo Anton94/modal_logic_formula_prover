@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
         const auto variables = f.get_variables();
         info() << "Variables: " << variables;
 
-        slow_model m;
+        measured_model m;
         const auto res = f.is_satisfiable(m);
         info() << "The formula is " << (res ? "" : "not ") << "satisfiable.";
     }

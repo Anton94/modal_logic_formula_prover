@@ -2,8 +2,8 @@
 
 #include "library.h"
 
-void is_satisfiable(const char* input_f, bool has_satisfiable_model, bool has_satisfiable_connected_model, bool has_satisfiable_slow_model,
-                    bool run_slow_models = true)
+void is_satisfiable(const char* input_f, bool has_satisfiable_model, bool has_satisfiable_connected_model, bool has_satisfiable_measured_model,
+                    bool run_measured_models = true)
 {
     formula_mgr f;
     CHECK(f.build(input_f));
@@ -23,14 +23,14 @@ void is_satisfiable(const char* input_f, bool has_satisfiable_model, bool has_sa
         CHECK(f.is_model_satisfiable(connected_m));
     }
 
-    if(run_slow_models)
+    if(run_measured_models)
     {
-        slow_model slow_m;
-        CHECK(f.is_satisfiable(slow_m) == has_satisfiable_slow_model);
+        measured_model measured_m;
+        CHECK(f.is_satisfiable(measured_m) == has_satisfiable_measured_model);
 
-        if(has_satisfiable_slow_model)
+        if(has_satisfiable_measured_model)
         {
-            CHECK(f.is_model_satisfiable(slow_m));
+            CHECK(f.is_model_satisfiable(measured_m));
         }
 
         basic_bruteforce_model brute_force_model;
@@ -401,7 +401,7 @@ TEST_CASE("not satisfiable with 10 variables", "[satisfiability]")
                    true, false);
 }
 
-TEST_CASE("satisfiable but resetting in slow_model functionality", "[satisfiability]")
+TEST_CASE("satisfiable but resetting in measured_model functionality", "[satisfiability]")
 {
     is_satisfiable("~<=m(a * b, 0) & ~<=(a,b)", true, true, true);
 }
@@ -441,17 +441,17 @@ TEST_CASE("not satisfiable system 2", "[satisfiability]")
     is_satisfiable("C(a,b) & <=(b,c) & C(a,c) | <=m(a,b) & ~<=m(b,c + a)", true, true, true);
 }
 
-TEST_CASE("slow_model additional points 1", "[satisfiability]")
+TEST_CASE("measured_model additional points 1", "[satisfiability]")
 {
     is_satisfiable("~<=m(a,0)", true, true, true);
 }
 
-TEST_CASE("slow_model additional points 2", "[satisfiability]")
+TEST_CASE("measured_model additional points 2", "[satisfiability]")
 {
     is_satisfiable("~<=m(a,b)", true, true, true);
 }
 
-TEST_CASE("slow_model additional points 3", "[satisfiability]")
+TEST_CASE("measured_model additional points 3", "[satisfiability]")
 {
     is_satisfiable("~<=m(a * b, 0) & ~<=m(a,b)", true, true, true);
 }
