@@ -21,6 +21,9 @@ void check(const std::string& input_formula, const std::string& expected_formate
         CHECK(!f.build(input_formula));
         return;
     }
+
+    CHECK(expected_error.msg.empty());
+
     std::stringstream ast_printed;
     VPrinter printer(ast_printed);
     ast->accept(printer);
@@ -36,6 +39,42 @@ void check(const std::string& input_formula, const std::string& expected_formate
     }
 }
 
+}
+
+TEST_CASE("AST building syntax error", "[AST_building]")
+{
+    check("", "", false, {1, 1, "syntax error"});
+    check("()", "", false, {1, 2, "syntax error"});
+    check("(())", "", false, {1, 3, "syntax error"});
+    check("(())()", "", false, {1, 3, "syntax error"});
+    check("C(a9, b0", "", false, {1, 7, "syntax error"});
+    check("C(a9,\n   b0", "", false, {2, 4, "syntax error"});
+    check("C a9, b0)", "", false, {1, 3, "syntax error"});
+
+    check("C(ax, bx) C(yz, ft) | C(r,f) & C(gg,asx)", "", false, {1, 11, "syntax error"});
+    check("C(ax, bx) & C(yz, ft) C(r,f) & C(gg,asx)", "", false, {1, 23, "syntax error"});
+    check("C(ax, bx) & C(yz, ft) | C(r,f) C(gg,asx)", "", false, {1, 32, "syntax error"});
+    check("C(ax, bx) -> C(yz, ft) ~C(r,f) & C(gg,asx)", "", false, {1, 24, "syntax error"});
+
+    check("C(ax, bx) ~ <-> C(yz, ft) ~C(r,f) & C(gg,asx)", "", false, {1, 11, "syntax error"});
+
+    check("(C(ax, bx) ->) C(yz, ft) ~C(r,f) & C(gg,asx)", "", false, {1, 14, "syntax error"});
+    check("(C(ax, bx) ->() C(yz, ft) ~C(r,f) & C(gg,asx)", "", false, {1, 15, "syntax error"});
+    check("(C(ax, bx) ->) C(yz, ft) ~C(r,f) & C(gg,asx)", "", false, {1, 14, "syntax error"});
+    check("(C(ax, bx) -> C(yz, ft)) | ~C(r,f) ~ & C(gg,asx)", "", false, {1, 36, "syntax error"});
+    check("(C(ax, bx) -> C(yz, ft)) | ~C(r,f) ~T & C(gg,asx)", "", false, {1, 36, "syntax error"});
+    check("(C(ax, bx) -> C(yz, ft)) | ~C(r,f) (| ~T & C(gg,asx))", "", false, {1, 36, "syntax error"});
+
+    check("(C(ax, bx) -> C(yz +, ft)) | ~C(r,f) | (~T & C(gg,asx))", "", false, {1, 21, "syntax error"});
+    check("(C(ax, bx) -> C(yz = -x, ft)) | ~C(r,f) | (~T & C(gg,asx))", "", false, {1, 20, "syntax error"});
+    check("(C(ax, bx) -> C(yz & -x, ft)) | ~C(r,f) | (~T & C(gg,asx))", "", false, {1, 20, "syntax error"});
+    check("(C(ax, bx) -> C(yz | -x, ft)) | ~C(r,f) | (~T & C(gg,asx))", "", false, {1, 20, "syntax error"});
+    check("(C(ax, bx) -> C(a, ft)) | ~C(r,f) | (~T & C(gg,yz + ~x))", "", false, {1, 53, "syntax error"});
+    check("(C(ax, bx) -> C(a, ft)) | ~C(r,f) | (~T & C(gg,yz + ~x))", "", false, {1, 53, "syntax error"});
+    check("(C(ax, bx) -> C(yz - x*, ft)) | ~C(r,f) | (~T & C(gg,asx))", "", false, {1, 20, "syntax error"});
+    check("(C(ax, bx) -> C(yz + x*, ft)) | ~C(r,f) | (~T & C(gg,asx))", "", false, {1, 24, "syntax error"});
+    check("(C(ax, bx) -> C(z, ft)) | ~C(r,yz + x*) | (~T & C(gg,asx))", "", false, {1, 39, "syntax error"});
+    check("(C(ax, bx) -> C(z, ft)) | ~C(*r,yz + x*) | (~T & C(gg,asx))", "", false, {1, 30, "syntax error"});
 }
 
 TEST_CASE("AST building constants", "[AST_building]")
