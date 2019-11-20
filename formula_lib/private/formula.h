@@ -101,6 +101,7 @@ private:
     formula_mgr* formula_mgr_;
     std::size_t hash_;
 
+    // TODO use variant and unique_ptrs instead of raw pointers
     struct child_formulas
     {
         formula* left;

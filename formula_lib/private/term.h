@@ -127,6 +127,7 @@ private:
     variables_mask_t variables_; // TODO: alternative is to calculate the used variables each time when we
                                  // need them. would it be better?
 
+    // TODO use variant and unique_ptrs instead of raw pointers
     struct childs
     {
         term* left;

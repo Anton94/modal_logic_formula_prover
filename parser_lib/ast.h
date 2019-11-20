@@ -66,6 +66,7 @@ public:
     auto deep_copy() const -> NFormula* override;
 
     formula_operation_t op;
+    // TODO use variant and unique_ptrs instead of raw pointers
     Node* left;
     Node* right;
 
@@ -92,6 +93,7 @@ public:
     auto deep_copy() const -> NTerm* override;
 
     term_operation_t op;
+    // TODO use variant and unique_ptrs instead of raw pointers and additional @variable
     NTerm* left;
     NTerm* right;
 
