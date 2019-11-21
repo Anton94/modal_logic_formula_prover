@@ -476,9 +476,9 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    51,    51,    57,    60,    63,    66,    69,    72,    75,
-      78,    81,    84,    87,    90,    93,    96,    99,   102,   107,
-     110,   113,   118,   121,   124,   127,   130,   133
+       0,    51,    51,    56,    59,    62,    65,    68,    71,    74,
+      77,    80,    83,    86,    89,    92,    95,    98,   101,   106,
+     109,   112,   117,   120,   123,   126,   129,   132
 };
 #endif
 
@@ -1404,215 +1404,214 @@ yyreduce:
 #line 51 "parser.y"
     {
         parsed_formula.reset((yyvsp[0].formula));
-        assert(get_lexer_strings_size() == 0);
     }
-#line 1410 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1409 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 3:
-#line 57 "parser.y"
+#line 56 "parser.y"
     {
         (yyval.formula) = create_formula_node(formula_operation_t::constant_true);
     }
-#line 1418 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1417 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 4:
-#line 60 "parser.y"
+#line 59 "parser.y"
     {
         (yyval.formula) = create_formula_node(formula_operation_t::constant_false);
     }
-#line 1426 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1425 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 5:
-#line 63 "parser.y"
+#line 62 "parser.y"
     {
         (yyval.formula) = create_formula_node(formula_operation_t::contact, (yyvsp[-3].term), (yyvsp[-1].term));
     }
-#line 1434 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1433 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 6:
-#line 66 "parser.y"
+#line 65 "parser.y"
     {
         (yyval.formula) = create_formula_node(formula_operation_t::less_eq, (yyvsp[-3].term), (yyvsp[-1].term));
     }
-#line 1442 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1441 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 7:
-#line 69 "parser.y"
+#line 68 "parser.y"
     {
         (yyval.formula) = create_formula_node(formula_operation_t::measured_less_eq, (yyvsp[-3].term), (yyvsp[-1].term));
     }
-#line 1450 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1449 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 8:
-#line 72 "parser.y"
+#line 71 "parser.y"
     {
         (yyval.formula) = create_formula_node(formula_operation_t::eq_zero, (yyvsp[-1].term));
     }
-#line 1458 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1457 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 9:
-#line 75 "parser.y"
+#line 74 "parser.y"
     {
         (yyval.formula) = create_formula_node(formula_operation_t::conjunction, (yyvsp[-3].formula), (yyvsp[-1].formula));
     }
-#line 1466 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1465 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 10:
-#line 78 "parser.y"
+#line 77 "parser.y"
     {
         (yyval.formula) = create_formula_node(formula_operation_t::conjunction, (yyvsp[-2].formula), (yyvsp[0].formula));
     }
-#line 1474 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1473 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 11:
-#line 81 "parser.y"
+#line 80 "parser.y"
     {
         (yyval.formula) = create_formula_node(formula_operation_t::disjunction, (yyvsp[-3].formula), (yyvsp[-1].formula));
     }
-#line 1482 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1481 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 12:
-#line 84 "parser.y"
+#line 83 "parser.y"
     {
         (yyval.formula) = create_formula_node(formula_operation_t::disjunction, (yyvsp[-2].formula), (yyvsp[0].formula));
     }
-#line 1490 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1489 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 13:
-#line 87 "parser.y"
+#line 86 "parser.y"
     {
         (yyval.formula) = create_formula_node(formula_operation_t::negation, (yyvsp[0].formula));
     }
-#line 1498 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1497 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 14:
-#line 90 "parser.y"
+#line 89 "parser.y"
     {
         (yyval.formula) = create_formula_node(formula_operation_t::implication, (yyvsp[-3].formula), (yyvsp[-1].formula));
     }
-#line 1506 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1505 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 15:
-#line 93 "parser.y"
+#line 92 "parser.y"
     {
         (yyval.formula) = create_formula_node(formula_operation_t::implication, (yyvsp[-2].formula), (yyvsp[0].formula));
     }
-#line 1514 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1513 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 16:
-#line 96 "parser.y"
+#line 95 "parser.y"
     {
         (yyval.formula) = create_formula_node(formula_operation_t::equality, (yyvsp[-3].formula), (yyvsp[-1].formula));
     }
-#line 1522 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1521 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 17:
-#line 99 "parser.y"
+#line 98 "parser.y"
     {
         (yyval.formula) = create_formula_node(formula_operation_t::equality, (yyvsp[-2].formula), (yyvsp[0].formula));
     }
-#line 1530 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1529 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 18:
-#line 102 "parser.y"
+#line 101 "parser.y"
     {
         (yyval.formula) = (yyvsp[-1].formula);
     }
-#line 1538 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1537 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 19:
-#line 107 "parser.y"
+#line 106 "parser.y"
     {
         (yyval.term) = create_term_node(term_operation_t::constant_true);
     }
-#line 1546 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1545 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 20:
-#line 110 "parser.y"
+#line 109 "parser.y"
     {
         (yyval.term) = create_term_node(term_operation_t::constant_false);
     }
-#line 1554 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1553 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 21:
-#line 113 "parser.y"
+#line 112 "parser.y"
     {
         (yyval.term) = create_term_node(term_operation_t::variable);
         (yyval.term)->variable = std::move(*(yyvsp[0].T_STRING));
         free_lexer_string((yyvsp[0].T_STRING));
     }
-#line 1564 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1563 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 22:
-#line 118 "parser.y"
+#line 117 "parser.y"
     {
         (yyval.term) = create_term_node(term_operation_t::intersection, (yyvsp[-3].term), (yyvsp[-1].term));
     }
-#line 1572 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1571 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 23:
-#line 121 "parser.y"
+#line 120 "parser.y"
     {
         (yyval.term) = create_term_node(term_operation_t::intersection, (yyvsp[-2].term), (yyvsp[0].term));
     }
-#line 1580 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1579 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 24:
-#line 124 "parser.y"
+#line 123 "parser.y"
     {
         (yyval.term) = create_term_node(term_operation_t::union_, (yyvsp[-3].term), (yyvsp[-1].term));
     }
-#line 1588 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1587 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 25:
-#line 127 "parser.y"
+#line 126 "parser.y"
     {
         (yyval.term) = create_term_node(term_operation_t::union_, (yyvsp[-2].term), (yyvsp[0].term));
     }
-#line 1596 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1595 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 26:
-#line 130 "parser.y"
+#line 129 "parser.y"
     {
         (yyval.term) = create_term_node(term_operation_t::complement, (yyvsp[0].term));
     }
-#line 1604 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1603 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
   case 27:
-#line 133 "parser.y"
+#line 132 "parser.y"
     {
         (yyval.term) = (yyvsp[-1].term);
     }
-#line 1612 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1611 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
     break;
 
 
-#line 1616 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
+#line 1615 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/parser.cpp"
 
       default: break;
     }
@@ -1850,7 +1849,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 137 "parser.y"
+#line 136 "parser.y"
 
 
 

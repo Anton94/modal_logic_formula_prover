@@ -50,7 +50,6 @@
 modal_logic_formula
     : formula {
         parsed_formula.reset($1);
-        assert(get_lexer_strings_size() == 0);
     }
   ;
 formula
