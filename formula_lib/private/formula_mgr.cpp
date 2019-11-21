@@ -36,7 +36,7 @@ auto formula_mgr::build(const std::string& f, const formula_refiners& refiners_f
     {
         std::stringstream error_msg;
         error_info.printer(f, error_msg);
-        error() << "\n" << error_msg.str();
+        info() << "\n" << error_msg.str();
         return false;
     }
 
