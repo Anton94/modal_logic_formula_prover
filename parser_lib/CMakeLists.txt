@@ -53,5 +53,5 @@ message("Creating parser_lib")
 set(PARSER_LIB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(PARSER_LIB_INCLUDE_DIR ${PARSER_LIB_INCLUDE_DIR} PARENT_SCOPE)
 
-set(LIB_SRCS visitor.cpp ast.cpp parser_API.h parser_API.cpp visitor.h ast.h ${generated_parser_cpp} ${generated_lexer_cpp} ${generated_parser_hpp} ${generated_lexer_hpp})
+set(LIB_SRCS visitor.cpp ast.cpp parser_API.h parser_API.cpp visitor.h ast.h internal/string_memory_mgr.h internal/string_memory_mgr.cpp ${generated_parser_cpp} ${generated_lexer_cpp} ${generated_parser_hpp} ${generated_lexer_hpp})
 add_library(parser_lib STATIC ${LIB_SRCS})

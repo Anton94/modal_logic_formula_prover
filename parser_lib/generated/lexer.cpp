@@ -466,6 +466,7 @@ static yyconst flex_int32_t yy_rule_can_match_eol[12] =
 #define YY_NO_INPUT 1
 #line 8 "lexer.l"
     #include "../ast.h"
+    #include "../internal/string_memory_mgr.h"
     #include "parser.hpp"
 
     #define YY_USER_ACTION                                             \
@@ -477,18 +478,7 @@ static yyconst flex_int32_t yy_rule_can_match_eol[12] =
         yylloc->last_line = yylineno;                                  \
         yylloc->last_column = yytext + yyleng - strrchr(yytext, '\n'); \
       }
-
-    // Custom strdup because the one in cstdio is not standard(when compiling strictly C)
-    char* custom_strdup(const char * c, int length)
-    {
-        char* dup = (char*)malloc(length + 1);
-
-        if (dup != NULL)
-           strcpy(dup, c);
-
-        return dup;
-    }
-#line 492 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/lexer.cpp"
+#line 482 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/lexer.cpp"
 
 #define INITIAL 0
 
@@ -771,9 +761,9 @@ YY_DECL
 		}
 
 	{
-#line 33 "lexer.l"
+#line 23 "lexer.l"
 
-#line 777 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/lexer.cpp"
+#line 767 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/lexer.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -841,60 +831,60 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 34 "lexer.l"
+#line 24 "lexer.l"
 ; // ignore all whitespace
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 35 "lexer.l"
+#line 25 "lexer.l"
 {return yytext[0];} // all single charecter tokens will be passed as their ASCIIs for an easier use in bison (in my opinion, better readability)
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 36 "lexer.l"
+#line 26 "lexer.l"
 {return T_LESS_EQ;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 37 "lexer.l"
+#line 27 "lexer.l"
 {return T_MEASURED_LESS_EQ;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 38 "lexer.l"
+#line 28 "lexer.l"
 {return T_EQ_ZERO;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 39 "lexer.l"
+#line 29 "lexer.l"
 {return T_EQ_ZERO;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 40 "lexer.l"
+#line 30 "lexer.l"
 {return T_FORMULA_OP_IMPLICATION;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 41 "lexer.l"
+#line 31 "lexer.l"
 {return T_FORMULA_OP_EQUALITY;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 42 "lexer.l"
-{yylval->T_STRING = custom_strdup(yytext, yyleng); return T_STRING;}
+#line 32 "lexer.l"
+{yylval->T_STRING = create_lexer_string(yytext, yyleng); return T_STRING;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 43 "lexer.l"
+#line 33 "lexer.l"
 {return yytext[0];} // bison will trigger an error if it's unrecognized symbol
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 44 "lexer.l"
+#line 34 "lexer.l"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
-#line 898 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/lexer.cpp"
+#line 888 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/lexer.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2057,7 +2047,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 44 "lexer.l"
+#line 34 "lexer.l"
 
 
 

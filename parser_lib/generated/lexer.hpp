@@ -343,7 +343,7 @@ extern int yylex \
 #undef YY_DECL
 #endif
 
-#line 44 "lexer.l"
+#line 34 "lexer.l"
 
 
 #line 350 "/home/default/workspace/university/modal_logic_formula_prover/parser_lib/generated/lexer.hpp"

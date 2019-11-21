@@ -6,6 +6,7 @@
 
 %{
     #include "../ast.h"
+    #include "../internal/string_memory_mgr.h"
     #include "parser.hpp"
 
     #define YY_USER_ACTION                                             \
@@ -17,17 +18,6 @@
         yylloc->last_line = yylineno;                                  \
         yylloc->last_column = yytext + yyleng - strrchr(yytext, '\n'); \
       }
-
-    // Custom strdup because the one in cstdio is not standard(when compiling strictly C)
-    char* custom_strdup(const char * c, int length)
-    {
-        char* dup = (char*)malloc(length + 1);
-
-        if (dup != NULL)
-           strcpy(dup, c);
-
-        return dup;
-    }
 %}
 
 %%
@@ -39,6 +29,6 @@
 "= 0"              {return T_EQ_ZERO;}
 "->"               {return T_FORMULA_OP_IMPLICATION;}
 "<->"              {return T_FORMULA_OP_EQUALITY;}
-[a-zA-Z0-9]+       {yylval->T_STRING = custom_strdup(yytext, yyleng); return T_STRING;}
+[a-zA-Z0-9]+       {yylval->T_STRING = create_lexer_string(yytext, yyleng); return T_STRING;}
 .                  {return yytext[0];} // bison will trigger an error if it's unrecognized symbol
 %%

@@ -7,8 +7,10 @@
     #include <memory>
     #include <functional>
     #include <unordered_set>
+    #include <cassert>
 
     #include "../ast.h"
+    #include "../internal/string_memory_mgr.h"  // TODO: update to newer version and to C++ and start using 'variant' to hold directly the std::string
 }
 
 %code requires {
@@ -27,12 +29,12 @@
 }
 
 %define api.value.type union
-%token <const char*> T_STRING   "string"
-%token T_LESS_EQ                "<="
-%token T_MEASURED_LESS_EQ       "<=m"
-%token T_EQ_ZERO                "=0"
-%token T_FORMULA_OP_IMPLICATION "->"
-%token T_FORMULA_OP_EQUALITY    "<->"
+%token <std::string*> T_STRING   "string"
+%token T_LESS_EQ                 "<="
+%token T_MEASURED_LESS_EQ        "<=m"
+%token T_EQ_ZERO                 "=0"
+%token T_FORMULA_OP_IMPLICATION  "->"
+%token T_FORMULA_OP_EQUALITY     "<->"
 
 // the operators precedence is from low to hight (w.r.t. the order (by line) in which they are defined)
 %left T_FORMULA_OP_IMPLICATION T_FORMULA_OP_EQUALITY
@@ -48,6 +50,7 @@
 modal_logic_formula
     : formula {
         parsed_formula.reset($1);
+        assert(get_lexer_strings_size() == 0);
     }
   ;
 formula
@@ -109,8 +112,8 @@ term
     }
     | "string" {
         $$ = create_term_node(term_operation_t::variable);
-        $$->variable = $1;
-        free((void*)$1);
+        $$->variable = std::move(*$1);
+        free_lexer_string($1);
     }
     | '(' term '*' term ')' {
         $$ = create_term_node(term_operation_t::intersection, $2, $4);
@@ -157,6 +160,7 @@ void on_before_parsing()
 {
     created_ast_term_nodes.clear();
     created_ast_formula_nodes.clear();
+    assert(get_lexer_strings_size() == 0);
     parsed_formula.reset();
 }
 
@@ -183,5 +187,6 @@ void yyerror(YYLTYPE* yyllocp, yyscan_t, const char* msg)
     {
         on_error(yyllocp->first_line, yyllocp->first_column, msg);
         free_all_nodes();
+        free_lexer_strings();
     }
 }
