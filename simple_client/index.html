@@ -92,7 +92,8 @@
 		           	  	  change_computing_components_availability(true)
 			              // populate the output that the formula was canceled
 		              } else if (jsonified["status"] == "RUNNING") {
-		              	  // populate the verbose output  
+		              	  // populate the verbose output
+						  document.getElementById('verbose_output').innerText += jsonified["output"];
 		              }
 		            });
 			}

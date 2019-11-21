@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <string>
+#include <chrono>
 
 #include <filesystem/filesystem.hpp>
 
@@ -12,6 +13,7 @@ using namespace web;
 using namespace utility;
 using namespace http;
 using namespace web::http::experimental::listener;
+using namespace std::chrono_literals;
 
 namespace
 {
@@ -219,11 +221,27 @@ void microservice_controller::handle_task(http_request message)
 
                     try
                     {
-                        std::stringstream info_output;
-                        //set_verbose_logger([](std::stringstream&& s) { std::cout << "Verbose: " << s.rdbuf() << std::endl; });
-                        //set_trace_logger([](std::stringstream&& s) { std::cout << "Trace: " << s.rdbuf() << std::endl; });
-                        set_info_logger([&](std::stringstream&& s) { info_output << "Info: " << s.rdbuf() << "\n"; });
-                        //set_error_logger([](std::stringstream&& s) { std::cout << "Error: " << s.rdbuf() << std::endl; });
+						std::stringstream info_output;
+						auto stream_accumulated_output = [&]()
+						{
+							static std::chrono::steady_clock::time_point next_update = std::chrono::steady_clock::now() + 5s;
+
+							const auto now = std::chrono::steady_clock::now();
+							if(next_update < now)
+							{
+								std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
+								auto& final_result = op_id_to_task_info_.find(op_id)->second.result_;
+								final_result.output.append(info_output.str());
+								info_output.clear();
+								next_update = now + 5s;
+							}
+						};
+
+						//set_verbose_logger([&](std::stringstream&& s) { info_output << "Verbose: " << s.rdbuf() << "\n"; stream_accumulated_output();  });
+                        // if the trace on user preference.
+						set_trace_logger([&](std::stringstream&& s) { info_output << "Trace: " << s.rdbuf() << "\n"; stream_accumulated_output(); });
+                        set_info_logger([&](std::stringstream&& s) { info_output << "Info: " << s.rdbuf() << "\n"; stream_accumulated_output(); });
+                        set_error_logger([&](std::stringstream&& s) { info_output << "Error: " << s.rdbuf() << "\n"; stream_accumulated_output(); });
                         formula_mgr mgr;
                         formula_mgr::formula_refiners formula_refs =
                             extract_formula_refiners(formula_filters);
@@ -357,25 +375,21 @@ void microservice_controller::handle_ping(http_request message)
         }
         else
         {
+			// refactor this.
             auto& info = op_id_to_task_info_.find(op_id)->second;
             auto& res = info.result_;
-            if(res.status_code == "FINISHED")
-            {
-                message.reply(status_codes::OK, res.to_string()).then([](pplx::task<void> t) {
-                    handle_error(t);
-                });
-                remove_op_id(op_id);
-            }
-            else
-            {
-                info.activate();
-                std::string resulting_json = "{ 'status': '";
-                resulting_json.append(res.status_code);
-                resulting_json.append("' }");
-                message.reply(status_codes::OK, resulting_json).then([](pplx::task<void> t) {
-                    handle_error(t);
-                });
-            }
+			info.activate();
+			message.reply(status_codes::OK, res.to_string()).then([](pplx::task<void> t) {
+				handle_error(t);
+			});
+
+			res.output.clear();
+			// send the output and clean it, in JS APPEND to the already accumulated
+
+			if (res.status_code == "FINISHED")
+			{
+				remove_op_id(op_id);
+			}
         }
     });
 }
