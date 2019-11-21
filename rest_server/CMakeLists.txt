@@ -23,11 +23,26 @@ if(UNIX)
 endif()
 
 
-add_executable(rest_server source.cpp microservice_controller.cpp microservice_controller.h task_result.cpp task_result.h task_info.cpp task_info.h)
-target_link_libraries(rest_server formula_lib cpprestsdk::cpprest)
+set(executable rest_server)
+add_executable(${executable} source.cpp microservice_controller.cpp microservice_controller.h task_result.cpp task_result.h task_info.cpp task_info.h)
+target_link_libraries(${executable} formula_lib cpprestsdk::cpprest)
 
 if(UNIX)
-    target_link_libraries(rest_server ${Boost_SYSTEM_LIBRARY})
+    target_link_libraries(${executable} ${Boost_SYSTEM_LIBRARY})
 elseif(MSVC)
-    target_compile_options(rest_server PRIVATE -bigobj)
+    target_compile_options(${executable} PRIVATE -bigobj)
 endif()
+
+if(${ENABLE_THREAD_SANITIZER})
+    message("Enabling thread sanitizer for " ${executable} " app")
+    list(APPEND ECM_ENABLE_SANITIZERS "thread")
+endif()
+if(${ENABLE_MEMORY_SANITIZER})
+    message("Enabling memory sanitizer for " ${executable} " app")
+    list(APPEND ECM_ENABLE_SANITIZERS "memory") # memory is not allowed with address
+elseif(${ENABLE_ADDRESS_UB_LEAK_SANITIZERS})
+    message("Enabling address undefined leak sanitizer for " ${executable} " app")
+    list(APPEND ECM_ENABLE_SANITIZERS "address;undefined;leak")
+endif()
+
+include(ECMEnableSanitizers)

@@ -28,19 +28,5 @@ add_subdirectory (tests)
 #add_subdirectory (client)
 add_subdirectory (parser)
 
-if(${ENABLE_THREAD_SANITIZER})
-    message("Enabling thread sanitizer")
-    list(APPEND ECM_ENABLE_SANITIZERS "thread")
-endif()
-if(${ENABLE_MEMORY_SANITIZER})
-    message("Enabling memory sanitizer")
-    list(APPEND ECM_ENABLE_SANITIZERS "memory") # memory is not allowed with address
-elseif(${ENABLE_ADDRESS_UB_LEAK_SANITIZERS})
-    message("Enabling address undefined leak sanitizer")
-    list(APPEND ECM_ENABLE_SANITIZERS "address;undefined;leak")
-endif()
-
-include(ECMEnableSanitizers)
-
 file(COPY simple_client/ DESTINATION client/dist)
 

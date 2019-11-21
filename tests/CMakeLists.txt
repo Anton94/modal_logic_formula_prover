@@ -12,5 +12,20 @@ include(ECMUtilities)
 set(sources)
 GET_CPP_H_RECURSIVE(${CMAKE_CURRENT_SOURCE_DIR} sources)
 
-add_executable(tests ${sources})
-target_link_libraries(tests formula_lib)
+set(executable tests)
+add_executable(${executable} ${sources})
+target_link_libraries(${executable} formula_lib)
+
+if(${ENABLE_THREAD_SANITIZER})
+    message("Enabling thread sanitizer for " ${executable} " app")
+    list(APPEND ECM_ENABLE_SANITIZERS "thread")
+endif()
+if(${ENABLE_MEMORY_SANITIZER})
+    message("Enabling memory sanitizer for " ${executable} " app")
+    list(APPEND ECM_ENABLE_SANITIZERS "memory") # memory is not allowed with address
+elseif(${ENABLE_ADDRESS_UB_LEAK_SANITIZERS})
+    message("Enabling address undefined leak sanitizer for " ${executable} " app")
+    list(APPEND ECM_ENABLE_SANITIZERS "address;undefined;leak")
+endif()
+
+include(ECMEnableSanitizers)
