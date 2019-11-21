@@ -131,6 +131,65 @@ TEST_CASE("AST building syntax error", "[AST_building]")
     check_SE("C(ax, bx) -> C(a, C))", 19);
     check_SE("C(ax, bx) -> <=(a, C))", 20);
     check_SE("C(ax, bx) -> =<(a, C))", 14);
+
+    check_SE("ax * bx", 6);
+    check_SE("ax * bx <= ef", 9);
+    check_SE("ax * bx!=0", 8);
+    check_SE("ax & ZZzZ1023", 4);
+    check_SE("T & ZZzZ1023", 5);
+    check_SE("T & ZZzZ1023", 5);
+    check_SE("t & ZZzZ1023", 3);
+    check_SE("f & ZZzZ1023", 3);
+    check_SE("<=m(m,m) & (F & ZZzZ1023) -> T", 25);
+    check_SE("<=m(m,m) & (ax & T) -> T", 16);
+
+    check_SE("T && F", 4);
+    check_SE("T &| F", 4);
+    check_SE("T &~& F", 5);
+    check_SE("T ~& F", 3);
+    check_SE("~T <--> F", 4);
+    check_SE("~T <-> -> F", 8);
+    check_SE("<=(a,b) <-> C(e,f) | <-m(g,h)", 22);
+    check_SE("<=(a,b) <-> C(e,~f) | <=m(g,h)", 17);
+    check_SE("<=(a,b) <-> C(e,-f * +g) | <=m(g,h)", 22);
+    check_SE("<=(a,b) <-> C(-f * +g,a) | <=m(g,h)", 20);
+    check_SE("<=(a,-f * +gb) <-> C(b,a) | <=m(g,-f * +g)", 11);
+    check_SE("<=(-f * +gb,b) <-> C(b,a) | <=m(g,-f * +g)", 9);
+    check_SE("<=(x,b) <-> C(b,a) | <=m(g,-f * +g)", 33);
+    check_SE("<=(x,b) <-> C(b,a) | <=m(-f * +g,qx1)", 31);
+    check_SE("<=(x,b) <-> C(b,a) | <=m(-f * -g,qx1) C(e,f)", 39);
+    check_SE("<=(x,b) <-> C(b,a | b) | <=m(-f * -g,qx1) C(e,f)", 19);
+    check_SE("<=(x,b) <-> C(b,a & b) | <=m(-f * -g,qx1) C(e,f)", 19);
+    check_SE("<=(x,b) --> C(b,a & b) | <=m(-f * -g,qx1) C(e,f)", 9);
+    check_SE("<=(x,b) - C(b,a & b) | <=m(-f * -g,qx1) C(e,f)", 9);
+
+    check_SE("<=(x,b) <- C(b,a * (b + ~j)) | <=m(-f * -g,qx1) C(e,f) ads", 9);
+    check_SE("<=(x,b) <> C(b,a * (b + ~j)) | <=m(-f * -g,qx1) C(e,f) asd", 9);
+    check_SE("<=(x,b) <-> C(b,a * (b + ~j)) | <=m(-f * -g,qx1) C(e,f)asd  as", 26);
+    check_SE("<=(x,b)ax <-> C(b,a * (b + ~j)) | <=m(-f * -g,qx1) C(e,f)asd  as", 8);
+    check_SE("<=(x,b) <-> C(b,a * (b + -j)) | <=m(-f * -g,qx1) | C(e,f)asd  as", 58);
+    check_SE("<=(x,b) <-> C(b,a * (b + -j)) | <=m(-f * -g,qx1) | C(e,f) as", 59);
+    check_SE("<=(x,b) <-> C(b,a * (b + -j)asd) | <=m(-f * -g,qx1) | C(e,f) as", 29);
+    check_SE("<=(x,b) <-> C(b,a * as(b + -j)asd) | <=m(-f * -g,qx1) | C(e,f) as", 23);
+    check_SE("<=(C,b12d) <-> C(b,a * as(b + -j)asd) | <=m(-f * -g,qx1) | C(e,f) as", 4);
+    check_SE("<=(Cx,b12d) <-> C(b,a * as(b + -j)asd) | <=m(-f * -g,qx1) | C(e,f) as", 27);
+    check_SE("<=(C(x,y),b12d) <-> C(b,a * as(b + -j)asd) | <=m(-f * -g,qx1) | C(e,f) as", 4);
+    check_SE("<=(X11C),b12d) <-> C(b ax,a * as(b + -j)asd) | <=m(-f * -g,qx1) | C(e,f) as", 8);
+    check_SE("<=(X11C,b12d) <-> C(b ax,a * as(b + -j)asd) | <=m(-f * -g,qx1) | C(e,f) as", 23);
+    check_SE("<=(X11C,b12d) <-> C(b_ax,a * as * (b + -j) * asd) | <=m(-f * -g,qx1) | C(e,f) as", 22);
+    check_SE("<=(X11C,b12d) <-> C(b1ax,a * as * (b + -j) * asd) | <=m(-f * -g,qx1) | C(e,f) as", 79);
+    check_SE("<=(X11C,b12d) <-> Ca,b) & (b1ax,a * as * (b + -j) * asd) | <=m(-f * -g,qx1) | C(e,f) as", 21);
+    check_SE("<=(X11C,b12d) <-> <=a,b) & (b1ax,a * as * (b + -j) * asd) | <=m(-f * -g,qx1) | C(e,f) as", 21);
+    check_SE("<=(X11C,b12d) <-> <=ma,b) & (b1ax,a * as * (b + -j) * asd) | <=m(-f * -g,qx1) | C(e,f) as", 22);
+    check_SE("<=(X11C,b12d) <-> C(ab) & (b1ax,a * as * (b + -j) * asd) | <=m(-f * -g,qx1) | C(e,f) as", 23);
+    check_SE("<=(X11C,b12d) <-> <=(ab) & (b1ax,a * as * (b + -j) * asd) | <=m(-f * -g,qx1) | C(e,f) as", 24);
+    check_SE("<=(X11C,b12d) <-> <=m(ab) & (b1ax,a * as * (b + -j) * asd) | <=m(-f * -g,qx1) | C(e,f) as", 25);
+    check_SE("<=(X11C,b12d) <-> (a * b =0) & C(b1ax,a * as * (b + -j) * asd) | <=m(-f * -g,qx1) | C(e,f) as", 92);
+    check_SE("<=(X11C,b12d) <-> ~((a * b)=0) & C(b1ax,a * as * (b + -j) * asd) | <=m(-f * -g,qx1) | C(e,f) as", 94);
+    check_SE("<=(X11C,b12d) <-> -((a * b)=0) & C(b1ax,a * as * (b + -j) * asd) | <=m(-f * -g,qx1) | C(e,f) as", 28);
+    check_SE("<=(X11C,b12d) <-> -(a * b)=0) & C(b1ax,a * as * (b + -j) * asd) | <=m(-f * -g,qx1) | C(e,f) as", 29);
+    check_SE("<=(X11C,b12d) <-> (a * ~b =0) & C(b1ax,a * as * (b + -j) * asd) | <=m(-f * -g,qx1) | C(e,f) as", 24);
+    check_SE("<=(X11C,b12d) <-> (a * -b =0) & C(b1ax,a * as * (b + -j) * asd) | <=m(-f * -g,qx1) | C(e,f) as", 93);
 }
 
 TEST_CASE("AST building constants", "[AST_building]")
