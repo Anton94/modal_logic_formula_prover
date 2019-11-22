@@ -80,7 +80,7 @@ auto formula::operator!=(const formula& rhs) const -> bool
     return !operator==(rhs);
 }
 
-auto formula::build(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool
+auto formula::build(const NFormula& f) -> bool
 {
     clear();
 
@@ -94,22 +94,22 @@ auto formula::build(const NFormula& f, const variable_to_id_map_t& variable_to_i
             op_ = operation_t::constant_false;
             break;
         case formula_operation_t::conjunction:
-            is_constructed = construct_binary_formula(f, operation_t::conjunction, variable_to_id);
+            is_constructed = construct_binary_formula(f, operation_t::conjunction);
             break;
         case formula_operation_t::disjunction:
-            is_constructed = construct_binary_formula(f, operation_t::disjunction, variable_to_id);
+            is_constructed = construct_binary_formula(f, operation_t::disjunction);
             break;
         case formula_operation_t::negation:
-            is_constructed = construct_negation_formula(f, variable_to_id);
+            is_constructed = construct_negation_formula(f);
             break;
         case formula_operation_t::measured_less_eq:
-            is_constructed = construct_measured_less_eq_atomic_formula(f, variable_to_id);
+            is_constructed = construct_measured_less_eq_atomic_formula(f);
             break;
         case formula_operation_t::contact:
-            is_constructed = construct_contact_atomic_formula(f, variable_to_id);
+            is_constructed = construct_contact_atomic_formula(f);
             break;
         case formula_operation_t::eq_zero:
-            is_constructed = construct_eq_zero_atomic_formula(f, variable_to_id);
+            is_constructed = construct_eq_zero_atomic_formula(f);
             break;
         case formula_operation_t::implication:
         case formula_operation_t::equality:
@@ -516,14 +516,14 @@ void formula::move(formula&& rhs) noexcept
     rhs.op_ = operation_t::invalid;
 }
 
-auto formula::construct_eq_zero_atomic_formula(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool
+auto formula::construct_eq_zero_atomic_formula(const NFormula& f) -> bool
 {
     op_ = operation_t::eq_zero;
 
     child_t_.left = new(std::nothrow) term(formula_mgr_);
     assert(child_t_.left);
 
-    if(!child_t_.left->build(*static_cast<const NTerm*>(f.left), variable_to_id))
+    if(!child_t_.left->build(*static_cast<const NTerm*>(f.left)))
     {
         return false;
     }
@@ -534,7 +534,7 @@ auto formula::construct_eq_zero_atomic_formula(const NFormula& f, const variable
     return true;
 }
 
-auto formula::construct_contact_atomic_formula(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool
+auto formula::construct_contact_atomic_formula(const NFormula& f) -> bool
 {
     op_ = operation_t::c;
 
@@ -543,7 +543,7 @@ auto formula::construct_contact_atomic_formula(const NFormula& f, const variable
     assert(child_t_.left && child_t_.right);
 
     // recursive construction of the child terms
-    if(!child_t_.left->build(*static_cast<const NTerm*>(f.left), variable_to_id) || !child_t_.right->build(*static_cast<const NTerm*>(f.right), variable_to_id))
+    if(!child_t_.left->build(*static_cast<const NTerm*>(f.left)) || !child_t_.right->build(*static_cast<const NTerm*>(f.right)))
     {
         return false;
     }
@@ -554,7 +554,7 @@ auto formula::construct_contact_atomic_formula(const NFormula& f, const variable
     return true;
 }
 
-auto formula::construct_measured_less_eq_atomic_formula(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool
+auto formula::construct_measured_less_eq_atomic_formula(const NFormula& f) -> bool
 {
     op_ = operation_t::measured_less_eq;
 
@@ -563,7 +563,7 @@ auto formula::construct_measured_less_eq_atomic_formula(const NFormula& f, const
     assert(child_t_.left && child_t_.right);
 
     // recursive construction of the child terms
-    if(!child_t_.left->build(*static_cast<const NTerm*>(f.left), variable_to_id) || !child_t_.right->build(*static_cast<const NTerm*>(f.right), variable_to_id))
+    if(!child_t_.left->build(*static_cast<const NTerm*>(f.left)) || !child_t_.right->build(*static_cast<const NTerm*>(f.right)))
     {
         return false;
     }
@@ -573,14 +573,14 @@ auto formula::construct_measured_less_eq_atomic_formula(const NFormula& f, const
     return true;
 }
 
-auto formula::construct_negation_formula(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool
+auto formula::construct_negation_formula(const NFormula& f) -> bool
 {
     op_ = operation_t::negation;
 
     child_f_.left = new(std::nothrow) formula(formula_mgr_);
     assert(child_f_.left);
 
-    if(!child_f_.left->build(*static_cast<const NFormula*>(f.left), variable_to_id))
+    if(!child_f_.left->build(*static_cast<const NFormula*>(f.left)))
     {
         return false;
     }
@@ -589,7 +589,7 @@ auto formula::construct_negation_formula(const NFormula& f, const variable_to_id
     return true;
 }
 
-auto formula::construct_binary_formula(const NFormula& f, operation_t op, const variable_to_id_map_t& variable_to_id) -> bool
+auto formula::construct_binary_formula(const NFormula& f, operation_t op) -> bool
 {
     op_ = op;
     assert(op_ == operation_t::conjunction || op_ == operation_t::disjunction);
@@ -599,7 +599,7 @@ auto formula::construct_binary_formula(const NFormula& f, operation_t op, const 
     assert(child_f_.left && child_f_.right);
 
     // recursive construction of the child formulas
-    if(!child_f_.left->build(*static_cast<const NFormula*>(f.left), variable_to_id) || !child_f_.right->build(*static_cast<const NFormula*>(f.right), variable_to_id))
+    if(!child_f_.left->build(*static_cast<const NFormula*>(f.left)) || !child_f_.right->build(*static_cast<const NFormula*>(f.right)))
     {
         return false;
     }

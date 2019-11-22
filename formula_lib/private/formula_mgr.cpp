@@ -133,7 +133,7 @@ auto formula_mgr::build(const std::string& f, const formula_refiners& refiners_f
         variables_.emplace_back(variable);
     }
 
-    return f_.build(*formula_AST, variable_to_id_);
+    return f_.build(*formula_AST);
 }
 
 auto formula_mgr::brute_force_evaluate_with_points_count(basic_bruteforce_model& out_model) const -> bool
