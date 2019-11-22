@@ -30,7 +30,7 @@ public:
         convert_contact_less_eq_with_same_terms = 1 << 1,
         convert_disjunction_in_contact_less_eq  = 1 << 2,
         reduce_constants                        = 1 << 3,
-        reduce_contacts_with_constants  = 1 << 4,
+        reduce_contacts_with_constants          = 1 << 4,
         remove_double_negation                  = 1 << 5,
         all = convert_contact_less_eq_with_same_terms | convert_disjunction_in_contact_less_eq | reduce_constants | reduce_contacts_with_constants | remove_double_negation
     };
