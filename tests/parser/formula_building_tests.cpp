@@ -66,6 +66,7 @@ TEST_CASE("AST building syntax error", "[AST_building]")
     check_SE("C(x , x) | <=(a,b", 17);
     check_SE("C(x , x) | <=(a,b(", 18);
     check_SE("C(x , x) | <=(a,b) ~", 20);
+    check_SE("C(x , x) <=(a,b)", 10);
 
     check_SE("C(ax, bx) C(yz, ft) | C(r,f) & C(gg,asx)", 11);
     check_SE("C(ax, bx) & C(yz, ft) C(r,f) & C(gg,asx)", 23);
