@@ -30,7 +30,7 @@ The tokenizer's grammar is pretty simple:
     "= 0"              {return T_EQ_ZERO;}
     "->"               {return T_FORMULA_OP_IMPLICATION;}
     "<->"              {return T_FORMULA_OP_EQUALITY;}
-    [a-zA-Z0-9]+       {yylval->T_STRING = custom_strdup(yytext, yyleng); return T_STRING;} // Returns T_STRING literal and the string value is written to yylval which can be later accessed from the parser
+    [a-zA-Z0-9]+       {yylval->T_STRING = create_lexer_string(yytext, yyleng); return T_STRING;} // Returns T_STRING literal type and the string value is written to yylval which can be later accessed from the parser. Note that it uses our simple memory manager to allocate this string in order to be able to safely free all allocated strings even when some syntax error occures
     .                  {return yytext[0];} // bison will trigger an error if it's unrecognized symbol
 
 For the parser, firslty define the literals for the multi character tokens
@@ -117,9 +117,9 @@ term
         $$ = create_term_node(constant_false);
     }
     | "string" {
-        $$ = create_term_node(variable);
-        $$->variable = $1;
-        free((void*)$1); // the string is allocated from the tokenizer and we need to free it
+        $$ = create_term_node(term_operation_t::variable);
+        $$->variable = std::move(*$1);
+        free_lexer_string($1); // the string is allocated from the tokenizer and we need to free it
     }
     | '(' term '*' term ')' {
         $$ = create_term_node(intersection, $2, $4);
@@ -144,10 +144,9 @@ term
 We are using the visitor pattern to modify the formula(it's AST tree).
 The visitor pattern uses double virtual dispatching.
 
-
 The AST tree has the following structure:
 
-Node types:
+Operation types in the formula/term nodes:
 enum class formula_operation_t
 {
     constant_true,
@@ -221,4 +220,42 @@ public:
 };
 
 The visitor pattern gives us the ability to add new visitors in a very simple manner.
-The new visitor should override the two visit methods and do whatever it wants with the ast nodes.
+The new visitor should override the two visit methods and do whatever it wants with the ast nodes. For example, the VPrinter.
+
+We have the following visitors which are changing the formula:
+    - VReduceConstants - Removes all unnecessary childs of And/Or/Negation operations of the following type:
+             -T -> F           -F -> T
+        (T & T) -> T      (F | F) -> F
+        (g & T) -> g      (g | T) -> T
+        (T & g) -> g      (T | g) -> T
+        (g & F) -> F      (g | F) -> g
+        (F & g) -> F      (F | g) -> g
+            0=0 -> T          1=0 -> F
+        <=(0,a) -> T      <=(a,1) -> T
+        C(0,0)  -> F       C(1,1) -> T
+        C(a,0)  -> F       C(0,a) -> F
+             -1 -> 0           -0 -> 1
+        (1 * 1) -> 1      (0 + 0) -> 0
+        (t * 1) -> t      (t + 1) -> 1
+        (1 * t) -> t      (1 + t) -> 1
+        (t * 0) -> 0      (t + 0) -> t
+        (0 * t) -> 0      (0 + t) -> t
+    - VConvertContactsWithConstantTerms - Converts contacts with constant 1 terms in !=0 atomic formulas. NOTE: better use it after the contacts are reduced, via VReduceConstants
+         C(a,1) -> ~(a=0)  C(1,a) -> ~(a=0)
+    - VConvertLessEqContactWithEqualTerms - Converts contacts and <= atomic formulas with same terms:
+        <=(a,a) -> T (because (a * -a = 0))
+         C(a,a) -> ~(a=0)
+    - VReduceDoubleNegation - Removes the double/tripple/etc negations. Better use it after all visitors which might add additional negations!
+            --g -> g
+            --t -> t
+    - VConvertImplicationEqualityToConjDisj - Converts all formula nodes of type implication and equality to nodes which are using just conjuction and disjunction.
+    Main reason for that is to simplify the tableau method - to work only with conj. and disj.
+      (f -> g)  -> (~f | g)
+      (f <-> g) -> ((f & g) | (~f & ~g))
+    - VConvertLessEqToEqZero - Converts the <=(a,b) operations to (a * -b) = 0 operations
+    - VSplitDisjInLessEqAndContacts:
+       Splits C(a + b, c) to C(a,c) | C(b,c)
+       Splits <=(a + b, c) -> <=(a,c) & <=(b,c)
+We also have a couple which just collects info from the formula:
+    - VVariablesGetter - gets all variables from the formula (as string)
+    - VPrinter - prints the formula to some provided output stream
