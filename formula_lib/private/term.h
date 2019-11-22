@@ -23,7 +23,7 @@ public:
 
     auto build(const NTerm& t) -> bool;
 
-    auto evaluate(const variable_id_to_points_t& variable_evaluations, const size_t elements_count) const
+    auto evaluate(const variable_id_to_points_t& variable_evaluations, const size_t points_count) const
         -> model_points_set_t;
 
     void clear();

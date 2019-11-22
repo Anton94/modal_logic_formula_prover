@@ -111,32 +111,32 @@ auto term::build(const NTerm& t) -> bool
     return true;
 }
 
-auto term::evaluate(const variable_id_to_points_t& variable_evaluations, const size_t elements_count) const
+auto term::evaluate(const variable_id_to_points_t& variable_evaluations, const size_t points_count) const
     -> model_points_set_t
 {
     switch(op_)
     {
         case operation_t::constant_true:
-            return ~model_points_set_t(elements_count);
+            return ~model_points_set_t(points_count);
         case operation_t::constant_false:
-            return model_points_set_t(elements_count);
+            return model_points_set_t(points_count);
         case operation_t::union_:
             assert(childs_.left && childs_.right);
-            return childs_.left->evaluate(variable_evaluations, elements_count) |
-                   childs_.right->evaluate(variable_evaluations, elements_count);
+            return childs_.left->evaluate(variable_evaluations, points_count) |
+                   childs_.right->evaluate(variable_evaluations, points_count);
         case operation_t::intersection:
             assert(childs_.left && childs_.right);
-            return childs_.left->evaluate(variable_evaluations, elements_count) &
-                   childs_.right->evaluate(variable_evaluations, elements_count);
+            return childs_.left->evaluate(variable_evaluations, points_count) &
+                   childs_.right->evaluate(variable_evaluations, points_count);
         case operation_t::complement:
             assert(childs_.left);
-            return ~childs_.left->evaluate(variable_evaluations, elements_count);
+            return ~childs_.left->evaluate(variable_evaluations, points_count);
         case operation_t::variable:
             assert(variable_id_ < variable_evaluations.size());
             return variable_evaluations[variable_id_]; // returns the evaluation for the variable
         default:
             assert(false && "Unrecognized.");
-            return model_points_set_t(elements_count);
+            return model_points_set_t(points_count);
     }
 }
 
