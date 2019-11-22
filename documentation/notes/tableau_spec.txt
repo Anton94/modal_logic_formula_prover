@@ -1,0 +1,49 @@
+We are using tableau method to find contradictions in the formula.
+
+TODO: explain standard tableau - the same as Tinko explained to us
+
+We keep 8 collections:
+    - formulas_t formulas_T_ - T formulas, e.g. C(a,b) | <=(a,b)
+    - formulas_t formulas_F_ - F formulas, e.g. ~(C(a,b) | <=(a,b)), we will keep just (C(a,b) | <=(a,b)) and we will know that we want it to be false(F).
+    - formulas_t contacts_T_ - T contact atomic formulas, e.g. C(a,b)
+    - formulas_t contacts_F_ - F contact atomic formulas
+    - terms_t zero_terms_T_ - T zero terms, e.g. (t1 + t2)=0
+    - terms_t zero_terms_F_ - F zero terms
+    - formulas_t measured_less_eq_T_ - T <=m atomic formulas
+    - formulas_t measured_less_eq_F_ - F <=m atomic formulas
+
+Invariant - at any time, all formulas in the collections does not contradict.
+A contradiction can occure if we split some formula and some on it's components and any of them contradicts with some of the other formulas in the collections.
+At first, we are inserting the whole formula in T formulas(if it's constant false - returns directly false, etc.)
+
+Almost as in the standard implementation, but with additional a few additional rules:
+    - for the constants true/false
+    - the comutativity of the contacts - C(a,b) == C(b,a)
+    - adding atomic formula of type: C(a,b) checks that there are not already added  a == 0 OR b == 0 because it would be a contradictions
+    - adding atomic formula of type: a=0 checks if there is T(C(a,_)) or T(C(_,a))
+
+The checks when adding contact/=0 atomic formula is done effectively (constant time) via additional collection, multiterms_t contact_T_terms_,
+which keeps the terms of the T contacts(the contacts in @contacts_T_), i.e. for each T(C(a,b)) : a, b are in the collection.
+They are checked via the auto has_broken_contact_rule(const formula* f) const -> bool; method
+
+TODO explain that we keep pointers to formulas/terms but compare them via their hashes and contents
+
+We have a couple of handy functions:
+    - auto find_in_T(const formula* f) const -> bool
+        Searches the formula 'f' in T collections depending on the type of 'f':
+            - contact - in contacts_T_
+            - <=(a) - searches 'a' in zero_terms_T_
+            - <=m - in measured_less_eq_T_
+            - conj. disj. or negation in formulast_T_
+        Note that it is not used to search constants, they should be handled separately.
+    - auto find_in_F(const formula* f) const -> bool;
+        Analogous to find_in_T but in F collections
+    - void add_formula_to_T(const formula* f)
+        TODO
+    - void add_formula_to_F(const formula* f)
+        TODO
+    - void remove_formula_from_T(const formula* f)
+        TODO
+    - void remove_formula_from_F(const formula* f)
+        TODO
+
