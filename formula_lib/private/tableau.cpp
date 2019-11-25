@@ -118,7 +118,7 @@ auto tableau::satisfiable_step() -> bool
             {
                 return false;
             }
-            left.add_to_T();
+            left.add_to_T(); // A wrapper for adding/removing because we might not add it and then we do not have to remove it, just to be safer adding/removing.
 
             if(!right.validate())
             {
