@@ -1,0 +1,95 @@
+The bruteforce algorithm is pretty straight forward.
+It goes through all possible sets of points and tries to satisfy the formula.
+
+Details:
+
+First let us define a function named is_satisfied(sets, phi).
+
+In order to define this function let us first define a helper function which is defined recursively,
+and which works only for terms:
+
+calc(sets, tao):
+	if tao is 1
+		return W
+	if tao is 0
+		return empty_set
+	if tao is a + b 
+		return calc(a) | calc(b) // union
+	if tao is a * b 
+		return calc(a) & calc(b) // intercetion
+	if tao is -a
+		return W \ calc(a) // inverse
+	if tao is a
+		return 
+
+Create some sets of points for each variable in the formula.
+Test if this satisfies the formula, by going through all complex terms in the formula and calculating the operation of the term.
+
+how do we evaluate terms:
+Given
+	- set of points for each variable S, if 'a' is variable, then the set of points for a is defined as S(a)
+	- W - the whole world
+
+calc(tao) -> Set
+	if tao is 1
+		return W
+	if tao is 0
+		return empty_set
+	if tao is a + b 
+		return calc(a) | calc(b) // union
+	if tao is a * b 
+		return calc(a) & calc(b) // intercetion
+	if tao is -a
+		return W \ calc(a) // inverse
+	if tao is a
+		return S(a)
+
+how do we evaluate formulas:
+
+Given 
+	- set of points for each variable S, if 'a' is variable, then the set of points for a is defined as S(a)
+	- Matrix determining if there is a relation between two points R,
+		there is a relation between A and B then R[A][B] = True 
+	- W - the whole world
+
+calc(phi) -> Boolean 
+	if phi is T
+		return True
+	if phi is F
+		return False
+	if phi is a & b
+		return a
+	if phi is a | b
+		return a
+	if phi is ~a
+		return !a
+	if phi is a -> b
+		return calc(~a | b)
+	if phi is a <-> b
+		return calc(a -> b & b -> a) 
+	if phi is C(a,b)
+		If there exists p in a and q in b such that R[p][q] = True
+			return True
+		otherwise 
+			return False
+	if phi is <=(a,b)
+		If there exists p in a such that p does not belong in b
+			return False
+		otherwise 
+			return True
+
+How to generate new sets for the variables:
+Procedure to deterministically generate new combination of Sets of points.
+Note: Each set of points represents the value of a variable in a formula.
+
+Since the size of each set is always <= |W|, each set can be represented 
+with a bit array, meaning that if at index i the values i True, then the i-th point
+belongs to that set.
+
+Concatenating the bit arrays for each set (knowing that each set represents the value of a variable in the formula) together constructs
+a single bit array. 
+
+All that is needed to generate a new combination of sets is the operation Add One.
+
+Example:
+
