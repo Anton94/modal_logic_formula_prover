@@ -22,7 +22,7 @@ public:
     auto operator==(const formula& rhs) const -> bool;
     auto operator!=(const formula& rhs) const -> bool;
 
-    auto build(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool;
+    auto build(const NFormula& f) -> bool;
 
     // TODO: remove and use the one with contact relations if it does not have negative performance impact
     auto evaluate(const variable_id_to_points_t& evals, int R, int P) const -> bool;
@@ -88,12 +88,12 @@ private:
     auto evaluate(const variable_id_to_points_t& evals, int R, int P, bool neutral_value) const -> bool;
     auto evaluate_internal(const variable_id_to_points_t& evals, const contacts_t& contact_relations) const -> internal_evaluation_result;
 
-    auto construct_eq_zero_atomic_formula(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool;
-    auto construct_measured_less_eq_atomic_formula(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool;
-    auto construct_contact_atomic_formula(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool;
-    auto construct_binary_formula(const NFormula& f, operation_t op, const variable_to_id_map_t& variable_to_id) -> bool;
-    auto construct_binary_atomic_formula(const NFormula& f, operation_t op, const variable_to_id_map_t& variable_to_id) -> bool;
-    auto construct_negation_formula(const NFormula& f, const variable_to_id_map_t& variable_to_id) -> bool;
+    auto construct_eq_zero_atomic_formula(const NFormula& f) -> bool;
+    auto construct_measured_less_eq_atomic_formula(const NFormula& f) -> bool;
+    auto construct_contact_atomic_formula(const NFormula& f) -> bool;
+    auto construct_binary_formula(const NFormula& f, operation_t op) -> bool;
+    auto construct_binary_atomic_formula(const NFormula& f, operation_t op) -> bool;
+    auto construct_negation_formula(const NFormula& f) -> bool;
 
     void free();
 

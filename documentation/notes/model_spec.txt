@@ -1,0 +1,95 @@
+A model is a set of points and contacts between them which satisfies the <= and C atomic formulas
+
+TODO: theory part a-y
+
+A point is identified by an evaluation of all used variables in the tableau's path.
+
+The main puprose of this model creation is to create a point for each !=0 term and one for each of the contact's terms, which will be 'connected' (will be in contact relaction)
+
+For example:
+    Les't have 3 contacts and 1 non-zero term in the following formula:
+
+    C(a,b) & C(c,d) & C(e,f) & g != 0 & x = 0 & ~C(y,z)
+
+    The model is the following:
+
+    (xxx...x) (a) O--------------1 (b) (xxx...x)
+    (xxx...x) (c) 2--------------3 (d) (xxx...x)
+    (xxx...x) (e) 4--------------5 (f) (xxx...x)
+    (xxx...x) (g) 6
+
+    Note that the zero terms and negation of C are not interested to us because they does not require
+    existence.
+
+    where (xxx...x) is a bitset, e.g. (010...1) which gives 0/1 evaluation for the variables in the
+    formula(the path in the tableau), so its size is the number of different variables in the formula
+    i = 0...6 are the model points (reflexive), the contact points are connected (-------) (also symetric)
+
+    Model evaluation 'v' which for a given term returns a subset of the model points.
+
+     - v(p) = { i | (i) (xxx...x)[p] == 1, i.e. in point 'i' the evaluation of the variable 'p' is 1 },
+    where 'p' is a variable(an id)
+     - v(a * b) = v(a) & v(b)
+     - v(a + b) = v(a) | v(b)
+     - v(-a) = ~v(a)
+
+    Not that each point's evaluation evaluates it's term to the constant true in order to that point to be
+    in the MODEL evaluation of the term,
+    i.e. for the point 0, the term 'a' and it's evaluation (xxx..x): a->evaluate(xxx..x) = constant_true
+    in order to 0 belongs to v(a)
+
+    Let's have C(a,b); C(c,d); e=0; f=0; ~C(g,h); ~C(i, j)
+    Then the model should be of the following type:
+    (P0 a)----(P1 b)
+    (P2 c)----(P3 d)
+
+    NOTE that if Pi evaluates the term 't' to constant true then the model evaluation v(t) contains the
+    point (Pi _) (and vice versa)
+
+    Where P0 evaluates(binary) a to constant true && e and f to constant false
+          P1 evaluates(binary) b to constant true && e and f to constant false
+          P2 evaluates(binary) c to constant true && e and f to constant false
+          P3 evaluates(binary) d to constant true && e and f to constant false
+
+    Also, to satisfy the requirement for ~C: (we need to check each contact relation):
+    !(P0 evaluates g to constant true && P1 evaluates h to constant true) && // i.e. (P0 a) belongs to v(g)
+    and (P1 b) belongs to v(h)
+    !(P0 evaluates i to constant true && P1 evaluates j to constant true)
+    and for P2 and P3:
+    !(P2 evaluates g to constant true && P3 evaluates h to constant true) &&
+    !(P2 evaluates i to constant true && P3 evaluates j to constant true)
+
+    The contact relation is reflexive, so for each point we also need to check also:
+    !(Pi evaluates g to constant true && Pi evaluates h to constant true) && // i.e. (Pi t) point is not in
+    the model evaluation v(g) and v(h) (it's not a common point)
+    !(Pi evaluates i to constant true && Pi evaluates j to constant true)
+
+
+The algorithm tries to create two points for the first C(X,Y) atomic formula. Let's call them (P0 X) and (P1 Y).
+P0 evaluates X to true and P1 evaluates Y to true(to satisfy the defenition of v(x) and Contact).
+Checks if P0 / P1 does not break some =0 atomic formula, if so - tries to make new evaluation for P0/P1.
+Makes a edge between the two points and checks if they does not breake some ~C atomic formula.
+If it breaks any ~C then it will generate new evaluation for P1, until it find a satisfiable one.
+If not possible it changes the evaluation of P0 and againt iterates over all P1 combinations.
+Let's N be the number of used variables in the formula(path), then the complexity will be 2^N * 2^N for this atomic contact formula,
+so overall it will be |C|*|Z|*2^N*2^N, where C is the number of Contacts(in contacts_T collection) and Z is the number of !=0 terms (in zero_terms_F collection).
+
+auto model::create(const formulas_t& contacts_T, const formulas_t& contacts_F, const terms_t& zero_terms_T,
+                   const terms_t& zero_terms_F, const formulas_t&, const formulas_t&, const variables_mask_t& used_variables,
+                   const formula_mgr* mgr) -> bool
+{
+    clear();
+    used_variables_ = used_variables;
+    mgr_ = mgr;
+
+    if(construct_contact_model_points(contacts_T, contacts_F, zero_terms_T) &&
+       construct_non_zero_model_points(zero_terms_F, contacts_F, zero_terms_T))
+    {
+        calculate_the_model_evaluation_of_each_variable(); // claculates v(p) for each variable in the WHOLE formula(empty set for not used)
+        create_contact_relations_first_2k_in_contact(points_.size(), contacts_T.size()); // creats adjacency matrix in which 2k is in contact with 2k+1 (k < contacts_T.size())
+        return true;
+    }
+    return false;
+}
+
+TODO: Finish it

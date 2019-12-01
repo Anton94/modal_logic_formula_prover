@@ -67,7 +67,7 @@ auto term::operator!=(const term& rhs) const -> bool
     return !operator==(rhs);
 }
 
-auto term::build(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> bool
+auto term::build(const NTerm& t) -> bool
 {
     clear();
 
@@ -81,16 +81,16 @@ auto term::build(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> 
             op_ = operation_t::constant_false;
             break;
         case term_operation_t::variable:
-            is_constructed = construct_variable_operation(t, variable_to_id);
+            is_constructed = construct_variable_operation(t);
             break;
         case term_operation_t::union_:
-            is_constructed = construct_binary_operation(t, operation_t::union_, variable_to_id);
+            is_constructed = construct_binary_operation(t, operation_t::union_);
             break;
         case term_operation_t::intersection:
-            is_constructed = construct_binary_operation(t, operation_t::intersection, variable_to_id);
+            is_constructed = construct_binary_operation(t, operation_t::intersection);
             break;
         case term_operation_t::complement:
-            is_constructed = construct_complement_operation(t, variable_to_id);
+            is_constructed = construct_complement_operation(t);
             break;
         default:
             assert(false && "Unrecognized.");
@@ -111,32 +111,32 @@ auto term::build(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> 
     return true;
 }
 
-auto term::evaluate(const variable_id_to_points_t& variable_evaluations, const size_t elements_count) const
+auto term::evaluate(const variable_id_to_points_t& variable_evaluations, const size_t points_count) const
     -> model_points_set_t
 {
     switch(op_)
     {
         case operation_t::constant_true:
-            return ~model_points_set_t(elements_count);
+            return ~model_points_set_t(points_count);
         case operation_t::constant_false:
-            return model_points_set_t(elements_count);
+            return model_points_set_t(points_count);
         case operation_t::union_:
             assert(childs_.left && childs_.right);
-            return childs_.left->evaluate(variable_evaluations, elements_count) |
-                   childs_.right->evaluate(variable_evaluations, elements_count);
+            return childs_.left->evaluate(variable_evaluations, points_count) |
+                   childs_.right->evaluate(variable_evaluations, points_count);
         case operation_t::intersection:
             assert(childs_.left && childs_.right);
-            return childs_.left->evaluate(variable_evaluations, elements_count) &
-                   childs_.right->evaluate(variable_evaluations, elements_count);
+            return childs_.left->evaluate(variable_evaluations, points_count) &
+                   childs_.right->evaluate(variable_evaluations, points_count);
         case operation_t::complement:
             assert(childs_.left);
-            return ~childs_.left->evaluate(variable_evaluations, elements_count);
+            return ~childs_.left->evaluate(variable_evaluations, points_count);
         case operation_t::variable:
             assert(variable_id_ < variable_evaluations.size());
             return variable_evaluations[variable_id_]; // returns the evaluation for the variable
         default:
             assert(false && "Unrecognized.");
-            return model_points_set_t(elements_count);
+            return model_points_set_t(points_count);
     }
 }
 
@@ -410,7 +410,7 @@ void term::move(term&& rhs) noexcept
     rhs.op_ = operation_t::invalid;
 }
 
-auto term::construct_complement_operation(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> bool
+auto term::construct_complement_operation(const NTerm& t) -> bool
 {
     op_ = operation_t::complement;
 
@@ -418,25 +418,25 @@ auto term::construct_complement_operation(const NTerm& t, const variable_to_id_m
     assert(childs_.left);
 
     assert(t.left);
-    return childs_.left->build(*t.left, variable_to_id);
+    return childs_.left->build(*t.left);
 }
 
-auto term::construct_variable_operation(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> bool
+auto term::construct_variable_operation(const NTerm& t) -> bool
 {
     op_ = operation_t::variable;
-    auto it = variable_to_id.find(t.variable);
-    if(it == variable_to_id.end())
+    auto var_id = formula_mgr_->get_variable(t.variable);
+    if(var_id == variable_id_t(-1))
     {
         error() << "Unable to find the variable " << t.variable << " in the set of all variables";
         assert(false);
         return false;
     }
 
-    variable_id_ = it->second;
+    variable_id_ = var_id;
     return true;
 }
 
-auto term::construct_binary_operation(const NTerm& t, operation_t op, const variable_to_id_map_t& variable_to_id) -> bool
+auto term::construct_binary_operation(const NTerm& t, operation_t op) -> bool
 {
     op_ = op;
     assert(is_binary_operaton());
@@ -448,7 +448,7 @@ auto term::construct_binary_operation(const NTerm& t, operation_t op, const vari
 
     // recursive construction of the child terms
     assert(t.left && t.right);
-    return childs_.left->build(*t.left, variable_to_id) && childs_.right->build(*t.right, variable_to_id);
+    return childs_.left->build(*t.left) && childs_.right->build(*t.right);
 }
 
 void term::construct_hash()

@@ -21,9 +21,9 @@ public:
     auto operator==(const term& rhs) const -> bool;
     auto operator!=(const term& rhs) const -> bool;
 
-    auto build(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> bool;
+    auto build(const NTerm& t) -> bool;
 
-    auto evaluate(const variable_id_to_points_t& variable_evaluations, const size_t elements_count) const
+    auto evaluate(const variable_id_to_points_t& variable_evaluations, const size_t points_count) const
         -> model_points_set_t;
 
     void clear();
@@ -101,9 +101,9 @@ public:
 private:
     void move(term&& rhs) noexcept;
 
-    auto construct_complement_operation(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> bool;
-    auto construct_variable_operation(const NTerm& t, const variable_to_id_map_t& variable_to_id) -> bool;
-    auto construct_binary_operation(const NTerm& t, operation_t op, const variable_to_id_map_t& variable_to_id) -> bool;
+    auto construct_complement_operation(const NTerm& t) -> bool;
+    auto construct_variable_operation(const NTerm& t) -> bool;
+    auto construct_binary_operation(const NTerm& t, operation_t op) -> bool;
 
     // calculates and sets the hash depending on the @op_ and the child hashes (if any)
     void construct_hash();
@@ -122,6 +122,9 @@ private:
     void free();
 
     operation_t op_;
+    // A pointer, because the formula_mgr could be moved, so it could change.
+    // Used to make a bitmask for the used variables in the term(w.r.t all variables in the whole formula) and to print the term with it's variable names instead of their (optimized) IDs.
+    // Yes, we can get rid of it but will have to keep mapping of all used variables ids to their names, etc.
     const formula_mgr* formula_mgr_;
 
     variables_mask_t variables_; // TODO: alternative is to calculate the used variables each time when we

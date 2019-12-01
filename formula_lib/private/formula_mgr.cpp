@@ -56,7 +56,7 @@ auto formula_mgr::build(const std::string& f, const formula_refiners& refiners_f
     // TODO: consider making VSplitDisjInLessEqAndContacts and VSplitDisjInLessEqAndContacts combined
     // because in some intermediate splitting the two terms might match
     // Nevertheless, this will still be not 100% sufficient because the order of spliting might take a big role and
-    // skip some pontential matches. For not just convert them after the splitting.
+    // skip some pontential matches. For now just convert them after the splitting.
     if(has_flag(refiners_flags, formula_refiners::convert_contact_less_eq_with_same_terms))
     {
         VConvertLessEqContactWithEqualTerms convertor_lessEq_contact_with_equal_terms;
@@ -133,7 +133,7 @@ auto formula_mgr::build(const std::string& f, const formula_refiners& refiners_f
         variables_.emplace_back(variable);
     }
 
-    return f_.build(*formula_AST, variable_to_id_);
+    return f_.build(*formula_AST);
 }
 
 auto formula_mgr::brute_force_evaluate_with_points_count(basic_bruteforce_model& out_model) const -> bool
