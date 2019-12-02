@@ -53,14 +53,71 @@
       <a href="./howto.html">How To</a>
     </div>
 
-    <div class="main">
+    <div class="main" style="font-size: 16px;">
       <h2>How To</h2>
       <p>Step by step instruction on how to use the formula proover.</p>
       <p>Brief Modal Logic introduction:</p>
       <p>Space Modal logics</p>
-      <p>Formula to topological view example with picture. example for satisfiable and not satisfiable.</p>
-      <p>Symbols for Terms and Formulas</p>
+      <h3>Formula Representation</h3>
+      Term definition:
+      <ul>
+        <li> Each variable represents a term  </li>
+        <li> 0 is a term </li>
+        <li> 1 is a term </li>
+        <li> If a, b are terms, then 
+            <ul>
+              <li> -a is a term </li>
+              <li> a * b is a term </li>
+              <li> a + b is a term </li>
+            </ul>
+        </li>
+      </ul>
+      Formula definition:
+      <ul>
+        <li> T is a formula</li>
+        <li> F is a formula</li>
+        <li> If a, b are terms, then
+          <ul>
+            <li> C(a, b) is an atomic formula </li>
+            <li> <=(a, b) is an atomic formula </li>
+          </ul>
+        </li>
+        <li> If &phi;, &psi; are formulas, then 
+          <ul>
+            <li> ~&phi; is a formula </li>
+            <li> &phi; & &psi; is a formula </li>
+            <li> &phi; | &psi; is a formula </li>
+            <li> &phi; -> &psi; is a formula </li>
+            <li> &phi; <-> &psi; is a formula </li>
+          </ul>
+        </li>
+      </ul>
+      Example formulas:
+      <ul>
+        <li> C(a*b, c*d) & C(a,b) -> <=(a,d) & <=(b,c) </li>
+        <li> C(a+c,b) & ~<=(a,b)  </li>
+        <li> <=(a,b) & <=(b,c) & C(a,c) -> C(b,c) & <=(a,c)  </li>
+      </ul>
+      <h3>Formula Satisfiability</h3>
+        We say that &phi; is satisfiable if there exists an evaluation for the variables of &phi; such that, 
+        &phi; evaluates to true.
+        Satisfiable formulas:
+        <ul>
+          <li> 
+            <i>C(a,b) & <=(a,c)</i> is satisfiable with: a = {1}, b = {2}, c = {1, 3} and R = {(1, 2)}.
+          </li>
+          <li> 
+            <i>C(a,b) & C(b,c)</i> is satisfiable with: a = {1}, b = {2}, c = {3} and R = {(1,2), (2,3)}.
+          </li>
+        </ul>
+        Unsatisfiable formulas:
+        <ul>
+          <li> C(a,b) & ~C(b,a) </li>
+          <li> C(a,b) & <=(a,c) & ~C(c,b) </li>
+        </ul>
+        
       <p>Algorithms</p>
+      Explanation of each algorithm.
     </div>
        
   </body>
