@@ -78,8 +78,9 @@
         <li> F is a formula</li>
         <li> If a, b are terms, then
           <ul>
-            <li> C(a, b) is an atomic formula </li>
-            <li> <=(a, b) is an atomic formula </li>
+            <li> C(a, b) is an atomic formula (Contact)</li>
+            <li> <=(a, b) is an atomic formula (Less or equal)</li>
+            <li> <=m(a, b) is an atomic formula (Less or equal with meassure)</li>
           </ul>
         </li>
         <li> If &phi;, &psi; are formulas, then 
@@ -118,6 +119,25 @@
         
       <p>Algorithms</p>
       Explanation of each algorithm.
+      <h4>Simple Model</h4>
+      <p>The Simple Model takes a formula defined using constants, the <i>Contact</i> and <i>Less or equal</i> atomic formulas and the operations over them and verifies that the formula is 
+      satisfiable. If the formula is satisfiable the correspoding model is displayed, otherwise a proof is written as an output 
+      describing why the formula can not be satisfied.</p>
+      <h4>Measured Model</h4>
+      <p>The Meassured Model takes a formula defined using constants, all atomic formulas and the operations over them and verifies that the formula is satisfiable. If the formula is satisfiable the correspoding model is displayed, otherwise a proof is written as an output 
+      describing why the formula can not be satisfied.</p>
+      <p>The process of determining that the formula is satisfiable is firstly done by satisfying all <i>Contacts</i> and <i>Less or equal</i>, and secondly by satisfying the <i>Less or equal with meassure</i>. The process of determing if the <i>Less or equal with messure</i> atomic formulas are satisfied is done using a third party library for solving system of linear inequalities.</p>
+      <h4>Connectivity Model</h4>
+      <p>First let's get acquainted with an axiom that is going to be used to describe this model.</p>
+      <p><i>Connectivity Axiom: </i> a &ne; <b>&empty;</b> & a &ne; <b>W</b> -> C(a, -a), where <b>W</b> is the whole world.</p>
+        <p>This axiom states that if there exists a set which is not the empty set and is not the whole set, then there must exist 
+        a Contact between the set itself and the opposite set.</p>
+      <p>Now for the Connectivity Model itself. The input that it takes is a formula defined using constants, the <i>Contact</i> and <i>Less or equal</i> atomic formulas and the operations over them and verifies that the formula is satisfiable and the connectivity axiom is satisfied as well. If the formula is satisfiable the correspoding model is displayed, otherwise a proof is written as an output 
+      describing why the formula can not be satisfied.</p>
+      <h4>Bruteforce Model</h4>
+      <p>The Bruteforce Model is solving the same problem as the Simple Model, but it can do this extrimely slow. This is kinda his secret!!</p>
+      <p>The idea behind the Bruteforce Model was to have a standarized algorithm which does the job in a simple and correct manner, so that 
+      every other algorithm can be compared to it.</p>
     </div>
        
   </body>
