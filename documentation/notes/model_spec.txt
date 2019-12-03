@@ -70,9 +70,11 @@ P0 evaluates X to true and P1 evaluates Y to true(to satisfy the defenition of v
 Checks if P0 / P1 does not break some =0 atomic formula, if so - tries to make new evaluation for P0/P1.
 Makes a edge between the two points and checks if they does not breake some ~C atomic formula.
 If it breaks any ~C then it will generate new evaluation for P1, until it find a satisfiable one.
-If not possible it changes the evaluation of P0 and againt iterates over all P1 combinations.
-Let's N be the number of used variables in the formula(path), then the complexity will be 2^N * 2^N for this atomic contact formula,
-so overall it will be |C|*|Z|*2^N*2^N, where C is the number of Contacts(in contacts_T collection) and Z is the number of !=0 terms (in zero_terms_F collection).
+If not possible, then it changes the evaluation of P0 and potentially - again iterates over all P1 combinations.
+For all a!= atomic formulast it tries to create a point which evaluates 'a' to true (i.e. v(a) contains that point), does not break any negation of contact rule(the reflexivity part of it) and =0 atomics.
+Let's N be the number of used variables in the formula(path), then the complexity will be 2^N * 2^N for one atomic contact formula,
+so overall it will be (|C|*2^N*2^N + |Z|*2^N)*X, where C is the number of Contacts(in contacts_T collection), Z is the number of !=0 terms (in zero_terms_F collection),
+X is the number of =0 and ~C formulas, which have to be validated.
 
 auto model::create(const formulas_t& contacts_T, const formulas_t& contacts_F, const terms_t& zero_terms_T,
                    const terms_t& zero_terms_F, const formulas_t&, const formulas_t&, const variables_mask_t& used_variables,
@@ -85,11 +87,93 @@ auto model::create(const formulas_t& contacts_T, const formulas_t& contacts_F, c
     if(construct_contact_model_points(contacts_T, contacts_F, zero_terms_T) &&
        construct_non_zero_model_points(zero_terms_F, contacts_F, zero_terms_T))
     {
-        calculate_the_model_evaluation_of_each_variable(); // claculates v(p) for each variable in the WHOLE formula(empty set for not used)
+        calculate_the_model_evaluation_of_each_variable(); // claculates v(p) for each variable in the WHOLE formula(empty set for not used variables)
         create_contact_relations_first_2k_in_contact(points_.size(), contacts_T.size()); // creats adjacency matrix in which 2k is in contact with 2k+1 (k < contacts_T.size())
         return true;
     }
     return false;
 }
 
-TODO: Finish it
+auto model::construct_contact_model_points(const formulas_t& contacts_T, const formulas_t& contacts_F,
+                                           const terms_t& zero_terms_T) -> bool
+{
+    for(const auto& c : contacts_T)
+    {
+        if(!construct_contact_points(c, contacts_F, zero_terms_T))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+auto model::does_point_evaluation_satisfies_basic_rules(const term* t,
+                                                        const variables_evaluations_block& evaluation,
+                                                        const formulas_t& contacts_F,
+                                                        const terms_t& zero_terms_T) const -> bool
+{
+    return t->evaluate(evaluation).is_constant_true() &&
+           are_zero_terms_T_satisfied(zero_terms_T, evaluation) && // for all 'a=0' atomics checks that v(a) with this point evaluation is false
+           is_contacts_F_reflexive_rule_satisfied(contacts_F, evaluation); // Checks if for all ~C(a,b) this point evaluation does not evaluates both, 'a' and 'b' to true, i.e. this point will be in v(a) and v(b)
+}
+
+auto model::construct_non_zero_model_points(const terms_t& zero_terms_F, const formulas_t& contacts_F,
+                                            const terms_t& zero_terms_T) -> bool
+{
+    for(const auto& z : zero_terms_F)
+    {
+        TERMINATE_IF_NEEDED();
+        variables_evaluations_block eval(variables_mask_t(0)); // it will be overriten if succeed
+        if(!create_point_evaluation(z, eval, contacts_F, zero_terms_T))
+        {
+            return false;
+        }
+        points_.push_back(std::move(eval));
+    }
+
+    return true;
+}
+
+auto model::create_point_evaluation(const term* t, variables_evaluations_block& out_evaluation,
+                                    const formulas_t& contacts_F, const terms_t& zero_terms_T) const -> bool
+{
+    out_evaluation = variables_evaluations_block(used_variables_);
+
+    return does_point_evaluation_satisfies_basic_rules(t, out_evaluation, contacts_F, zero_terms_T) ||
+           generate_next_point_evaluation(t, out_evaluation, contacts_F, zero_terms_T); // generates next point evaluation which satisfies the basic rules
+}
+
+auto model::construct_contact_points(const formula* c, const formulas_t& contacts_F,
+                                     const terms_t& zero_terms_T) -> bool
+{
+    const auto left = c->get_left_child_term();
+    const auto right = c->get_right_child_term();
+
+    variables_evaluations_block left_eval(variables_mask_t(0)); // it will be overriten if succeed
+    if(!create_point_evaluation(left, left_eval, contacts_F, zero_terms_T))
+    {
+        return false;
+    }
+
+    do
+    {
+        variables_evaluations_block right_eval(variables_mask_t(0));
+        if(!create_point_evaluation(right, right_eval, contacts_F, zero_terms_T))
+        {
+            return false;
+        }
+
+        do
+        {
+            if(is_contacts_F_connectivity_rule_satisfied(contacts_F, left_eval, right_eval)) // for all ~C(a,b) check that the left point is not in v(a) and the right point is not in v(b), because this operation brings a connection between this two points and we wont to satisfy ~C(a,b) TODO: what about the vice versa case?
+            {
+                points_.push_back(std::move(left_eval));
+                points_.push_back(std::move(right_eval));
+                return true;
+            }
+        } while(generate_next_point_evaluation(right, right_eval, contacts_F, zero_terms_T));
+    } while(generate_next_point_evaluation(left, left_eval, contacts_F, zero_terms_T));
+
+    return false;
+}
