@@ -176,7 +176,7 @@ auto model::is_contacts_F_connectivity_rule_satisfied(
     for(const auto& c : contacts_F)
     {
         if(c->get_left_child_term()->evaluate(evaluation_left).is_constant_true() &&
-           c->get_right_child_term()->evaluate(evaluation_right).is_constant_true())
+           c->get_right_child_term()->evaluate(evaluation_right).is_constant_true()) // TODO: what about the evaluation_left(right_child) && evaluation_right(left_child)???
         {
             return false;
         }
