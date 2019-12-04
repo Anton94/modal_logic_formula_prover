@@ -90,6 +90,3 @@ Concatenating the bit arrays for each set (knowing that each set represents the 
 a single bit array. 
 
 All that is needed to generate a new combination of sets is the operation Add One.
-
-Example:
-

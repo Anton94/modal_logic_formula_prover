@@ -1,11 +1,14 @@
 Rest Server
 
-The Web server is used to server:
+The Web server is used to serve:
 	- Rest APIs 
 	- Resources
 
-The Rest APIs are used to check fo satisfiability, connectivity models.
-The Resources contains html pages, images and Javascript code.
+The Rest APIs are used to check for satisfiability, to find connectivity models or meassured models.
+The Resources are:
+	- html pages, 
+	- images 
+	- Javascript code.
 
 The Web Interface is easy to use, contains only the needed information and from there 
 can be executed all of the described satisfiability algorithms.
@@ -16,6 +19,9 @@ This way it is ensured that there are not a lot of simultaneous executing progra
 If the program execution time gets too long the client has the possibility to terminate the execution 
 of the current program by server. This will re-enable the client to execute another program and will remove 
 the execution load from the server.
+
+If the client posts a comples formula for calculation nad terminetes the session (for example closes the browser),
+then the task in the backend will be terminated as well.
 
 The output of the program is separated in three modules:
 	Resulting output - indicates what was the final result of the execution.

@@ -138,6 +138,25 @@
       <p>The Bruteforce Model is solving the same problem as the Simple Model, but it can do this extrimely slow. This is kinda his secret!!</p>
       <p>The idea behind the Bruteforce Model was to have a standarized algorithm which does the job in a simple and correct manner, so that 
       every other algorithm can be compared to it.</p>
+
+      <h4>Example formula: (C(a*b, c*d) & C(a,b)) | (<=(a,d) & <=(b,c))</h4>
+      <p>The above formula is constructed from 4 atomic formulas:
+        <ul>
+          <li>C(a*b, c*d)</li>
+          <li>C(a,b)</li>
+          <li><=(a,d)</li>
+          <li><=(b,c)</li>
+        </ul>
+        and the &, | logical operators over formulas.
+      </p>
+
+      <p>Possible solution to this formula is:
+          a = {1},<br/>
+          b = {1, 2},<br/>
+          c = {4, 5},<br/>
+          d = {5},<br/>
+          R = {(4,5), (1,5)}<br/>
+      </p>
     </div>
        
   </body>

@@ -342,6 +342,16 @@
 			  margin-left: 20px;
 			  margin-right: 20px;
 			}
+
+			.verbose_output {
+			    height: auto;
+			    max-height: 400px;
+			    overflow: auto;
+			    background-color: #eeeeee;
+			    word-break: normal !important;
+			    word-wrap: normal !important;
+			    white-space: pre !important;
+			}​
 		</style>
 		<script>
 			function pre_init() {
@@ -422,7 +432,7 @@
 
 				<button class="accordion">Verbose Output / Console</button>
 				<div class="panel">
-				  <pre id="verbose_output"></pre>
+				  <pre class="verbose_output" id="verbose_output"></pre>
 				</div>
 
 				<button class="accordion" style="margin-bottom: 20px;">Visualized Model</button>
