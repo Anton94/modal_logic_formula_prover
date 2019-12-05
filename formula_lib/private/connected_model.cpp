@@ -177,7 +177,7 @@ auto connected_model::is_contact_satisfied(const formula* c) const -> bool
     const auto v_a = c->get_left_child_term()->evaluate(variable_evaluations_, points_.size());
     const auto v_b = c->get_right_child_term()->evaluate(variable_evaluations_, points_.size());
 
-    auto point_from_v_a = v_a.find_first();
+    auto point_from_v_a = v_a.find_first(); // TODO: maybe iterate over the set with less items
     while (point_from_v_a != model_points_set_t::npos)
     {
         const auto& contacts_of_point_from_v_a = contact_relations_[point_from_v_a];
