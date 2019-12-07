@@ -35,7 +35,7 @@ auto measured_model::create(const formulas_t& contacts_T, const formulas_t& cont
     // We need at least K points in the model, where K is the number of <=m / ~<=m atomics multiplied by 2
     // TODO: explain why and prove that it is enough TODO: check it only ~<=m requies new points?
     // We need at least one model point.
-    const auto minimal_points = std::max(1ul, (measured_less_eq_T.size() + measured_less_eq_F.size()) * 2);
+    const auto minimal_points = std::max(1ul, static_cast<unsigned long>((measured_less_eq_T.size() + measured_less_eq_F.size()) * 2));
     if(points_.size() < minimal_points)
     {
         const auto number_of_points_to_add = minimal_points - points_.size();
