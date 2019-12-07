@@ -4,6 +4,7 @@
 #include "term.h"
 #include "thread_termiator.h"
 
+#include <algorithm>
 #include <cassert>
 
 measured_model::measured_model()
