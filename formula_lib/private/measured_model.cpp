@@ -113,9 +113,9 @@ auto measured_model::is_zero_term_rule_satisfied(const terms_t& zero_terms_T) co
 auto measured_model::has_solvable_system_of_inequalities() -> bool
 {
     // For each <=m(a,b) calculate v(a) and v(b), then we will create
-    // an inequality of the following type: SUM_I Xi <= SUM_J Xj, where I and J are set v(a) and v(b).
-    // For each ~<=m(a,b) calculate v(a) and v(b), then
-    // an inequality of the following type: SUM_I Xi > SUM_J Xj, where I and J are set v(a) and v(b).
+    // an inequality of the following type: SUM_I Xi <= SUM_J Xj, where I is v(a) and J is v(b).
+    // For each ~<=m(a,b) calculate v(a) and v(b), then we will create
+    // an inequality of the following type: SUM_I Xi > SUM_J Xj, where I is v(a) and J is v(b).
     // Each inequality is a row in the system of inequalities. If this system has a solution, then we are good.
 
     const auto points_size = points_.size();

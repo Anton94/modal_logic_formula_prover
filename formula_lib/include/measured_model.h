@@ -13,7 +13,7 @@ class formula;
 struct measured_model : public imodel
 {
     /*
-     * TODO: add O complexities for the algorithm(on each step, etc.)
+     * TODO: add O complexities for the algorithm(on each step, etc.) The term evaluation complexity is skipped
      *
      * Let us have the following formula: C(Ai, Bi) & ~C(Ej, Fj) & Dk!=0 & Gl=0 & <=m(Hs, Os) & ~<=m(Qu, Ru) (i,j,k,l,s,u can iterate over some ranges).
      * This are all atomic formulas in some path in the tableau.
@@ -34,48 +34,53 @@ struct measured_model : public imodel
      * For 'c*d' a point could be: P('c*d', [0011]).
      * We need the point to know it's associated term because we will generate 'next' evaluation which evaluates the term to 'true'.
      *
-     * 1) For each C(Ai, Bi) we create two points Pa and Pb: Pa[Ai] = true and Pb[Bi] = true. (if not possible then there is no such model, at each step, if we can't create next point then there is no such model)
-     * 2) For each Dk!=0 we create one point P: P[Dk] = true
+     * 1) For each C(Ai, Bi) we create two points Pa and Pb: Pa[Ai] = true and Pb[Bi] = true. If not possible - then there is no satisfiable model.
+     * 2) For each Dk!=0 we create one point P: P[Dk] = true  If not possible - then there is no satisfiable model.
      *
      * 3) If the points are less than the measured atomics*2 (or zero points) then we create dummy points which are associated to '1' constant term, just to make real points and to be able to put at least one variable in both sides of the inequalities
      *
      * Now, We have at least one point.
      *
-     * 4) We make a connection between the contact points, i.e. for each 0 <= i < I we add a connection in the connectivity matrix between 2i and 2i + 1 points.
+     * 4) We make a connection between the contact points, first 2*I points are from contact's terms, i.e. for each 0 <= i < I we add a connection in the connectivity matrix between 2i and 2i + 1 points.
+     *
      * 5) We calculate the v(X) for each variable. (TODO: this should be explained somewhere else already)
      *
      * Now, we have satisfied all C(Ai, Bi) and Dk!=0 atomic formulas.
      *
-     * 6)
+     * Note: If any of 6) 7) or 8) is not satisfied, then we generate new combination of points - step 9) and again checking 6),7) and 8) until we can generate new combination of points. If not possible then there is no satisfiable model.
      *
+     * 6) For each Gl=0 we evaluate v(Gl) and check if it's the empty set. O(L)
      *
-     * The main difference between this model and 'model.h' is that this one generates new points and checks some conditions
-     * and the other once generates the points in a way which satisfies the conditions and every point(or pair of points for contacts)
-     * which it generates are satisfiable and there is no need to go back and regenrate them.
-    */
+     * 7) For each ~C(Ej, Fj) we check if v(Ej) and v(Fj) contains a common point OR one of sets(e.g.v(Ej) contains a point which is in contact with a point in the other set.
+     *  O(J * (I + J) * G)
+     *        G is the complexity for "bit operator &" which is most likely something like (I+J)/2^6.
+     *        I+J is the number of points.
 
-    /*
-        Les't have 3 contacts and 1 non-zero term in the following formula:
-        C(a,b) & C(c,d) & C(e,f) & g != 0 & x = 0 & ~C(y,z)
-        The model is the following:
-        (xxx...x) (a) O--------------1 (b) (xxx...x)
-        (xxx...x) (c) 2--------------3 (d) (xxx...x)
-        (xxx...x) (e) 4--------------5 (f) (xxx...x)
-        (xxx...x) (g) 6
-        Note that the zero terms and negation of C are not interested to us because they does not require existence.
-        where (xxx...x) is a bitset, e.g. (010...1) which gives 0/1 evaluation for the variables in the formula, so its size is the number of different variables in the formula
-        i = 0...6 are the model points (reflexive), the contact points are connected (-------) (also symetric)
-        Model evaluation 'v' which for a given term returns a subset of the model points.
-        :
-         - v(p) = { i | (i) (xxx...x)[p] == 1, i.e. in point 'i' the evaluation of the variable 'p' is 1 }, where 'p' is a variable(an id)
-         - v(a * b) = v(a) & v(b)
-         - v(a + b) = v(a) | v(b)
-         - v(-a) = ~v(a)
-        Not that each point's evaluation evaluates it's term to the constant true in order to that point to be in the MODEL evaluation of the term,
-        i.e. for the point 0, the term 'a' and it's evaluation (xxx..x): a->evaluate(xxx..x) = constant_true in order to 0 belongs to v(a)
-        Connectivity axiome:
-        a != 0 & a != 1 -> C(a,a*)
-        in our case, we evaluate each point's term (i.e., v(a)) and if it's not the whole set of points, we will create a contact relation with an element from v(a*)
+     * 8) We check also the measured atomics: (TODO: we should have already defined why we are doing it in some theoretical part of the documentation)
+     *  For each <=m(a,b) calculate v(a) and v(b), then we will create
+     *  an inequality of the following type: SUM_I Xi <= SUM_J Xj, where I and J are v(a) and v(b).
+     *  For each ~<=m(a,b) calculate v(a) and v(b), then we will create
+     *  an inequality of the following type: SUM_I Xi > SUM_J Xj, where I and J are v(a) and v(b).
+     *  Each inequality is a row in the system of inequalities. If this system has a solution, then we are good and the generated model is a satisfiable one. Finish!
+     *
+     * TODO: somewhere else we should explain how we solve such systems!
+     *
+     * 9) The generation of new combination of points (remember that a points is just a variable evaluation AND a term which should be evaluated to 'true' (in order that point to be in v(point's term))):
+     * Similar to binary +1 operation but instead of just 0 and 1 states on each position we have 2^N combinations(from which some will not be valid because they will not evaluate the point's term to true)
+     * For example:
+     *    - binary +1: 000 + 1 = 001 + 1 = 010 + 1 = 011 + 1 = 100 ...
+     *    - if we have two variables and two points(let's ignore the term for now).
+     *     At first they will be only 0s. [00][00] where first [00] is the evaluation of the first point which evaluates both variables to 0.
+     *     [00][00] -(next combination)-> [00][01] -> [00][10] -> [00][11] -> [01][00] -> [01][01] -..-> [01][11] -> [10][00] -..-> [11][11] which is the last combination.
+     *     When we bring also the condition that the point's evaluation should evaluate the term to true then we skip all evaluations which does not satisfy it.
+     *     E.g. if the variables are 'x' and 'y', first point's term is 'x', second point's term is 'y' then the valid sequence of combinations will be:
+     *     [x:1 y:0, 'x'][x:0 y:1, 'y'] -> [10][11] -> [11][01] -> [11][11] and that's all.
+     * Note that the generation could be done like +1 operation (from back to forth) or vise versa, doesn't matter.
+     *
+     * O((I+J) * G), where G is the complexity for finding a next evaluation for a point(i.e. finding a evaluation which evaluates the point's term to true), which is at most 2^N.
+     * After a successfull generation we need to recalculate the v(X) for each X(variable) so it's (I+J)*N, i.e. for each point's evaluation - we go through each set bit to add that point to the set of points of v(X)(where X is the variable which bit is set) TODO: better explanation
+     * Overall, all combinations are: (2^N)^(I+J)
+     *
     */
     measured_model();
 
