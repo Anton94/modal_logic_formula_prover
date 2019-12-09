@@ -148,8 +148,8 @@ private:
      *  !(evaluation_left evaluates a to true && evaluation_right evaluates b to true)
      */
     auto is_contacts_F_connectivity_rule_satisfied(const formulas_t& contacts_F,
-                                                   const variables_evaluations_block& evaluation_left,
-                                                   const variables_evaluations_block& evaluation_right) const
+                                                   const variables_evaluations_block& eval_a,
+                                                   const variables_evaluations_block& eval_b) const
         -> bool;
 
     void calculate_the_model_evaluation_of_each_variable();

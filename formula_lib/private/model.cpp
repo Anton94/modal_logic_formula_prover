@@ -169,20 +169,25 @@ auto model::does_point_evaluation_satisfies_basic_rules(const term* t,
            is_contacts_F_reflexive_rule_satisfied(contacts_F, evaluation);
 }
 
-auto model::is_contacts_F_connectivity_rule_satisfied(
-    const formulas_t& contacts_F, const variables_evaluations_block& evaluation_left,
-    const variables_evaluations_block& evaluation_right) const -> bool
+auto model::is_contacts_F_connectivity_rule_satisfied(const formulas_t& contacts_F,
+                                                      const variables_evaluations_block& eval_a,
+                                                      const variables_evaluations_block& eval_b) const -> bool
 {
     for(const auto& c : contacts_F)
     {
-        if(c->get_left_child_term()->evaluate(evaluation_left).is_constant_true() &&
-           c->get_right_child_term()->evaluate(evaluation_right).is_constant_true()) // TODO: what about the evaluation_left(right_child) && evaluation_right(left_child)???
+        const auto l = c->get_left_child_term();
+        const auto r = c->get_right_child_term();
+        if((l->evaluate(eval_a).is_constant_true() &&
+            r->evaluate(eval_b).is_constant_true()) ||
+           (l->evaluate(eval_b).is_constant_true() &&
+            r->evaluate(eval_a).is_constant_true()))
         {
             return false;
         }
     }
     return true;
 }
+
 void model::calculate_the_model_evaluation_of_each_variable()
 {
     const auto points_size = points_.size();
