@@ -1,0 +1,15 @@
+We are using automatic unit tests which we run and validate in each automatic build.
+
+Some of the tests are grouped in the following groups:
+    - AST structure tests - a low level tests for the real structure of the AST based on different input strings, i.e. they check the type and content of each node in the AST.
+    - Parser tests - each test case tries to parse an input string as a formula. There are quite a few tests which tests a wrong input and the produced error. Each test case also tests the formula_mgr's building with the input string.
+    - Visitor tests - all visitors which modify the formula are tested to match an expected representation of the produced formula.
+    - Contact commutativity functionality - C(a,b) == C(b,a)
+    - System of inequalities - each test case tests the system of our special type by adding one row at a time(to be satisfiable or not - configurable for each row, etc). Checks the variables values greater to be grater than 0.
+    - Term evaluation with variable evaluations - each test case evaluates a term with variables which gives 0/1/subTerm (which should match with the given expected).
+    - Variable evalautions block - tests the variables_evaluations_block. Tests with different variables masks, number of variables. Each of them tests also the sequentional generation of new evaluations.
+    - Variables retrieving tests - each test case tests the functionality for getting the used variables in term/formula.
+    - Satsfiability tests - they check if some formula is satisfiable with each model(configurable which models to test)
+    - Performance tests - they measure the time to run 'is_satisfiable' on each model with some input formula (usually a heavy one).
+
+There are other tests which are not so interesting(e.g., not used functionality at the moment or a specific implementation details, e.g. moving of objects).
