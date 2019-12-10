@@ -55,26 +55,69 @@
 
     <div class="main" style="font-size: 16px;">
       <h2>How To</h2>
-      <h3>Brief introduction: <i>Region-based theories of space:</i></h3>
+      <h3>Brief introduction: <i>Region-based theories of space</i></h3>
         <p>
           The goal of the Region-based theory of space is to describe elements with the usage <br/>
           of separate scattered regions collected together, these regions<br/>
           alone are not that interesting, but with the addition of relations<br/>
-          and subregion between them a beautiful theory is achived.
+          and subregions between them a beautiful theory is achived.
         </p>
 
-        <p>For comparison the Euclidean space is composed of point as a primitive type, with multiple points <br/>
+        <p>For comparison the Euclidean space is composed of points as a primitive types, with multiple points <br/>
           a line, plain and all other figures can be achived. But all of these are indivisible parts, glued together.<br/>
-          Exactly the lack of choosing scattered points to create some kind of object is addressed by the Region-based theory.<br/>
+          Exactly the lack of choosing scattered points to create some kind of object is achived by the Region-based theory.<br/>
         </p>
         
         <p>
-          In the Region-based theory we have the Regions as primative types, over regions a mereological relation<br/>
+          In the Region-based theory we have the regions as primative types, over regions a mereological relation<br/>
           is defined which we are going to call Contact and a topological relation which defines the subrigions of a region.<br/>
           The points are defined as series of operations over the <br/>
           regions.
         </p>
+        <h4>Representation:</h4>
+        <p>
+          Each region is going to be represented as a set of elements.<br/> 
+          We are going to use the lower case english alphabet letters to represent a region.<br/>
+          For example:<br/>
+            Let's define few regions so that we can use them in the following section for our examples.
+            <ul>
+             <li><i>a = {1, 3, 5}</i>, denotes the region of three elements, namely 1, 3 and 5.</li>
+             <li><i>b = {2, 3}</i>, denotes the region of two elements, namely 2 and 3.</li>
+             <li><i>c = {4}</i>, denotes the region of only one element, namely 4.</li>
+             <li><i>W = {1, 2, 3, 4, 6}</i>, denotes the whole world, we can create regions only from elements in W.</li>
+             <li><i>&empty; = {}</i>, denotes the empty region.</li>
+            </ul>
+
+          Let's define few basic operations over regions.<br/>
+          Suppose that p and q are two regions, then
+          <ul>
+            <li>&not; p, is also a region defined as W \ p</li>
+            <li>p &or; q, is also a region defined as p &xcup; q</li>
+            <li>p &and; q, is also a region defined as p &xcap; q</li>
+          </ul>
+          <p>
+          Examples:
+          <ul>
+            <li><i>&not; a</i> = {2, 4, 6}</li>
+            <li><i>a &and; b</i> = {3}</li>
+            <li><i>a &or; b </i>= {1, 2, 3, 5}</li>
+          </ul>
+          </p>
+          <p>
+          Contact relation:
+          <p>
+            We say that one region is in contact with another region if there<br/>
+            exists an element from the first regiono in relation with an element from the second region.
+          </p>
+          Subregion:
+          <p>
+            We say that a region is a subregion of another region if all elements<br/>
+            from the first region are elements of the second region as well.
+          </p>
+
+        </p>
       <h3>Formula Representation</h3>
+      <p></p>
       Term definition:
       <ul>
         <li> Each variable represents a term  </li>
