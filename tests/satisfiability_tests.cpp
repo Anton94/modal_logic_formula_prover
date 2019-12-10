@@ -206,6 +206,36 @@ TEST_CASE("satisfiable 19", "[satisfiability]")
                    true, false);
 }
 
+TEST_CASE("satisfiable 20", "[satisfiability]")
+{
+    is_satisfiable("~C(a,a)", true, true, true);
+}
+
+TEST_CASE("satisfiable 21", "[satisfiability]")
+{
+    is_satisfiable("~C(a,a) | ~C(-a, -a)", true, true, true);
+}
+
+TEST_CASE("satisfiable 22", "[satisfiability]")
+{
+    is_satisfiable("T", true, true, true);
+}
+
+TEST_CASE("satisfiable 23", "[satisfiability]")
+{
+    is_satisfiable("F", false, false, false);
+}
+
+TEST_CASE("satisfiable 24", "[satisfiability]")
+{
+    is_satisfiable("~C(a + 1, a)", true, true, true);
+}
+
+TEST_CASE("satisfiable 25", "[satisfiability]")
+{
+    is_satisfiable("~C(a + 1, -a)", true, true, true);
+}
+
 TEST_CASE("satisfiable evaluation of path 1", "[satisfiability]")
 {
     is_satisfiable("~C(x * -z,b) & (~C(-b,b) & ~<=(x, z))", true, true, true);
@@ -228,7 +258,6 @@ TEST_CASE("satisfiable evaluation of path 4", "[satisfiability]")
 
 TEST_CASE("satisfiable evaluation of path 5", "[satisfiability]")
 {
-    //
     is_satisfiable("((C(a,a) & C(d,d)) & ~C(a,d)) & ((n * m) * -o = 0)", true, true, true, false);
 }
 
@@ -454,4 +483,34 @@ TEST_CASE("measured_model additional points 2", "[satisfiability]")
 TEST_CASE("measured_model additional points 3", "[satisfiability]")
 {
     is_satisfiable("~<=m(a * b, 0) & ~<=m(a,b)", true, true, true);
+}
+
+TEST_CASE("empty model satisfies the formula but there should be at least one point 1", "[satisfiability]")
+{
+    is_satisfiable("a=0 & -a=0", false, false, false);
+}
+
+TEST_CASE("empty model satisfies the formula but there should be at least one point 2", "[satisfiability]")
+{
+    is_satisfiable("~C(a,a) & ~C(-a,-a)", false, false, false);
+}
+
+TEST_CASE("empty model satisfies the formula but there should be at least one point 3", "[satisfiability]")
+{
+    is_satisfiable("~C(a,a) & ~C(-a,-a)", false, false, false);
+}
+
+TEST_CASE("empty model satisfies the formula but there should be at least one point 4", "[satisfiability]")
+{
+    is_satisfiable("~C(1, 1)", false, false, false);
+}
+
+TEST_CASE("empty model satisfies the formula but there should be at least one point 5", "[satisfiability]")
+{
+    is_satisfiable("(a + -a)=0", false, false, false);
+}
+
+TEST_CASE("empty model satisfies the formula but there should be at least one point 6", "[satisfiability]")
+{
+    is_satisfiable("~C(a + -a, b + -b)", false, false, false);
 }
