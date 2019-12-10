@@ -14,14 +14,21 @@ auto model::create(const formulas_t& contacts_T, const formulas_t& contacts_F, c
     used_variables_ = used_variables;
     mgr_ = mgr;
 
-    if(construct_contact_model_points(contacts_T, contacts_F, zero_terms_T) &&
-       construct_non_zero_model_points(zero_terms_F, contacts_F, zero_terms_T))
+    if(!construct_contact_model_points(contacts_T, contacts_F, zero_terms_T) ||
+       !construct_non_zero_model_points(zero_terms_F, contacts_F, zero_terms_T))
     {
-        calculate_the_model_evaluation_of_each_variable();
-        create_contact_relations_first_2k_in_contact(points_.size(), contacts_T.size());
-        return true;
+        return false;
+
     }
-    return false;
+
+    if(points_.empty() && !construct_dummy_point(contacts_F, zero_terms_T))
+    {
+        return false;
+    }
+
+    calculate_the_model_evaluation_of_each_variable();
+    create_contact_relations_first_2k_in_contact(points_.size(), contacts_T.size());
+    return true;
 }
 
 auto model::get_model_points() const -> const points_t&
@@ -186,6 +193,21 @@ auto model::is_contacts_F_connectivity_rule_satisfied(const formulas_t& contacts
         }
     }
     return true;
+}
+
+auto model::construct_dummy_point(const formulas_t& contacts_F, const terms_t& zero_terms_T) -> bool
+{
+    term t(mgr_);
+    t.construct_constant(true);
+
+    variables_evaluations_block eval(variables_mask_t(0)); // it will be overriten if succeed
+    if(create_point_evaluation(&t, eval, contacts_F, zero_terms_T))
+    {
+        points_.push_back(std::move(eval));
+        return true;
+    }
+
+    return false;
 }
 
 void model::calculate_the_model_evaluation_of_each_variable()

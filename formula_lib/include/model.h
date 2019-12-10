@@ -181,6 +181,11 @@ private:
                                                    const variables_evaluations_block& eval_b) const
         -> bool;
 
+    /*
+     * Creates a dummy point evaluation which does not break the =0 and ~C reflexivity rules.
+     */
+    auto construct_dummy_point(const formulas_t& contacts_F, const terms_t& zero_terms_T) -> bool;
+
     void calculate_the_model_evaluation_of_each_variable();
 
     variables_mask_t used_variables_{};

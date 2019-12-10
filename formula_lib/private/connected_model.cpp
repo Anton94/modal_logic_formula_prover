@@ -18,6 +18,12 @@ auto connected_model::create(const formulas_t& contacts_T, const formulas_t& con
 
     construct_all_valid_unique_points(contacts_F, zero_terms_T);
 
+    if(points_.empty())
+    {
+        trace() << "Unable to create even one model point which does not break the =0 or the reflexivity of ~C atomics.";
+        return false;
+    }
+
     calculate_the_model_evaluation_of_each_variable();
     TERMINATE_IF_NEEDED();
 

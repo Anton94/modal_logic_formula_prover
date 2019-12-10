@@ -2,6 +2,8 @@
 #include "formula_mgr.h"
 #include "../include/thread_termiator.h"
 
+#include <algorithm>
+
 void basic_bruteforce_model::clear()
 {
     number_of_contacts_ = 0;
@@ -59,7 +61,7 @@ auto basic_bruteforce_model::create(const formulas_t& contacts_T, const formulas
 
 	number_of_contacts_ = contacts_T.size();
 	number_of_non_empty_ = zero_terms_F.size();
-	number_of_points_ = 2 * number_of_contacts_ + number_of_non_empty_;
+    number_of_points_ = std::max(1ul, static_cast<unsigned long>(2 * number_of_contacts_ + number_of_non_empty_));
 
 	// populate 00..00 for every variable
 	variable_evaluations_.clear();
@@ -121,7 +123,7 @@ auto basic_bruteforce_model::create(const formula& f, size_t variables_count, co
     mgr_ = mgr;
     number_of_contacts_ = f.get_contacts_count().first;
     number_of_non_empty_ = f.get_zeroes_count().second;
-    number_of_points_ = 2 * number_of_contacts_ + number_of_non_empty_;
+    number_of_points_ = std::max(1ul, static_cast<unsigned long>(2 * number_of_contacts_ + number_of_non_empty_));
 
     // populate 00..00 for every variable
     variable_evaluations_.clear();
