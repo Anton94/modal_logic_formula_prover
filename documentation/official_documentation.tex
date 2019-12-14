@@ -1,5 +1,7 @@
 \documentclass{article}
 \usepackage{amssymb}
+\usepackage{newtxtext}
+\usepackage{newtxmath}
 
 \title{Satisfiability Of Modal Logic Formulas}
 \date{2019-9-28}
@@ -15,7 +17,7 @@
 	\[ \mathbb{V}ar = \{p_0, p_1, p_2 ... \}\]
 	Let $\mathbb{C}_t$ be the set of Term constants:
 	\[ \mathbb{C}_t = \{0, 1 \}\]
-	Term recursive definition
+	\subsection{Term recursive definition}
 	\begin{itemize}
 		\item $a \in \mathbb{C}_t$ is a term
 		\item $p \in \mathbb{V}ar$ is a term
@@ -25,7 +27,7 @@
 	\end{itemize}
 	Let $\mathbb{C}_f$ be the set of formula constants:
 	\[ \mathbb{C}_f = \{T, F \}\]
-	Formula recursive definition
+	\subsection{Formula recursive definition}
 	\begin{itemize}
 		\item $a \in \mathbb{C}_f$ is a formula
 		\item If x and y are terms, then C(x, y) is a formula
@@ -36,15 +38,126 @@
 			where $\sigma \in \{\vee, \wedge, \rightarrow, \leftrightarrow\}$
 	\end{itemize}
 	
+		\subsection{Definition: Atomic Formula}
+			A formula will be called atomic formula if it is a constant or it is in one of the followings:
+			\begin{itemize}
+				\item C(x, y)
+				\item $x \le y$
+				\item $x \le_m y$
+			\end{itemize}
+			where x and y are terms.
 
-	\section{Tableaux Process}
+	\section{Tableaux}
 	The Tableaux process is decision procedure, which recursively breaks down a given formula into basic components 
 	based on which a decision can be concluded. The recursive step which breaks down a formula creates one or two 
 	new formulas, which in terms of their structure are simpler then the initial formula. Since the recursive step can create
 	at most two new formulas, this means the recursive step will create at most two branches or a binary tree, where the nodes
-	are the formulas and the links represent the recursive step.
+	are the formulas and the links represent the recursive step. The different branches are considered to be disjuncted while
+   	nodes of the same branch are considered in conjunction. The procedure modifies the tableau in such a way that the 
+	formula represented by the resulting tableau is equivalent to the original one.
 
 	Contradiction may arise when in the same branch, on some step there exists a formula and the negation of the same formula.
 	If in some branch there exists a contradiction, then that branch closes. If all branches close then the proof is complete.
+	
+	The main principle of the tableaux is to break complex formulae into smaller ones until complementary pairs of literals are
+	produced or no further expansion is possible.
+
+	\subsection{Definition: Tableaux Step}
+		The Tableaux Step takes as input a formula and a set of accumulated formulae and produces as 
+		output one or two new formulae, depending on the operation. 
+		The set of accumulated formulae consist of the broken down formulae by previous tableaux steps.
+		The output of the tableaux step depends on the rule applied to the formula.
+
+		\subsubsection{Rules}
+		\subsubsection*{Negation}
+			$\begin{array}{rl}
+				& \neg \phi, X \\
+			      \cline{2-2}
+			      & \phi, X
+			\end{array}$
+
+		\subsubsection*{And}
+			$\begin{array}{rl}
+				& \phi \: \wedge \: \psi, X \\
+			      \cline{2-2}
+			      & \phi, \psi, X
+			\end{array}$
+
+		\subsubsection*{Or}
+			$\begin{array}{rl}
+				& \:\:\: \phi \: \vee \: \psi, X \\
+			      \cline{2-2}
+			      & \phi, X \:\:\:\:\:\:\:\: \psi, X
+			\end{array}$
+
+		\subsubsection*{Implication}
+			$\begin{array}{rl}
+				& \:\:\: \phi \: \rightarrow \: \psi, X \\
+			      \cline{2-2}
+			      & \neg\phi, X \:\:\:\:\:\:\:\: \psi, X
+			\end{array}$
+
+		\subsubsection*{Equivalence}
+			$\begin{array}{rl}
+				& \:\:\:\:\:\:\:\: \phi \: \leftrightarrow \: \psi, X \\
+			      \cline{2-2}
+			      & \phi, \psi, X \:\:\:\:\:\:\:\: \neg\phi, \neg \psi, X
+			\end{array}$
+	\newline
+	\newline
+	\newline
+	The final output of the Tableaux process is "False" when all branches are closed or a set of atomic formulae, when there exists a branch which is not closed.
+	\newline
+
+	For our usecases the functionality of the tableaux process shall be extended to achive better results, since if the branch is not closed, there are 
+	additional calculations needed in order to verify that there is no contradiction, namely to verify that there is no contradiction on Term level.
+	This verification can be done in different manners, depending on the algorithm type. The best way to think about it is to have the tableaux process
+	return a list, where each element is the set of atomic formulae found in a specific branch. This way the atomic formulae for each branch are produced, and 
+	afterwards can be used in different algorithms. This is just an example, a way of thinking about the problem the real implementation is much more space 
+	efficient.
+
+	\subsection{Tableaux implementation}
 	\newpage
 \end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
