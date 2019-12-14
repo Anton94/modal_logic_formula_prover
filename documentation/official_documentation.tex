@@ -1,4 +1,5 @@
 \documentclass{article}
+\usepackage{amssymb}
 
 \title{Satisfiability Of Modal Logic Formulas}
 \date{2019-9-28}
@@ -9,6 +10,41 @@
 	\pagenumbering{gobble}
 	\newpage
 
+	\section{Formula Representation}
+	Let $\mathbb{V}ar$ be the set of variables:
+	\[ \mathbb{V}ar = \{p_0, p_1, p_2 ... \}\]
+	Let $\mathbb{C}_t$ be the set of Term constants:
+	\[ \mathbb{C}_t = \{0, 1 \}\]
+	Term recursive definition
+	\begin{itemize}
+		\item $a \in \mathbb{C}_t$ is a term
+		\item $p \in \mathbb{V}ar$ is a term
+		\item If x is a term, then $\bar{x}$ is a term as well
+		\item If x and y are terms, then $x \sigma y $ is a term as well,\\
+			where $\sigma \: \in \: \{\sqcap, \sqcup\}$
+	\end{itemize}
+	Let $\mathbb{C}_f$ be the set of formula constants:
+	\[ \mathbb{C}_f = \{T, F \}\]
+	Formula recursive definition
+	\begin{itemize}
+		\item $a \in \mathbb{C}_f$ is a formula
+		\item If x and y are terms, then C(x, y) is a formula
+		\item If x and y are terms, then $x \le y$ is a formula
+		\item If x and y are terms, then $x \le_m y$ is a formula
+		\item If $\phi$ is a formula, then $\neg \phi$ is a formula as well
+		\item If $\phi$ and $\psi$ are formulas, then $\phi \: \sigma \: \psi $ is a formula as well,\\
+			where $\sigma \in \{\vee, \wedge, \rightarrow, \leftrightarrow\}$
+	\end{itemize}
+	
 
+	\section{Tableaux Process}
+	The Tableaux process is decision procedure, which recursively breaks down a given formula into basic components 
+	based on which a decision can be concluded. The recursive step which breaks down a formula creates one or two 
+	new formulas, which in terms of their structure are simpler then the initial formula. Since the recursive step can create
+	at most two new formulas, this means the recursive step will create at most two branches or a binary tree, where the nodes
+	are the formulas and the links represent the recursive step.
+
+	Contradiction may arise when in the same branch, on some step there exists a formula and the negation of the same formula.
+	If in some branch there exists a contradiction, then that branch closes. If all branches close then the proof is complete.
 	\newpage
 \end{document}

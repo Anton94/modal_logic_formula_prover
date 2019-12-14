@@ -15,7 +15,7 @@ We keep 8 collections:
 Each collection is a unordered_map, i.e. hashmap, which stores the formulas by pointers to them, uses their precalculated hash and operator== to compare them.
 Avg. complexity O(1) for search, insert, erase.
 
-Invariant - at any time, all formulas in the collections does not contradict.
+Invariant - at any time, all formulas in the collections do not contradict.
 A contradiction can occure if we split some formula and some to it's components and any of them contradicts with some of the other formulas in the collections.
 E.g. if we have C(a,b) in contacts_T_ and we are splitting (T & ~C(a,b)) then ~C(a,b) will contradict with C(a,b) from contacts_T_ collection.
 At first, we are inserting the whole formula in T formulas(if it's constant false - returns directly false, etc.)
