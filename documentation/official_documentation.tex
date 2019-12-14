@@ -71,37 +71,37 @@
 		\subsubsection{Rules}
 		\subsubsection*{Negation}
 			$\begin{array}{rl}
-				& \neg \phi, X \\
+				& \neg \varphi, X \\
 			      \cline{2-2}
-			      & \phi, X
+			      & \varphi, X
 			\end{array}$
 
 		\subsubsection*{And}
 			$\begin{array}{rl}
-				& \phi \: \wedge \: \psi, X \\
+				& \varphi \: \wedge \: \psi, X \\
 			      \cline{2-2}
-			      & \phi, \psi, X
+			      & \varphi, \psi, X
 			\end{array}$
 
 		\subsubsection*{Or}
 			$\begin{array}{rl}
-				& \:\:\: \phi \: \vee \: \psi, X \\
+				& \:\:\: \varphi \: \vee \: \psi, X \\
 			      \cline{2-2}
-			      & \phi, X \:\:\:\:\:\:\:\: \psi, X
+			      & \varphi, X \:\:\:\:\:\:\:\: \psi, X
 			\end{array}$
 
 		\subsubsection*{Implication}
 			$\begin{array}{rl}
-				& \:\:\: \phi \: \rightarrow \: \psi, X \\
+				& \:\:\: \varphi \: \rightarrow \: \psi, X \\
 			      \cline{2-2}
-			      & \neg\phi, X \:\:\:\:\:\:\:\: \psi, X
+			      & \neg\varphi, X \:\:\:\:\:\:\:\: \psi, X
 			\end{array}$
 
 		\subsubsection*{Equivalence}
 			$\begin{array}{rl}
-				& \:\:\:\:\:\:\:\: \phi \: \leftrightarrow \: \psi, X \\
+				& \:\:\:\:\:\:\:\: \varphi \: \leftrightarrow \: \psi, X \\
 			      \cline{2-2}
-			      & \phi, \psi, X \:\:\:\:\:\:\:\: \neg\phi, \neg \psi, X
+			      & \varphi, \psi, X \:\:\:\:\:\:\:\: \neg\varphi, \neg \psi, X
 			\end{array}$
 	\newline
 	\newline
@@ -117,6 +117,30 @@
 	efficient.
 
 	\subsection{Tableaux implementation}
+		The programming implementation of the tableaux method follows the standard tableaux process explaned above.
+
+		\subsubsection{Definition: Marked Formula} 
+			Let $\varphi$ be a formula and X be the set of accumulated formulae, then $\varphi $ is said to be marked as:
+			\begin{itemize}
+				\item true if and only if $\mathbb{T}\varphi  \in X $
+				\item false if and only if $\mathbb{F}\varphi  \in X $
+			\end{itemize}	
+
+		First interesting design decision is to keep all true formulae in one data set, and all false formulae in another data set.
+		This enables fast searches wheter a formula has been marked as true or false.
+		There exist 8 important collections of data used for storing formulae.
+		This means that each collection represents a set of formulae:
+		\begin{itemize}
+			\item formulas\_T\_ - contains only formulae marked as true
+			\item formulas\_F\_ - contains only formulae marked as false, \\
+				For example, if $\neg\varphi$ is encountered as an output of the tableaux step, then only $\varphi$ is inserted into the formula\_F\_
+			\item contacts\_T\_ - contains only contacts formulae marked as true
+			\item contacts\_F\_ - contains only contacts formulae marked as false
+			\item zero\_terms\_T\_ - contains only formulae of type $\varphi \le \psi$ marked as true
+			\item zero\_terms\_F\_ - contains only formulae of type $\varphi \le \psi$ marked as false
+			\item measured\_less\_eq\_T\_ - contains only formulae of type $\varphi \le_m \psi$ marked as true
+			\item measured\_less\_eq\_F\_ - contains only formulae of type $\varphi \le_m \psi$ marked as false
+		\end{itemize}
 	\newpage
 \end{document}
 
