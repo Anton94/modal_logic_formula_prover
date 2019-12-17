@@ -1,0 +1,28 @@
+// TODO: somewhere else should be the system definitions, etc
+
+
+The systems are of the following type:
+SUM Xi <= SUM Xj
+...
+SUM Xi > SUM Xj
+
+we are using the kiwi library.
+
+We add a constraint for each variable to be grater than zero.
+We also make a little optimization by removing all variables which are in Xi and Xj sets (per an inequality).
+
+All libraries which we researched and have the feature for solving an inequalities does not support > / < operations.
+Unfortunately, we need the > operation because of the ~<=m(t1,t2) atomic formulas, so we need to simulate it.
+We did it in the following maneer:
+X > Y (where X and Y could be a sum of variables)
+X > Y ---> X - Y > 0 ---> Y - X < 0 ---> Y - X + Z <= 0
+where Z is a new variable, grater than 0.
+
+TODO: why not just epsilon instead of a variable, is epsilon enough? what is the benefit of the variable over epsilon, we might get questions about that, Martin :D
+
+The constraints for a variable to be grater than zero is the following:
+X > 0 ---> X - epsilon >= 0
+
+Kiwi's precision is around 1*10^-8 which we compared to a bigger library - google's or tools which have around 1*10^-7. This is based on a simple empirical test -
+a simple system of one inequality, " X > 0 " which is converted to " X - epsilon >= 0 ". We changed the value of epsilon and when it get's smaller than 1*10^-7 (1*10^-6 for google's or tools) the solver gave a wrong answer.
+Nevertheless, this precision is enough for our purporses.
