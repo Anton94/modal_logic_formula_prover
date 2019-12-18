@@ -219,10 +219,30 @@
 			since C(a,b) is already present in contacts\_T\_ formulae
 
 		\subsubsection*{Tableaux Algorithm}
-			Given a formula $\varphi$, the following algorithm determines the final atomic formulas in all branches of the tableaux process.
+			Given a formula $\varphi$, the following algorithm determines final atomic formulae in all branches of the tableaux process.
 
 			As a first step if the formula $\varphi$ is the constant F, then false is returned directly, otherwise the whole formula $\varphi$ is inserted in formulas\_T\_.
+		\newline
+			\subsubsection*{Remarks}
+			\begin{itemize}
+				\item true boolean value is used to represent the formula constant T
+				\item false boolean value is used to represent the formula constant F
+				\item The commutativity of the contacts: C(a,b) == C(b,a)
+			\end{itemize}
+			Few lemmas which will provide a much more efficient contradiction finding in the tableaux process.
+			\subsubsection*{Lemma: A}
+				Let x be a term, suppose that the atomic formula x = 0 has already been marked as true,
+				then marking the following formulae as true will lead to contradiction:
+				\begin{itemize}
+					\item C(x,y)
+					\item C(y,x)
+				\end{itemize}
+				for some arbitrary term y.
 
+			\subsubsection*{Lemma: A-inverse}
+				Let x, y and z be terms, suppose that the atomic formulae C(x,y) or C(z, x) has already been marked as true,
+				then marking the formula x = 0 as true will lead to contradiction.
+				
 	\newpage
 \end{document}
 
