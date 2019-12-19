@@ -2,6 +2,13 @@
 \usepackage{amssymb}
 \usepackage{newtxtext}
 \usepackage{newtxmath}
+\usepackage{listings}
+\usepackage{xcolor}
+\lstset { %
+    language=C++,
+    backgroundcolor=\color{black!5}, % set backgroundcolor
+    basicstyle=\footnotesize,% basic font setting
+}
 
 \title{Satisfiability Of Modal Logic Formulas}
 \date{2019-9-28}
@@ -179,6 +186,7 @@
 		\newline
 		\newline
 		There exist 8 important marked formula collections:
+%Note add definition for positive and negative collections !!!
 		\begin{itemize}
 			\item formulas\_T\_ - contains only formulae marked as true
 			\item formulas\_F\_ - contains only formulae marked as false, \\
@@ -243,6 +251,102 @@
 				Let x, y and z be terms, suppose that the atomic formulae C(x,y) or C(z, x) has already been marked as true,
 				then marking the formula x = 0 as true will lead to contradiction.
 				
+			\subsubsection*{Lemma: Complexity A and A-inverse} 
+				The algorithmic complexity to check whether a new formula leads to contradiction by Lemma A and Lemma A-inverse is done
+				effectively, namely in constant time with the usage of one new collection contact\_T\_terms\_ which keeps the terms of 
+				the true contacts, namely the contacts in in the collection contacts\_T\_. This means that for each $\mathbb{T}(C(x, y))$, the 
+				terms x and y are in the mentioned collection of true terms. The contact\_T\_terms\_  is a multiset and keeps track 
+				of all added terms, meaning that if the term x is added twice and then removed only once there will still be an entry of 
+				that x in the contact\_T\_terms\_ collection.
+				
+				To check if a new formula leads to contradiction by Lemma A or Lemma A-inverse the following method is used:
+				\begin{lstlisting}
+auto has_broken_contact_rule(const formula* f) const -> bool;
+				\end{lstlisting}
+
+			\subsubsection{Handy methods}
+			\subsubsection*{Find formula}
+			\subsubsection*{Find formula marked as true}
+				\begin{lstlisting}
+auto find_in_T(const formula* f) const -> bool
+				\end{lstlisting}
+				Checks if the formula $\varphi$ exists in any positive collection depending on the type of $\varphi$, namely
+				if $\varphi$ is of type:
+				\begin{itemize}
+					\item C(x, y), then return true $\iff \varphi \in contacts\_T\_$
+					\item $x \le y$, then return true $\iff \varphi \in zero_terms\_T\_$
+					\item $x \le_m y$, then return true $\iff \varphi \in measured_less_eq\_T\_$
+					\item $\neg \psi$, then return true $\iff \varphi \in formulas\_T\_$
+					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then return true $\iff \varphi \in formulas\_T\_$
+				\end{itemize}
+			\subsubsection*{Find formula marked as false}
+				\begin{lstlisting}
+auto find_in_F(const formula* f) const -> bool
+				\end{lstlisting}
+				Checks if the formula $\varphi$ exists in any negative collection depending on the type of $\varphi$, namely
+				if $\varphi$ is of type:
+				\begin{itemize}
+					\item C(x, y), then return true $\iff \varphi \in contacts\_F\_$
+					\item $x \le y$, then return true $\iff \varphi \in zero_terms\_F\_$
+					\item $x \le_m y$, then return true $\iff \varphi \in measured_less_eq\_F\_$
+					\item $\neg \psi$, then return true $\iff \varphi \in formulas\_F\_$
+					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then return true $\iff \varphi \in formulas\_F\_$
+				\end{itemize}
+			\subsubsection*{Add formula}
+			\subsubsection*{Mark formula as true}
+				\begin{lstlisting}
+void add_formula_to_T(const formula* f)
+				\end{lstlisting}
+				Adds the formula $\varphi$ as true in in the respective positive collection, namely
+				if $\varphi$ is of type:
+				\begin{itemize}
+					\item C(x, y), then $\varphi$ is added to contacts\_T\_, and the terms x and y are added to the contact\_T\_terms\_ collection.
+					\item $x = 0$, then x is added in zero\_terms\_T\_
+					\item $x \le_m y$, then $\varphi$ is added to measured\_less\_eq\_T\_
+					\item $\neg \psi$, then $\varphi$ is added to formulas\_T\_
+					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then $\varphi$ is added to formulas\_T\_
+				\end{itemize}
+			\subsubsection*{Mark formula as false}
+				\begin{lstlisting}
+void add_formula_to_F(const formula* f)
+				\end{lstlisting}
+				Adds the formula $\varphi$ as false in in the respective negative collection, namely
+				if $\varphi$ is of type:
+				\begin{itemize}
+					\item C(x, y), then $\varphi$ is added to contacts\_F\_.
+					\item $x = 0$, then x is added in zero\_terms\_F\_
+					\item $x \le_m y$, then $\varphi$ is added to measured\_less\_eq\_F\_
+					\item $\neg \psi$, then $\varphi$ is added to formulas\_F\_
+					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then $\varphi$ is added to formulas\_F\_
+				\end{itemize}
+			\subsubsection*{Remove formula}
+			\subsubsection*{Remove formula marked as true}
+				\begin{lstlisting}
+void remove_formula_from_T(const formula* f)
+				\end{lstlisting}
+				Removes the formula $\varphi$ from the respective positive collection, namely
+				if $\varphi$ is of type:
+				\begin{itemize}
+					\item C(x, y), then $\varphi$ is removed from contacts\_T\_, and the terms x and y are removed from the contact\_T\_terms\_ collection.
+					\item $x = 0$, then x is removed from zero\_terms\_T\_
+					\item $x \le_m y$, then $\varphi$ is removed from measured\_less\_eq\_T\_
+					\item $\neg \psi$, then $\varphi$ is removed from formulas\_T\_
+					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then $\varphi$ is removed from formulas\_T\_
+				\end{itemize}
+			\subsubsection*{Remove formula marked as true}
+				\begin{lstlisting}
+void remove_formula_from_F(const formula* f)
+				\end{lstlisting}
+				Removes the formula $\varphi$ from the respective negative collection, namely
+				if $\varphi$ is of type:
+				\begin{itemize}
+					\item C(x, y), then $\varphi$ is removed from contacts\_F\_
+					\item $x = 0$, then x is removed from zero\_terms\_F\_
+					\item $x \le_m y$, then $\varphi$ is removed from measured\_less\_eq\_F\_
+					\item $\neg \psi$, then $\varphi$ is removed from formulas\_F\_
+					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then $\varphi$ is removed from formulas\_F\_
+				\end{itemize}
+
 	\newpage
 \end{document}
 

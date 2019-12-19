@@ -64,7 +64,7 @@ The algoritmh:
 auto tableau::satisfiable_step() -> bool
 {
 
-The bottom the the recursive algorithm is when we have only atomic formulas(which does not contradicts). Then we can run algorithms for model construction.
+The bottom of the recursive algorithm is when we have only atomic formulas(which does not contradicts). Then we can run algorithms for model construction.
     if(formulas_T_.empty() && formulas_F_.empty())
     {
         return has_satisfiable_model();
