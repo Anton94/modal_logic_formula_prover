@@ -108,8 +108,7 @@ def generate_contact(contacts_A, contacts_B, terms_to_ignore):
     for i in range(0,RETRY_COUNTS):
         a = generate_term(options.max_term_length)
         b = generate_term(options.max_term_length)
-        # TODO unique terms in the contact!
-        if a not in terms_to_ignore and b not in terms_to_ignore and C(a,b) not in contacts_A and C(a,b) not in contacts_B:
+        if not a == b and a not in terms_to_ignore and b not in terms_to_ignore and C(a,b) not in contacts_A and C(a,b) not in contacts_B:
             return (a,b)
 
     out.close()
