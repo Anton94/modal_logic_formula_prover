@@ -1,17 +1,15 @@
-import sys
-import random
-import math
 from optparse import OptionParser
-import string
+import random
 
-RETRY_COUNTS = 1000
+RETRY_COUNT = 1000
 
 min_term_length = 1
 min_variables_count = 3
 min_existence_rules = 4
 min_non_existence_rules = 2
 
-parser = OptionParser(usage="Generates -n number of formulas for each combination of -v -k and -m (values of each ranges in [min,max]. Max bound is configurable.")
+parser = OptionParser(usage="Generates -n number of formulas for each combination of -v -k and -m (values of each ranges in [min,max]."
+                            "Max bound is configurable.")
 parser.add_option("-o", "--output_filename", dest="output_filename", type = "string", default = "output.txt",
                   help="Filename for the generated formulas.")
 parser.add_option("-t", "--max_term_length", dest="max_term_length", default = 3, type = "int",
@@ -79,7 +77,7 @@ out = open(options.output_filename,"w+")
 
 terms = set()
 def generate_unique_term():
-    for i in range(0, RETRY_COUNTS):
+    for _ in range(0, RETRY_COUNT):
         # try 100 times to generate new combination if a == b or b == c or a == c
         # if not able then the restrictions are too strong
         # (or we are out of 'luck' to not generate a suitable one, but it's good enough)
@@ -105,7 +103,7 @@ def create_union_all_vars_not_zero():
     return t
 
 def generate_contact(contacts_A, contacts_B, terms_to_ignore):
-    for i in range(0,RETRY_COUNTS):
+    for _ in range(0,RETRY_COUNT):
         a = generate_term(options.max_term_length)
         b = generate_term(options.max_term_length)
         if not a == b and a not in terms_to_ignore and b not in terms_to_ignore and C(a,b) not in contacts_A and C(a,b) not in contacts_B:
@@ -116,7 +114,7 @@ def generate_contact(contacts_A, contacts_B, terms_to_ignore):
     exit()
 
 def generate_term_with_ignore_collections(ignore_terms_A, ignore_terms_B, ignore_terms_C):
-    for i in range(0,RETRY_COUNTS):
+    for _ in range(0,RETRY_COUNT):
         a = generate_term(options.max_term_length)
         if a not in ignore_terms_A and a not in ignore_terms_B and a not in ignore_terms_C:
             return a
@@ -182,7 +180,7 @@ def generate_formula(v, k, m):
             k -= 1
 
     # generate the rest of non-existence rules
-    for i in range(0, m):
+    for _ in range(0, m):
         r = random.randint(1, 2)
         if r == 1: # generate a ~contact
             (a,b) = generate_contact(contacts, neg_contacts, set())
@@ -208,7 +206,7 @@ for k in range(min_existence_rules, options.max_existence_rules + 1):
         for v in range(options.min_variables_count, options.max_variables_count + 1):
             generate_variables(v)
             out.write("INFO: " + str(v) + " variables, " + str(k) + " existence rules, " + str(m) + " non existence rules.\n")
-            for l in range(0, options.formulas):
+            for _ in range(0, options.formulas):
                 f = generate_formula(v, k, m)
                 out.write(f + "\n")
 
