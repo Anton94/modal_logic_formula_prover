@@ -1,15 +1,15 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6840 64-bit) (preloaded format=pdflatex 2019.12.17)  19 DEC 2019 16:54
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7250 64-bit) (preloaded format=pdflatex 2019.11.16)  24 DEC 2019 00:23
 entering extended mode
-**C:/Users/stoevm/source/repos/modal_logic_formula_prover/documentation/officia
-l_documentation.tex
+**C:/Users/ickob/OneDrive/Documents/sources/modal_logic_formula_proover/modal_l
+ogic_formula_prover/documentation/official_documentation.tex
 
-(C:/Users/stoevm/source/repos/modal_logic_formula_prover/documentation/official
-_documentation.tex
-LaTeX2e <2018-04-01> patch level 5
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\article.cls"
-Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\size10.clo"
-File: size10.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
+(C:/Users/ickob/OneDrive/Documents/sources/modal_logic_formula_proover/modal_lo
+gic_formula_prover/documentation/official_documentation.tex
+LaTeX2e <2019-10-01> patch level 3
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\article.cls"
+Document Class: article 2019/10/25 v1.4k Standard LaTeX document class
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\size10.clo"
+File: size10.clo 2019/10/25 v1.4k Standard LaTeX file (size option)
 )
 \c@part=\count80
 \c@section=\count81
@@ -23,27 +23,28 @@ File: size10.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
 \belowcaptionskip=\skip42
 \bibindent=\dimen102
 )
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\amsfonts\amssymb.
-sty"
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/amsfonts\amssymb.s
+ty"
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
 
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\amsfonts\amsfonts
-.sty"
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/amsfonts\amsfonts.
+sty"
 Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
 \@emptytoks=\toks14
 \symAMSa=\mathgroup4
 \symAMSb=\mathgroup5
+LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
 LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
 ))
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\newtx\newtxtext.s
-ty"
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/newtx\newtxtext.st
+y"
 Package: newtxtext 2018/03/27 v1.531
 
 `newtxtext' v1.531, 2018/03/27 Text macros taking advantage of TeX-Gyre Termes 
 fonts (msharpe)
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\fontaxes\fontaxes
-.sty"
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/fontaxes\fontaxes.
+sty"
 Package: fontaxes 2014/03/23 v1.0d Font selection axes
 LaTeX Info: Redefining \upshape on input line 29.
 LaTeX Info: Redefining \itshape on input line 31.
@@ -52,35 +53,36 @@ LaTeX Info: Redefining \scshape on input line 37.
 )
 \ntx@fs=\dimen103
 
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\xkeyval\xkeyval.s
-ty"
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/xkeyval\xkeyval.st
+y"
 Package: xkeyval 2014/12/03 v2.7a package option processing (HA)
 
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\generic\xkeyval\xkeyval
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/generic/xkeyval\xkeyval.
+tex"
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/generic/xkeyval\xkvutils
 .tex"
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\generic\xkeyval\xkvutil
-s.tex"
 \XKV@toks=\toks15
 \XKV@tempa@toks=\toks16
 
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\generic\xkeyval\keyval.
-tex"))
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/generic/xkeyval\keyval.t
+ex"))
 \XKV@depth=\count88
 File: xkeyval.tex 2014/12/03 v2.7a key=value parser (HA)
 ))
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\etoolbox\etoolbox
-.sty"
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/etoolbox\etoolbox.
+sty"
 Package: etoolbox 2019/09/21 v2.5h e-TeX tools for LaTeX (JAW)
 \etb@tempcnta=\count89
 )
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\fontenc.sty"
-Package: fontenc 2017/04/05 v2.0i Standard LaTeX package
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\t1enc.def"
-File: t1enc.def 2017/04/05 v2.0i Standard LaTeX file
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\fontenc.sty"
+Package: fontenc 2018/08/11 v2.0j Standard LaTeX package
+
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\t1enc.def"
+File: t1enc.def 2018/08/11 v2.0j Standard LaTeX file
 LaTeX Font Info:    Redeclaring font encoding T1 on input line 48.
-)) ("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\textcomp.
-sty"
-Package: textcomp 2017/04/05 v2.0i Standard LaTeX package
+))
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\textcomp.sty"
+Package: textcomp 2018/08/11 v2.0j Standard LaTeX package
 Package textcomp Info: Sub-encoding information:
 (textcomp)               5 = only ISO-Adobe without \textcurrency
 (textcomp)               4 = 5 + \texteuro
@@ -94,12 +96,13 @@ Package textcomp Info: Sub-encoding information:
 (textcomp)             See the documentation for details.
 Package textcomp Info: Setting ? sub-encoding to TS1/1 on input line 79.
 Package textcomp Info: Changing ? sub-encoding to TS1/0 on input line 80.
- ("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\ts1enc.def"
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\ts1enc.def"
 File: ts1enc.def 2001/06/05 v3.0e (jk/car/fm) Standard LaTeX file
 Now handling font encoding TS1 ...
 ... processing UTF-8 mapping file for font encoding TS1
- ("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\ts1enc.dfu"
-File: ts1enc.dfu 2018/04/05 v1.2c UTF-8 support for inputenc
+
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\ts1enc.dfu"
+File: ts1enc.dfu 2019/07/11 v1.2j UTF-8 support for inputenc
    defining Unicode char U+00A2 (decimal 162)
    defining Unicode char U+00A3 (decimal 163)
    defining Unicode char U+00A4 (decimal 164)
@@ -169,6 +172,8 @@ File: ts1enc.dfu 2018/04/05 v1.2c UTF-8 support for inputenc
    defining Unicode char U+25E6 (decimal 9702)
    defining Unicode char U+25EF (decimal 9711)
    defining Unicode char U+266A (decimal 9834)
+   defining Unicode char U+27E8 (decimal 10216)
+   defining Unicode char U+27E9 (decimal 10217)
    defining Unicode char U+FEFF (decimal 65279)
 ))
 LaTeX Info: Redefining \oldstylenums on input line 334.
@@ -234,54 +239,56 @@ Package textcomp Info: Setting pplx sub-encoding to TS1/3 on input line 406.
 Package textcomp Info: Setting pplj sub-encoding to TS1/3 on input line 407.
 Package textcomp Info: Setting ptmx sub-encoding to TS1/4 on input line 408.
 Package textcomp Info: Setting ptmj sub-encoding to TS1/4 on input line 409.
-))
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\newtx\newtxmath.s
-ty"
+)
+LaTeX Font Info:    Redeclaring math symbol \mathsterling on input line 233.
+)
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/newtx\newtxmath.st
+y"
 Package: newtxmath 2019/11/21 v1.611
 
 `newtxmath' v1.611, 2019/11/21 Math macros based originally on txfonts (msharpe
 )
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\amsmath\amsmath.s
-ty"
-Package: amsmath 2017/09/02 v2.17a AMS math features
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/amsmath\amsmath.st
+y"
+Package: amsmath 2019/04/01 v2.17c AMS math features
 \@mathmargin=\skip43
 
 For additional information on amsmath, use the `?' option.
 
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\amsmath\amstext.s
-ty"
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/amsmath\amstext.st
+y"
 Package: amstext 2000/06/29 v2.01 AMS text
 
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\amsmath\amsgen.st
-y"
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/amsmath\amsgen.sty
+"
 File: amsgen.sty 1999/11/30 v2.0 generic functions
 \@emptytoks=\toks17
 \ex@=\dimen104
 ))
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\amsmath\amsbsy.st
-y"
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/amsmath\amsbsy.sty
+"
 Package: amsbsy 1999/11/29 v1.2d Bold Symbols
 \pmbraise@=\dimen105
 )
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\amsmath\amsopn.st
-y"
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/amsmath\amsopn.sty
+"
 Package: amsopn 2016/03/08 v2.02 operator names
 )
 \inf@bad=\count90
-LaTeX Info: Redefining \frac on input line 213.
+LaTeX Info: Redefining \frac on input line 227.
 \uproot@=\count91
 \leftroot@=\count92
-LaTeX Info: Redefining \overline on input line 375.
+LaTeX Info: Redefining \overline on input line 389.
 \classnum@=\count93
 \DOTSCASE@=\count94
-LaTeX Info: Redefining \ldots on input line 472.
-LaTeX Info: Redefining \dots on input line 475.
-LaTeX Info: Redefining \cdots on input line 596.
-\Mathstrutbox@=\box26
-\strutbox@=\box27
+LaTeX Info: Redefining \ldots on input line 486.
+LaTeX Info: Redefining \dots on input line 489.
+LaTeX Info: Redefining \cdots on input line 610.
+\Mathstrutbox@=\box27
+\strutbox@=\box28
 \big@size=\dimen106
-LaTeX Font Info:    Redeclaring font encoding OML on input line 712.
-LaTeX Font Info:    Redeclaring font encoding OMS on input line 713.
+LaTeX Font Info:    Redeclaring font encoding OML on input line 733.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 734.
 \macc@depth=\count95
 \c@MaxMatrixCols=\count96
 \dotsspace@=\muskip10
@@ -302,26 +309,28 @@ LaTeX Font Info:    Redeclaring font encoding OMS on input line 713.
 \multlinegap=\skip44
 \multlinetaggap=\skip45
 \mathdisplay@stack=\toks21
-LaTeX Info: Redefining \[ on input line 2817.
-LaTeX Info: Redefining \] on input line 2818.
+LaTeX Info: Redefining \[ on input line 2855.
+LaTeX Info: Redefining \] on input line 2856.
 )
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\generic\ifxetex\ifxetex
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/generic/iftex\ifxetex.st
+y"
+Package: ifxetex 2019/10/25 v0.7 ifxetex legacy package. Use iftex instead.
+
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/generic/iftex\iftex.sty"
+Package: iftex 2019/11/07 v1.0c TeX engine tests
+))
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/generic/iftex\ifluatex.s
+ty"
+Package: ifluatex 2019/10/25 v1.5 ifluatex legacy package. Use iftex instead.
+)
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/oberdiek\centernot
 .sty"
-Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
-)
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\generic\oberdiek\ifluat
-ex.sty"
-Package: ifluatex 2016/05/16 v1.4 Provides the ifluatex switch (HO)
-Package ifluatex Info: LuaTeX not detected.
-)
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\oberdiek\centerno
-t.sty"
 Package: centernot 2016/05/16 v1.4 Centers the not symbol horizontally (HO)
 )
 \tx@cntz=\count102
 
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\generic\binhex\binhex.t
-ex")
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/generic/binhex\binhex.te
+x")
 \tx@Isdigit=\count103
 \tx@IsAlNum=\count104
 \tx@tA=\toks22
@@ -434,6 +443,13 @@ LaTeX Font Info:    Redeclaring math delimiter \lvert on input line 786.
 LaTeX Font Info:    Redeclaring math delimiter \rvert on input line 787.
 LaTeX Font Info:    Redeclaring math delimiter \lVert on input line 788.
 LaTeX Font Info:    Redeclaring math delimiter \rVert on input line 789.
+LaTeX Font Info:    Redeclaring math accent \dot on input line 846.
+LaTeX Font Info:    Redeclaring math accent \ddot on input line 847.
+LaTeX Font Info:    Redeclaring math delimiter \ulcorner on input line 1475.
+LaTeX Font Info:    Redeclaring math delimiter \urcorner on input line 1476.
+LaTeX Font Info:    Redeclaring math delimiter \llcorner on input line 1482.
+LaTeX Font Info:    Redeclaring math delimiter \lrcorner on input line 1483.
+LaTeX Font Info:    Redeclaring math accent \vec on input line 1910.
 \ntx@numstart=\count105
 \ntx@UCstart=\count106
 \ntx@lcstart=\count107
@@ -442,10 +458,10 @@ LaTeX Font Info:    Redeclaring math delimiter \rVert on input line 789.
 \ntx@jmath=\count110
 LaTeX Info: Redefining \not on input line 2566.
 )
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\listings\listings
-.sty"
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/listings\listings.
+sty"
 \lst@mode=\count111
-\lst@gtempboxa=\box28
+\lst@gtempboxa=\box29
 \lst@token=\toks25
 \lst@length=\count112
 \lst@currlwidth=\dimen113
@@ -457,31 +473,30 @@ LaTeX Info: Redefining \not on input line 2566.
 \lst@lineno=\count116
 \lst@maxwidth=\dimen116
 
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\listings\lstmisc.
-sty"
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/listings\lstmisc.s
+ty"
 File: lstmisc.sty 2019/09/10 1.8c (Carsten Heinz)
 \c@lstnumber=\count117
 \lst@skipnumbers=\count118
-\lst@framebox=\box29
+\lst@framebox=\box30
 )
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\listings\listings
-.cfg"
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/listings\listings.
+cfg"
 File: listings.cfg 2019/09/10 1.8c listings configuration
 ))
 Package: listings 2019/09/10 1.8c (Carsten Heinz)
 
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\xcolor\xcolor.sty
-"
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/xcolor\xcolor.sty"
 Package: xcolor 2016/05/11 v2.12 LaTeX color extensions (UK)
 
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\graphics-cfg\colo
-r.cfg"
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics-cfg\color
+.cfg"
 File: color.cfg 2016/01/02 v1.6 sample color configuration
 )
 Package xcolor Info: Driver file: pdftex.def on input line 225.
 
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\graphics-def\pdft
-ex.def"
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/graphics-def\pdfte
+x.def"
 File: pdftex.def 2018/01/08 v1.0l Graphics/color driver for pdftex
 )
 Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1348.
@@ -494,23 +509,22 @@ Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1369.
 Package xcolor Info: Model `Gray' substituted by `gray' on input line 1370.
 Package xcolor Info: Model `wave' substituted by `hsb' on input line 1371.
 )
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\listings\lstlang1
-.sty"
-File: lstlang1.sty 2019/09/10 1.8c listings language file
-)
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\listings\lstlang1
-.sty"
-File: lstlang1.sty 2019/09/10 1.8c listings language file
-)
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\listings\lstmisc.
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/listings\lstlang1.
 sty"
+File: lstlang1.sty 2019/09/10 1.8c listings language file
+)
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/listings\lstlang1.
+sty"
+File: lstlang1.sty 2019/09/10 1.8c listings language file
+)
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/listings\lstmisc.s
+ty"
 File: lstmisc.sty 2019/09/10 1.8c (Carsten Heinz)
 )
-LaTeX Font Info:    Try loading font information for T1+ntxtlf on input line 17
-.
+LaTeX Font Info:    Trying to load font information for T1+ntxtlf on input line
+ 17.
 
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\newtx\t1ntxtlf.fd
-"
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/newtx\t1ntxtlf.fd"
 File: t1ntxtlf.fd 2015/01/17 v1.0 font definition file for T1/ntx/tlf
 )
 LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
@@ -520,10 +534,9 @@ No file official_documentation.aux.
 \openout1 = `official_documentation.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/ntxmi/m/it on input line 17.
-LaTeX Font Info:    Try loading font information for OML+ntxmi on input line 17
-.
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\newtx\omlntxmi.fd
-"
+LaTeX Font Info:    Trying to load font information for OML+ntxmi on input line
+ 17.
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/newtx\omlntxmi.fd"
 File: omlntxmi.fd 2015/08/25 Fontinst v1.933 font definitions for OML/ntxmi.
 )
 LaTeX Font Info:    ... okay on input line 17.
@@ -536,37 +549,219 @@ LaTeX Font Info:    ... okay on input line 17.
 LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 17.
 LaTeX Font Info:    ... okay on input line 17.
 LaTeX Font Info:    Checking defaults for U/ntxexa/m/n on input line 17.
-LaTeX Font Info:    Try loading font information for U+ntxexa on input line 17.
-
-
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\newtx\untxexa.fd"
+LaTeX Font Info:    Trying to load font information for U+ntxexa on input line 
+17.
+ ("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/newtx\untxexa.fd"
 File: untxexa.fd 2012/04/16 Fontinst v1.933 font definitions for U/ntxexa.
 )
 LaTeX Font Info:    ... okay on input line 17.
 LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 17.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 17.
- ("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\base\ts1cmr.fd"
+LaTeX Font Info:    Trying to load font information for TS1+cmr on input line 1
+7.
+ ("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/base\ts1cmr.fd"
 File: ts1cmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    ... okay on input line 17.
 LaTeX Font Info:    Checking defaults for LMS/ntxsy/m/n on input line 17.
-LaTeX Font Info:    Try loading font information for LMS+ntxsy on input line 17
-.
-
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\newtx\lmsntxsy.fd
+LaTeX Font Info:    Trying to load font information for LMS+ntxsy on input line
+ 17.
+ ("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/newtx\lmsntxsy.fd
 "
 File: lmsntxsy.fd 2016/07/02 Fontinst v1.933 font definitions for LMS/ntxsy.
 )
 LaTeX Font Info:    ... okay on input line 17.
 LaTeX Font Info:    Checking defaults for LMX/ntxexx/m/n on input line 17.
-LaTeX Font Info:    Try loading font information for LMX+ntxexx on input line 1
-7.
+LaTeX Font Info:    Trying to load font information for LMX+ntxexx on input lin
+e 17.
 
-("C:\Users\stoevm\AppData\Local\Programs\MiKTeX 2.9\tex\latex\newtx\lmxntxexx.f
-d"
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/newtx\lmxntxexx.fd
+"
 File: lmxntxexx.fd 2016/07/03 Fontinst v1.933 font definitions for LMX/ntxexx.
 )
 LaTeX Font Info:    ... okay on input line 17.
 \c@mv@tabular=\count119
 \c@mv@boldtabular=\count120
 \c@lstlisting=\count121
+
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/context/base/mkii\supp-p
+df.mkii"
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count122
+\scratchdimen=\dimen117
+\scratchbox=\box31
+\nofMPsegments=\count123
+\nofMParguments=\count124
+\everyMPshowfont=\toks26
+\MPscratchCnt=\count125
+\MPscratchDim=\dimen118
+\MPnumerator=\count126
+\makeMPintoPDFobject=\count127
+\everyMPtoPDFconversion=\toks27
+)
+LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
+(Font)              scaled to size 17.28pt on input line 18.
+LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
+(Font)              scaled to size 12.0pt on input line 18.
+LaTeX Font Info:    Trying to load font information for OT1+ntxtlf on input lin
+e 18.
+
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/newtx\ot1ntxtlf.fd
+"
+File: ot1ntxtlf.fd 2015/01/17 v1.0 font definition file for OT1/ntx/tlf
+)
+LaTeX Font Info:    Font shape `OT1/ntxtlf/m/n' will be
+(Font)              scaled to size 12.0pt on input line 18.
+LaTeX Font Info:    Font shape `OT1/ntxtlf/m/n' will be
+(Font)              scaled to size 8.8pt on input line 18.
+LaTeX Font Info:    Font shape `OT1/ntxtlf/m/n' will be
+(Font)              scaled to size 6.6pt on input line 18.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 18.
+
+ ("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/amsfonts\umsa.fd"
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 18.
+
+
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/amsfonts\umsb.fd"
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+LaTeX Font Info:    Trying to load font information for U+ntxmia on input line 
+18.
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/newtx\untxmia.fd"
+File: untxmia.fd 2018/04/14 Fontinst v1.933 font definitions for U/ntxmia.
+)
+LaTeX Font Info:    Trying to load font information for U+ntxsym on input line 
+18.
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/newtx\untxsym.fd"
+File: untxsym.fd 2015/03/20 Fontinst v1.933 font definitions for U/ntxsym.
+)
+LaTeX Font Info:    Trying to load font information for U+ntxsyc on input line 
+18.
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/newtx\untxsyc.fd"
+File: untxsyc.fd 2012/04/12 Fontinst v1.933 font definitions for U/ntxsyc.
+) [1
+
+{C:/Users/ickob/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}]
+LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
+(Font)              scaled to size 14.4pt on input line 22.
+LaTeX Font Info:    Font shape `T1/ntxtlf/bx/n' in size <14.4> not available
+(Font)              Font shape `T1/ntxtlf/b/n' tried instead on input line 22.
+LaTeX Font Info:    Font shape `T1/ntxtlf/b/n' will be
+(Font)              scaled to size 14.4pt on input line 22.
+LaTeX Font Info:    Font shape `OT1/ntxtlf/m/n' will be
+(Font)              scaled to size 10.0pt on input line 23.
+LaTeX Font Info:    Font shape `OT1/ntxtlf/m/n' will be
+(Font)              scaled to size 7.3pt on input line 23.
+LaTeX Font Info:    Font shape `OT1/ntxtlf/m/n' will be
+(Font)              scaled to size 5.5pt on input line 23.
+LaTeX Font Info:    Font shape `T1/ntxtlf/bx/n' in size <12> not available
+(Font)              Font shape `T1/ntxtlf/b/n' tried instead on input line 27.
+LaTeX Font Info:    Font shape `T1/ntxtlf/b/n' will be
+(Font)              scaled to size 12.0pt on input line 27.
+LaTeX Font Info:    Trying to load font information for TS1+ntxtlf on input lin
+e 29.
+
+("C:\Users\ickob\AppData\Local\Programs\MiKTeX 2.9\tex/latex/newtx\ts1ntxtlf.fd
+"
+File: ts1ntxtlf.fd 2015/01/18 v1.0 fd file for TS1/ntxtlf
+)
+LaTeX Font Info:    Font shape `TS1/ntxtlf/m/n' will be
+(Font)              scaled to size 10.0pt on input line 29.
+ [2]
+LaTeX Font Info:    Font shape `T1/ntxtlf/bx/n' in size <10> not available
+(Font)              Font shape `T1/ntxtlf/b/n' tried instead on input line 85.
+LaTeX Font Info:    Font shape `T1/ntxtlf/b/n' will be
+(Font)              scaled to size 10.0pt on input line 85.
+ [3]
+Underfull \hbox (badness 10000) in paragraph at lines 149--165
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 149--165
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 149--165
+
+ []
+
+[4]
+Underfull \hbox (badness 10000) in paragraph at lines 183--190
+
+ []
+
+[5]
+Underfull \hbox (badness 10000) in paragraph at lines 232--234
+
+ []
+
+[6]
+LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
+(Font)              scaled to size 8.0pt on input line 263.
+LaTeX Font Info:    Font shape `T1/ntxtlf/bx/n' in size <8> not available
+(Font)              Font shape `T1/ntxtlf/b/n' tried instead on input line 264.
+
+LaTeX Font Info:    Font shape `T1/ntxtlf/b/n' will be
+(Font)              scaled to size 8.0pt on input line 264.
+LaTeX Font Info:    Font shape `TS1/ntxtlf/m/n' will be
+(Font)              scaled to size 8.0pt on input line 264.
+LaTeX Font Info:    Font shape `OT1/ntxtlf/m/n' will be
+(Font)              scaled to size 8.0pt on input line 264.
+LaTeX Font Info:    Font shape `OT1/ntxtlf/m/n' will be
+(Font)              scaled to size 6.2pt on input line 264.
+LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
+(Font)              scaled to size 7.3pt on input line 276.
+LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
+(Font)              scaled to size 5.5pt on input line 276.
+ [7] [8]
+Overfull \hbox (394.20752pt too wide) in paragraph at lines 354--355
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
+][][][][][][][][][][][][][] 
+ []
+
+LaTeX Font Info:    Font shape `T1/ntxtlf/m/it' will be
+(Font)              scaled to size 8.0pt on input line 362.
+
+Overfull \hbox (221.40576pt too wide) in paragraph at lines 363--364
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
+][] 
+ []
+
+
+Overfull \hbox (202.20557pt too wide) in paragraph at lines 388--389
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
+][] 
+ []
+
+[9] [10] (official_documentation.aux) ) 
+Here is how much of TeX's memory you used:
+ 7405 strings out of 492450
+ 94403 string characters out of 3120004
+ 358922 words of memory out of 3000000
+ 11656 multiletter control sequences out of 15000+200000
+ 78641 words of font info for 124 fonts, out of 3000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 47i,7n,97p,977b,1595s stack positions out of 5000i,500n,10000p,200000b,50000s
+{C:/Users/ickob/AppData/Local/Programs/M
+iKTeX 2.9/fonts/enc/dvips/newtx/ntx-ec-tlf.enc} <C:\Users\ickob\AppData\Local\M
+iKTeX\2.9\fonts/pk/modeless/public/tex-gyre/dpi480\ts1-qtmr.pk> <C:\Users\ickob
+\AppData\Local\MiKTeX\2.9\fonts/pk/modeless/public/tex-gyre/dpi600\ts1-qtmr.pk>
+{C:/Users/ickob/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/newtx/ntx-ot1
+-tlf.enc} <C:\Users\ickob\AppData\Local\MiKTeX\2.9\fonts/pk/modeless/public/txf
+onts/dpi600\txsyb.pk><C:/Users/ickob/AppData/Local/Programs/MiKTeX 2.9/fonts/ty
+pe1/public/newtx/NewTXMI.pfb><C:/Users/ickob/AppData/Local/Programs/MiKTeX 2.9/
+fonts/type1/public/newtx/NewTXMI7.pfb><C:/Users/ickob/AppData/Local/Programs/Mi
+KTeX 2.9/fonts/type1/public/tex-gyre/qtmb.pfb><C:/Users/ickob/AppData/Local/Pro
+grams/MiKTeX 2.9/fonts/type1/public/tex-gyre/qtmr.pfb><C:/Users/ickob/AppData/L
+ocal/Programs/MiKTeX 2.9/fonts/type1/public/tex-gyre/qtmri.pfb><C:/Users/ickob/
+AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/newtx/txmiaX.pfb><C:/Users
+/ickob/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/newtx/txsys.pfb>
+Output written on official_documentation.pdf (10 pages, 135347 bytes).
+PDF statistics:
+ 85 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+

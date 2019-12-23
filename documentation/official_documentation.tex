@@ -346,7 +346,250 @@ void remove_formula_from_F(const formula* f)
 					\item $\neg \psi$, then $\varphi$ is removed from formulas\_F\_
 					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then $\varphi$ is removed from formulas\_F\_
 				\end{itemize}
+			\subsubsection*{Tableaux Satisfiable Step Implementation}
+				\begin{lstlisting}
+auto tableau::satisfiable_step() -> bool
+{
+    // The bottom of the recursive algorithm is when we have 
+    // only atomic formulas(which does not contradicts). 
+    // Then we can run algorithms for model construction.
+    if(formulas_T_.empty() && formulas_F_.empty())
+    {
+        return has_satisfiable_model();
+    }
 
+    if(!formulas_T_.empty())
+    {
+        // Choosing some formula to handle in this step.
+        // If this branch does not produce a valid satisfiable path,
+	 // then this formula will be returned to formulas_T_
+        auto f = *formulas_T_.begin();
+
+        const auto op = f->get_operation_type();
+        if(op == op_t::negation)
+        {
+            // T(~X) -> F(X)
+            auto X = f->get_left_child_formula();
+            if(X->is_constant())
+            {
+                // F(T) is not satisfiable
+                if(X->is_constant_true())
+                {
+                    return false;
+                }
+		// F(F) is satisfiable, continue with the rest
+                return satisfiable_step(); 
+            }
+
+            if(find_in_T(X))
+            {
+		// contradiction, we want to satisfy F(X) 
+		// but we already have to satisfy T(X)
+                return false;
+            }
+
+            if(find_in_F(X)) // skip adding it multiple times
+            {
+                return satisfiable_step();
+            }
+
+            add_formula_to_F(X);
+            auto res = satisfiable_step();
+            remove_formula_from_F(X);
+            return res;
+        }
+
+        if(op == op_t::conjunction)
+        {
+            // T(X & Y) -> T(X) & T(Y)
+            T_conjuction_child X(*this, f->get_left_child_formula());
+            T_conjuction_child Y(*this, f->get_right_child_formula());
+		
+	    // Checks if X breaks the contact rule 
+            // or brings a contradiction
+            if(!X.validate()) 
+            {
+                return false;
+            }
+            X.add_to_T(); // Adds X to T collection
+
+            if(!Y.validate())
+            {
+                X.remove_from_T();
+                return false;
+            }
+            Y.add_to_T();
+
+            auto res = satisfiable_step();
+            X.remove_from_T();
+            Y.remove_from_T();
+
+            return res;
+        }
+
+        assert(op == op_t::disjunction);
+
+        // T(X v Y) -> T(X) v T(Y)
+        auto X = f->get_left_child_formula();
+        auto Y = f->get_right_child_formula();
+        trace() << "Will split to two subtrees: " 
+		<< *X << " and " << *Y;
+
+        // T(T) is satisfiable and we can skip the other branch
+        if(X->is_constant_true() || Y->is_constant_true())
+        {
+            trace() << "One of the childs is constant true";
+            return satisfiable_step();
+        }
+
+        auto process_T_disj_child = [&](const formula* child) {
+            if(child->is_constant_false() || // T(F) is not satisfiable
+               find_in_F(child) || has_broken_contact_rule(child))
+            {
+                return false;
+            }
+
+            if(find_in_T(child)) // skip adding it multiple times
+            {
+                return satisfiable_step();
+            }
+
+            add_formula_to_T(child);
+            const auto res = satisfiable_step();
+            remove_formula_from_T(child);
+            return res;
+        };
+
+        trace() << "Start of the left subtree: " << *X << " of " << *f;
+        if(process_T_disj_child(X))
+        {
+            return true; // there was no contradiction in the left path, 
+			 // so there is no need to continue with
+                         // the right path
+        }
+
+        trace() << "Start of the right subtree: " << *Y << " of " << *f;
+        return process_T_disj_child(Y);
+    }
+
+    // Almost analogous but taking a formula from Fs
+
+    // Choosing some formula to handle in this step.
+    // If this branch does not produce a valid satisfiable path,
+    // then this formula will be returned to formulas_F_
+    auto f = *formulas_F_.begin();
+
+    const auto op = f->get_operation_type();
+    if(op == op_t::negation)
+    {
+        // F(~X) -> T(X)
+        auto X = f->get_left_child_formula();
+        if(X->is_constant())
+        {
+            // T(F) is not satisfiable
+            if(X->is_constant_false())
+            {
+                return false;
+            }
+		// T(T) is satisfiable, continue with the rest
+            return satisfiable_step(); 
+        }
+        if(find_in_F(X)) 
+        {
+		// contradiction, we want to satisfy T(X)
+		// but we already have to satisfy F(X)
+            return false;
+        }
+	  // We will add T(X) where X might be Contact or =0 term,
+        // so we need to verify that we will not break the contact rule
+        if(has_broken_contact_rule(X)) 
+        {
+            return false;
+        }
+
+        if(find_in_T(X)) // skip adding it multiple times
+        {
+            return satisfiable_step();
+        }
+
+        add_formula_to_T(X);
+        auto res = satisfiable_step();
+        remove_formula_from_T(X);
+        return res;
+    }
+
+    if(op == op_t::disjunction)
+    {
+        // F(X v Y) -> F(X) & F(Y)
+        F_disjunction_child X(*this, f->get_left_child_formula());
+        F_disjunction_child Y(*this, f->get_right_child_formula());
+
+	// Checks that X does not bring a contradiction
+        if(!X.validate()) 
+        {
+            return false;
+        }
+        X.add_to_F();
+
+        if(!Y.validate())
+        {
+            X.remove_from_F();
+            return false;
+        }
+        Y.add_to_F();
+
+        auto res = satisfiable_step();
+
+        X.remove_from_F();
+        Y.remove_from_F();
+
+        return res;
+    }
+
+    assert(op == op_t::conjunction);
+
+    // F(X & Y) -> F(X) v F(Y)
+    auto X = f->get_left_child_formula();
+    auto Y = f->get_right_child_formula();
+
+    trace() << "Will split to two subtrees: " << *X << " and " << *Y;
+
+    // F(F) is satisfiable and we can skip the other branch
+    if(X->is_constant_false() || Y->is_constant_false())
+    {
+        trace() << "One of the childs is constant false";
+        return satisfiable_step();
+    }
+
+    auto process_F_conj_child = [&](const formula* child) {
+        if(child->is_constant_true() || // F(T) is not satisfiable
+           find_in_T(child))
+        {
+            return false;
+        }
+        if(find_in_F(child)) // skip adding it multiple times
+        {
+            return satisfiable_step();
+        }
+
+        add_formula_to_F(child);
+        const auto res = satisfiable_step();
+        remove_formula_from_F(child);
+        return res;
+    };
+
+    trace() << "Start of the left subtree: " << *X << " of " << *f;
+    if(process_F_conj_child(X))
+    {
+        return true; // there was no contradiction in left path,
+			// so there is no need to continue with the
+                     // right path
+    }
+
+    trace() << "Start of the right subtree: " << *Y << " of " << *f;
+    return process_F_conj_child(Y);
+}
+				\end{lstlisting}
 	\newpage
 \end{document}
 
