@@ -4,6 +4,9 @@
 \usepackage{newtxmath}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{array}
+\usepackage{makecell}
+
 \lstset { %
     language=C++,
     backgroundcolor=\color{black!5}, % set backgroundcolor
@@ -32,6 +35,8 @@
 		\item If x and y are terms, then $x \sigma y $ is a term as well,\\
 			where $\sigma \: \in \: \{\sqcap, \sqcup\}$
 	\end{itemize}
+	Parentheses are used to define the priority of an operation.
+
 	Let $\mathbb{C}_f$ be the set of formula constants:
 	\[ \mathbb{C}_f = \{T, F \}\]
 	\subsection{Formula recursive definition}
@@ -40,26 +45,98 @@
 		\item If x and y are terms, then C(x, y) is a formula
 		\item If x and y are terms, then $x \le y$ is a formula
 		\item If x and y are terms, then $x \le_m y$ is a formula
-		\item If $\phi$ is a formula, then $\neg \phi$ is a formula as well
-		\item If $\phi$ and $\psi$ are formulas, then $\phi \: \sigma \: \psi $ is a formula as well,\\
+		\item If $\varphi$ is a formula, then $\neg \varphi$ is a formula as well
+		\item If $\varphi$ and $\psi$ are formulas, then $\varphi \: \sigma \: \psi $ is a formula as well,\\
 			where $\sigma \in \{\vee, \wedge, \rightarrow, \leftrightarrow\}$
 	\end{itemize}
-	
-		\subsection{Definition: Atomic Formula}
-			A formula will be called atomic formula if it is a constant or it is in one of the followings:
-			\begin{itemize}
-				\item C(x, y)
-				\item $x \le y$
-				\item $x \le_m y$
-			\end{itemize}
-			where x and y are terms.
 
-		\subsection{Definition/Theorem: Zero Term Formula}
-			Let x and y be two terms, then:
-			\begin{equation}
-				x \le y  \iff x \sqcap \bar{y} = 0
-			\end{equation}
-			A formula in the form $x \sqcap \bar{y} = 0$ will be called Zero Term Formula.
+	\subsubsection*{Formula Parentheses}
+		Parentheses are used to define the priority of an operation. They are defined for terms and formulae.
+	
+	\subsection{Definition: Atomic Formula}
+		A formula will be called atomic formula if it is a constant or it is in one of the followings:
+		\begin{itemize}
+			\item C(x, y)
+			\item $x \le y$
+			\item $x \le_m y$
+		\end{itemize}
+		where x and y are terms.
+	
+	\subsection{Definition/Theorem: Zero Term Formula}
+		Let x and y be two terms, then:
+		\begin{equation}
+			x \le y  \iff x \sqcap \bar{y} = 0
+		\end{equation}
+		A formula in the form $x \sqcap \bar{y} = 0$ will be called Zero Term Formula.
+
+
+	\subsection{Parser}
+		Flex and Bison are used to generate a parser with the modal logic grammar.
+		Flex is used as a tokenizer while Bison is used as the parser.
+
+		There are two types of building elements in the modal logic formula:
+		\begin{itemize}
+			\item terms, defined in \#REF Term Recursive Definition
+			\item formulae, defined in \#REF Formula Recursive Definition
+		\end{itemize}
+		
+	\subsubsection{Symbols Representation}
+		\subsubsection*{Atomic terms}
+		\begin{itemize}
+			\item 0 is the term constant True
+			\item 1 is the term constant False
+			\item Arbitrary string is used to represent a variable
+		\end{itemize}
+		
+		\subsubsection*{Terms operations}
+		Let t1, t2 be terms, then the followings are the representations for term operations
+		\begin{itemize}
+			\item ~t1 is used to represent the complement term operation, namely $\bar{t1}$
+			\item t1 * t2 is used to represent the intersection term operation, namely $t1 \: \sqcap \: t2$
+			\item t1 * t2 is used to represent the union term operation, namely $t1 \: \sqcup \: t2$
+		\end{itemize}
+		
+		\subsubsection*{Atomic formulae}
+		Let t1, t2 be terms, then the followings are representation of atomic formulas
+		\begin{itemize}
+			\item T is the formula constant True
+			\item F is the formula constant False
+			\item C(t1, t2) is the contact operation
+			\item <=(t1, t2) is the less or equal operation
+			\item <=m(t1, t2) is the measured less or equal operation
+			\item (t1)=0 is the equal to zero operation
+		\end{itemize}
+
+	\subsection{Tokenizer}
+	\subsubsection*{Grammar}
+		The tokenizer's grammar is pretty simple and is explaned in details in the following table:
+		\begin{flushleft}
+			\begin{tabular}{ | m{7em} | m{15em}| m{10em} | } 
+				\hline
+					[ \textbackslash t \textbackslash  n] & ; & Returns nothing, ignore all whitespace \\ 
+				\hline
+					[,TF01()C\&|~*+-] 	& {return yytext[0];} & all single charecter tokens will be passed as their ASCIIs for an easier use in bison \\
+				\hline
+				    "<="            &   {return T\_LESS\_EQ;} & Returns a special literal which maps the '<=' sequence \\
+				\hline
+				    "<=m"           &   {return T\_MEASURED\_LESS\_EQ;} & \\
+				\hline
+				    "=0"            &   {return T\_EQ\_ZERO;} & \\
+				\hline
+				    "= 0"           &   {return T\_EQ\_ZERO;} & \\
+				\hline
+				    "->"            &   {return T\_FORMULA\_OP\_IMPLICATION;} & \\
+				\hline
+				    "<->"           &   {return T\_FORMULA\_OP\_EQUALITY;} & \\
+				\hline
+				    [a-zA-Z0-9]+    &   \makecell{\{yylval->T\_STRING =\\ create\_lexer\_string(yytext, yyleng); \\ return T\_STRING;\}} & Returns T\_STRING literal type and the string  value is written to yylval which can be later accessed from the parser. Note that it uses our simple memory manager to allocate this string in order to be able to safely free all allocated strings even when some syntax error occures \\
+				\hline
+				    .               &   {return yytext[0];} & bison will trigger an error if it's unrecognized symbol \\
+				\hline
+
+			\end{tabular}
+		\end{flushleft}
+
 
 	\section{Tableaux}
 	The Tableaux process is decision procedure, which recursively breaks down a given formula into basic components 
