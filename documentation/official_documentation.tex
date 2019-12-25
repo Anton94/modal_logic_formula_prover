@@ -6,6 +6,11 @@
 \usepackage{xcolor}
 \usepackage{array}
 \usepackage{makecell}
+\usepackage{booktabs}% http://ctan.org/pkg/booktabs
+\usepackage{float}
+
+\restylefloat{table}
+\newcommand{\tabitem}{~~\llap{\textbullet}~~}
 
 \lstset { %
     language=C++,
@@ -136,6 +141,296 @@
 
 			\end{tabular}
 		\end{flushleft}
+
+		\subsubsection*{Parser literals}
+			The followings are definition of literals for multi character tokens
+			\begin{itemize}
+				\item \%token <const char*> T\_STRING is the literal for "string"
+				\item \%token T\_LESS\_EQ is the literal for "<="
+				\item \%token T\_MEASURED\_LESS\_EQ is the literal for "<=m"
+				\item \%token T\_EQ\_ZERO is the literal for "=0"
+				\item \%token T\_FORMULA\_OP\_IMPLICATION is the literal for "->"
+				\item \%token T\_FORMULA\_OP\_EQUALITY is the literal for "<->"
+			\end{itemize}
+
+		\subsubsection*{Parser literals}
+			The followings are definitions of priority and associativity of the operation tokens. 
+			The priority is from low to hight (w.r.t. the line order in which they are defined)
+			\begin{itemize}
+				\item \%left T\_FORMULA\_OP\_IMPLICATION T\_FORMULA\_OP\_EQUALITY
+				\item \%left '|' '+'
+				\item \%left '\&' '*'
+				\item \%right '~' '-'
+				\item \%nonassoc '(' ')'
+			\end{itemize}
+
+		\subsubsection*{Parser grammar}
+			In the process of parsing the formula the Abstract Syntax Tree(AST) is built as well, 
+			which later is used to make formula modifications, for example converting X -> Y to ~X | Y .
+			
+			create\_formula\_node and create\_term\_node are two helper functions which construct AST nodes
+			% go into details here about the create_formula_node and term_node
+
+
+		\begin{lstlisting}
+modal_logic_formula // The start non-terminal
+    : formula {                   
+        // $1 gives the matched formula and we write
+        // it in a 'global' variable parsed_formula
+        parsed_formula.reset($1); 
+    }
+  ;
+formula // 'formula' non-terminal
+    : 'T' { // trying to match token 'T'
+        // $$ is the return value to the 'parent' 
+        // who can use the matched subsequence
+        $$ = create_formula_node(constant_true);   
+    }
+    | 'F' {
+        $$ = create_formula_node(constant_false);
+    }
+    | 'C' '(' term ',' term ')' {                  
+        // $3 and $5 gives the 'values' for the two 
+        // matched terms (3 and 5 are their positions) 
+        // and construct a contact node with them
+        $$ = create_formula_node(contact, $3, $5); 
+    }
+    | "<=" '(' term ',' term ')' {
+        $$ = create_formula_node(less_eq, $3, $5);
+    }
+    | "<=m" '(' term ',' term ')' {
+        $$ = create_formula_node(measured_less_eq, $3, $5);
+    }
+    | term "=0" {
+        $$ = create_formula_node(eq_zero, $1);
+    }
+    | '(' formula '&' formula ')' {
+        $$ = create_formula_node(conjunction, $2, $4);
+    }
+    | formula '&' formula {
+        $$ = create_formula_node(conjunction, $1, $3);
+    }
+    | '(' formula '|' formula ')' {
+        $$ = create_formula_node(disjunction, $2, $4);
+    }
+    | formula '|' formula {
+        $$ = create_formula_node(disjunction, $1, $3);
+    }
+    | '~' formula {
+        $$ = create_formula_node(negation, $2);
+    }
+    | '(' formula "->" formula ')' {
+        $$ = create_formula_node(implication, $2, $4);
+    }
+    | formula "->" formula {
+        $$ = create_formula_node(implication, $1, $3);
+    }
+    | '(' formula "<->" formula ')' {
+        $$ = create_formula_node(equality, $2, $4);
+    }
+    | formula "<->" formula {
+        $$ = create_formula_node(equality, $1, $3);
+    }
+    | '(' formula ')' {
+        $$ = $2;
+    }
+  ;
+term
+    : '1' {
+        $$ = create_term_node(constant_true);
+    }
+    | '0' {
+        $$ = create_term_node(constant_false);
+    }
+    | "string" {
+        $$ = create_term_node(term_operation_t::variable);
+        $$->variable = std::move(*$1);
+        // the string is allocated from the
+        // tokenizer and we need to free it
+        free_lexer_string($1); 
+    }
+    | '(' term '*' term ')' {
+        $$ = create_term_node(intersection, $2, $4);
+    }
+    | term '*' term {
+        $$ = create_term_node(intersection, $1, $3);
+    }
+    | '(' term '+' term ')' {
+        $$ = create_term_node(union_, $2, $4);
+    }
+    | term '+' term {
+        $$ = create_term_node(union_, $1, $3);
+    }
+    | '-' term {
+        $$ = create_term_node(complement, $2);
+    }
+    | '(' term ')' {
+        $$ = $2;
+    }
+  ;
+		\end{lstlisting}
+
+		\subsubsection*{Abstract Syntax Tree}
+			The visitor pattern is used to modify the formula, namely it's AST tree.
+			
+			The visitor pattern uses double virtual dispatching.
+
+			\subsubsection*{Operation types in the formula/term nodes}
+				\begin{lstlisting}
+enum class formula_operation_t
+{
+    constant_true,
+    constant_false,
+    conjunction,
+    disjunction,
+    negation,
+    implication,
+    equality,
+    contact,
+    less_eq,
+    measured_less_eq,
+    eq_zero
+};
+
+enum class term_operation_t
+{
+    constant_true,
+    constant_false,
+    union_, // union is a keyword
+    intersection,
+    complement,
+    variable
+};
+
+class Node
+{
+public:
+    virtual void accept(Visitor& v) = 0;
+};
+
+class NFormula : public Node
+{
+public:
+    NFormula(formula_operation_t op, Node* left = nullptr, Node* right = nullptr);
+
+    void accept(Visitor& v) override { v.visit(*this); }
+
+    formula_operation_t op;
+    Node* left;
+    Node* right;
+};
+
+class NTerm : public Node
+{
+public:
+    NTerm(term_operation_t op, NTerm* left = nullptr, NTerm* right = nullptr);
+
+    void accept(Visitor& v) override { v.visit(*this); }
+
+    term_operation_t op;
+    NTerm* left;
+    NTerm* right;
+    std::string variable;
+};
+				\end{lstlisting}
+	
+			\subsubsection*{Visitor Structure}
+				\begin{lstlisting}
+class Visitor
+{
+public:
+    virtual void visit(NFormula& f) = 0;
+    virtual void visit(NTerm& t) = 0;
+};
+
+class VPrinter : public Visitor
+{
+public:
+    void visit(NFormula& f) override 
+    {
+	  // Here it prints the formula node information 
+    }
+
+    void visit(NTerm& t) override 
+    { 
+         // Here it prints the term node information 
+    }
+};
+				\end{lstlisting}
+
+				The visitor pattern gives us the ability to add new visitors in a very simple manner.
+				The new visitor should override the two visit methods and do whatever it wants with the ast nodes.
+
+				%intro on why are we doing all those modifications to the formula's AST
+
+			\subsubsection*{Visitors Implementation}
+				\subsubsection*{VReduceConstants}
+					Removes all unnecessary childs of And/Or/Negation operations of the following type:
+
+					\begin{table}[H]
+					  \centering
+					  \begin{tabular}{llll}
+					    \toprule
+					    \midrule
+					\tabitem -T $\equiv$ F & \tabitem C(0,0)  $\equiv$ F & \tabitem -F $\equiv$ T & \tabitem C(1,1) $\equiv$ T \\
+					\tabitem (T \& T) $\equiv$ T & \tabitem C(a,0)  $\equiv$ F & \tabitem (F | F) $\equiv$ F & \tabitem C(0,a) $\equiv$ F \\
+					\tabitem (g \& T) $\equiv$ g & \tabitem -1 $\equiv$ 0 & \tabitem (g | T) $\equiv$ T & \tabitem -0 $\equiv$ 1 \\
+					\tabitem (T \& g) $\equiv$ g & \tabitem (1 * 1) $\equiv$ 1 & \tabitem (T | g) $\equiv$ T & \tabitem (0 + 0) $\equiv$ 0 \\
+					\tabitem (g \& F) $\equiv$ F & \tabitem (t * 1) $\equiv$ t & \tabitem (g | F) $\equiv$ g & \tabitem (t + 1) $\equiv$ 1 \\
+					\tabitem (F \& g) $\equiv$ F & \tabitem (1 * t) $\equiv$ t & \tabitem (F | g) $\equiv$ g & \tabitem (1 + t) $\equiv$ 1 \\
+					\tabitem 0=0 $\equiv$ T & \tabitem (t * 0) $\equiv$ 0 & \tabitem 1=0 $\equiv$ F & \tabitem (t + 0) $\equiv$ t \\
+					\tabitem <=(0,a) $\equiv$ T & \tabitem (0 * t) $\equiv$ 0 & \tabitem <=(a,1) $\equiv$ T & \tabitem (0 + t) $\equiv$ t \\
+
+					    \bottomrule
+					  \end{tabular}
+					\end{table}
+				\subsubsection*{VConvertContactsWithConstantTerms}
+					Converts contacts with constant 1 terms in !=0 atomic formulas. 
+					This visitor is best used after the contacts are reduced, via VReduceConstants
+					\begin{itemize}
+						\item C(a,1) $\equiv$ ~(a=0)  
+						\item C(1,a) $\equiv$ ~(a=0)
+					\end{itemize}
+				\subsubsection*{VConvertLessEqContactWithEqualTerms}
+					Converts contacts and <= atomic formulas with same terms:
+					\begin{itemize}
+						\item <=(a,a) $\equiv$ T, \\
+							since (a * -a = 0))
+						\item C(a,a) $\equiv$ ~(a=0)
+					\end{itemize}
+				\subsubsection*{VReduceDoubleNegation}
+					Removes the double/tripple/etc negations. 
+					This visitor is best used after all visitors which might add additional negations!
+					\begin{itemize}
+						\item --g $\equiv$ g
+						\item --t $\equiv$ t
+					\end{itemize}
+				\subsubsection{VConvertImplicationEqualityToConjDisj}
+					Converts all formula nodes of type implication and equality to nodes 
+					which are using just conjuction and disjunction. 
+					Main reason for that is to simplify the tableau method - 
+					to work only with conjunctions and disjunctions.
+					\begin{itemize}
+						\item (f -> g)  $\equiv$ (~f | g)
+						\item (f <-> g) $\equiv$ ((f \& g) | (~f \& ~g))
+					\end{itemize}
+				\subsubsection*{VConvertLessEqToEqZero}
+					Converts the less equal atomic formula to an equals to zero atomic formula
+					\begin{itemize}
+						\item <=(a,b) $\equiv$ (a * -b) = 0
+					\end{itemize}
+				\subsubsection*{VSplitDisjInLessEqAndContacts}
+					Converts the less equal atomic formula to an equals to zero atomic formula
+					\begin{itemize}
+						\item C(a + b, c) $\equiv$ C(a,c) | C(b,c)
+						\item <=(a + b, c) $\equiv$ <=(a,c) \& <=(b,c)
+					\end{itemize}
+
+				There are few visitors which only collect or print information from the formula
+					\begin{itemize}
+						\item VVariablesGetter - gets all variables from the formula (as string)
+						\item VPrinter - prints the formula to some provided output stream
+					\end{itemize}
 
 
 	\section{Tableaux}
