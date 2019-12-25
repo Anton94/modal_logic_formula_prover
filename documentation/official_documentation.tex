@@ -432,6 +432,122 @@ public:
 						\item VPrinter - prints the formula to some provided output stream
 					\end{itemize}
 
+	\section{Formula Structure}
+		The formula structure is similar to the AST structure, but with restricted formula operations and additional information.
+		% intro that the formula is built recursively 
+		There are 2 types of nodes: 
+			\begin{itemize}
+				\item formula
+				\item term
+			\end{itemize}
+		Every member variable in the nodes is caluclated in building, 
+		this way getting the hash code of a node is done in constant time.
+
+		\subsection*{Formula Node Structure}
+		\begin{lstlisting}
+class formula
+{
+public:
+    enum class operation_type : char
+    {
+        constant_true,
+        constant_false,
+        conjunction,
+        disjunction,
+        negation,
+        measured_less_eq,
+        eq_zero,
+        c
+    };
+
+    operation_type op_;
+    formula_mgr* formula_mgr_;
+    std::size_t hash_;
+
+    // For simplicity raw pointers and union, 
+    // a better solution would be unique pointers and variants
+    struct child_formulas
+    {
+        formula* left;
+        formula* right;
+    };
+    struct child_terms
+    {
+        term* left;
+        term* right;
+    };
+    union {
+        child_formulas child_f_;
+        child_terms child_t_;
+    };
+
+    auto build(const NFormula& f) -> bool;
+
+    auto operator==(const formula& rhs) const -> bool;
+    auto operator!=(const formula& rhs) const -> bool;
+
+    // Evalates the formula but ignores all measured less or equal 
+    // atomic formulas, as if there were not existing
+    auto evaluate(const variable_id_to_points_t& evals,
+		const contacts_t& contact_relations) const -> bool;
+};
+		\end{lstlisting}
+	
+		\subsection*{Term Node Structure}
+		\begin{lstlisting}
+class term
+{
+public:
+    enum class operation_type : char
+    {
+        constant_true,
+        constant_false,
+        union_,
+        intersection,
+        complement,
+        variable
+    };
+
+    operation_type op_;
+
+    // Used to make a bitmask for the used variables in the 
+    // term(w.r.t all variables in the whole formula) and to print the
+    // term with it's variable names instead of their (optimized) IDs.
+    const formula_mgr* formula_mgr_; 
+    variables_mask_t variables_; // All used variables in the term.
+
+    // For simplicity raw pointers and union, 
+    // a better solution would be unique pointers and variants
+    struct childs
+    {
+        term* left;
+        term* right;
+    };
+    union {
+        childs childs_;
+        size_t variable_id_;
+    };
+
+    std::size_t hash_;
+
+    auto build(const NTerm& t) -> bool;
+
+    auto operator==(const term& rhs) const -> bool;
+    auto operator!=(const term& rhs) const -> bool;
+
+    auto evaluate(const variable_id_to_points_t& variable_evaluations, 
+    	const size_t points_count) const -> model_points_set_t;
+
+    // Evaluates the term with the provided variables evaluations but if
+    // some of the used variables in the term do not have evaluations
+    // it creates a smaller subterm with the unknown variables.
+    // Note that it reduces the term's constants, e.g. '1 + X' -> '1'
+    // and does not look at the X's evaluation at all.
+    // With the latest algorithms, this is not used.
+    auto evaluate(const variables_evaluations_block& evaluation_block, 
+	bool skip_subterm_creation = false) const -> evaluation_result;
+};
+		\end{lstlisting}
 
 	\section{Tableaux}
 	The Tableaux process is decision procedure, which recursively breaks down a given formula into basic components 
