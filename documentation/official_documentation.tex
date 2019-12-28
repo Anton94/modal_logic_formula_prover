@@ -548,6 +548,209 @@ public:
 	bool skip_subterm_creation = false) const -> evaluation_result;
 };
 		\end{lstlisting}
+	
+
+	\subsection{Building a formula node}  % Add more information on how the formula is built.
+		The building of the formula structure is trivial, namely based on the AST node's operation types.
+		Few important specifications of a node 
+		\begin{itemize}
+			\item hash code
+			\item variable mask for all used variables in the term(and it's child terms)
+		\end{itemize}
+
+		\subsubsection*{Node's hash code}
+			The hash code of a node is mainly used to compare if two nodes are equal. 
+			This comparison is used in all maps and sets where the key is a node. 
+			
+			If for two formulas/terms nodes, their hash codes are same, then the content of the nodes is 
+			compared in order to verify that they are the same formulas/terms.
+			\newline
+			The contact operatior requires a special check since the commutativity of Contacts is supported.
+			\newline
+			% for this we should have an additional definition.
+
+			Let a, b be two terms, then
+			\begin{equation}
+				C(a, b) = C(b, a)
+			\end{equation}
+			therefore the check for equality will be done twice instead of once, namely
+			\begin{equation}
+				 C(a, b) = C(c, d) \rightarrow (a = c \wedge b = d) \vee (a = d \wedge b = c).
+			\end{equation}
+		
+		\subsubsection{Formula Refiners}
+			The formula refiners are an optional parameter when building a formula node.
+			They are a set of optional filters which may optimize the formula by reducing redundant parts of the 
+			formula or by transforming some nodes in a way that they will be easier to be evaluated later on.
+			
+			Most important formula refiners:
+			\begin{itemize}
+				\item Convert Contacts and less or equal atomic formas which have same terms
+				\item Convert disjunction in contacts and less or equal atomic formulas
+				\item Reduce constants
+				\item Reduce contacts with constants
+				\item Remove double negation
+			\end{itemize}
+
+			These formula refiners are done when the formula is built, meaning that after the 
+			AST tree is constructed each of these refiners enables or disabled a visitor. 
+			The formula refiners are mapped in a one to one manner to a subset of all the visitors defined 
+			in \#REF visitor.
+
+			\begin{itemize}
+				\item Convert Contacts and less or equal atomic formas which have same terms \\
+					 is mapped to VConvertLessEqContactWithEqualTerms
+				\item Convert disjunction in contacts and less or equal atomic formulas \\
+					 is mapped to VSplitDisjInLessEqAndContacts
+				\item Reduce constants \\
+					 is mapped to VReduceConstants
+				\item Reduce contacts with constants \\
+					 is mapped to VConvertContactsWithConstantTerms
+				\item Remove double negation \\
+					 is mapped to VReduceDoubleNegation
+			\end{itemize}
+						
+		\subsubsection*{Implementation}
+			The formula refiners are just a flag denoting if a formula refiner should be applied.
+			\begin{lstlisting}
+enum class formula_refiners : int32_t
+{
+    none                                    = 0,
+    convert_contact_less_eq_with_same_terms = 1 << 1,
+    convert_disjunction_in_contact_less_eq  = 1 << 2,
+    reduce_constants                        = 1 << 3,
+    reduce_contacts_with_constants          = 1 << 4,
+    remove_double_negation                  = 1 << 5,
+    all = convert_contact_less_eq_with_same_terms
+        | convert_disjunction_in_contact_less_eq 
+        | reduce_constants 
+        | reduce_contacts_with_constants 
+        | remove_double_negation
+};
+			\end{lstlisting}
+
+			\begin{lstlisting}
+auto formula_mgr::build(const std::string& f, 
+	const formula_refiners& refiners_flags) -> bool
+{
+    // Parsing the formula
+    parser_error_info error_info;
+    auto formula_AST = parse_from_input_string(f.c_str(), error_info);
+    if(!formula_AST)
+    {
+        std::stringstream error_msg;
+        error_info.printer(f, error_msg);
+        info() << "\n" << error_msg.str();
+        return false;
+    }
+
+    std::stringstream info_buff;
+    info_buff << "Parsed formula: ";
+    VPrinter printer(info_buff);
+    formula_AST->accept(printer);
+    info_buff << "\n";
+
+    VConvertImplicationEqualityToConjDisj convertor;
+    formula_AST->accept(convertor);
+    info_buff << "Converted (-> <->)        : ";
+    formula_AST->accept(printer);
+
+    // NOTE: Consider making VSplitDisjInLessEqAndContacts 
+    // and VSplitDisjInLessEqAndContacts combined because in some 
+    // intermediate splitting the two terms might match.
+    // Nevertheless, this will still be not 100\% sufficient because 
+    // the order of spliting might take a big role and skip 
+    // some pontential matches. 
+    // For not just convert them after the splitting. 
+    // It's just a small optimization.
+    if(has_flag(refiners_flags, 
+	formula_refiners::convert_contact_less_eq_with_same_terms))
+    {
+        VConvertLessEqContactWithEqualTerms 
+		convertor_lessEq_contact_with_equal_terms;
+        formula_AST->accept(convertor_lessEq_contact_with_equal_terms);
+        info_buff << "Converted C(a,a);<=(a,a)  : ";
+        formula_AST->accept(printer);
+    }
+
+    if(has_flag(refiners_flags, 
+	formula_refiners::convert_disjunction_in_contact_less_eq))
+    {
+        VSplitDisjInLessEqAndContacts disj_in_contact_splitter;
+        formula_AST->accept(disj_in_contact_splitter);
+        info_buff << "C(a+b,c)->C(a,c)|C(b,c) ;\n";
+        info_buff << "<=(a+b,c)-><=(a,c)&<=(b,c): ";
+        formula_AST->accept(printer);
+    }
+
+    if(has_flag(refiners_flags, 
+	formula_refiners::convert_contact_less_eq_with_same_terms))
+    {
+        VConvertLessEqContactWithEqualTerms 
+		convertor_lessEq_contact_with_equal_terms;
+        formula_AST->accept(convertor_lessEq_contact_with_equal_terms);
+        info_buff << "Converted C(a,a);<=(a,a)  : ";
+        formula_AST->accept(printer);
+    }
+
+    VConvertLessEqToEqZero eq_zero_convertor;
+    formula_AST->accept(eq_zero_convertor);
+    info_buff << "Converted (<= =0) formula : ";
+    formula_AST->accept(printer);
+
+    if(has_flag(refiners_flags, 
+	formula_refiners::reduce_constants))
+    {
+        VReduceConstants trivial_reducer;
+        formula_AST->accept(trivial_reducer);
+        info_buff << "Reduced constants         : ";
+        formula_AST->accept(printer);
+    }
+
+    if(has_flag(refiners_flags, 
+	formula_refiners::reduce_contacts_with_constants))
+    {
+        VConvertContactsWithConstantTerms 
+		contacts_with_constant_as_term_convertor;
+        formula_AST->accept(contacts_with_constant_as_term_convertor);
+        info_buff << "Converted C(a,1)->~(a=0)  : ";
+        formula_AST->accept(printer);
+    }
+
+    if(has_flag(refiners_flags, 
+	formula_refiners::remove_double_negation))
+    {
+        VReduceDoubleNegation double_negation_reducer;
+        formula_AST->accept(double_negation_reducer);
+        info_buff << "Reduced double negation   : ";
+        formula_AST->accept(printer);
+    }
+
+    info() << info_buff.str();
+
+    // Will cash all variables and when building the formula 
+    // tree we will use their ids instead of the heavy strings
+    VVariablesGetter::variables_set_t variables;
+    VVariablesGetter variables_getter(variables);
+    formula_AST->accept(variables_getter);
+
+    variables_.reserve(variables.size());
+    variable_to_id_.reserve(variables.size());
+    for(const auto& variable : variables)
+    {
+        variable_to_id_[variable] = variables_.size();
+        variables_.emplace_back(variable);
+    }
+
+    // The building of the formula from it's AST
+    return f_.build(*formula_AST); 
+}
+			\end{lstlisting}
+
+	\subsubsection*{Node evaluation}
+		% this should be explained very well, and not just here but with multilpe definitions on theory level
+
+
 
 	\section{Tableaux}
 	The Tableaux process is decision procedure, which recursively breaks down a given formula into basic components 
