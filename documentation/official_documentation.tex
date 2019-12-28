@@ -1282,6 +1282,92 @@ auto tableau::satisfiable_step() -> bool
 }
 				\end{lstlisting}
 	\newpage
+
+
+	\subsection{Formula Model}
+		% What is a model ? 
+		Every model type has at least two things in common:
+		\begin{itemize}
+			\item Adjacency matrix for the contacts between the points
+			\item Vector of bitsets representing the value of v(p), namely the set of points which are in v(p)
+		\end{itemize}
+
+		All models also have similar collection of points each of which has an evaluation for all 
+		used variables in the tableau's path (this evaluation identifies the point).
+		\newline
+		All models can be created(or at least tried to be created) via the marked formula collections and 
+		some meta information for the whole formula, via the 'create' method.
+		\begin{lstlisting}
+virtual auto create(const formulas_t& contacts_T, 
+	const formulas_t& contacts_F, 
+	const terms_t& zero_terms_T,
+	const terms_t& zero_terms_F, 
+	const formulas_t& measured_less_eq_T, 
+	const formulas_t& measured_less_eq_F, 
+	const variables_mask_t& used_variables, 
+	const formula_mgr* mgr)
+    -> bool = 0;
+		\end{lstlisting}
+
+		\subsubsection*{Adjacency Matrix member variable}
+			\begin{lstlisting}
+/*
+    Symetric square bit matrix. contacts_[i] gives a bit mask
+    of all points which are in contact with the point 'i'.
+    For example, let us have a model with 6 points:
+        0---1  // contact between 0 and 1
+        2---3  // contact between 2 and 3
+        4      // point from !=0 term
+        5      // point from !=0 term
+
+    The bit matrix will be the following:
+        \ 012345
+        0 110000    // from 0---1 and reflexivity (0---0)
+        1 110000    // from 1---0 and reflexivity (1---1)
+        2 001100    // from 2---3 and reflexivity (2---2)
+        3 001100    // from 3---2 and reflexivity (3---3)
+        4 000010    // just reflexivity (4---4)
+        5 000001    // just reflexivity (5---5)
+*/
+contacts_t contact_relations_;
+			\end{lstlisting}
+
+		\subsubsection*{Variable Evaluations member variable}
+			\begin{lstlisting}
+/*
+    A vector of size the number of variables in the formula, 
+    each element is a set of points, represented as a bitset.
+    Keeps the variable evaluations, i.e. v(p).
+
+    Model evaluation 'v' which for a given term returns 
+    a subset of the model points.
+    :
+     - v(p) = { i | (i) (xxx...x)[p] == 1, i.e. in point 'i' 
+        the evaluation of the variable 'p' is 1 }, where 'p'
+        is a variable(for optimzations it's an id of the 
+        string representation of that variable)
+     - v(a * b) = v(a) & v(b)
+     - v(a + b) = v(a) | v(b)
+     - v(-a) = ~v(a)
+
+    For example, let us have the following 
+        formula: C(a * b, c) & c != 0 & -a != 0
+    Then a model could be the following:
+        (110) (a * b) 0---1 (c) (001)
+        (011) (c)  2
+        (000) (-a) 3
+    Let assume that 'a' has a variable id 0, 
+        'b' has id 1 and 'c' has id 2.
+    The bit matrix will be the following:
+        \ 0123     // variable ids (rows) \ model points (columns)
+        0 1000     // v(a) = { 0 }, i.e. all points 
+             which have evaluation with bit at positon 0 set to 1
+        1 1010     // v(b) = { 0, 2 }, ... at position 1 ...
+        2 0110     // v(c) = { 1, 2 }, ... at position 2 ...
+*/
+variable_id_to_points_t variable_evaluations_;
+			\end{lstlisting}
+		
 \end{document}
 
 
