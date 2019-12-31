@@ -8,8 +8,8 @@ min_variables_count = 3
 min_existence_rules = 4
 min_non_existence_rules = 2
 
-parser = OptionParser(usage="Generates -n number of formulas for each combination of -v -k and -m (values of each ranges in [min,max]."
-                            "Max bound is configurable.")
+parser = OptionParser(usage="Generates -n number of formulas for each combination of -v -k and -m (values of each ranges in their [min,max]."
+                            "Note that there are no lexical contradictions in the formulas, but all of them are not satisfiable.")
 parser.add_option("-o", "--output_filename", dest="output_filename", type = "string", default = "output.txt",
                   help="Filename for the generated formulas.")
 parser.add_option("-t", "--max_term_length", dest="max_term_length", default = 3, type = "int",
