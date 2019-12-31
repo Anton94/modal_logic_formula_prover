@@ -59,7 +59,10 @@ time_type process_formula_group_for_model(const std::vector<std::string>& formul
             start = std::chrono::high_resolution_clock::now();
             try
             {
-                mgr.is_satisfiable(m);
+                if (mgr.is_satisfiable(m))
+                {
+                    std::cerr << "The formula is satisfiable, there might be some issue, because it should not be satisfiable for a better performance measuring!\n";
+                }
             }
             catch (const TerminationException&)
             {
