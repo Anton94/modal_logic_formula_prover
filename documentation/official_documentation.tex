@@ -1,5 +1,6 @@
 \documentclass{article}
 \usepackage{amssymb}
+\usepackage{amsmath}
 \usepackage{newtxtext}
 \usepackage{newtxmath}
 \usepackage{listings}
@@ -774,10 +775,10 @@ auto formula_mgr::build(const std::string& f,
 		The output of the tableaux step depends on the rule applied to the formula.
 
 		\subsubsection*{Definition: Marked Formula} 
-			Let $\varphi$ be a formula and X be the set of accumulated formulae, then $\varphi$ is said to be marked as:
+			Let $\varphi$ be a formula, then $\varphi$ might be marked as:
 			\begin{itemize}
-				\item true if and only if $\mathbb{T}\varphi$
-				\item false if and only if $\mathbb{F}\varphi$
+				\item true, we will write $\mathbb{T}\varphi$
+				\item false, we will write $\mathbb{F}\varphi$
 			\end{itemize}
 
 		\subsubsection*{Definition: Accumulated Formulae}
@@ -1037,6 +1038,23 @@ void remove_formula_from_F(const formula* f)
 					\item $\neg \psi$, then $\varphi$ is removed from formulas\_F\_
 					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then $\varphi$ is removed from formulas\_F\_
 				\end{itemize}
+			\subsubsection{Def: Tableaux branch output}
+				As stated above the ouput of a branch in the tableaux process is a set of atomic formulas.
+				These atomic formulas can be grouped in four groups:
+				\begin{itemize}
+					\item Contacts
+					\item Non Contacts
+					\item Equal to Zero Terms
+					\item Not Equal to Zero Terms
+				\end{itemize}
+				These four groups can be represented with the following formula:
+				\begin{equation}
+					\bigwedge\nolimits_{i} \; C(a_i, b_i) \:\: \wedge \:\:
+					\bigwedge\nolimits_{j} \; \neg C(e_j, f_j) \:\: \wedge \:\:
+					\bigwedge\nolimits_{k} \; d_k = 0 \:\: \wedge \:\:
+					\bigwedge\nolimits_{l} \; g_l \neq 0 
+				\end{equation}
+				% TODO explain which is what
 			\subsubsection*{Tableaux Satisfiable Step Implementation}
 				\begin{lstlisting}
 auto tableau::satisfiable_step() -> bool
@@ -1368,6 +1386,108 @@ contacts_t contact_relations_;
 variable_id_to_points_t variable_evaluations_;
 			\end{lstlisting}
 		
+	\section{Models}
+		Intro on what the models are and when they are used.
+	\subsection{Connectivity Model}
+		% NOTE Intro on what the connectivity model really is !
+		Let us have $\varphi$ in the format defined in REF 4. % for now this is formula 4 
+		Let us define few constants which will ease the annotation:
+		\begin{itemize}
+			\item N - number of variables in the atomic formulas
+			\item M - number of atomic formulas
+			\item I - number of Contact atomic formulae
+			\item J - number of Non Contact atomic formulae
+			\item K - number of Not Equal to Zero atomic formulae
+			\item L - number of Equal to Zero atomic formulae
+		\end{itemize}
+
+		1) Let $\mathbb{M}$ denote the model of all possible unique model points, where one model point corresponds to 
+			one variable evaluation $P_i$. 
+			Since there are N variables, the number of unique model points is $2^N$.
+			1.1) Filter out the model points which interfere with the zero terms, which means that:
+				 \begin{equation}
+					if P_i evaluates some term G_l to constant true then P_i is filtered out.
+				\end{equation}
+			1.2) Filter out the model points which interfere with the Non contants, which mens that:
+				\begin{equation}
+					If P_i evaluates some terms E_j and F_j to true, then P_i is filtered out.
+				\end{equation}
+
+			NOTE: that if $P_i$ evaluates the term $\tau$ to constant true then the model 
+			evaluation v($\tau$) contains the point $P_i$ (and vice versa).
+
+		So far, the model $\mathbb{M}$ satisfies all Equal to Zero atomic formulas and 
+		'half' of the Non Contacts (only the reflexivity of the points)
+		
+		2) Verification is done for the Not Equal to Zero atomic formulas in $\mathbb{M}$, namely:
+			\begin{equation}
+				If \exists k: v(D_k) \neq \empty, then there does not exist a connected model.
+			\end{equation}
+
+		2.1) Verification is done for the Contact atomic formulas in $\mathbb{M}$, namely:
+			\begin{equation}
+				If \exists i: v(A_i) \neq \empty \vee v(B_i) \neq \empty, then there does not exist a connected model.
+			\end{equation}
+
+		So far, $O(2^N * N)$ bits of memory to hold all points and 
+		their evaluations and $O(2^N * M)$ time to process them.
+
+		3) Let $\mathbb{C}$ be a bit matrix of size $2^N x 2^N$.
+			This matrix will be called connectivity matrix and will represent the connected points in $\mathbb{M}$.
+			
+			\begin{equation}
+				Model points i and j are in contanct if \mathbb{C}[ i ][ j ] is set.
+			\end{equation}
+			Let $\forall i, j \in \mathbb{N} : \mathbb{C}[ i ][ j ] = 1$
+			meaning that at its creation all points are in contact.
+
+			3.1) Remove all connections which interfere with Non Contact atomic formulas.
+				Note that the reflexivity has been satisfied in 1.
+				\begin{equation}
+					\forall a, b < 2^N, \forall j : 
+						if P_a [E_j] = 1 \wedge P_b [F_j] = 1 \vee P_a[F_j] = 1 \wedge P_b[E_j] = 1,
+						then \mathbb{C}[a][b] = 0 and \mathbb{C}[b][a] = 0.
+				\end{equation} 
+
+			For this step $O(2^N * 2^N) = O(2^{2*N})$ bits of memory were used and 
+			total of $O(2^N * 2^N * J)$ time complexity.
+
+		4) Check that all Contacts are still satisfied
+			\begin{equation}
+				\forall i, j \in \mathbb{N}: C(A_i, B_i) is satisfied
+			\end{equation}
+			
+			For each contact $C(A_i, B_i)$, evaluate $v(A_i)$ and $v(B_i)$, 
+			then for each point in $v(A_i)$ check in the connectivity matrix $\mathbb{C}$
+			if it is connected with some point of $v(B_i)$.
+			This is done with one "bitwise \&" operation directly on the whole row in 
+			the matrix and $v(B_i)$ (which is a bitset).
+		
+			The complexity for this step is: $O(I * (H + L * G)$,where: 
+			\begin{itemize}
+				\item H is the complexity for evaluation some term, 
+					it's at most the number of operations in the term, something small.
+				\item L is the number of points in $v(A_i)$ which is at most $2^N$.
+			       \item G is the complexity for "bit operator \&" which is $2^N/2^6$.
+			\end{itemize}
+
+		5) The previous step produces the Maximal unique satisfiable model, wihch is a graph $\mathbb{G}$. 
+			If there exists a satisfiable connected subgraph in the $\mathbb{G}$, then this is the connected model.
+			\newline
+			Finding all connected subgraphs has time complexity of $O(2^N + 2^N * 2^N)$.
+			Checking if a subset of points satisfies the formula can be done in a similar fashion(as the one above).
+			\newline
+			Note that only the check for Not Equal to Zero and Contacts atomic formulas has to be done, 
+			since when a point is removed the  Equal to Zero and Non Contacts atomic formulas can not be broken.
+			\newline
+			Let Y be the number of points in the subset, then at most $O(Y * Y * M)$ time complexity.
+			Note that this must be done for ach connected subgraph and the subgraphs are not overlapping!
+			Upper bound for Y is $2^N$, so the upper bound and on the time complexity is: $O(2^N * 2^N * M)$,
+			since $x * x * M + y * y * M <<< (x+y)*(x+y)*M$ ????????
+
+		Overall memory complexity: $O(2^N * 2^N)$ bits
+		Overall time complexity: $O(2^N * 2^N * M)$
+
 \end{document}
 
 
