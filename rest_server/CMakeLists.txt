@@ -24,7 +24,7 @@ endif()
 
 
 set(executable rest_server)
-add_executable(${executable} source.cpp microservice_controller.cpp microservice_controller.h task_result.cpp task_result.h task_info.cpp task_info.h)
+add_executable(${executable} source.cpp microservice_controller.cpp microservice_controller.h task_result.cpp task_result.h task_info.cpp task_info.h command_runner.h command_runner.cpp)
 target_link_libraries(${executable} formula_lib cpprestsdk::cpprest)
 
 if(UNIX)

@@ -3,7 +3,7 @@
 #include "library.h"
 
 void is_satisfiable(const char* input_f, bool has_satisfiable_model, bool has_satisfiable_connected_model, bool has_satisfiable_measured_model,
-                    bool run_measured_models = true)
+                    bool run_slow_models = true)
 {
     formula_mgr f;
     CHECK(f.build(input_f));
@@ -23,7 +23,7 @@ void is_satisfiable(const char* input_f, bool has_satisfiable_model, bool has_sa
         CHECK(f.is_model_satisfiable(connected_m));
     }
 
-    if(run_measured_models)
+    if(run_slow_models)
     {
         measured_model measured_m;
         CHECK(f.is_satisfiable(measured_m) == has_satisfiable_measured_model);
