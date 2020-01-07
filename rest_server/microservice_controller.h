@@ -45,6 +45,7 @@ private:
     void handle_task(http_request message);
     void handle_cancel(http_request message);
     void handle_ping(http_request message);
+    void handle_formula_generation(http_request message);
 
     std::string generate_random_op_id(size_t length);
     void remove_op_id(std::string op_id);

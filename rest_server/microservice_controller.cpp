@@ -1,10 +1,12 @@
 ﻿#include "microservice_controller.h"
 #include "model.h"
 #include "thread_termiator.h"
+#include "command_runner.h"
 
 #include <iostream>
 #include <string>
 #include <chrono>
+#include <cstdio>
 
 #include <filesystem/filesystem.hpp>
 
@@ -390,6 +392,107 @@ void microservice_controller::handle_ping(http_request message)
 			{
 				remove_op_id(op_id);
 			}
+        }
+    });
+}
+
+void microservice_controller::handle_formula_generation(http_request message)
+{
+    message.content_ready().then([=](web::http::http_request request)
+    {
+        auto query_params = uri::split_query(request.request_uri().query());
+
+        auto get_param = [&](const std::string& param, std::string& param_value)
+        {
+            auto op_id_u = query_params.find(U(param));
+            if(op_id_u == query_params.end())
+            {
+                message.reply(status_codes::BadRequest, "Missing 'op_id' query parameter.")
+                    .then([](pplx::task<void> t) { handle_error(t); });
+                return false;
+            }
+
+            param_value = utility::conversions::to_utf8string(op_id_u->second);
+            return true;
+        };
+
+        std::string max_term_length;
+        std::string min_variables_count;
+        std::string max_variables_count;
+        std::string max_existence_rules;
+        std::string min_non_existence_rules;
+        std::string max_non_existence_rules;
+        std::string formulas;
+
+        if(!get_param("max_term_length", max_term_length) ||
+           !get_param("min_variables_count", min_variables_count) ||
+           !get_param("max_variables_count", max_variables_count) ||
+           !get_param("max_existence_rules", max_existence_rules) ||
+           !get_param("min_non_existence_rules", min_non_existence_rules) ||
+           !get_param("max_non_existence_rules", max_non_existence_rules) ||
+           !get_param("formulas", formulas))
+        {
+            return;
+        }
+
+        // TODO: some guards for the arugments, e.g. max number of formulas, max term length, etc. in order to restrict the running time of the script to some reasonable value.
+
+        static std::atomic<unsigned> output_file_id{};
+        std::string output_file = "formula_generator_outputs/out_" + std::to_string(output_file_id++) + ".txt";
+        std::string output;
+        std::string cmd = "python3 ../../tools/formula_generator.py"; // TODO: proper path to the script, maybe copy the script to the build folder, etc
+        cmd += " --output_filename " + output_file;
+        cmd += " --max_term_length " + max_term_length;
+        cmd += " --min_variables_count " + min_variables_count;
+        cmd += " --max_variables_count " + max_variables_count;
+        cmd += " --max_existence_rules " + max_existence_rules;
+        cmd += " --min_non_existence_rules " + min_non_existence_rules;
+        cmd += " --max_non_existence_rules " + max_non_existence_rules;
+        cmd += " --formulas " + formulas;
+
+        if(!command_runner::run(cmd, output))
+        {
+            error() << "Something went wrong with running the script: " << cmd << "\n" << "Output:\n" << output;
+            message.reply(status_codes::OK, "Sorry, unable to generate formulas, try changing the values.")
+                .then([](pplx::task<void> t) { handle_error(t); });
+            return;
+        }
+
+        // When the script finishes correctly it prints "Done." at the end.
+        static const std::string DONE = "Done.";
+        const auto done_pos = output.find(DONE);
+        if(done_pos == std::string::npos || done_pos != output.size() - DONE.size())
+        {
+            error() << "The script: " << cmd << "\ndid not finished correctly. " << "Output:\n" << output;
+            message.reply(status_codes::OK, "Sorry, unable to generate formulas, try changing the values.")
+                .then([](pplx::task<void> t) { handle_error(t); });
+            return;
+        }
+
+        std::ifstream in(output_file);
+        std::string generated_formulas;
+
+        in.seekg(0, std::ios::end);
+        const auto size = in.tellg();
+        if (size < 0)
+        {
+            error() << "Something went wrong with the produced output file from formula_generator script: " << cmd << "\n" << "Output file: " << output_file;
+            message.reply(status_codes::OK, "Sorry, unable to generate formulas. Contact an administrator.")
+                .then([](pplx::task<void> t) { handle_error(t); });
+            return;
+        }
+
+        generated_formulas.reserve(static_cast<size_t>(size));
+        in.seekg(0, std::ios::beg);
+
+        generated_formulas.assign((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+
+        message.reply(status_codes::OK, generated_formulas)
+            .then([](pplx::task<void> t) { handle_error(t); });
+
+        if(remove(output_file.c_str()))
+        {
+            error() << "Unable to remove a generated output file: " << output_file;
         }
     });
 }
