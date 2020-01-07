@@ -1385,9 +1385,7 @@ contacts_t contact_relations_;
 */
 variable_id_to_points_t variable_evaluations_;
 			\end{lstlisting}
-		
-	\section{Models}
-		Intro on what the models are and when they are used.
+
 	\subsection{Connectivity Model}
 		% NOTE Intro on what the connectivity model really is !
 		Let us have $\varphi$ in the format defined in REF 4. % for now this is formula 4 
@@ -1509,6 +1507,44 @@ variable_id_to_points_t variable_evaluations_;
 		\newline
 		Overall time complexity: $O(2^N * 2^N * M)$
 
+	\section{Rest Server}
+		The Web Server is used to serve:
+		\begin{itemize}
+			\item Rest APIs
+			\item Resources
+		\end{itemize}
+		The Rest APIs are used to chek for satisfiability, to find connected models or meassured models.
+		\newline
+		The resources are:
+		\begin{itemize}
+			\item Html pages
+			\item Images 
+			\item Javascript code
+			\item Styles
+		\end{itemize}
+		The Web Interface is easy to use, contains only the needed information and from there 
+		can be executed all of the described satisfiability algorithms.
+
+		One client can execute only one algorithmic program at a time. 
+		This way it is ensured that there are not a lot of simultaneous executing programs by the server.
+		
+		If the program execution time gets too long the client has the possibility to terminate the execution 
+		of the current program by server. This will re-enable the client to execute another program and will remove 
+		the execution load from the server.
+
+		If the client posts a couple formula for calculation and terminetes the session (for example closes the browser),
+		then the task in the backend will be terminated as well.
+
+		\subsection*{Output}
+		The output of the program is separated in three modules:
+		\begin{itemize}
+			\item Resulting output - indicates what was the final result of the execution. \\
+				For example: The formula is satisfiable.
+			\item Verbose output - This is the output which contains the full proof of the formula execution. \\
+				This output is printed though the whole execution.
+			\item Visualized graph - This is the end result of the model, if such model exists \\
+				The visualization is done with a JavaScript third party library for drawing graphs.
+		\end{itemize}
 \end{document}
 
 

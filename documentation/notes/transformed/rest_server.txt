@@ -20,7 +20,7 @@ If the program execution time gets too long the client has the possibility to te
 of the current program by server. This will re-enable the client to execute another program and will remove 
 the execution load from the server.
 
-If the client posts a comples formula for calculation nad terminetes the session (for example closes the browser),
+If the client posts a couple formula for calculation and terminetes the session (for example closes the browser),
 then the task in the backend will be terminated as well.
 
 The output of the program is separated in three modules:
