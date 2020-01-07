@@ -469,19 +469,6 @@ void microservice_controller::handle_formula_generation(http_request message)
             return;
         }
 
-        // When the script finishes correctly it prints "Done." at the end.
-        static const std::string DONE = "Done.";
-        const auto done_pos = output.find(DONE);
-        if(done_pos == std::string::npos || done_pos != output.size() - DONE.size())
-        {
-            error() << "The script: " << cmd << "\ndid not finished correctly. "
-                    << "Output:\n"
-                    << output;
-            message.reply(status_codes::OK, "Sorry, unable to generate formulas, try changing the values.")
-                .then([](pplx::task<void> t) { handle_error(t); });
-            return;
-        }
-
         std::ifstream in(output_file);
         std::string generated_formulas;
 
