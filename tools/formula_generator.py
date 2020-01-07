@@ -32,19 +32,19 @@ print(options)
 
 if options.max_variables_count < options.min_variables_count or options.min_variables_count < min_variables_count:
     print("Wrong [-u, -v] range.")
-    exit()
+    exit(1)
 if options.max_term_length < min_term_length:
     print("Wrong -t argument, less than the minimal value.")
-    exit()
+    exit(1)
 if options.max_existence_rules < min_existence_rules:
     print("Wrong -k argument, less than the minimal value.")
-    exit()
+    exit(1)
 if options.max_non_existence_rules < options.min_non_existence_rules or options.min_non_existence_rules < min_non_existence_rules:
     print("Wrong [-l, -m] range.")
-    exit()
+    exit(1)
 if options.formulas <= 0:
     print("Wrong -n argument, it should be a positive number.")
-    exit()
+    exit(1)
 
 variables = []
 def generate_variables(variables_count):
@@ -87,7 +87,7 @@ def generate_unique_term():
 
     print("Not able to generate new unique term with the provided parameter ranges.")
     out.close()
-    exit()
+    exit(1)
 
 def C(t1, t2):
     return "C(" + t1 + ", " + t2 + ")"
@@ -111,7 +111,7 @@ def generate_contact(contacts_A, contacts_B, terms_to_ignore):
 
     out.close()
     print("Not able to generate new contact with the provided parameter ranges.")
-    exit()
+    exit(1)
 
 def generate_term_with_ignore_collections(ignore_terms_A, ignore_terms_B, ignore_terms_C):
     for _ in range(0,RETRY_COUNT):
@@ -121,7 +121,7 @@ def generate_term_with_ignore_collections(ignore_terms_A, ignore_terms_B, ignore
 
     out.close() # TODO: make a termination function
     print("Not able to generate new non-zero term with the provided parameter ranges.")
-    exit()
+    exit(1)
 
 def generate_formula(v, k, m):
     # generate the contradiction part: <=(b,a) & C(b,c) & ~C(a, c)
