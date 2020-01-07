@@ -27,5 +27,4 @@ bool run(const std::string& cmd, std::string& output)
 
     return pclose(file) == 0;
 }
-
 }

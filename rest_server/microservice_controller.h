@@ -1,8 +1,8 @@
 #pragma once
 
 #include "library.h"
-#include "task_result.h"
 #include "task_info.h"
+#include "task_result.h"
 
 #include <cpprest/asyncrt_utils.h>
 #include <cpprest/containerstream.h>
@@ -23,7 +23,7 @@ class microservice_controller
 public:
     microservice_controller(utility::string_t url);
 
-	microservice_controller(utility::string_t url, size_t requests_limit);
+    microservice_controller(utility::string_t url, size_t requests_limit);
 
     pplx::task<void> open()
     {
@@ -52,15 +52,15 @@ private:
 
     auto extract_formula_refiners(std::string formula_filters) -> formula_mgr::formula_refiners;
 
-	bool is_requests_limit_exceeded();
+    bool is_requests_limit_exceeded();
 
     http_listener m_listener;
 
     std::mutex op_id_to_task_info_mutex_;
     std::unordered_map<std::string, task_info> op_id_to_task_info_;
 
-	std::mutex requests_limit_mutex_;
-	size_t requests_limit_;
+    std::mutex requests_limit_mutex_;
+    size_t requests_limit_;
 
     std::string CLIENT_DIR = "../client/dist";
 };

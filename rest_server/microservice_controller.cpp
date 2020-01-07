@@ -1,12 +1,12 @@
 ﻿#include "microservice_controller.h"
+#include "command_runner.h"
 #include "model.h"
 #include "thread_termiator.h"
-#include "command_runner.h"
 
-#include <iostream>
-#include <string>
 #include <chrono>
 #include <cstdio>
+#include <iostream>
+#include <string>
 
 #include <filesystem/filesystem.hpp>
 
@@ -31,13 +31,13 @@ bool starts_with(const std::string& s, const std::string& prefix)
 }
 
 microservice_controller::microservice_controller(utility::string_t url)
-	: microservice_controller(url, 1000)
+    : microservice_controller(url, 1000)
 {
 }
 
 microservice_controller::microservice_controller(utility::string_t url, size_t requests_limit)
-	: m_listener(url)
-	, requests_limit_(requests_limit)
+    : m_listener(url)
+    , requests_limit_(requests_limit)
 {
     m_listener.support(methods::GET,
                        std::bind(&microservice_controller::handle_get, this, std::placeholders::_1));
@@ -160,13 +160,13 @@ void microservice_controller::handle_delete(http_request message)
 
 void microservice_controller::handle_task(http_request message)
 {
-	// TODO: do we need a mutex lock for this ? 
-	if (op_id_to_task_info_.size() > requests_limit_)
-	{
-		message.reply(status_codes::TooManyRequests, "There are too many requests, try again later.")
-			.then([](pplx::task<void> t) { handle_error(t); });
-		return;
-	}
+    // TODO: do we need a mutex lock for this ?
+    if(op_id_to_task_info_.size() > requests_limit_)
+    {
+        message.reply(status_codes::TooManyRequests, "There are too many requests, try again later.")
+            .then([](pplx::task<void> t) { handle_error(t); });
+        return;
+    }
 
     struct id_token
     {
@@ -218,32 +218,41 @@ void microservice_controller::handle_task(http_request message)
                 [=](string_t res) {
                     const auto formula = utility::conversions::to_utf8string(web::uri().decode(res));
 
-                    set_termination_callback(
-                        [&]() { return token.is_canceled(); }); // TODO: pass by value?
+                    set_termination_callback([&]() { return token.is_canceled(); }); // TODO: pass by value?
 
                     try
                     {
-						std::stringstream info_output;
-						auto stream_accumulated_output = [&]()
-						{
-							static std::chrono::steady_clock::time_point next_update = std::chrono::steady_clock::now() + 5s;
+                        std::stringstream info_output;
+                        auto stream_accumulated_output = [&]() {
+                            static std::chrono::steady_clock::time_point next_update =
+                                std::chrono::steady_clock::now() + 5s;
 
-							const auto now = std::chrono::steady_clock::now();
-							if(next_update < now)
-							{
-								std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
-								auto& final_result = op_id_to_task_info_.find(op_id)->second.result_;
-								final_result.output.append(info_output.str());
-								info_output.clear();
-								next_update = now + 5s;
-							}
-						};
+                            const auto now = std::chrono::steady_clock::now();
+                            if(next_update < now)
+                            {
+                                std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
+                                auto& final_result = op_id_to_task_info_.find(op_id)->second.result_;
+                                final_result.output.append(info_output.str());
+                                info_output.clear();
+                                next_update = now + 5s;
+                            }
+                        };
 
-						//set_verbose_logger([&](std::stringstream&& s) { info_output << "Verbose: " << s.rdbuf() << "\n"; stream_accumulated_output();  });
+                        // set_verbose_logger([&](std::stringstream&& s) { info_output << "Verbose: " <<
+                        // s.rdbuf() << "\n"; stream_accumulated_output();  });
                         // if the trace on user preference.
-						set_trace_logger([&](std::stringstream&& s) { info_output << "Trace: " << s.rdbuf() << "\n"; stream_accumulated_output(); });
-                        set_info_logger([&](std::stringstream&& s) { info_output << "Info: " << s.rdbuf() << "\n"; stream_accumulated_output(); });
-                        set_error_logger([&](std::stringstream&& s) { info_output << "Error: " << s.rdbuf() << "\n"; stream_accumulated_output(); });
+                        set_trace_logger([&](std::stringstream&& s) {
+                            info_output << "Trace: " << s.rdbuf() << "\n";
+                            stream_accumulated_output();
+                        });
+                        set_info_logger([&](std::stringstream&& s) {
+                            info_output << "Info: " << s.rdbuf() << "\n";
+                            stream_accumulated_output();
+                        });
+                        set_error_logger([&](std::stringstream&& s) {
+                            info_output << "Error: " << s.rdbuf() << "\n";
+                            stream_accumulated_output();
+                        });
                         formula_mgr mgr;
                         formula_mgr::formula_refiners formula_refs =
                             extract_formula_refiners(formula_filters);
@@ -280,7 +289,7 @@ void microservice_controller::handle_task(http_request message)
                         final_result.is_satisfied = is_satisfiable;
                         final_result.output = info_output.str();
 
-                        if (is_parsed && is_satisfiable)
+                        if(is_parsed && is_satisfiable)
                         {
                             final_result.ids = the_model->get_variables_evaluations();
                             final_result.contacts = the_model->get_contact_relations();
@@ -339,8 +348,7 @@ void microservice_controller::handle_cancel(http_request message)
         std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
         auto it = op_id_to_task_info_.find(op_id);
         bool was_removed = false;
-        if(it != op_id_to_task_info_.end() &&
-           it->second.result_.status_code != "FINISHED")
+        if(it != op_id_to_task_info_.end() && it->second.result_.status_code != "FINISHED")
         {
             it->second.cancel();
             it->second.activate();
@@ -377,33 +385,31 @@ void microservice_controller::handle_ping(http_request message)
         }
         else
         {
-			// refactor this.
+            // refactor this.
             auto& info = op_id_to_task_info_.find(op_id)->second;
             auto& res = info.result_;
-			info.activate();
-			message.reply(status_codes::OK, res.to_string()).then([](pplx::task<void> t) {
-				handle_error(t);
-			});
+            info.activate();
+            message.reply(status_codes::OK, res.to_string()).then([](pplx::task<void> t) {
+                handle_error(t);
+            });
 
-			res.output.clear();
-			// send the output and clean it, in JS APPEND to the already accumulated
+            res.output.clear();
+            // send the output and clean it, in JS APPEND to the already accumulated
 
-			if (res.status_code == "FINISHED")
-			{
-				remove_op_id(op_id);
-			}
+            if(res.status_code == "FINISHED")
+            {
+                remove_op_id(op_id);
+            }
         }
     });
 }
 
 void microservice_controller::handle_formula_generation(http_request message)
 {
-    message.content_ready().then([=](web::http::http_request request)
-    {
+    message.content_ready().then([=](web::http::http_request request) {
         auto query_params = uri::split_query(request.request_uri().query());
 
-        auto get_param = [&](const std::string& param, std::string& param_value)
-        {
+        auto get_param = [&](const std::string& param, std::string& param_value) {
             auto op_id_u = query_params.find(U(param));
             if(op_id_u == query_params.end())
             {
@@ -429,18 +435,21 @@ void microservice_controller::handle_formula_generation(http_request message)
            !get_param("max_variables_count", max_variables_count) ||
            !get_param("max_existence_rules", max_existence_rules) ||
            !get_param("min_non_existence_rules", min_non_existence_rules) ||
-           !get_param("max_non_existence_rules", max_non_existence_rules) ||
-           !get_param("formulas", formulas))
+           !get_param("max_non_existence_rules", max_non_existence_rules) || !get_param("formulas", formulas))
         {
             return;
         }
 
-        // TODO: some guards for the arugments, e.g. max number of formulas, max term length, etc. in order to restrict the running time of the script to some reasonable value.
+        // TODO: some guards for the arugments, e.g. max number of formulas, max term length, etc. in order to
+        // restrict the running time of the script to some reasonable value.
 
         static std::atomic<unsigned> output_file_id{};
-        std::string output_file = "formula_generator_outputs/out_" + std::to_string(output_file_id++) + ".txt";
+        std::string output_file =
+            "formula_generator_outputs/out_" + std::to_string(output_file_id++) + ".txt";
         std::string output;
-        std::string cmd = "python3 ../../tools/formula_generator.py"; // TODO: proper path to the script, maybe copy the script to the build folder, etc
+        std::string cmd = "python3 ../../tools/formula_generator.py"; // TODO: proper path to the script,
+                                                                      // maybe copy the script to the build
+                                                                      // folder, etc
         cmd += " --output_filename " + output_file;
         cmd += " --max_term_length " + max_term_length;
         cmd += " --min_variables_count " + min_variables_count;
@@ -452,7 +461,9 @@ void microservice_controller::handle_formula_generation(http_request message)
 
         if(!command_runner::run(cmd, output))
         {
-            error() << "Something went wrong with running the script: " << cmd << "\n" << "Output:\n" << output;
+            error() << "Something went wrong with running the script: " << cmd << "\n"
+                    << "Output:\n"
+                    << output;
             message.reply(status_codes::OK, "Sorry, unable to generate formulas, try changing the values.")
                 .then([](pplx::task<void> t) { handle_error(t); });
             return;
@@ -463,7 +474,9 @@ void microservice_controller::handle_formula_generation(http_request message)
         const auto done_pos = output.find(DONE);
         if(done_pos == std::string::npos || done_pos != output.size() - DONE.size())
         {
-            error() << "The script: " << cmd << "\ndid not finished correctly. " << "Output:\n" << output;
+            error() << "The script: " << cmd << "\ndid not finished correctly. "
+                    << "Output:\n"
+                    << output;
             message.reply(status_codes::OK, "Sorry, unable to generate formulas, try changing the values.")
                 .then([](pplx::task<void> t) { handle_error(t); });
             return;
@@ -474,9 +487,11 @@ void microservice_controller::handle_formula_generation(http_request message)
 
         in.seekg(0, std::ios::end);
         const auto size = in.tellg();
-        if (size < 0)
+        if(size < 0)
         {
-            error() << "Something went wrong with the produced output file from formula_generator script: " << cmd << "\n" << "Output file: " << output_file;
+            error() << "Something went wrong with the produced output file from formula_generator script: "
+                    << cmd << "\n"
+                    << "Output file: " << output_file;
             message.reply(status_codes::OK, "Sorry, unable to generate formulas. Contact an administrator.")
                 .then([](pplx::task<void> t) { handle_error(t); });
             return;
@@ -487,8 +502,7 @@ void microservice_controller::handle_formula_generation(http_request message)
 
         generated_formulas.assign((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
 
-        message.reply(status_codes::OK, generated_formulas)
-            .then([](pplx::task<void> t) { handle_error(t); });
+        message.reply(status_codes::OK, generated_formulas).then([](pplx::task<void> t) { handle_error(t); });
 
         if(remove(output_file.c_str()))
         {
@@ -566,7 +580,7 @@ void microservice_controller::remove_non_active()
     std::vector<std::string> op_ids_to_remove;
     for(auto& op_id_ctx : op_id_to_task_info_)
     {
-        if (!op_id_ctx.second.is_active())
+        if(!op_id_ctx.second.is_active())
         {
             op_ids_to_remove.push_back(op_id_ctx.first);
         }
