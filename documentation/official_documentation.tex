@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage{systeme}
 \usepackage{newtxtext}
 \usepackage{newtxmath}
 \usepackage{listings}
@@ -1507,6 +1508,90 @@ variable_id_to_points_t variable_evaluations_;
 		\newline
 		Overall time complexity: $O(2^N * 2^N * M)$
 
+	\newpage
+	\section{System of Inequalities}
+		The systems are of the following type:	
+		\[
+			\syslineskipcoeff{1.50}
+			\systeme*{\sum_{i^1} X_{i^1} <= \sum_{j^1} X_{j^1},
+				\:\:.\:\:.\:\:.,
+				\sum_{i^n} X_{i^n} <= \sum_{j^n} X_{j^n}, 
+				\sum_{k^1} X_{k^1} > \sum_{l^1} X_{l^1},
+				\:\:.\:\:.\:\:.,
+				\sum_{k^m} X_{k^m} > \sum_{l^m} X_{l^m}
+				}
+		\]
+	
+		To calculate these systems of inequalities a third party library is used, which is specialized 
+		to solve systems of inequalities. The library's name is Kiwi.
+		\newline
+		\subsection{System Construction}
+		The system of inequalities is constructed from the potential meassured model by evaluating each
+		of the terms in the Meassured less or equals and Meassured less atomic formulas. For each 
+		point for which the evaluation is evaluated to true a new variable is added to the system of inequalities, namely:
+		\newline
+
+		1) For each <=m(x, y) calculate v(x) and v(y), then an inequality of the following type is created: 
+		\begin{align*}
+			\sum_i X_i <= \sum_j X_j, \text{ where }i \in v(a) \vee j \in v(b).
+		\end{align*}
+
+		If some X is on both sides of an inequality, then both of them are removed.
+		\newline
+
+		2) For each \textasciitilde<=m(a,b) calculate v(a) and v(b), then an inequality of the following type is created: 
+		\begin{align*}
+			\sum_i X_i > \sum_j X_j, \text{ where }i \in v(a) \vee j \in v(b).
+		\end{align*}
+
+		If some X is on both sides of an inequality, then both of them are removed.
+		\newline
+
+		3) For each variable in the model a new greater than constraint is added to the system
+		\newline
+		If the system of inequalities constructed in this maner has solution, then this system of inequalities
+		satisfies the meassured model.
+
+		\subsection{Meassured Less Operator Representation}
+		All of the researched third party libraries for solving systems of inequalities work only with Less or Equal inequalities.
+		This means that the Less inequalites must be simulated with the usage of Less or Equal inequalities.
+		\newline
+		This absence is solved with the addition of a really small variable while converting the less inequality to 
+		less or equal inequality.
+		\newline
+		Let us have the following inequality
+		\[
+			\syslineskipcoeff{1.50}
+			\systeme*{\sum_{i^1} X_{i^1} > \sum_{j^1} X_{j^1}}
+		\]
+		then this inequality is transformed into:
+		\[
+			\syslineskipcoeff{1.50}
+			\systeme*{\sum_{i^1} X_{i^1} - \sum_{j^1} X_{j^1}} + \epsilon <= 0 
+		\]
+		where $\epsilon$ is a small value.
+		\newline
+		The inequality X > 0, which is a variable to be greater than zero is transformed into:
+		\[
+			\syslineskipcoeff{1.50}
+			\systeme*{X - \epsilon >= 0} 
+		\]
+		\newline
+		Google's linear solver Glop (OR-Tools) was one of the tested libraries and it has precision around $1*10^{-7}$.
+		Kiwi's precision is around $1*10^{-8}$. 
+		\newline
+		These results are based on simple empirical testing, namely:
+
+		A simple system of only one inequality $X > 0$ which is converted to $X - \epsilon >= 0$. 
+		While testing the $\epsilon$ value was slowly decreasing and when it gets smaller than $1*10^{-7}$
+		($1*10^{-6}$ for google's Glop (OR-Tools) ) the solver gave a wrong answer.
+		\newline
+		\newline
+		Besides this anomaly, the precision is good enough for the purposes of finding solutions for the special type
+		of systems of inequalities defined above.
+		
+		
+	\newpage
 	\section{Rest Server}
 		The Web Server is used to serve:
 		\begin{itemize}
