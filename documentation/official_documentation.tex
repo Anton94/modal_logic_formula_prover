@@ -1589,8 +1589,165 @@ variable_id_to_points_t variable_evaluations_;
 		\newline
 		Besides this anomaly, the precision is good enough for the purposes of finding solutions for the special type
 		of systems of inequalities defined above.
+
+	\subsection{Meassured Model}
+		% NOTE Intro on what the connectivity model really is !
+		Let us have $\varphi$ in the format defined in REF 4. % for now this is formula 4 
+		Let us define few constants which will ease the annotation:
+		\begin{itemize}
+			\item N - number of variables in the atomic formulas
+			\item M - number of atomic formulas
+			\item I - number of Contact atomic formulae
+			\item J - number of Non Contact atomic formulae
+			\item K - number of Not Equal to Zero atomic formulae
+			\item L - number of Equal to Zero atomic formulae
+			\item S - number of Measured Not Equal to Zero atomic formulae
+			\item U - number of Measured Equal to Zero atomic formulae
+		\end{itemize}
 		
-		
+		\subsubsection*{Points construction}
+		The first step is to construct the points which will represent the possible meassured model.
+		The following atomic formulas produce an existance of a point:
+		\begin{itemize}
+			\item C(x, y) produces two model points, \\
+				where x and y are terms.
+			\item $x != 0$ produces one model point, \\
+				where x is a term.
+			\item Each measured atomic formula produces one model point
+		\end{itemize}
+		For each contact $C(A_i, B_i)$ two new model points are created A and B, where $A \in v(A_i) \text{ and } B \in v(B_i)$.
+		In some cases the point created for a contact might be one, but this in turn is simulated by having the same evaluation for two 
+		points, which means that the point is duplicated.
+		\newline
+		For each Not Equal to Zero atomic formula one new modal point is created.
+		\newline
+		For each measured atomic formula one new point is added % TODO add detailed description why is this new one point
+		\newline
+		Each Point will be represented with $P(\tau , e)$, where $\tau$ is a term and e is the variable evaluation.
+		The point's evaluation P[e] positively evaluates the point's term $P[\tau ]$, this means that in order for the 
+		point to be valid it's term must be evaluated to true. This means that P belongs to $v(P[\tau ])$.
+		\newline
+		Example: Let's have C(a + b, c*d)
+		\newline
+		then a valid model point for 'a + b' is P(a+b, [1000]), where [1000] is the evaluation for (a, b, c, d) variables.
+		That evaluation evaluates 'a+b' to true.
+		\newline
+		For 'c*d' a point could be: P('c*d', [0011]).
+		\newline
+		Each point must keep track of it's associated term in order to be able to generate next evaluation which evaluates the term to 'true'. % TODO what is next eval.
+		The search for satisfiable model is done in steps, where in each steps a set of evaluation is tested for satisfiability,
+		if this test fails then new set of point evaluations must be generated. 
+		The mechanics behind the next evaluation generation will be described further.
+
+		\subsubsection*{Measured Model Algorithm}
+
+			1)  For each $C(A_i, B_i)$ two points are created $P_a$ and $P_b$: $P_a[A_i] = true$ and $P_b[B_i] = true$.
+				If not possible - then there is no satisfiable model.
+			\newline
+
+			2) For each $D_k \neq 0$ one point is created P: $P[D_k] = true$.
+				If not possible - then there is no satisfiable model.
+			\newline
+
+			3) If the points are less than the measured atomics*2 (or zero points) then dummy points are 
+				created which are associated to '1' constant term, 
+				just to make real points and to be able to put at least 
+				one variable in both sides of the inequalities. % TODO
+			\newline
+			\newline
+			At this point there is at least one point in the model.
+			\newline
+			
+			4) A connection is made between the contact points, first 2*I points are from Contact terms,
+				 i.e. for each 0 <= i < I a connection is added in the connectivity matrix between 2*i and 2*i + 1 points. % NOTE DEF CONNECTIVITY MATRIX
+			\newline
+			
+			5) Calculate the v(X) for each variable. % (TODO: this should be explained somewhere else already)
+			\newline
+
+			6) For each $G_l \neq 0$ evaluate $v(G_l)$ and check if it's the empty set. O(L)
+			\newline
+
+			7) For each $~C(E_j, F_j)$ check if $v(E_j)$ and $v(F_j)$ contain a common point or if one of the sets contains a point which is in contact with a point in the other set.
+			\newline
+			\newline
+
+			Complexity: O(J * (I + J) * G)
+			\newline
+			
+			G is the complexity for "bit operator \&" which is something like $(I+J)/2^6$.
+			\newline
+			
+			I+J is the number of points.
+			\newline
+			
+			8) Check the measured atomics: \\% TODO: we should have already defined why we are doing it in some theoretical part of the documentation 
+
+			For each <=m(a, b) calculate v(a) and v(b), create an inequality of the following type: 
+			\begin{align*}
+				\sum_i X_i <= \sum_j X_j, \text{ where }i \in v(a) \vee j \in v(b).
+			\end{align*}
+			For each ~<=m(a,b) calculate v(a) and v(b), create an inequality of the following type: 
+			\begin{align*}
+				\sum_i X_i > \sum_j X_j, \text{ where }i \in v(a) \vee j \in v(b).
+			\end{align*}
+			Each inequality is a row in the system of inequalities. 
+			If this system has a solution, then the generated model is a satisfiable one. \\ % say that the above def of system of in. is the solver
+			
+			Finish!
+			\newline
+
+			9) The generation of new combination of points: \\
+				Similar to binary +1 operation but instead of just 0 and 1 states on each position there are $2^N$ combinations,
+				from which some will not be valid because they will not evaluate the point's term to true
+			\newline
+			Here is an example of binary +1 operation:
+			\begin{align*}
+				000 + 1 &= 001 \\
+				001 + 1 &= 010 \\
+				010 + 1 &= 011 \\ 
+				011 + 1 &= 100 \\
+				100 + 1 &= 101 \\
+				101 + 1 &= ...
+			\end{align*}
+			If there are two variables and two points and for the sake of simplicity ignore the term for now.
+    			At first there will be only 0s. \\
+			$[00][00]$ where the first [00] is the evaluation of the first point which evaluates both variables to 0.
+			\newline
+			The next generations look as follows:
+			\begin{align*}
+				[00][00] -(&\text{next combination})-> [00][01] \\
+				->& [00][10] \\
+				->& [00][11] \\
+				->& [01][00] \\
+				->& [01][01] \\
+				->& [01][11] \\
+				->& [10][00] \\
+				-..->& [11][11]
+			\end{align*}
+			In the above example the [11][11] is the last combination.
+			\newline
+    			When the condition that the point's evaluation should evaluate the term to true is takein into account, then all evaluation which do not evaluate the 
+			term to true are skipped.
+			\newline
+    			Example: if the variables are 'x' and 'y', first point's term is 'x', second point's term is 'y' then the valid sequence of combinations will be:
+			\begin{align*}
+				[x:1 y:0, 'x']&[x:0 y:1, 'y'] -> [10][11]  \\
+				->& [11][01] \\
+				->& [11][11]
+			\end{align*} % WHAT ? 
+			\newline
+
+			Complexity: O((I+J) * G), where G is the complexity for finding a next evaluation for a point, 
+			namely finding an evaluation which evaluates the point's term to true, 
+			which is at most $2^N$.
+			\newline
+
+			After a successfull generation v(X) is recalculated for each X(variable) so it's (I+J)*N, namely for each point's evaluation 
+			go through each bitset to add that point to the set of points of v(X)(where X is the variable which bit is set) % TODO: better explanation
+			\newline
+
+			Overall, all combinations are: $(2^N)^(I+J)$
 	\newpage
 	\section{Rest Server}
 		The Web Server is used to serve:
