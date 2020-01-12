@@ -10,6 +10,7 @@
 \usepackage{makecell}
 \usepackage{booktabs}% http://ctan.org/pkg/booktabs
 \usepackage{float}
+\usepackage{hyperref}
 
 \restylefloat{table}
 \newcommand{\tabitem}{~~\llap{\textbullet}~~}
@@ -28,7 +29,11 @@
 	\maketitle
 	\pagenumbering{gobble}
 	\newpage
-
+	TODO: Theoretical intro should be added about the region based modal logics.
+	Definitions of Contact, <=, <=m...
+	\newline
+	TODO \#REF should be replaced with the real reference of a definiton.
+	\newpage
 	\section{Formula Representation}
 	Let $\mathbb{V}ar$ be the set of variables:
 	\[ \mathbb{V}ar = \{p_0, p_1, p_2 ... \}\]
@@ -43,7 +48,7 @@
 			where $\sigma \: \in \: \{\sqcap, \sqcup\}$
 	\end{itemize}
 	Parentheses are used to define the priority of an operation.
-
+	\newline
 	Let $\mathbb{C}_f$ be the set of formula constants:
 	\[ \mathbb{C}_f = \{T, F \}\]
 	\subsection{Formula recursive definition}
@@ -61,8 +66,10 @@
 		Parentheses are used to define the priority of an operation. They are defined for terms and formulae.
 	
 	\subsection{Definition: Atomic Formula}
-		A formula will be called atomic formula if it is a constant or it is in one of the followings:
+		A formula will be called atomic formula if it is one of the followings:
 		\begin{itemize}
+			\item T
+			\item F
 			\item C(x, y)
 			\item $x \le y$
 			\item $x \le_m y$
@@ -80,7 +87,7 @@
 	\subsection{Parser}
 		Flex and Bison are used to generate a parser with the modal logic grammar.
 		Flex is used as a tokenizer while Bison is used as the parser.
-
+		\newline
 		There are two types of building elements in the modal logic formula:
 		\begin{itemize}
 			\item terms, defined in \#REF Term Recursive Definition
@@ -90,21 +97,21 @@
 	\subsubsection{Symbols Representation}
 		\subsubsection*{Atomic terms}
 		\begin{itemize}
-			\item 0 is the term constant True
-			\item 1 is the term constant False
+			\item 0 is the term constant False
+			\item 1 is the term constant True
 			\item Arbitrary string is used to represent a variable
 		\end{itemize}
 		
 		\subsubsection*{Terms operations}
 		Let t1, t2 be terms, then the followings are the representations for term operations
 		\begin{itemize}
-			\item ~t1 is used to represent the complement term operation, namely $\bar{t1}$
+			\item - t1 is used to represent the complement term operation, namely $\bar{t1}$
 			\item t1 * t2 is used to represent the intersection term operation, namely $t1 \: \sqcap \: t2$
-			\item t1 * t2 is used to represent the union term operation, namely $t1 \: \sqcup \: t2$
+			\item t1 + t2 is used to represent the union term operation, namely $t1 \: \sqcup \: t2$
 		\end{itemize}
 		
 		\subsubsection*{Atomic formulae}
-		Let t1, t2 be terms, then the followings are representation of atomic formulas
+		Let t1, t2 be terms, then the followings are representation of atomic formulae
 		\begin{itemize}
 			\item T is the formula constant True
 			\item F is the formula constant False
@@ -116,35 +123,39 @@
 
 	\subsection{Tokenizer}
 	\subsubsection*{Grammar}
-		The tokenizer's grammar is pretty simple and is explaned in details in the following table:
+		The tokenizer's grammar is pretty simple and is explaned in details in the following table with Flex syntaxes:
+		% Matched token |  token
 		\begin{flushleft}
 			\begin{tabular}{ | m{7em} | m{15em}| m{10em} | } 
 				\hline
+					Matched token & Formatted token & Description \\ [0.7ex] 
+				\hline
 					[ \textbackslash t \textbackslash  n] & ; & Returns nothing, ignore all whitespace \\ 
 				\hline
-					[,TF01()C\&|~*+-] 	& {return yytext[0];} & all single charecter tokens will be passed as their ASCIIs for an easier use in bison \\
+					[,TF01()C\&|~*+-] 	& yytext[0]; & yytext[0] is the matched character. All single charecter tokens will be passed as their ASCIIs for an easier use in Bison \\
 				\hline
-				    "<="            &   {return T\_LESS\_EQ;} & Returns a special literal which maps the '<=' sequence \\
+				    "<="            &   T\_LESS\_EQ; & Returns a special literal which maps the '<=' sequence \\
 				\hline
-				    "<=m"           &   {return T\_MEASURED\_LESS\_EQ;} & \\
+				    "<=m"           &   T\_MEASURED\_LESS\_EQ; & \\
 				\hline
-				    "=0"            &   {return T\_EQ\_ZERO;} & \\
+				    "=0"            &   T\_EQ\_ZERO; & \\
 				\hline
-				    "= 0"           &   {return T\_EQ\_ZERO;} & \\
+				    "= 0"           &   T\_EQ\_ZERO; & \\
 				\hline
-				    "->"            &   {return T\_FORMULA\_OP\_IMPLICATION;} & \\
+				    "->"            &   T\_FORMULA\_OP\_IMPLICATION; & \\
 				\hline
-				    "<->"           &   {return T\_FORMULA\_OP\_EQUALITY;} & \\
+				    "<->"           &   T\_FORMULA\_OP\_EQUALITY; & \\
 				\hline
-				    [a-zA-Z0-9]+    &   \makecell{\{yylval->T\_STRING =\\ create\_lexer\_string(yytext, yyleng); \\ return T\_STRING;\}} & Returns T\_STRING literal type and the string  value is written to yylval which can be later accessed from the parser. Note that it uses our simple memory manager to allocate this string in order to be able to safely free all allocated strings even when some syntax error occures \\
+				    [a-zA-Z0-9]+    &   T\_STRING; & Returns T\_STRING literal type and the string  value is written to yylval which can be later accessed from the parser. Note that it uses our simple memory manager to allocate this string in order to be able to safely free all allocated strings even when some syntax error occures \\
 				\hline
-				    .               &   {return yytext[0];} & bison will trigger an error if it's unrecognized symbol \\
+				    .               &   yytext[0]; & bison will trigger an error if it's unrecognized symbol \\
 				\hline
 
 			\end{tabular}
 		\end{flushleft}
 
 		\subsubsection*{Parser literals}
+			One character tokens are passed as their ASCII to Bison.
 			The followings are definition of literals for multi character tokens
 			\begin{itemize}
 				\item \%token <const char*> T\_STRING is the literal for "string"
@@ -162,26 +173,19 @@
 				\item \%left T\_FORMULA\_OP\_IMPLICATION T\_FORMULA\_OP\_EQUALITY
 				\item \%left '|' '+'
 				\item \%left '\&' '*'
-				\item \%right '~' '-'
+				\item \%right '\textasciitilde' '-'
 				\item \%nonassoc '(' ')'
 			\end{itemize}
 
 		\subsubsection*{Parser grammar}
 			In the process of parsing the formula the Abstract Syntax Tree(AST) is built as well, 
-			which later is used to make formula modifications, for example converting X -> Y to ~X | Y .
-			
+			which later is used to make formula modifications, for example converting X -> Y to \textasciitilde X | Y .
+			\newline
 			create\_formula\_node and create\_term\_node are two helper functions which construct AST nodes
 			% go into details here about the create_formula_node and term_node
 
 
 		\begin{lstlisting}
-modal_logic_formula // The start non-terminal
-    : formula {                   
-        // $1 gives the matched formula and we write
-        // it in a 'global' variable parsed_formula
-        parsed_formula.reset($1); 
-    }
-  ;
 formula // 'formula' non-terminal
     : 'T' { // trying to match token 'T'
         // $$ is the return value to the 'parent' 
@@ -274,7 +278,7 @@ term
 
 		\subsubsection*{Abstract Syntax Tree}
 			The visitor pattern is used to modify the formula, namely it's AST tree.
-			
+			\newline
 			The visitor pattern uses double virtual dispatching.
 
 			\subsubsection*{Operation types in the formula/term nodes}
@@ -313,7 +317,8 @@ public:
 class NFormula : public Node
 {
 public:
-    NFormula(formula_operation_t op, Node* left = nullptr, Node* right = nullptr);
+    NFormula(formula_operation_t op, 
+	Node* left = nullptr, Node* right = nullptr);
 
     void accept(Visitor& v) override { v.visit(*this); }
 
@@ -325,7 +330,8 @@ public:
 class NTerm : public Node
 {
 public:
-    NTerm(term_operation_t op, NTerm* left = nullptr, NTerm* right = nullptr);
+    NTerm(term_operation_t op, 
+	NTerm* left = nullptr,  NTerm* right = nullptr);
 
     void accept(Visitor& v) override { v.visit(*this); }
 
@@ -362,7 +368,7 @@ public:
 
 				The visitor pattern gives us the ability to add new visitors in a very simple manner.
 				The new visitor should override the two visit methods and do whatever it wants with the ast nodes.
-
+				\newline
 				%intro on why are we doing all those modifications to the formula's AST
 
 			\subsubsection*{Visitors Implementation}
@@ -374,7 +380,7 @@ public:
 					  \begin{tabular}{llll}
 					    \toprule
 					    \midrule
-					\tabitem -T $\equiv$ F & \tabitem C(0,0)  $\equiv$ F & \tabitem -F $\equiv$ T & \tabitem C(1,1) $\equiv$ T \\
+					\tabitem \textasciitilde T $\equiv$ F & \tabitem C(0,0)  $\equiv$ F & \tabitem \textasciitilde F $\equiv$ T & \tabitem C(1,1) $\equiv$ T \\
 					\tabitem (T \& T) $\equiv$ T & \tabitem C(a,0)  $\equiv$ F & \tabitem (F | F) $\equiv$ F & \tabitem C(0,a) $\equiv$ F \\
 					\tabitem (g \& T) $\equiv$ g & \tabitem -1 $\equiv$ 0 & \tabitem (g | T) $\equiv$ T & \tabitem -0 $\equiv$ 1 \\
 					\tabitem (T \& g) $\equiv$ g & \tabitem (1 * 1) $\equiv$ 1 & \tabitem (T | g) $\equiv$ T & \tabitem (0 + 0) $\equiv$ 0 \\
@@ -407,7 +413,7 @@ public:
 						\item --g $\equiv$ g
 						\item --t $\equiv$ t
 					\end{itemize}
-				\subsubsection{VConvertImplicationEqualityToConjDisj}
+				\subsubsection*{VConvertImplicationEqualityToConjDisj}
 					Converts all formula nodes of type implication and equality to nodes 
 					which are using just conjuction and disjunction. 
 					Main reason for that is to simplify the tableau method - 
@@ -433,7 +439,8 @@ public:
 						\item VVariablesGetter - gets all variables from the formula (as string)
 						\item VPrinter - prints the formula to some provided output stream
 					\end{itemize}
-
+	
+	\newpage
 	\section{Formula Structure}
 		The formula structure is similar to the AST structure, but with restricted formula operations and additional information.
 		% intro that the formula is built recursively 
@@ -442,8 +449,8 @@ public:
 				\item formula
 				\item term
 			\end{itemize}
-		Every member variable in the nodes is caluclated in building, 
-		this way getting the hash code of a node is done in constant time.
+		Every member variable in the nodes is caluclated dulring its building,
+		this way getting the hash code of a node is done in a constant time.
 
 		\subsection*{Formula Node Structure}
 		\begin{lstlisting}
@@ -580,6 +587,8 @@ public:
 				 C(a, b) = C(c, d) \rightarrow (a = c \wedge b = d) \vee (a = d \wedge b = c).
 			\end{equation}
 		
+		\newline TODO Explain \item variable mask for all used variables in the term(and it's child terms)
+
 		\subsubsection{Formula Refiners}
 			The formula refiners are an optional parameter when building a formula node.
 			They are a set of optional filters which may optimize the formula by reducing redundant parts of the 
@@ -600,7 +609,7 @@ public:
 			in \#REF visitor.
 
 			\begin{itemize}
-				\item Convert Contacts and less or equal atomic formas which have same terms \\
+				\item Convert Contacts and less or equal atomic formula which have same terms \\
 					 is mapped to VConvertLessEqContactWithEqualTerms
 				\item Convert disjunction in contacts and less or equal atomic formulas \\
 					 is mapped to VSplitDisjInLessEqAndContacts
@@ -630,6 +639,8 @@ enum class formula_refiners : int32_t
         | remove_double_negation
 };
 			\end{lstlisting}
+
+			% TODO Add: The building of a formula is done in the following manner:
 
 			\begin{lstlisting}
 auto formula_mgr::build(const std::string& f, 
@@ -750,9 +761,8 @@ auto formula_mgr::build(const std::string& f,
 			\end{lstlisting}
 
 	\subsubsection*{Node evaluation}
-		% this should be explained very well, and not just here but with multilpe definitions on theory level
-
-
+		TODO: this should be explained very well, and not just here but with multilpe definitions on theory level
+		
 
 	\section{Tableaux}
 	The Tableaux process is decision procedure, which recursively breaks down a given formula into basic components 
@@ -770,20 +780,21 @@ auto formula_mgr::build(const std::string& f,
 	produced or no further expansion is possible.
 
 	\subsection{Definition: Tableaux Step}
-		The Tableaux Step takes as input a formula and a set of accumulated formulae and produces as 
-		output one or two new formulae, depending on the operation. 
-		The set of accumulated formulae consist of the broken down formulae by previous tableaux steps.
-		The output of the tableaux step depends on the rule applied to the formula.
 
-		\subsubsection*{Definition: Marked Formula} 
-			Let $\varphi$ be a formula, then $\varphi$ might be marked as:
+		\subsubsection*{Definition: Signed Formula} 
+			Let $\varphi$ be a formula, then:
 			\begin{itemize}
-				\item true, we will write $\mathbb{T}\varphi$
-				\item false, we will write $\mathbb{F}\varphi$
+				\item $\mathbb{T}\varphi$ signs $\varphi$ as true
+				\item $\mathbb{F}\varphi$ signs $\varphi$ as false
 			\end{itemize}
 
-		\subsubsection*{Definition: Accumulated Formulae}
-			The accumulated formulae set consists only of marked formulae and the letter X will be usually used for its representation.
+		\subsubsection*{Definition: Signed Formulae set}
+			The signed formulae set consists only of signed formulae and the letter X will be usually used for its representation.
+
+		The Tableaux Step takes as input a formula and a signed formulae set and produces as 
+		output one or two new formulae, depending on the operation.
+		The signed formulae set consists of the broken down formulae by previous tableaux steps.
+		The output of the tableaux step depends on the rule applied to the formula.
 
 		\subsubsection{Rules}
 		\subsubsection*{Negation}
@@ -857,82 +868,82 @@ auto formula_mgr::build(const std::string& f,
 		\newline
 	
 		For our usecases the functionality of the tableaux process shall be extended to achive better results, since if the branch is not closed, there are 
-		additional calculations needed in order to verify that there is no contradiction, namely to verify that there is no contradiction on Term level.
-		This verification can be done in different manners, depending on the algorithm type. The best way to think about it is to have the tableaux process
-		return a list, where each element is the set of atomic formulae found in a specific branch. This way the atomic formulae for each branch are produced, and 
-		afterwards can be used in different algorithms. This is just an example, a way of thinking about the problem the real implementation is much more space 
-		efficient.
+		additional calculations needed in order to verify that there is no contradiction, namely to verify that there is no contradiction on Term level which means 
+		that there exists a satisfiable model.
+		This verification can be done in different manners, depending on the algorithm type. The best way to think about it is that the tableaux process returns a 
+		not-closed branch and if there is a model for the set of atomic formuas in this branch, then the formula is satisfiable, otherwise the tableaux process proceeds 
+		with the next not-closed branch. If such branch does not exist then the formula is not satisfiable. 
 
 	\subsection{Tableaux implementation}
 		The programming implementation of the tableaux method follows the standard tableaux process explaned above.
 
-		First interesting design decision is to keep all true formulae in one data set, and all false formulae in another data set.
-		This enables fast searches wheter a formula has been marked as true or false.
+		First interesting design decision is to keep all true signed formulae in one data set, and all false signed formulae in another data set.
+		This enables fast searches wheter a formula has been signed as true or false.
 		
-		\subsubsection*{Definition: Marked Formula Collection}
-			Let X be a set of formulae, then X is called marked formula collection if and only if all formulae in X are marked as true 
-			or all formulae are marked as false.
+		\subsubsection*{Definition: Signed Formula Collection}
+			Let X be a set of formulae, then X is called signed formula collection if and only if all formulae in X are signed as true 
+			or all formulae are signed as false.
 
 			This collection is implemented with unordered\_map (hashmap),
 			which stores the formulae by pointers to them, uses their precalculated hash and operator== to compare them.
 			The average complexity for search, insert and erase in this collection is O(1).
 		\newline
 		\newline
-		There exist 8 important marked formula collections:
+		There exist 8 important signed formula collections:
 %Note add definition for positive and negative collections !!!
 		\begin{itemize}
-			\item formulas\_T\_ - contains only formulae marked as true
-			\item formulas\_F\_ - contains only formulae marked as false, \\
-				For example, if $\neg\varphi$ is encountered as an output of the tableaux step, then only $\varphi$ is inserted into the formula\_F\_
-			\item contacts\_T\_ - contains only contacts formulae marked as true
-			\item contacts\_F\_ - contains only contacts formulae marked as false
-			\item zero\_terms\_T\_ - contains only formulae of type $\varphi \le \psi$ marked as true
-			\item zero\_terms\_F\_ - contains only formulae of type $\varphi \le \psi$ marked as false
-			\item measured\_less\_eq\_T\_ - contains only formulae of type $\varphi \le_m \psi$ marked as true
-			\item measured\_less\_eq\_F\_ - contains only formulae of type $\varphi \le_m \psi$ marked as false
+			\item formulas\_T - contains only non-atomic formulae signed as true
+			\item formulas\_F - contains only non-atomic formulae signed as false, \\
+				For example, if $\neg\varphi$ is encountered as an output of the tableaux step, then only $\varphi$ is inserted into the formula\_F
+			\item contacts\_T - contains only contacts formulae signed as true
+			\item contacts\_F - contains only contacts formulae signed as false
+			\item zero\_terms\_T - contains only formulae of type $\varphi \le \psi$ signed as true
+			\item zero\_terms\_F - contains only formulae of type $\varphi \le \psi$ signed as false
+			\item measured\_less\_eq\_T - contains only formulae of type $\varphi \le_m \psi$ signed as true
+			\item measured\_less\_eq\_F - contains only formulae of type $\varphi \le_m \psi$ signed as false
 		\end{itemize}
 
 		\subsubsection*{Definition: Formula Contradiction}
-			Let $\varphi$ be a marked formula, then $\varphi$ is causing a contradiction if any of the followings is true:
+			Let $\varphi$ be a signed formula, then $\varphi$ is causing a contradiction if any of the followings is true:
 			\begin{itemize}
-				\item $\varphi$ is marked as true and $\varphi \in$ formulas\_F\_
-				\item $\varphi$ is marked as false and $\varphi \in$ formulas\_T\_
-				\item $\varphi$ is a contact formula marked as true and $\varphi \in$ contacts\_F\_
-				\item $\varphi$ is a contact formula marked as false and $\varphi \in$ contacts\_T\_
-				\item $\varphi$ is a zero terms formula marked as true and $\varphi \in$ zero\_terms\_F\_
-				\item $\varphi$ is a zero terms formula marked as false and $\varphi \in$ zero\_terms\_T\_
-				\item $\varphi$ is a measured less formula marked as true and $\varphi \in$ measured\_less\_eq\_F\_
-				\item $\varphi$ is a measured less formula marked as false and $\varphi \in$ measured\_less\_eq\_T\_
+				\item $\varphi$ is a non-atomic signed as true and $\varphi \in$ formulas\_F
+				\item $\varphi$ is a non-atomic signed as false and $\varphi \in$ formulas\_T
+				\item $\varphi$ is a contact formula signed as true and $\varphi \in$ contacts\_F
+				\item $\varphi$ is a contact formula signed as false and $\varphi \in$ contacts\_T
+				\item $\varphi$ is a zero terms formula signed as true and $\varphi \in$ zero\_terms\_F
+				\item $\varphi$ is a zero terms formula signed as false and $\varphi \in$ zero\_terms\_T
+				\item $\varphi$ is a measured less formula signed as true and $\varphi \in$ measured\_less\_eq\_F
+				\item $\varphi$ is a measured less formula signed as false and $\varphi \in$ measured\_less\_eq\_T
 
 			\end{itemize}
 
 		\subsubsection*{Invariant}
-			At any time, all formulae in all eight marked formula collections do not contradict.
+			At any time, all formulae in all eight signed formula collections do not contradict.
 
 			A contradiction may occure if a formula is split and some of the resulting components causes a contradiction.
 
 		\subsubsection*{Example}
-			Let's assume that contacts\_T\_ = \{ C(a, b)\} and let's have a look at the following formula $\mathbb{T}(T \wedge \neg C(a,b))$.
-
-			By the rules of decomposition, namely the ( $\wedge$ ) rule will produce $\mathbb{T}T, \mathbb{T}\neg C(a,b)$. 
+			Let's assume that contacts\_T = \{ C(a, b)\} and let's have a look at the following formula $\mathbb{T}(T \wedge \neg C(a,b))$.
+			\newline
+			By the rules of decomposition, namely the ( $\wedge$ ) rule produces $\mathbb{T}T \text{ and } \mathbb{T}\neg C(a,b)$. 
 
 			Then the $\mathbb{T}\neg C(a,b)$ will be decomposed to $\mathbb{F} C(a,b)$ by the ( $\neg$ ) rule, which causes a contradiction
-			since C(a,b) is already present in contacts\_T\_ formulae
+			since C(a,b) is already present in contacts\_T formulae
 
 		\subsubsection*{Tableaux Algorithm}
-			Given a formula $\varphi$, the following algorithm determines final atomic formulae in all branches of the tableaux process.
+			Given a formula $\varphi$, the following algorithm determines the atomic formulae in all branches of the tableaux process.
 
-			As a first step if the formula $\varphi$ is the constant F, then false is returned directly, otherwise the whole formula $\varphi$ is inserted in formulas\_T\_.
+			As a first step if the formula $\varphi$ is the constant F, then false is returned directly, otherwise the whole formula $\varphi$ is inserted in formulas\_T.
 		\newline
 			\subsubsection*{Remarks}
 			\begin{itemize}
 				\item true boolean value is used to represent the formula constant T
 				\item false boolean value is used to represent the formula constant F
-				\item The commutativity of the contacts: C(a,b) == C(b,a)
+				\item Contact atomic formula is commutativity, meaning that: C(a,b) == C(b,a)
 			\end{itemize}
 			Few lemmas which will provide a much more efficient contradiction finding in the tableaux process.
 			\subsubsection*{Lemma: A}
-				Let x be a term, suppose that the atomic formula x = 0 has already been marked as true,
+				Let x be a term, suppose that the atomic formula x = 0 has already been signed as true,
 				then marking the following formulae as true will lead to contradiction:
 				\begin{itemize}
 					\item C(x,y)
@@ -941,13 +952,14 @@ auto formula_mgr::build(const std::string& f,
 				for some arbitrary term y.
 
 			\subsubsection*{Lemma: A-inverse}
-				Let x, y and z be terms, suppose that the atomic formulae C(x,y) or C(z, x) has already been marked as true,
+				Let x, y and z be terms, suppose that the atomic formulae C(x,y) or C(z, x) has already been signed as true,
 				then marking the formula x = 0 as true will lead to contradiction.
-				
-			\subsubsection*{Lemma: Complexity A and A-inverse} 
+				\newline
+				TODO: addd short proof.
+			\subsubsection*{Time Complexity A and A-inverse} 
 				The algorithmic complexity to check whether a new formula leads to contradiction by Lemma A and Lemma A-inverse is done
 				effectively, namely in constant time with the usage of one new collection contact\_T\_terms\_ which keeps the terms of 
-				the true contacts, namely the contacts in in the collection contacts\_T\_. This means that for each $\mathbb{T}(C(x, y))$, the 
+				the true contacts, namely the contacts in in the collection contacts\_T. This means that for each $\mathbb{T}(C(x, y))$, the 
 				terms x and y are in the mentioned collection of true terms. The contact\_T\_terms\_  is a multiset and keeps track 
 				of all added terms, meaning that if the term x is added twice and then removed only once there will still be an entry of 
 				that x in the contact\_T\_terms\_ collection.
@@ -959,31 +971,31 @@ auto has_broken_contact_rule(const formula* f) const -> bool;
 
 			\subsubsection{Handy methods}
 			\subsubsection*{Find formula}
-			\subsubsection*{Find formula marked as true}
+			\subsubsection*{Find formula signed as true}
 				\begin{lstlisting}
 auto find_in_T(const formula* f) const -> bool
 				\end{lstlisting}
 				Checks if the formula $\varphi$ exists in any positive collection depending on the type of $\varphi$, namely
 				if $\varphi$ is of type:
 				\begin{itemize}
-					\item C(x, y), then return true $\iff \varphi \in contacts\_T\_$
-					\item $x \le y$, then return true $\iff \varphi \in zero_terms\_T\_$
-					\item $x \le_m y$, then return true $\iff \varphi \in measured_less_eq\_T\_$
-					\item $\neg \psi$, then return true $\iff \varphi \in formulas\_T\_$
-					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then return true $\iff \varphi \in formulas\_T\_$
+					\item C(x, y), then return true $\iff \varphi \in contacts\_T$
+					\item $x \le y$, then return true $\iff \varphi \in zero_terms\_T$
+					\item $x \le_m y$, then return true $\iff \varphi \in measured_less_eq\_T$
+					\item $\neg \psi$, then return true $\iff \varphi \in formulas\_T$
+					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then return true $\iff \varphi \in formulas\_T$
 				\end{itemize}
-			\subsubsection*{Find formula marked as false}
+			\subsubsection*{Find formula signed as false}
 				\begin{lstlisting}
 auto find_in_F(const formula* f) const -> bool
 				\end{lstlisting}
 				Checks if the formula $\varphi$ exists in any negative collection depending on the type of $\varphi$, namely
 				if $\varphi$ is of type:
 				\begin{itemize}
-					\item C(x, y), then return true $\iff \varphi \in contacts\_F\_$
-					\item $x \le y$, then return true $\iff \varphi \in zero_terms\_F\_$
-					\item $x \le_m y$, then return true $\iff \varphi \in measured_less_eq\_F\_$
-					\item $\neg \psi$, then return true $\iff \varphi \in formulas\_F\_$
-					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then return true $\iff \varphi \in formulas\_F\_$
+					\item C(x, y), then return true $\iff \varphi \in contacts\_F$
+					\item $x \le y$, then return true $\iff \varphi \in zero_terms\_F$
+					\item $x \le_m y$, then return true $\iff \varphi \in measured_less_eq\_F$
+					\item $\neg \psi$, then return true $\iff \varphi \in formulas\_F$
+					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then return true $\iff \varphi \in formulas\_F$
 				\end{itemize}
 			\subsubsection*{Add formula}
 			\subsubsection*{Mark formula as true}
@@ -993,11 +1005,11 @@ void add_formula_to_T(const formula* f)
 				Adds the formula $\varphi$ as true in in the respective positive collection, namely
 				if $\varphi$ is of type:
 				\begin{itemize}
-					\item C(x, y), then $\varphi$ is added to contacts\_T\_, and the terms x and y are added to the contact\_T\_terms\_ collection.
-					\item $x = 0$, then x is added in zero\_terms\_T\_
-					\item $x \le_m y$, then $\varphi$ is added to measured\_less\_eq\_T\_
-					\item $\neg \psi$, then $\varphi$ is added to formulas\_T\_
-					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then $\varphi$ is added to formulas\_T\_
+					\item C(x, y), then $\varphi$ is added to contacts\_T, and the terms x and y are added to the contact\_T\_terms\_ collection.
+					\item $x = 0$, then x is added in zero\_terms\_T
+					\item $x \le_m y$, then $\varphi$ is added to measured\_less\_eq\_T
+					\item $\neg \psi$, then $\varphi$ is added to formulas\_T
+					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then $\varphi$ is added to formulas\_T
 				\end{itemize}
 			\subsubsection*{Mark formula as false}
 				\begin{lstlisting}
@@ -1006,55 +1018,60 @@ void add_formula_to_F(const formula* f)
 				Adds the formula $\varphi$ as false in in the respective negative collection, namely
 				if $\varphi$ is of type:
 				\begin{itemize}
-					\item C(x, y), then $\varphi$ is added to contacts\_F\_.
-					\item $x = 0$, then x is added in zero\_terms\_F\_
-					\item $x \le_m y$, then $\varphi$ is added to measured\_less\_eq\_F\_
-					\item $\neg \psi$, then $\varphi$ is added to formulas\_F\_
-					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then $\varphi$ is added to formulas\_F\_
+					\item C(x, y), then $\varphi$ is added to contacts\_F.
+					\item $x = 0$, then x is added in zero\_terms\_F
+					\item $x \le_m y$, then $\varphi$ is added to measured\_less\_eq\_F
+					\item $\neg \psi$, then $\varphi$ is added to formulas\_F
+					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then $\varphi$ is added to formulas\_F
 				\end{itemize}
 			\subsubsection*{Remove formula}
-			\subsubsection*{Remove formula marked as true}
+			\subsubsection*{Remove formula signed as true}
 				\begin{lstlisting}
 void remove_formula_from_T(const formula* f)
 				\end{lstlisting}
 				Removes the formula $\varphi$ from the respective positive collection, namely
 				if $\varphi$ is of type:
 				\begin{itemize}
-					\item C(x, y), then $\varphi$ is removed from contacts\_T\_, and the terms x and y are removed from the contact\_T\_terms\_ collection.
-					\item $x = 0$, then x is removed from zero\_terms\_T\_
-					\item $x \le_m y$, then $\varphi$ is removed from measured\_less\_eq\_T\_
-					\item $\neg \psi$, then $\varphi$ is removed from formulas\_T\_
-					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then $\varphi$ is removed from formulas\_T\_
+					\item C(x, y), then $\varphi$ is removed from contacts\_T, and the terms x and y are removed from the contact\_T\_terms\_ collection.
+					\item $x = 0$, then x is removed from zero\_terms\_T
+					\item $x \le_m y$, then $\varphi$ is removed from measured\_less\_eq\_T
+					\item $\neg \psi$, then $\varphi$ is removed from formulas\_T
+					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then $\varphi$ is removed from formulas\_T
 				\end{itemize}
-			\subsubsection*{Remove formula marked as true}
+			\subsubsection*{Remove formula signed as true}
 				\begin{lstlisting}
 void remove_formula_from_F(const formula* f)
 				\end{lstlisting}
 				Removes the formula $\varphi$ from the respective negative collection, namely
 				if $\varphi$ is of type:
 				\begin{itemize}
-					\item C(x, y), then $\varphi$ is removed from contacts\_F\_
-					\item $x = 0$, then x is removed from zero\_terms\_F\_
-					\item $x \le_m y$, then $\varphi$ is removed from measured\_less\_eq\_F\_
-					\item $\neg \psi$, then $\varphi$ is removed from formulas\_F\_
-					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then $\varphi$ is removed from formulas\_F\_
+					\item C(x, y), then $\varphi$ is removed from contacts\_F
+					\item $x = 0$, then x is removed from zero\_terms\_F
+					\item $x \le_m y$, then $\varphi$ is removed from measured\_less\_eq\_F
+					\item $\neg \psi$, then $\varphi$ is removed from formulas\_F
+					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then $\varphi$ is removed from formulas\_F
 				\end{itemize}
 			\subsubsection{Def: Tableaux branch output}
+			\label{tableaux:branch:output}
 				As stated above the ouput of a branch in the tableaux process is a set of atomic formulas.
-				These atomic formulas can be grouped in four groups:
+				These atomic formulas can be grouped in six groups:
 				\begin{itemize}
 					\item Contacts
 					\item Non Contacts
 					\item Equal to Zero Terms
 					\item Not Equal to Zero Terms
+					\item Meassured Equal to Zero Terms
+					\item Meassured Not Equal to Zero Terms
 				\end{itemize}
 				These four groups can be represented with the following formula:
-				\begin{equation}
-					\bigwedge\nolimits_{i} \; C(a_i, b_i) \:\: \wedge \:\:
-					\bigwedge\nolimits_{j} \; \neg C(e_j, f_j) \:\: \wedge \:\:
-					\bigwedge\nolimits_{k} \; d_k = 0 \:\: \wedge \:\:
-					\bigwedge\nolimits_{l} \; g_l \neq 0 
-				\end{equation}
+				\begin{align*}
+					\bigwedge\nolimits_{i} \; C(a_i, b_i) \:\: \wedge \:\: &
+					\bigwedge\nolimits_{j} \; \neg C(e_j, f_j) \:\: \wedge \:\: \\
+					\bigwedge\nolimits_{k} \; d_k = 0 \:\: \wedge \:\: &
+					\bigwedge\nolimits_{l} \; g_l \neq 0 \:\: \wedge \:\: \\
+					\bigwedge\nolimits_{s} \; <=_m(H_s, O_s) \:\: \wedge \:\: &
+					\bigwedge\nolimits_{u} \; \neg (<=_m(Q_u, R_u) )
+				\end{align*}
 				% TODO explain which is what
 			\subsubsection*{Tableaux Satisfiable Step Implementation}
 				\begin{lstlisting}
@@ -1314,7 +1331,7 @@ auto tableau::satisfiable_step() -> bool
 		All models also have similar collection of points each of which has an evaluation for all 
 		used variables in the tableau's path (this evaluation identifies the point).
 		\newline
-		All models can be created(or at least tried to be created) via the marked formula collections and 
+		All models can be created(or at least tried to be created) via the signed formula collections and 
 		some meta information for the whole formula, via the 'create' method.
 		\begin{lstlisting}
 virtual auto create(const formulas_t& contacts_T, 
@@ -1387,9 +1404,10 @@ contacts_t contact_relations_;
 variable_id_to_points_t variable_evaluations_;
 			\end{lstlisting}
 
-	\subsection{Connectivity Model}
-		% NOTE Intro on what the connectivity model really is !
-		Let us have $\varphi$ in the format defined in REF 4. % for now this is formula 4 
+	\subsection{Connected Model}
+		NOTE Intro on what the connected model really is !
+		ADD Connectivity lemma.
+		Let us have $\varphi$ in the format defined in the definition of \hyperref[tableaux:branch:output]{the tableaux branch output}. % for now this is formula 4 
 		Let us define few constants which will ease the annotation:
 		\begin{itemize}
 			\item N - number of variables in the atomic formulas
@@ -1418,20 +1436,20 @@ variable_id_to_points_t variable_evaluations_;
 			\newline
 			\newline
 		So far, the model $\mathbb{M}$ satisfies all Equal to Zero atomic formulas and 
-		'half' of the Non Contacts (only the reflexivity of the points)
+		the reflexivity property of the Non Contacts.
+		\newline TODO: explain reflexivity of contacts in the theoretical part.
 			\newline
 			\newline		
 		2) Verification is done for the Not Equal to Zero atomic formulas in $\mathbb{M}$, namely:
 			\begin{equation}
-				\text{If  } \exists k: v(D_k) \neq \empty \text{ , then there does not exist a connected model.}
+				\text{If  } \exists k: v(D_k) \neq \emptyset \text{ , then there does not exist a connected model.}
 			\end{equation}
 
 		2.1) Verification is done for the Contact atomic formulas in $\mathbb{M}$, namely:
 			\begin{equation}
-				\text{If  } \exists i: v(A_i) \neq \empty \vee v(B_i) \neq \empty \text{, then there does not exist a connected model.}
+				\text{If  } \exists i: v(A_i) = \emptyset \vee v(B_i) = \emptyset \text{, then there does not exist a connected model.}
 			\end{equation}
 			\newline
-			\newline	
 		So far, $O(2^N * N)$ bits of memory to hold all points and 
 		their evaluations and $O(2^N * M)$ time to process them.
 			\newline
@@ -1444,22 +1462,21 @@ variable_id_to_points_t variable_evaluations_;
 			\begin{equation}
 				\text{Model points i and j are in contanct if } \mathbb{C}[ i ][ j ] \text{ is set.}
 			\end{equation}
-			\begin{equation}
-				\text{Let } \forall i, j \in \mathbb{N} : \mathbb{C}[ i ][ j ] = 1
-			\end{equation}
 
-			meaning that at its creation all points are in contact.
-			\newline
+			Initialy all points are in contact, which means that the initial value of each bit is set:
+			\begin{equation}
+				\text{Let } \forall i, j < 2^N : \mathbb{C}[ i ][ j ] = 1
+			\end{equation}
 	
 			3.1) Remove all connections which interfere with Non Contact atomic formulas.
-				\newline
-
-				Note that the reflexivity has been satisfied in 1.
 				\begin{align*}
-					\forall a, b < 2^N, \forall j :& \\
+					\forall a, b < 2^N, \forall j < J :& \\
 						\text{if } P_a [E_j] = 1 \wedge P_b [F_j] = 1 &\vee P_a[F_j] = 1 \wedge P_b[E_j] = 1, \\
-						\text{then } \mathbb{C}[a][b] = 0 &\text{ and } \mathbb{C}[b][a] = 0.
+						\text{then unset } \mathbb{C}[a][b] &\text{ and } \mathbb{C}[b][a].
 				\end{align*} 
+				
+			Note that the reflexivity has been satisfied in 1).
+			\newline
 
 			For this step $O(2^N * 2^N) = O(2^{2*N})$ bits of memory were used and 
 
@@ -1468,14 +1485,20 @@ variable_id_to_points_t variable_evaluations_;
 			\newline	
 		4) Check that all Contacts are still satisfied
 			\begin{equation}
-				\forall i, j \in \mathbb{N}: C(A_i, B_i) \text{ is satisfied}
+				\forall i, j < 2^N: C(A_i, B_i) \text{ is satisfied}
 			\end{equation}
 			
-			For each contact $C(A_i, B_i)$, evaluate $v(A_i)$ and $v(B_i)$, 
-			then for each point in $v(A_i)$ check in the connectivity matrix $\mathbb{C}$
-			if it is connected with some point of $v(B_i)$.
-			This is done with one "bitwise \&" operation directly on the whole row in 
-			the matrix and $v(B_i)$ (which is a bitset).
+			The check whether $C(A_i, B_i)$ is satisfied is done in the following maner:
+			
+			\begin{equation}
+				\forall p \in v(A_i): (\mathbb{C}[p] \text{  bit\&  } v(B_i)) \neq 0
+			\end{equation}
+			Where $\mathbb{C}[p]$ is a bitset representing all contacts of p and 
+			$v(B_i)$ is a bitset representing the evaluation of $B_i$.
+			\newline
+			Thus $(\mathbb{C}[p] \text{  bit\&  } v(B_i)) \neq 0$ means that there is 
+			a common point between the evaluation of $B_i$ and the contacts of p.
+			\newline
 			\newline
 			The complexity for this step is: $O(I * (H + L * G)$,where: 
 			\begin{itemize}
@@ -1527,21 +1550,23 @@ variable_id_to_points_t variable_evaluations_;
 		\newline
 		\subsection{System Construction}
 		The system of inequalities is constructed from the potential meassured model by evaluating each
-		of the terms in the Meassured less or equals and Meassured less atomic formulas. For each 
-		point for which the evaluation is evaluated to true a new variable is added to the system of inequalities, namely:
+		of the terms in the Meassured less or equals and Meassured greater atomic formulas. The points in the model are 
+		enumerated from 0 to N - 1, where N is the number of model points. The system will have N different variables $X_0, X_1, ..., X_n$, 
+		where $\forall i < N: X_i \text{ is mapped to point i}$
 		\newline
-
+		TODO: Add beter theoretical explanation
+		\newline
+		\newline
 		1) For each <=m(x, y) calculate v(x) and v(y), then an inequality of the following type is created: 
 		\begin{align*}
-			\sum_i X_i <= \sum_j X_j, \text{ where }i \in v(a) \vee j \in v(b).
+			\sum_{i \in v(x)} X_i <= \sum_{j \in v(y)} X_j
 		\end{align*}
 
 		If some X is on both sides of an inequality, then both of them are removed.
 		\newline
-
-		2) For each \textasciitilde<=m(a,b) calculate v(a) and v(b), then an inequality of the following type is created: 
+		2) For each \textasciitilde<=m(x,y) calculate v(x) and v(y), then an inequality of the following type is created: 
 		\begin{align*}
-			\sum_i X_i > \sum_j X_j, \text{ where }i \in v(a) \vee j \in v(b).
+			\sum_{i \in v(x)} X_i > \sum_{j \in v(y)} X_j
 		\end{align*}
 
 		If some X is on both sides of an inequality, then both of them are removed.
@@ -1554,9 +1579,9 @@ variable_id_to_points_t variable_evaluations_;
 
 		\subsection{Meassured Less Operator Representation}
 		All of the researched third party libraries for solving systems of inequalities work only with Less or Equal inequalities.
-		This means that the Less inequalites must be simulated with the usage of Less or Equal inequalities.
+		This means that the greater inequalites must be simulated with the usage of Less or Equal inequalities.
 		\newline
-		This absence is solved with the addition of a really small variable while converting the less inequality to 
+		This absence is solved with the addition of a really small variable while converting the greater inequality to 
 		less or equal inequality.
 		\newline
 		Let us have the following inequality
@@ -1567,14 +1592,14 @@ variable_id_to_points_t variable_evaluations_;
 		then this inequality is transformed into:
 		\[
 			\syslineskipcoeff{1.50}
-			\systeme*{\sum_{i^1} X_{i^1} - \sum_{j^1} X_{j^1}} + \epsilon <= 0 
+			\systeme*{0 <= \sum_{i^1} X_{i^1} - \sum_{j^1} X_{j^1}} + \epsilon
 		\]
 		where $\epsilon$ is a small value.
 		\newline
 		The inequality X > 0, which is a variable to be greater than zero is transformed into:
 		\[
 			\syslineskipcoeff{1.50}
-			\systeme*{X - \epsilon >= 0} 
+			\systeme*{0 <= X - \epsilon} 
 		\]
 		\newline
 		Google's linear solver Glop (OR-Tools) was one of the tested libraries and it has precision around $1*10^{-7}$.
@@ -1590,9 +1615,9 @@ variable_id_to_points_t variable_evaluations_;
 		Besides this anomaly, the precision is good enough for the purposes of finding solutions for the special type
 		of systems of inequalities defined above.
 
-	\subsection{Meassured Model}
-		% NOTE Intro on what the connectivity model really is !
-		Let us have $\varphi$ in the format defined in REF 4. % for now this is formula 4 
+	\subsection{Measured Model}
+		% NOTE Intro on what the measured model really is !
+		Let us have $\varphi$ in the format defined in the definition of \hyperref[tableaux:branch:output]{the tableaux branch output}. % for now this is formula 4 
 		Let us define few constants which will ease the annotation:
 		\begin{itemize}
 			\item N - number of variables in the atomic formulas
@@ -1606,90 +1631,80 @@ variable_id_to_points_t variable_evaluations_;
 		\end{itemize}
 		
 		\subsubsection*{Points construction}
-		The first step is to construct the points which will represent the possible meassured model.
-		The following atomic formulas produce an existance of a point:
+		The Measured Model is composed of modal points, the number of modal points is $I + L + S + U$.
+		
+		The following atomic formulas produce an existance of a modal point:
 		\begin{itemize}
-			\item C(x, y) produces two model points, \\
+			\item $C(A_i, B_i)$ produces two modal points, \\
 				where x and y are terms.
-			\item $x != 0$ produces one model point, \\
+			\item $g_l \neq 0$ produces one modal point, \\
 				where x is a term.
-			\item Each measured atomic formula produces one model point
+			\item $<=_m(H_s, O_s)$ produces one modal point
+			\item $\neg (<=_m(Q_u, R_u) )$ produces one modal point
 		\end{itemize}
 		For each contact $C(A_i, B_i)$ two new model points are created A and B, where $A \in v(A_i) \text{ and } B \in v(B_i)$.
 		In some cases the point created for a contact might be one, but this in turn is simulated by having the same evaluation for two 
 		points, which means that the point is duplicated.
 		\newline
-		For each Not Equal to Zero atomic formula one new modal point is created.
-		\newline
-		For each measured atomic formula one new point is added % TODO add detailed description why is this new one point
-		\newline
 		Each Point will be represented with $P(\tau , e)$, where $\tau$ is a term and e is the variable evaluation.
-		The point's evaluation P[e] positively evaluates the point's term $P[\tau ]$, this means that in order for the 
-		point to be valid it's term must be evaluated to true. This means that P belongs to $v(P[\tau ])$.
+		The point's evaluation P[e] positively evaluates the point's term $P[\tau ]$, meaning that P belongs to $v(P[\tau ])$.
 		\newline
 		Example: Let's have C(a + b, c*d)
 		\newline
-		then a valid model point for 'a + b' is P(a+b, [1000]), where [1000] is the evaluation for (a, b, c, d) variables.
+		then a valid model point for 'a + b' is P('a+b', [1000]), where [1000] is the evaluation for (a, b, c, d) variables.
 		That evaluation evaluates 'a+b' to true.
 		\newline
 		For 'c*d' a point could be: P('c*d', [0011]).
 		\newline
-		Each point must keep track of it's associated term in order to be able to generate next evaluation which evaluates the term to 'true'. % TODO what is next eval.
-		The search for satisfiable model is done in steps, where in each steps a set of evaluation is tested for satisfiability,
-		if this test fails then new set of point evaluations must be generated. 
-		The mechanics behind the next evaluation generation will be described further.
+		All possible combinations of such points are $2^{N * (I + L + S + U)}$, since there are $I + L + S + U$ number of points and 
+		each point has $2^N$ potential evaluations.
+		\newline
+		The following algorithm determins if there is a satisfiable measured model.
 
 		\subsubsection*{Measured Model Algorithm}
 
 			1)  For each $C(A_i, B_i)$ two points are created $P_a$ and $P_b$: $P_a[A_i] = true$ and $P_b[B_i] = true$.
 				If not possible - then there is no satisfiable model.
 			\newline
-
-			2) For each $D_k \neq 0$ one point is created P: $P[D_k] = true$.
+			\newline
+			2) For each $g_l \neq 0$ one point is created P: $P[g_l] = true$.
 				If not possible - then there is no satisfiable model.
 			\newline
-
-			3) If the points are less than the measured atomics*2 (or zero points) then dummy points are 
-				created which are associated to '1' constant term, 
-				just to make real points and to be able to put at least 
-				one variable in both sides of the inequalities. % TODO
+			\newline
+			3) For each measured atomic formula a modal point is created which is associated to '1' constant term.
 			\newline
 			\newline
-			At this point there is at least one point in the model.
-			\newline
-			
 			4) A connection is made between the contact points, first 2*I points are from Contact terms,
 				 i.e. for each 0 <= i < I a connection is added in the connectivity matrix between 2*i and 2*i + 1 points. % NOTE DEF CONNECTIVITY MATRIX
 			\newline
 			
+			A new combination of points is generated by 9) until the steps from 5 to 8 are satisfied.
+			\newline
+
 			5) Calculate the v(X) for each variable. % (TODO: this should be explained somewhere else already)
 			\newline
 
-			6) For each $G_l \neq 0$ evaluate $v(G_l)$ and check if it's the empty set. O(L)
+			6) For each $G_l \neq 0$ evaluate $v(G_l)$ and check that it is not the empty set. O(L)
 			\newline
 
-			7) For each $~C(E_j, F_j)$ check if $v(E_j)$ and $v(F_j)$ contain a common point or if one of the sets contains a point which is in contact with a point in the other set.
-			\newline
+			7) For each \textasciitilde $C(E_j, F_j)$ check that $v(E_j)$ and $v(F_j)$ does not contain a common point and that $v(E_j)$ does not contain a point which is in contact with a point $v(F_j)$.
 			\newline
 
 			Complexity: O(J * (I + J) * G)
-			\newline
-			
-			G is the complexity for "bit operator \&" which is something like $(I+J)/2^6$.
-			\newline
-			
-			I+J is the number of points.
-			\newline
+			\begin{itemize}
+				\item G is the complexity for "bit operator \&" which is something like $(I+J)/2^6$.
+				\item I+J is the number of points.
+			\end{itemize}
 			
 			8) Check the measured atomics: \\% TODO: we should have already defined why we are doing it in some theoretical part of the documentation 
 
-			For each <=m(a, b) calculate v(a) and v(b), create an inequality of the following type: 
+			For each $<=_m(H_s, O_s)$ calculate $v(H_s)$ and $v(O_s)$ and create an inequality of the following type: 
 			\begin{align*}
-				\sum_i X_i <= \sum_j X_j, \text{ where }i \in v(a) \vee j \in v(b).
+				\sum_{i \in v(H_s)} X_i <= \sum_{j \in v(O_s)} X_j
 			\end{align*}
-			For each ~<=m(a,b) calculate v(a) and v(b), create an inequality of the following type: 
+			For each $\neg (<=_m(Q_u, R_u) )$ calculate $v(Q_u)$ and $v(R_u)$, create an inequality of the following type: 
 			\begin{align*}
-				\sum_i X_i > \sum_j X_j, \text{ where }i \in v(a) \vee j \in v(b).
+				\sum_{i \in v(Q_u)} X_i > \sum_{j \in v(R_u)} X_j
 			\end{align*}
 			Each inequality is a row in the system of inequalities. 
 			If this system has a solution, then the generated model is a satisfiable one. \\ % say that the above def of system of in. is the solver
@@ -1714,7 +1729,7 @@ variable_id_to_points_t variable_evaluations_;
     			At first there will be only 0s. \\
 			$[00][00]$ where the first [00] is the evaluation of the first point which evaluates both variables to 0.
 			\newline
-			The next generations look as follows:
+			The next generations looks as follows:
 			\begin{align*}
 				[00][00] -(&\text{next combination})-> [00][01] \\
 				->& [00][10] \\
@@ -1727,7 +1742,7 @@ variable_id_to_points_t variable_evaluations_;
 			\end{align*}
 			In the above example the [11][11] is the last combination.
 			\newline
-    			When the condition that the point's evaluation should evaluate the term to true is takein into account, then all evaluation which do not evaluate the 
+    			When the condition that the point's evaluation should evaluate the term to true is taken into account, then all evaluation which do not evaluate the 
 			term to true are skipped.
 			\newline
     			Example: if the variables are 'x' and 'y', first point's term is 'x', second point's term is 'y' then the valid sequence of combinations will be:
@@ -1738,16 +1753,31 @@ variable_id_to_points_t variable_evaluations_;
 			\end{align*} % WHAT ? 
 			\newline
 
-			Complexity: O((I+J) * G), where G is the complexity for finding a next evaluation for a point, 
-			namely finding an evaluation which evaluates the point's term to true, 
-			which is at most $2^N$.
+			TODO: THIS complexity should be explained and recalculated:
 			\newline
+			Complexity: O((I + L + S + U) * G), where G is the complexity for finding a next evaluation for a point, 
+			namely finding an evaluation which evaluates the point's term to true.
+	\newpage
+		\subsubsection*{Fast Model Algorithm}
+			A model is simply a set of points and contacts between them which satisfies the Contacts and Less or equal atomic formulas.
 
-			After a successfull generation v(X) is recalculated for each X(variable) so it's (I+J)*N, namely for each point's evaluation 
-			go through each bitset to add that point to the set of points of v(X)(where X is the variable which bit is set) % TODO: better explanation
-			\newline
-
-			Overall, all combinations are: $(2^N)^(I+J)$
+			This model will be easirly explained with an example first:
+			\subsubsection*{Example 1.1}
+				Let $\varphi$ be the following formula:
+				\begin{equation*}
+					\varphi %= C(a,b) & C(c,d) & C(e,f) & g != 0 & x = 0 & ~C(y,z)
+				\end{equation*}
+				This formula is constructed from 3 contacts, one not equal to zero term, one equal to zero term 
+				and one non contact atomic formula.
+				\newline
+				The model for this formula is constructed from seven modal points, namely two modal points for each
+				contact and one point for the not equal to zero term.
+				\newline
+				HERE DRAW SOMEHOW THE MODAL
+				\newline
+				In the above graph the (xxx...x) is a bitset, for example (010...1) which gives zero/one evaluation
+				for the variables in the formula. Its size is the number of different variables in the formula.
+				
 	\newpage
 	\section{Rest Server}
 		The Web Server is used to serve:
