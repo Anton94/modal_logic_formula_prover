@@ -236,6 +236,21 @@ TEST_CASE("satisfiable 25", "[satisfiability]")
     is_satisfiable("~C(a + 1, -a)", true, true, true);
 }
 
+TEST_CASE("satisfiable but with at least two points for the measured model", "[satisfiability]")
+{
+    is_satisfiable("~a=0 & ~<=m(-a, a)", true, true, true);
+}
+
+TEST_CASE("satisfiable but with at least two points for the measured model 2", "[satisfiability]")
+{
+    is_satisfiable("~a=0 & <=m(a, 0)", true, true, false);
+}
+
+TEST_CASE("satisfiable but with at least two points for the measured model 3", "[satisfiability]")
+{
+    is_satisfiable("~a=0 & ~<=m(1, a)", true, true, true);
+}
+
 TEST_CASE("satisfiable evaluation of path 1", "[satisfiability]")
 {
     is_satisfiable("~C(x * -z,b) & (~C(-b,b) & ~<=(x, z))", true, true, true);
