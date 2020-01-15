@@ -32,13 +32,13 @@ auto measured_model::create(const formulas_t& contacts_T, const formulas_t& cont
         return false;
     }
 
-    // We need at least K points in the model, where K is the number of <=m / ~<=m atomics multiplied by 2
-    // TODO: explain why and prove that it is enough TODO: check it only ~<=m requies new points?
-    // We need at least one model point.
-    const auto minimal_points = std::max(1ul, static_cast<unsigned long>((measured_less_eq_T.size() + measured_less_eq_F.size()) * 2));
-    if(points_.size() < minimal_points)
+    // We need at least one modal point in the model
+    // and additional one point per atomic measured formula.
+    const auto additional_points_for_measured_atomics = measured_less_eq_T.size() + measured_less_eq_F.size();
+    const auto total_points_count = std::max(1ul, static_cast<unsigned long>(points_.size() + additional_points_for_measured_atomics));
+    if(points_.size() < total_points_count)
     {
-        const auto number_of_points_to_add = minimal_points - points_.size();
+        const auto number_of_points_to_add = total_points_count - points_.size();
         info() << "Adding additional " << number_of_points_to_add << " points because of the <=m/~<=m atomics. "
                   "We need a potential one model point for each side of each inequality in the system.";
         constant_true_ = std::make_unique<term>(mgr_);
