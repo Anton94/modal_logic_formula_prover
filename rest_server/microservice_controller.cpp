@@ -258,7 +258,7 @@ void microservice_controller::handle_task(http_request message)
                             extract_formula_refiners(formula_filters);
 
                         bool is_parsed = mgr.build(formula, formula_refs);
-                        imodel* the_model;
+                        imodel* the_model = nullptr;
                         if(algorithm_type == "MEASURED_MODEL")
                         {
                             the_model = new measured_model();
@@ -281,7 +281,8 @@ void microservice_controller::handle_task(http_request message)
                         }
                         else
                         {
-                            // assert since this should already be checked
+                            error() << "Something went wrong, received unrecognized model type from JS";
+                            return;
                         }
                         const auto is_satisfiable = (is_parsed) ? mgr.is_satisfiable(*the_model) : false;
 
