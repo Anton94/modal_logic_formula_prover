@@ -112,7 +112,7 @@
 
 			function create_task(algorithm_type) {
 				var formula = document.getElementById('formula').value;
-				if (!formula || !(algorithm_type == "MEASURED_MODEL" || algorithm_type == "FAST_MODEL" || algorithm_type == "CONNECTIVITY" || algorithm_type == "BRUTEFORCE_MODEL")) {
+                                if (!formula || !(algorithm_type == "MEASURED_MODEL" || algorithm_type == "OPTIMIZED_MEASURED_MODEL" || algorithm_type == "FAST_MODEL" || algorithm_type == "CONNECTIVITY" || algorithm_type == "BRUTEFORCE_MODEL")) {
 					return;
 				}
 
@@ -408,6 +408,7 @@
 			<div id="algorith_buttons" style="margin: 20px;">
 				Run algorithm:<br><br>
 				<button onclick="create_task('MEASURED_MODEL')" class="computing_element">MEASURED MODEL</button>
+                                <button onclick="create_task('OPTIMIZED_MEASURED_MODEL')" class="computing_element">OPTIMIZED MEASURED MODEL</button>
 				<button onclick="create_task('FAST_MODEL')" class="computing_element">FAST MODEL</button>
 				<button onclick="create_task('CONNECTIVITY')" class="computing_element">CONNECTIVITY</button>
 				<!-- Add killswitch which is only for development so that this line does not be present -->

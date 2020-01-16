@@ -263,6 +263,10 @@ void microservice_controller::handle_task(http_request message)
                         {
                             the_model = new measured_model();
                         }
+                        else if(algorithm_type == "OPTIMIZED_MEASURED_MODEL")
+                        {
+                            the_model = new optimized_measured_model();
+                        }
                         else if(algorithm_type == "FAST_MODEL")
                         {
                             the_model = new model();

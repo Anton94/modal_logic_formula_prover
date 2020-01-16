@@ -20,19 +20,23 @@ void is_satisfiable(const char* input_f, bool has_satisfiable_model)
 }
 
 #define PERF_TEST_CASE(name, formula, has_model, has_connected_model, run_measured_model, has_measured_model) \
-TEST_CASE(name" - model", "[!hide][performance]")                                                     \
-{                                                                                                     \
-    is_satisfiable<model>(formula, has_model);                                                        \
-}                                                                                                     \
-TEST_CASE(name" - connected_model", "[!hide][performance]")                                           \
-{                                                                                                     \
-    is_satisfiable<connected_model>(formula, has_connected_model);                                    \
-}                                                                                                     \
+TEST_CASE(name" - model", "[!hide][performance]")                                                             \
+{                                                                                                             \
+    is_satisfiable<model>(formula, has_model);                                                                \
+}                                                                                                             \
+TEST_CASE(name" - connected_model", "[!hide][performance]")                                                   \
+{                                                                                                             \
+    is_satisfiable<connected_model>(formula, has_connected_model);                                            \
+}                                                                                                             \
+TEST_CASE(name" - optimized_measured_model" , "[!hide][performance]")                                         \
+{                                                                                                             \
+    is_satisfiable<optimized_measured_model>(formula, has_measured_model);                                    \
+}                                                                                                             \
 TEST_CASE(name" - measured_model - Enabled["#run_measured_model"] " , "[!hide][performance]")                 \
-{                                                                                                     \
-    if(run_measured_model)                                                                                \
+{                                                                                                             \
+    if(run_measured_model)                                                                                    \
         is_satisfiable<measured_model>(formula, has_measured_model);                                          \
-}
+}                                                                                                             \
 
 PERF_TEST_CASE("not satisfiable with 6 variables 4 atomic formulas",
                "C(a * x, b * y) & C(b * y, c * z) & <=(b * y, a * x) & ~C(a * x, c * z)",
