@@ -258,26 +258,26 @@ void microservice_controller::handle_task(http_request message)
                             extract_formula_refiners(formula_filters);
 
                         bool is_parsed = mgr.build(formula, formula_refs);
-                        imodel* the_model = nullptr;
+                        std::unique_ptr<imodel> the_model;
                         if(algorithm_type == "MEASURED_MODEL")
                         {
-                            the_model = new measured_model();
+                            the_model = std::make_unique<measured_model>();
                         }
                         else if(algorithm_type == "OPTIMIZED_MEASURED_MODEL")
                         {
-                            the_model = new optimized_measured_model();
+                            the_model = std::make_unique<optimized_measured_model>();
                         }
                         else if(algorithm_type == "FAST_MODEL")
                         {
-                            the_model = new model();
+                            the_model = std::make_unique<model>();
                         }
                         else if(algorithm_type == "CONNECTIVITY")
                         {
-                            the_model = new connected_model();
+                            the_model = std::make_unique<connected_model>();
                         }
                         else if(algorithm_type == "BRUTEFORCE_MODEL")
                         {
-                            the_model = new basic_bruteforce_model();
+                            the_model = std::make_unique<basic_bruteforce_model>();
                         }
                         else
                         {
@@ -299,8 +299,6 @@ void microservice_controller::handle_task(http_request message)
                             final_result.ids = the_model->get_variables_evaluations();
                             final_result.contacts = the_model->get_contact_relations();
                         }
-
-                        delete the_model;
                     }
                     catch(const TerminationException&)
                     {
