@@ -70,6 +70,7 @@
 		            // on error change_computing_components_availability
 			}
 
+                        var running_count = 0;
 			function ping_task(op_id, timer_id) {
 				var params = "?op_id=" + valid_op_id;
 				$.get(IP_ADDRESS + "rest/ping" + params, null)
@@ -85,16 +86,25 @@
 						  graphis = transform_contacts_to_graph(jsonified["contacts"]);
 			              do_visualization(graphis, 2000, 800);
 		           	      change_computing_components_availability(true)
+                                      running_count = 0;
 		              } else if (jsonified["status"] == "CANCELED") {
 			              clearInterval(timer_id);
 			              valid_op_id = null;
                                                   document.getElementById('formula_output').innerText = "The Task was Canceled.";
                                                   document.getElementById('verbose_output').innerText += jsonified["output"];
+                                                  running_count = 0;
 		           	  	  change_computing_components_availability(true)
 			              // populate the output that the formula was canceled
 		              } else if (jsonified["status"] == "RUNNING") {
 		              	  // populate the verbose output
 						  document.getElementById('verbose_output').innerText += jsonified["output"];
+                                                  let dots = ".";
+                                                  if(running_count % 3 == 2)
+                                                    dots = "...";
+                                                  else if (running_count % 3 == 1)
+                                                    dots = ".."
+                                                  running_count += 1;
+                                                  document.getElementById('formula_output').innerText = "Running" + dots;
 		              }
 		            });
 			}
