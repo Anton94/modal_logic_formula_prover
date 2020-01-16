@@ -333,7 +333,7 @@ void microservice_controller::handle_task(http_request message)
                     }
                     catch(...)
                     {
-                        info() << "Task failed due to cancelation";
+                        info() << "Task failed due to cancelation"; // TODO: this info might be not initialized and therefre a NOOP if this is ran in a separate task
                     }
                 }
                 catch(...)
