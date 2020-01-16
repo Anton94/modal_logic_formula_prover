@@ -220,44 +220,48 @@ void microservice_controller::handle_task(http_request message)
 
                     set_termination_callback([&]() { return token.is_canceled(); }); // TODO: pass by value?
 
+                    std::stringstream info_output;
+                    auto stream_accumulated_output = [&]() {
+                        static std::chrono::steady_clock::time_point next_update =
+                            std::chrono::steady_clock::now() + 5s;
+
+                        const auto now = std::chrono::steady_clock::now();
+                        if(next_update < now)
+                        {
+                            std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
+                            auto& final_result = op_id_to_task_info_.find(op_id)->second.result_;
+                            final_result.output.append(info_output.str());
+                            info_output.clear();
+                            next_update = now + 5s;
+                        }
+                    };
+
+                    // set_verbose_logger([&](std::stringstream&& s) { info_output << "Verbose: " <<
+                    // s.rdbuf() << "\n"; stream_accumulated_output();  });
+                    // if the trace on user preference.
+                    set_trace_logger([&](std::stringstream&& s) {
+                        info_output << "Trace: " << s.rdbuf() << "\n";
+                        stream_accumulated_output();
+                    });
+                    set_info_logger([&](std::stringstream&& s) {
+                        info_output << "Info: " << s.rdbuf() << "\n";
+                        stream_accumulated_output();
+                    });
+                    set_error_logger([&](std::stringstream&& s) {
+                        info_output << "Error: " << s.rdbuf() << "\n";
+                        stream_accumulated_output();
+                    });
+
+                    bool is_parsed{};
+                    bool is_satisfiable{};
                     try
                     {
-                        std::stringstream info_output;
-                        auto stream_accumulated_output = [&]() {
-                            static std::chrono::steady_clock::time_point next_update =
-                                std::chrono::steady_clock::now() + 5s;
-
-                            const auto now = std::chrono::steady_clock::now();
-                            if(next_update < now)
-                            {
-                                std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
-                                auto& final_result = op_id_to_task_info_.find(op_id)->second.result_;
-                                final_result.output.append(info_output.str());
-                                info_output.clear();
-                                next_update = now + 5s;
-                            }
-                        };
-
-                        // set_verbose_logger([&](std::stringstream&& s) { info_output << "Verbose: " <<
-                        // s.rdbuf() << "\n"; stream_accumulated_output();  });
-                        // if the trace on user preference.
-                        set_trace_logger([&](std::stringstream&& s) {
-                            info_output << "Trace: " << s.rdbuf() << "\n";
-                            stream_accumulated_output();
-                        });
-                        set_info_logger([&](std::stringstream&& s) {
-                            info_output << "Info: " << s.rdbuf() << "\n";
-                            stream_accumulated_output();
-                        });
-                        set_error_logger([&](std::stringstream&& s) {
-                            info_output << "Error: " << s.rdbuf() << "\n";
-                            stream_accumulated_output();
-                        });
                         formula_mgr mgr;
                         formula_mgr::formula_refiners formula_refs =
                             extract_formula_refiners(formula_filters);
 
-                        bool is_parsed = mgr.build(formula, formula_refs);
+                        is_parsed = mgr.build(formula, formula_refs);
+
                         std::unique_ptr<imodel> the_model;
                         if(algorithm_type == "MEASURED_MODEL")
                         {
@@ -281,10 +285,14 @@ void microservice_controller::handle_task(http_request message)
                         }
                         else
                         {
-                            error() << "Something went wrong, received unrecognized model type from JS";
-                            return;
+                            error() << "Something went wrong, received unrecognized model type from JS. Fallback to FAST MODEL";
+                            the_model = std::make_unique<model>();
                         }
-                        const auto is_satisfiable = (is_parsed) ? mgr.is_satisfiable(*the_model) : false;
+
+                        if(is_parsed)
+                        {
+                            is_satisfiable = mgr.is_satisfiable(*the_model);
+                        }
 
                         // check this find here for not present
                         std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
@@ -302,11 +310,17 @@ void microservice_controller::handle_task(http_request message)
                     }
                     catch(const TerminationException&)
                     {
-                        info() << "Canceled ";
+                        info() << "The task was canceled.";
+
+                        std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
+                        // check this find here for not present
+                        auto& final_result = op_id_to_task_info_.find(op_id)->second.result_;
+                        final_result.status_code = "CANCELED";
+                        final_result.output = info_output.str();
                     }
                     catch(...)
                     {
-                        info() << "Canceled force";
+                        // TODO: add some general error??
                     }
                 },
                 token)
