@@ -152,19 +152,6 @@ private:
         -> bool;
 
     /*
-     * Returns true if evaluation evaluates all zero terms to false
-     */
-    auto are_zero_terms_T_satisfied(const terms_t& zero_terms_T,
-                                    const variables_evaluations_block& evaluation) const -> bool;
-    /*
-     * Returns true if for each ~C(a,b) the following is satisfied:
-     *  !(evaluation evaluates a to true && evaluation evaluates b to true), i.e. the reflexivity of
-     * the point and the ~C
-     */
-    auto is_contacts_F_reflexive_rule_satisfied(const formulas_t& contacts_F,
-                                                const variables_evaluations_block& evaluation) const -> bool;
-
-    /*
      * Returns true if the evaluation evaluates the term 't' to true,
      * are_zero_terms_T_satisfied & is_contacts_F_reflexive_rule_satisfied also return true
      */
@@ -180,14 +167,28 @@ private:
                                                    const variables_evaluations_block& eval_a,
                                                    const variables_evaluations_block& eval_b) const
         -> bool;
+protected:
 
     /*
-     * Creates a dummy point evaluation which does not break the =0 and ~C reflexivity rules.
+     * Returns true if evaluation evaluates all zero terms to false
      */
-    auto construct_dummy_point(const formulas_t& contacts_F, const terms_t& zero_terms_T) -> bool;
+    auto are_zero_terms_T_satisfied(const terms_t& zero_terms_T,
+                                    const variables_evaluations_block& evaluation) const -> bool;
+    /*
+     * Returns true if for each ~C(a,b) the following is satisfied:
+     *  !(evaluation evaluates a to true && evaluation evaluates b to true), i.e. the reflexivity of
+     * the point and the ~C
+     */
+    auto is_contacts_F_reflexive_rule_satisfied(const formulas_t& contacts_F,
+                                                const variables_evaluations_block& evaluation) const -> bool;
+    /*
+     * Creates a point evaluation which does not break the =0 and ~C reflexivity rules.
+     */
+    auto construct_point(const formulas_t& contacts_F, const terms_t& zero_terms_T) -> bool;
 
     void calculate_the_model_evaluation_of_each_variable();
 
+protected:
     variables_mask_t used_variables_{};
 
     points_t points_;

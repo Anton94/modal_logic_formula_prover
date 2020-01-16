@@ -21,7 +21,7 @@ auto model::create(const formulas_t& contacts_T, const formulas_t& contacts_F, c
 
     }
 
-    if(points_.empty() && !construct_dummy_point(contacts_F, zero_terms_T))
+    if(points_.empty() && !construct_point(contacts_F, zero_terms_T))
     {
         return false;
     }
@@ -138,34 +138,6 @@ auto model::construct_contact_points(const formula* c, const formulas_t& contact
     return false;
 }
 
-auto model::are_zero_terms_T_satisfied(const terms_t& zero_terms_T,
-                                       const variables_evaluations_block& evaluation) const -> bool
-{
-    for(const auto& z : zero_terms_T)
-    {
-        if(!z->evaluate(evaluation).is_constant_false())
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-auto model::is_contacts_F_reflexive_rule_satisfied(const formulas_t& contacts_F,
-                                                   const variables_evaluations_block& evaluation) const
-    -> bool
-{
-    for(const auto& c : contacts_F)
-    {
-        if(c->get_left_child_term()->evaluate(evaluation).is_constant_true() &&
-           c->get_right_child_term()->evaluate(evaluation).is_constant_true())
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
 auto model::does_point_evaluation_satisfies_basic_rules(const term* t,
                                                         const variables_evaluations_block& evaluation,
                                                         const formulas_t& contacts_F,
@@ -195,7 +167,35 @@ auto model::is_contacts_F_connectivity_rule_satisfied(const formulas_t& contacts
     return true;
 }
 
-auto model::construct_dummy_point(const formulas_t& contacts_F, const terms_t& zero_terms_T) -> bool
+auto model::are_zero_terms_T_satisfied(const terms_t& zero_terms_T,
+                                       const variables_evaluations_block& evaluation) const -> bool
+{
+    for(const auto& z : zero_terms_T)
+    {
+        if(!z->evaluate(evaluation).is_constant_false())
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+auto model::is_contacts_F_reflexive_rule_satisfied(const formulas_t& contacts_F,
+                                                   const variables_evaluations_block& evaluation) const
+    -> bool
+{
+    for(const auto& c : contacts_F)
+    {
+        if(c->get_left_child_term()->evaluate(evaluation).is_constant_true() &&
+           c->get_right_child_term()->evaluate(evaluation).is_constant_true())
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+auto model::construct_point(const formulas_t& contacts_F, const terms_t& zero_terms_T) -> bool
 {
     term t(mgr_);
     t.construct_constant(true);
