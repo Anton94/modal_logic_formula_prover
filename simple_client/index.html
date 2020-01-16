@@ -88,7 +88,8 @@
 		              } else if (jsonified["status"] == "CANCELED") {
 			              clearInterval(timer_id);
 			              valid_op_id = null;
-						  document.getElementById('formula_output').innerText = "The Task was Canceled.";
+                                                  document.getElementById('formula_output').innerText = "The Task was Canceled.";
+                                                  document.getElementById('verbose_output').innerText += jsonified["output"];
 		           	  	  change_computing_components_availability(true)
 			              // populate the output that the formula was canceled
 		              } else if (jsonified["status"] == "RUNNING") {
