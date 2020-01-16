@@ -223,7 +223,7 @@ void microservice_controller::handle_task(http_request message)
                     std::stringstream info_output;
                     auto stream_accumulated_output = [&]() {
                         static std::chrono::steady_clock::time_point next_update =
-                            std::chrono::steady_clock::now() + 5s;
+                            std::chrono::steady_clock::now() + 1s;
 
                         const auto now = std::chrono::steady_clock::now();
                         if(next_update < now)
