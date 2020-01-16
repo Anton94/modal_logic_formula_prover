@@ -218,8 +218,6 @@ void microservice_controller::handle_task(http_request message)
                 [=](string_t res) {
                     const auto formula = utility::conversions::to_utf8string(web::uri().decode(res));
 
-                    set_termination_callback([&]() { return token.is_canceled(); }); // TODO: pass by value?
-
                     std::stringstream info_output;
                     auto stream_accumulated_output = [&]() {
                         static std::chrono::steady_clock::time_point next_update =
@@ -235,6 +233,15 @@ void microservice_controller::handle_task(http_request message)
                             next_update = now + 5s;
                         }
                     };
+
+                    set_termination_callback([&]()
+                    {   // a little ugly but the accumulated output should be updated more often, not only when printing something,
+                        // because there might be huge intervals in which the algorithm does not print anything and some of the already accumulated log info will not be pushed to the final_result's output
+                        // till a new log message is received.
+                        // We want to provide all the accumulated output to that point so when there is no new output the user will know where the algorithm is slow.
+                        stream_accumulated_output();
+                        return token.is_canceled();
+                    }); // TODO: pass by value?
 
                     // set_verbose_logger([&](std::stringstream&& s) { info_output << "Verbose: " <<
                     // s.rdbuf() << "\n"; stream_accumulated_output();  });
