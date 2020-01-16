@@ -133,8 +133,6 @@ private:
     auto print_system_sum_variables(std::ostream& out, const model_points_set_t& variables) const -> std::ostream&;
     auto print_system(std::ostream& out) const -> std::ostream&;
 
-    friend std::ostream& operator<<(std::ostream& out, const measured_model& m);
-
     variables_mask_t used_variables_{};
     size_t number_of_contacts_{};
 

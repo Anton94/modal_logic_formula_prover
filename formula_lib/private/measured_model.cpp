@@ -34,16 +34,18 @@ auto measured_model::create(const formulas_t& contacts_T, const formulas_t& cont
 
     // We need at least one modal point in the model
     // and additional one point per atomic measured formula.
-    const auto additional_points_for_measured_atomics = measured_less_eq_T.size() + measured_less_eq_F.size();
-    const auto total_points_count = std::max(1ul, static_cast<unsigned long>(points_.size() + additional_points_for_measured_atomics));
-    if(points_.size() < total_points_count)
+    auto additional_points = measured_less_eq_T.size() + measured_less_eq_F.size();
+    if(points_.empty() && additional_points == 0)
     {
-        const auto number_of_points_to_add = total_points_count - points_.size();
-        info() << "Adding additional " << number_of_points_to_add << " points because of the <=m/~<=m atomics. "
+        additional_points = 1;
+    }
+    if(additional_points > 0)
+    {
+        info() << "Adding additional " << additional_points << " points because of the <=m/~<=m atomics or empty model. "
                   "We need a potential one model point for each side of each inequality in the system.";
         constant_true_ = std::make_unique<term>(mgr_);
         constant_true_->construct_constant(true);
-        points_.insert(points_.end(), number_of_points_to_add, {constant_true_.get(), variables_evaluations_block_for_positive_term(*constant_true_, used_variables_)});
+        points_.insert(points_.end(), additional_points, {constant_true_.get(), variables_evaluations_block_for_positive_term(*constant_true_, used_variables_)});
     }
 
     create_contact_relations_first_2k_in_contact(points_.size(), contacts_T.size());
