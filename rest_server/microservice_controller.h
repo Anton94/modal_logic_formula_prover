@@ -36,6 +36,8 @@ public:
 
     void remove_non_active();
 
+    void print_info() const;
+
 private:
     void handle_get(http_request message);
     void handle_post(http_request message);

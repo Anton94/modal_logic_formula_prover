@@ -604,3 +604,8 @@ void microservice_controller::remove_non_active()
         op_id_to_task_info_.erase(op_id);
     }
 }
+
+void microservice_controller::print_info() const
+{
+    std::cout << "Running tasks: " << op_id_to_task_info_.size() << std::endl;
+}
