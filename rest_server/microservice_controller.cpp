@@ -229,7 +229,7 @@ void microservice_controller::handle_task(http_request message)
                             std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
                             auto& final_result = op_id_to_task_info_.find(op_id)->second.result_;
                             final_result.output.append(info_output.str());
-                            info_output.clear();
+                            info_output.str(std::string());
                             next_update = now + 5s;
                         }
                     };
