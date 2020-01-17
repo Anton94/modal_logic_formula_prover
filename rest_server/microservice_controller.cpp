@@ -228,6 +228,7 @@ void microservice_controller::handle_task(http_request message)
                         if(next_update < now)
                         {
                             std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
+                            assert(op_id_to_task_info_.find(op_id) != op_id_to_task_info_.end());
                             auto& final_result = op_id_to_task_info_.find(op_id)->second.result_;
                             final_result.output.append(info_output.str());
                             info_output.str(std::string());
@@ -304,6 +305,7 @@ void microservice_controller::handle_task(http_request message)
 
                         // check this find here for not present
                         std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
+                        assert(op_id_to_task_info_.find(op_id) != op_id_to_task_info_.end());
                         auto& final_result = op_id_to_task_info_.find(op_id)->second.result_;
                         final_result.status_code = "FINISHED";
                         final_result.is_parsed = is_parsed;
@@ -321,6 +323,7 @@ void microservice_controller::handle_task(http_request message)
                         info() << "The task was canceled.";
 
                         std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
+                        assert(op_id_to_task_info_.find(op_id) != op_id_to_task_info_.end());
                         // check this find here for not present
                         auto& final_result = op_id_to_task_info_.find(op_id)->second.result_;
                         final_result.status_code = "CANCELED";
