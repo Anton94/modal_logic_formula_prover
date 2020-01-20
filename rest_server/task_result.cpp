@@ -29,10 +29,10 @@ std::string task_result::to_string()
 json::value task_result::json_contants()
 {
     json::value result = json::value::array();
-    for(int i = 0, len_i = contacts.size(); i < len_i; ++i)
+    for(size_t i = 0, len_i = contacts.size(); i < len_i; ++i)
     {
         json::value inner_array = json::value::array();
-        for(int j = 0, len_j = contacts[i].size(); j < len_j; ++j)
+        for(size_t j = 0, len_j = contacts[i].size(); j < len_j; ++j)
         {
             inner_array[j] = json::value(contacts[i][j] == true ? U("1") : U("0"));
         }
@@ -45,10 +45,10 @@ json::value task_result::json_contants()
 json::value task_result::json_ids()
 {
     json::value result = json::value::array();
-    for(int i = 0, len = ids.size(); i < len; ++i)
+    for(size_t i = 0, len = ids.size(); i < len; ++i)
     {
         json::value inner_array = json::value::array();
-        for(int j = 0, len_j = ids[i].size(); j < len_j; ++j)
+        for(size_t j = 0, len_j = ids[i].size(); j < len_j; ++j)
         {
             inner_array[j] = json::value(ids[i][j] == true ? U("1") : U("0"));
         }

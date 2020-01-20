@@ -19,23 +19,18 @@ using namespace std::chrono_literals;
 
 namespace
 {
-std::string to_string(bool b)
-{
-    return b ? "true" : "false";
-}
-
 bool starts_with(const std::string& s, const std::string& prefix)
 {
     return s.find(prefix) == 0;
 }
 }
 
-microservice_controller::microservice_controller(utility::string_t url)
+microservice_controller::microservice_controller(const  utility::string_t& url)
     : microservice_controller(url, 1000)
 {
 }
 
-microservice_controller::microservice_controller(utility::string_t url, size_t requests_limit)
+microservice_controller::microservice_controller(const  utility::string_t& url, size_t requests_limit)
     : m_listener(url)
     , requests_limit_(requests_limit)
 {
@@ -48,7 +43,7 @@ microservice_controller::microservice_controller(utility::string_t url, size_t r
     m_listener.support(methods::DEL,
                        std::bind(&microservice_controller::handle_delete, this, std::placeholders::_1));
 
-    srand(time(NULL));
+    srand(static_cast<unsigned>(time(nullptr)));
 }
 
 void handle_error(pplx::task<void>& t)
@@ -63,7 +58,7 @@ void handle_error(pplx::task<void>& t)
     }
 }
 
-void microservice_controller::handle_get(http_request message)
+void microservice_controller::handle_get(const http_request& message)
 {
     ucout << message.to_string() << std::endl;
 
@@ -131,7 +126,7 @@ void microservice_controller::handle_get(http_request message)
     message.reply(status_codes::BadGateway);
 }
 
-void microservice_controller::handle_post(http_request message)
+void microservice_controller::handle_post(const http_request& message)
 {
     ucout << message.to_string() << std::endl;
 
@@ -146,19 +141,19 @@ void microservice_controller::handle_post(http_request message)
     message.reply(status_codes::BadGateway);
 }
 
-void microservice_controller::handle_put(http_request message)
+void microservice_controller::handle_put(const http_request& message)
 {
     ucout << message.to_string() << std::endl;
     message.reply(status_codes::OK);
 }
 
-void microservice_controller::handle_delete(http_request message)
+void microservice_controller::handle_delete(const http_request& message)
 {
     ucout << message.to_string() << std::endl;
     message.reply(status_codes::OK);
 }
 
-void microservice_controller::handle_task(http_request message)
+void microservice_controller::handle_task(const http_request& message)
 {
     // TODO: do we need a mutex lock for this ?
     if(op_id_to_task_info_.size() > requests_limit_)
@@ -210,8 +205,8 @@ void microservice_controller::handle_task(http_request message)
         }
         message.reply(status_codes::OK, op_id).then([](pplx::task<void> t) { handle_error(t); });
 
-        auto algorithm_type = utility::conversions::to_utf8string(algorithm_type_u->second);
-        auto formula_filters = utility::conversions::to_utf8string(formula_filters_u->second);
+        const auto& algorithm_type = utility::conversions::to_utf8string(algorithm_type_u->second);
+        const auto& formula_filters = utility::conversions::to_utf8string(formula_filters_u->second);
 
         request.extract_string(true)
             .then(
@@ -359,7 +354,7 @@ void microservice_controller::handle_task(http_request message)
     });
 }
 
-void microservice_controller::handle_cancel(http_request message)
+void microservice_controller::handle_cancel(const http_request& message)
 {
     message.content_ready().then([=](web::http::http_request request) {
         auto query_params = uri::split_query(request.request_uri().query());
@@ -371,7 +366,7 @@ void microservice_controller::handle_cancel(http_request message)
             return;
         }
 
-        auto op_id = utility::conversions::to_utf8string(op_id_u->second);
+        const auto& op_id = utility::conversions::to_utf8string(op_id_u->second);
 
         std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
         auto it = op_id_to_task_info_.find(op_id);
@@ -390,7 +385,7 @@ void microservice_controller::handle_cancel(http_request message)
     });
 }
 
-void microservice_controller::handle_ping(http_request message)
+void microservice_controller::handle_ping(const http_request& message)
 {
     message.content_ready().then([=](web::http::http_request request) {
         auto query_params = uri::split_query(request.request_uri().query());
@@ -402,7 +397,7 @@ void microservice_controller::handle_ping(http_request message)
             return;
         }
 
-        auto op_id = utility::conversions::to_utf8string(op_id_u->second);
+        const auto& op_id = utility::conversions::to_utf8string(op_id_u->second);
         std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
 
         if(op_id_to_task_info_.find(op_id) == op_id_to_task_info_.end())
@@ -432,7 +427,7 @@ void microservice_controller::handle_ping(http_request message)
     });
 }
 
-void microservice_controller::handle_formula_generation(http_request message)
+void microservice_controller::handle_formula_generation(const http_request& message)
 {
     message.content_ready().then([=](web::http::http_request request) {
         auto query_params = uri::split_query(request.request_uri().query());
@@ -532,20 +527,20 @@ std::string microservice_controller::generate_random_op_id(size_t length)
         const char charset[] = "0123456789"
                                "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                "abcdefghijklmnopqrstuvwxyz";
-        const size_t max_index = (sizeof(charset) - 1);
-        return charset[rand() % max_index];
+        const size_t max_index = sizeof(charset) - 1;
+        return charset[static_cast<unsigned>(rand()) % max_index];
     };
     std::string str(length, 0);
     std::generate_n(str.begin(), length, randchar);
     return str;
 }
 
-void microservice_controller::remove_op_id(std::string op_id)
+void microservice_controller::remove_op_id(const std::string& op_id)
 {
     op_id_to_task_info_.erase(op_id);
 }
 
-auto microservice_controller::extract_formula_refiners(std::string formula_filters)
+auto microservice_controller::extract_formula_refiners(const std::string& formula_filters)
     -> formula_mgr::formula_refiners
 {
     formula_mgr::formula_refiners formula_refs = formula_mgr::formula_refiners::none;
@@ -554,32 +549,32 @@ auto microservice_controller::extract_formula_refiners(std::string formula_filte
     size_t pos = 0;
     std::string token;
     std::vector<std::string> xxx;
-    while((pos = s.find(",")) != std::string::npos)
+    while((pos = s.find(',')) != std::string::npos)
     {
         token = s.substr(0, pos);
         xxx.push_back(token);
         s.erase(0, pos + 1);
     }
 
-    for(int i = 0; i < xxx.size(); ++i)
+    for(const auto& filter : xxx)
     {
-        if(xxx[i] == "convert_contact_less_eq_with_same_terms")
+        if(filter == "convert_contact_less_eq_with_same_terms")
         {
             formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
         }
-        else if(xxx[i] == "convert_disjunction_in_contact_less_eq")
+        else if(filter == "convert_disjunction_in_contact_less_eq")
         {
             formula_refs |= formula_mgr::formula_refiners::convert_disjunction_in_contact_less_eq;
         }
-        else if(xxx[i] == "reduce_constants")
+        else if(filter == "reduce_constants")
         {
             formula_refs |= formula_mgr::formula_refiners::reduce_constants;
         }
-        else if(xxx[i] == "reduce_contacts_less_eq_with_constants")
+        else if(filter == "reduce_contacts_less_eq_with_constants")
         {
             formula_refs |= formula_mgr::formula_refiners::reduce_contacts_with_constants;
         }
-        else if(xxx[i] == "remove_double_negation")
+        else if(filter == "remove_double_negation")
         {
             formula_refs |= formula_mgr::formula_refiners::remove_double_negation;
         }

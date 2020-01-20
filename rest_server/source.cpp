@@ -1,3 +1,4 @@
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -13,6 +14,10 @@ using namespace web::http;            // Common HTTP functionality
 using namespace web::http::client;    // HTTP client features
 using namespace concurrency::streams; // Asynchronous streams
 
+using namespace std::chrono_literals;
+
+namespace
+{
 static std::unique_ptr<microservice_controller> g_http;
 
 void on_init(const string_t& address)
@@ -28,9 +33,10 @@ void on_init(const string_t& address)
     ucout << utility::string_t(U("Listening for requests at: ")) << addr << std::endl;
 }
 
-void on_shutdown()
-{
-    g_http->close().wait();
+//void on_shutdown()
+//{
+//    g_http->close().wait();
+//}
 }
 
 int main(int argc, char* argv[])
@@ -62,12 +68,12 @@ int main(int argc, char* argv[])
 
         while(true)
         {
-            std::this_thread::sleep_for(std::chrono::minutes(1));
+            std::this_thread::sleep_for(1s);
             g_http->remove_non_active();
             g_http->print_info();
         }
 
-        on_shutdown();
+        // on_shutdown();
     }
     catch(const cxxopts::OptionException& e)
     {

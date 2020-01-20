@@ -21,9 +21,9 @@ using namespace http::experimental::listener;
 class microservice_controller
 {
 public:
-    microservice_controller(utility::string_t url);
+    microservice_controller(const utility::string_t& url);
 
-    microservice_controller(utility::string_t url, size_t requests_limit);
+    microservice_controller(const utility::string_t& url, size_t requests_limit);
 
     pplx::task<void> open()
     {
@@ -39,20 +39,20 @@ public:
     void print_info() const;
 
 private:
-    void handle_get(http_request message);
-    void handle_post(http_request message);
-    void handle_put(http_request message);
-    void handle_delete(http_request message);
+    void handle_get(const http_request& message);
+    void handle_post(const http_request& message);
+    void handle_put(const http_request& message);
+    void handle_delete(const http_request& message);
 
-    void handle_task(http_request message);
-    void handle_cancel(http_request message);
-    void handle_ping(http_request message);
-    void handle_formula_generation(http_request message);
+    void handle_task(const http_request& message);
+    void handle_cancel(const http_request& message);
+    void handle_ping(const http_request& message);
+    void handle_formula_generation(const http_request& message);
 
     std::string generate_random_op_id(size_t length);
-    void remove_op_id(std::string op_id);
+    void remove_op_id(const std::string& op_id);
 
-    auto extract_formula_refiners(std::string formula_filters) -> formula_mgr::formula_refiners;
+    auto extract_formula_refiners(const std::string& formula_filters) -> formula_mgr::formula_refiners;
 
     bool is_requests_limit_exceeded();
 
