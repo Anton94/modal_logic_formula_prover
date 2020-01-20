@@ -25,12 +25,12 @@ bool starts_with(const std::string& s, const std::string& prefix)
 }
 }
 
-microservice_controller::microservice_controller(const  utility::string_t& url)
+microservice_controller::microservice_controller(const utility::string_t& url)
     : microservice_controller(url, 1000)
 {
 }
 
-microservice_controller::microservice_controller(const  utility::string_t& url, size_t requests_limit)
+microservice_controller::microservice_controller(const utility::string_t& url, size_t requests_limit)
     : m_listener(url)
     , requests_limit_(requests_limit)
 {
@@ -231,11 +231,14 @@ void microservice_controller::handle_task(const http_request& message)
                         }
                     };
 
-                    set_termination_callback([&]()
-                    {   // a little ugly but the accumulated output should be updated more often, not only when printing something,
-                        // because there might be huge intervals in which the algorithm does not print anything and some of the already accumulated log info will not be pushed to the final_result's output
+                    set_termination_callback([&]() { // a little ugly but the accumulated output should be
+                                                     // updated more often, not only when printing something,
+                        // because there might be huge intervals in which the algorithm does not print
+                        // anything and some of the already accumulated log info will not be pushed to the
+                        // final_result's output
                         // till a new log message is received.
-                        // We want to provide all the accumulated output to that point so when there is no new output the user will know where the algorithm is slow.
+                        // We want to provide all the accumulated output to that point so when there is no new
+                        // output the user will know where the algorithm is slow.
                         stream_accumulated_output();
                         return token.is_canceled();
                     }); // TODO: pass by value?
@@ -289,7 +292,8 @@ void microservice_controller::handle_task(const http_request& message)
                         }
                         else
                         {
-                            error() << "Something went wrong, received unrecognized model type from JS. Fallback to FAST MODEL";
+                            error() << "Something went wrong, received unrecognized model type from JS. "
+                                       "Fallback to FAST MODEL";
                             the_model = std::make_unique<model>();
                         }
 
@@ -339,7 +343,9 @@ void microservice_controller::handle_task(const http_request& message)
                     }
                     catch(...)
                     {
-                        info() << "Task failed due to cancelation"; // TODO: this info might be not initialized and therefre a NOOP if this is ran in a separate task
+                        info() << "Task failed due to cancelation"; // TODO: this info might be not
+                                                                    // initialized and therefre a NOOP if this
+                                                                    // is ran in a separate task
                     }
                 }
                 catch(...)
