@@ -213,7 +213,9 @@ void microservice_controller::handle_task(const http_request& message)
                 [=](string_t res) {
                     const auto formula = utility::conversions::to_utf8string(web::uri().decode(res));
 
+                    static bool is_task_info_removed = false;
                     std::stringstream info_output;
+
                     auto stream_accumulated_output = [&]() {
                         static const auto UPDATE_TIME = 1s;
                         static std::chrono::steady_clock::time_point next_update =
@@ -223,11 +225,18 @@ void microservice_controller::handle_task(const http_request& message)
                         if(next_update < now)
                         {
                             std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
-                            assert(op_id_to_task_info_.find(op_id) != op_id_to_task_info_.end());
-                            auto& final_result = op_id_to_task_info_.find(op_id)->second.result_;
-                            final_result.output.append(info_output.str());
-                            info_output.str(std::string());
-                            next_update = now + UPDATE_TIME;
+                            if(op_id_to_task_info_.find(op_id) != op_id_to_task_info_.end())
+                            {
+                                auto& final_result = op_id_to_task_info_.find(op_id)->second.result_;
+                                final_result.output.append(info_output.str());
+                                info_output.str(std::string());
+                                next_update = now + UPDATE_TIME;
+                            }
+                            else
+                            {
+                                std::cout << "The task info for: " << op_id << " has been removed, so will terminate the algorithm's execution." << std::endl;
+                                is_task_info_removed = true;
+                            }
                         }
                     };
 
@@ -240,7 +249,7 @@ void microservice_controller::handle_task(const http_request& message)
                         // We want to provide all the accumulated output to that point so when there is no new
                         // output the user will know where the algorithm is slow.
                         stream_accumulated_output();
-                        return token.is_canceled();
+                        return token.is_canceled() || is_task_info_removed;
                     }); // TODO: pass by value?
 
                     // set_verbose_logger([&](std::stringstream&& s) { info_output << "Verbose: " <<
@@ -304,17 +313,25 @@ void microservice_controller::handle_task(const http_request& message)
 
                         // check this find here for not present
                         std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
-                        assert(op_id_to_task_info_.find(op_id) != op_id_to_task_info_.end());
-                        auto& final_result = op_id_to_task_info_.find(op_id)->second.result_;
-                        final_result.status_code = "FINISHED";
-                        final_result.is_parsed = is_parsed;
-                        final_result.is_satisfied = is_satisfiable;
-                        final_result.output = info_output.str();
-
-                        if(is_parsed && is_satisfiable)
+                        auto task_info_it = op_id_to_task_info_.find(op_id);
+                        if(task_info_it != op_id_to_task_info_.end())
                         {
-                            final_result.ids = the_model->get_variables_evaluations();
-                            final_result.contacts = the_model->get_contact_relations();
+                            auto& final_result = task_info_it->second.result_;
+                            final_result.status_code = "FINISHED";
+                            final_result.is_parsed = is_parsed;
+                            final_result.is_satisfied = is_satisfiable;
+                            final_result.output = info_output.str();
+
+                            if(is_parsed && is_satisfiable)
+                            {
+                                final_result.ids = the_model->get_variables_evaluations();
+                                final_result.contacts = the_model->get_contact_relations();
+                            }
+                        }
+                        else
+                        {
+                            std::cout << "The task info for: " << op_id << " has been removed, so will not update it's result." << std::endl;
+                            is_task_info_removed = true;
                         }
                     }
                     catch(const TerminationException&)
@@ -322,11 +339,17 @@ void microservice_controller::handle_task(const http_request& message)
                         info() << "The task was canceled.";
 
                         std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
-                        assert(op_id_to_task_info_.find(op_id) != op_id_to_task_info_.end());
-                        // check this find here for not present
-                        auto& final_result = op_id_to_task_info_.find(op_id)->second.result_;
-                        final_result.status_code = "CANCELED";
-                        final_result.output = info_output.str();
+                        auto task_info_it = op_id_to_task_info_.find(op_id);
+                        if(task_info_it != op_id_to_task_info_.end())
+                        {
+                            auto& final_result = task_info_it->second.result_;
+                            final_result.status_code = "CANCELED";
+                            final_result.output = info_output.str();
+                        }
+                        else
+                        {
+                            std::cout << "The task info for: " << op_id << " has been removed, so will not update it's result." << std::endl;
+                        }
                     }
                     catch(...)
                     {
