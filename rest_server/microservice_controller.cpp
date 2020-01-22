@@ -651,6 +651,7 @@ void microservice_controller::remove_non_active()
 
     for(const auto& op_id : op_ids_to_remove)
     {
+        std::cout << "Removing non-active task with id: " << op_id << std::endl;
         op_id_to_task_info_.erase(op_id);
     }
 }
