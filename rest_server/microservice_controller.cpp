@@ -453,15 +453,15 @@ void microservice_controller::handle_ping(const http_request& message)
                     std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now())
                         .time_since_epoch();
                 const auto ellapsed_time = now_ms - info.start;
-                const auto is_time_limit_reached = ellapsed_time > task_run_time_limit_;
-                if(is_time_limit_reached)
+                if(ellapsed_time > task_run_time_limit_)
                 {
                     std::cout << "Task with op_id:" << op_id << " is taking more than "
                            << task_run_time_limit_.count() << "ms, so it will be terminated." << std::endl;
                     res.output +=
-                        "nThe task is taking more than " + std::to_string(task_run_time_limit_.count()) +
+                        "The task is taking more than " + std::to_string(task_run_time_limit_.count()) +
                         "ms and will be terminated. Try to simplify the formula or use a faster model "
                         "algorithm(if available).";
+                    res.status_code = "CANCELED";
                 }
 
                 message.reply(status_codes::OK, res.to_string()).then([](pplx::task<void> t) {
@@ -470,7 +470,7 @@ void microservice_controller::handle_ping(const http_request& message)
 
                 res.output.clear();
 
-                if(res.status_code == "FINISHED" || is_time_limit_reached)
+                if(res.status_code != "RUNNING")
                 {
                     remove_op_id(op_id);
                 }
