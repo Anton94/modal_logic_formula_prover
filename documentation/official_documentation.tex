@@ -29,12 +29,139 @@
 	\maketitle
 	\pagenumbering{gobble}
 	\newpage
+
+	\tableofcontents
+
+	\newpage
 	TODO: Theoretical intro should be added about the region based modal logics.
 	Definitions of Contact, <=, <=m...
 	\newline
 	TODO \#REF should be replaced with the real reference of a definiton.
 	\newpage
 	\section{Formula Representation}
+	Few paragraphs about the modal logic and basic story of how and what we are trying to accomplish	
+	\newpage
+	\subsection*{Def: Variable}
+		A sequence of characters and numbers compose a variable.
+	\newline
+	\newline
+	Example variables:
+	\begin{itemize}
+		\item x0
+		\item x1
+		\item foo
+		\item obj111
+	\end{itemize} 
+	\subsection*{Def: Index Variable Function} 
+		Let ivf: $\mathbb{V} \longmapsto \mathbb{N}$ be a bijective function which maps a variable to an index integer number. This function is used to map a variable into a 
+		computer memory, since integers are easily stored and manipulated.
+	\subsection*{Def: Optimal Variables indexes set}
+		Let S be a set of unique variables with size k, then there exists a variable index function ivf such that:
+		\begin{equation}
+			\forall i < k \: \exists v \in S: ivf(v) = i.
+		\end{equation}
+
+		\subsubsection*{Proof}
+			Arrange the variables from S in a sequence $x_0, x_1, ... x_k$, then take the index of the variable to be 
+			the value of the index variable function for that variable, namely:
+			\begin{equation}
+				\forall i < k \: : ivf(x_i) = i.
+			\end{equation}
+	\subsection*{Def: Bitset}
+		A sequence of zeros and ones compose a bitset.
+
+		If the sequence has size k, then it will be called k-bitset.
+		\newline
+		\newline
+		Let x be a bitset, namely $x = a_0, a_1, ...$, then the i-th element of the bitset x is $a_i$. 
+		To get the i-th element the following notation will be used:
+		\begin{equation}
+			x[i]
+		\end{equation}
+		which returns the $a_i$ element.
+
+		\subsubsection*{Operations over bitsets}
+			Let x and y be two k-bitsets, where $k \in \mathbb{N}$, then: 
+			\newline
+			\newline
+			bitset-AND operation is defined as:
+			\begin{equation}
+				a \& b = a[0] \& b[0], a[1] \& b[1], .. , a[k] \& b[k]
+			\end{equation}
+			where the truth table for two basic variables x and y is:
+			\newline
+			\begin{tabular}{cc|c}
+				x & y & x \& y \\
+				\hline
+				0 & 0 & 0 \\
+				0 & 1 & 0 \\
+				1 & 0 & 0 \\
+				1 & 1 & 1 \\
+			\end{tabular} 
+			\newline
+			bitset-OR operation is defined as:
+			\begin{equation}
+				a | b = a[0] | b[0], a[1] | b[1], .. , a[k] | b[k]
+			\end{equation}
+			where the truth table for two basic variables x and y is:
+			\newline
+			\begin{tabular}{cc|c}
+				x & y & x | y \\
+				\hline
+				0 & 0 & 0 \\
+				0 & 1 & 1 \\
+				1 & 0 & 1 \\
+				1 & 1 & 1 \\
+			\end{tabular} 
+			\newline
+			bitset-OR operation is defined as:
+			\begin{equation}
+				a \| b = \bar{a[0]}, .. , \bar{a[k]}
+			\end{equation}
+			where the truth table for basic variable x is:
+			\newline
+			\begin{tabular}{c|c}
+				x & $\bar{x}$ \\
+				\hline
+				0  & 1 \\
+				1 & 0 \\
+			\end{tabular} 
+			\newline
+			bitset-PlusOne
+			Deoted a + 1 represents the next bitset after a, which is constructed as follows:
+			\begin{itemize}
+				\item if $\forall i < k: a[i] \neq 0$, then there are no more k-bitsets, meaning that
+					the next bitset has size k+1 and has only one one at position zero and all others are zeroes.
+				\item Otherwise let i be the index of the last zero position, then the next bitset is constructed as:
+					\begin{equation}
+						a[0]^0, ..., a[i-1]^{i-1}, 1^i, 0^{i+1}, ...., 0^k
+					\end{equation}
+					The upper right index denotes the position in the bitset sequence.
+			\end{itemize}
+		\subsection*{Def: Variable bitset substitution}
+			Let $\mathbb{U}$ be a set of bitsets, then the Variable bitset substitution is a total mapping 
+			 $\rho : \mathbb{V} \longmapsto \mathbb{Ba}$ and the following notation will be used:
+			\begin{equation}
+				x \longmapsto b
+			\end{equation}
+			where x is a variable and b is a bitset.
+		\subsection*{Special types of bitsets}
+			Let x be a k-bitset, then x is called
+			\begin{itemize}
+				\item the world, if $\forall i<k : x[i] = 1$, denoted with 1
+				\item the empty k-bitset, if $\forall i<k : x[i] = 0$, denoted with 0
+			\end{itemize}
+		\subsection*{Term recursive definition}
+		\begin{itemize}
+			\item 1 is a term
+			\item 0 is a term
+			\item $p \in \mathbb{V}ar$ is a term
+			\item If x is a term, then $\bar{x}$ is a term as well
+			\item If x and y are terms, then $x \sigma y $ is a term as well,\\
+				where $\sigma \: \in \: \{\sqcap, \sqcup\}$
+		\end{itemize}	
+	\newpage
+	\section{Formula Representation1}
 	Let $\mathbb{V}ar$ be the set of variables:
 	\[ \mathbb{V}ar = \{p_0, p_1, p_2 ... \}\]
 	Let $\mathbb{C}_t$ be the set of Term constants:
@@ -587,7 +714,8 @@ public:
 				 C(a, b) = C(c, d) \rightarrow (a = c \wedge b = d) \vee (a = d \wedge b = c).
 			\end{equation}
 		
-		\newline TODO Explain \item variable mask for all used variables in the term(and it's child terms)
+
+		TODO Explain item variable mask for all used variables in the term(and it's child terms)
 
 		\subsubsection{Formula Refiners}
 			The formula refiners are an optional parameter when building a formula node.
@@ -1320,7 +1448,7 @@ auto tableau::satisfiable_step() -> bool
 	\newpage
 
 
-	\subsection{Formula Model}
+	\section{Formula Model}
 		% What is a model ? 
 		Every model type has at least two things in common:
 		\begin{itemize}
@@ -1532,7 +1660,7 @@ variable_id_to_points_t variable_evaluations_;
 		Overall time complexity: $O(2^N * 2^N * M)$
 
 	\newpage
-	\section{System of Inequalities}
+	\subsection{System of Inequalities}
 		The systems are of the following type:	
 		\[
 			\syslineskipcoeff{1.50}
@@ -1765,7 +1893,7 @@ variable_id_to_points_t variable_evaluations_;
 			\subsubsection*{Example 1.1}
 				Let $\varphi$ be the following formula:
 				\begin{equation*}
-					\varphi %= C(a,b) & C(c,d) & C(e,f) & g != 0 & x = 0 & ~C(y,z)
+					\varphi = C(a,b) \& C(c,d) \& C(e,f) \& g != 0 \& x = 0 \& ~C(y,z)
 				\end{equation*}
 				This formula is constructed from 3 contacts, one not equal to zero term, one equal to zero term 
 				and one non contact atomic formula.
@@ -1777,7 +1905,150 @@ variable_id_to_points_t variable_evaluations_;
 				\newline
 				In the above graph the (xxx...x) is a bitset, for example (010...1) which gives zero/one evaluation
 				for the variables in the formula. Its size is the number of different variables in the formula.
+				The model points are the nodes in the graph ranging from 0 to 6. 
+				Each node connected to its self, this way the reflexivity of the contacts is represented, and the 
+				edges represent the contact relations.
+				\newline
+				One note can be made that in the above graph the Zero terms and Non Contact atomic formulas are 
+				not represented since they do not require existance of model points.
+
+				\subsubsection*{Definition Model Evaluation}
+				Model evaluation v which for a given term returns a subset of the model points.
+				The model evaluation v is defined as:
+				\begin{equation*}
+					v(p) = \{ i | (i) (xxx...x)[p] == 1 \} 
+				\end{equation*}
+				which means that for a given variable p, 
+				v(p) returns a set of all points in which the variable p is evaluated to true.
+
+				\subsubsection*{Properties}
+				\begin{itemize}
+					\item v(a * b) = v(a) \& v(b)
+					\item v(a + b) = v(a) | v(b)
+					\item v(-a) = ~v(a)
+				\end{itemize}
+
+				Note that each point's evaluation evaluates it's term to the constant true in order to that point to be
+				in the MODEL evaluation of the term, i.e. for the point 0, 
+				the term 'a' and it's evaluation (xxx..x): a->evaluate(xxx..x) = constant\_true 
+				in order to 0 belongs to v(a)
+				\newline
+			
+			\subsubsection*{Example 1.2}
+				Let $\varphi$ be the following formula:
+				\begin{equation*}
+					\varphi = C(a,b) \& C(c,d) \& e=0 \& f=0 \& ~C(g,h) \& ~C(i, j)
+				\end{equation*}
+				Then the model should be of the following type:
+				\newline
+				DRAW THIS
+				(P0 a)----(P1 b)
+				(P2 c)----(P3 d)
+				\newline
+				NOTE that if Pi evaluates the term 't' to constant true then the model 
+				evaluation v(t) contains the point (Pi \_) (and vice versa)
+				\newline
+				Where: \\
+				P0 evaluates(binary) a to constant true \&\& e and f to constant false \\
+			      P1 evaluates(binary) b to constant true \&\& e and f to constant false \\ 
+				P2 evaluates(binary) c to constant true \&\& e and f to constant false \\ 
+			      P3 evaluates(binary) d to constant true \&\& e and f to constant false \\ 
+				Also, to satisfy the requirement for ~C: (we need to check each contact relation): \\
+				~[(P0 evaluates g to constant true \&\& P1 evaluates h to constant true) || \\
+				(P1 evaluates g to constant true \&\& P0 evaluates h to constant true)] \&\& \\
+				~[(P0 evaluates i to constant true \&\& P1 evaluates j to constant true) || \\
+				(P1 evaluates i to constant true \&\& P0 evaluates j to constant true)] \&\& ... analogous for P2 and P3. \\
+				\newline
+				The contact relation is reflexive, so for each point we also need to check also:	\\
+				~(Pi evaluates g to constant true \&\& Pi evaluates h to constant true) \&\& \\
+				~(Pi evaluates i to constant true \&\& Pi evaluates j to constant true)
+
+			\subsubsection{Algorithm}
+			% NOTE Intro on what the fast model really is !
+			Let us have $\varphi$ in the format defined in the definition of \hyperref[tableaux:branch:output]{the tableaux branch output}. % for now this is formula 4 
+			Let us define few constants which will ease the annotation:
+			\begin{itemize}
+				\item N - number of variables in the atomic formulas
+				\item M - number of atomic formulas
+				\item I - number of Contact atomic formulae
+				\item J - number of Non Contact atomic formulae
+				\item K - number of Not Equal to Zero atomic formulae
+				\item L - number of Equal to Zero atomic formulae
+			\end{itemize}
+			
+			Note: The term evaluation is with an accumulated complexity of O(L) which is not included in the O notation bellow.
+			\newline
+			\newline
+			The algorithm which creates such points in an iterative manner is as follows:
+			\newline
+			1) Creates contact points, i.e. for each C(a,b) we create two points Pa and Pb.  \\
+				Note that a point is just an variable evaluation. \\
+				They satsfy the following rules: 
+				\begin{itemize}
+					\item Pa[a]=1 and Pb[b]=1.
+					\item does not break any t=0 atomic formula, \\
+						i.e. Pa[t]=0 and Pb[t]=0.
+					\item does not break the reflexivity part of all ~C(e,f) atomic formulas, \\
+						i.e. Pa[e]=0 \& Pa[f]=0 \& Pb[e]=0 \& Pb[f]=0.
+					\item does not break any ~C(e,f) atomic formulas, \\
+						i.e. ~[(Pa[e]=1 \& Pb[f]=1) | (Pb[e]=1 \& Pa[f]=1)]
+				\end{itemize}
 				
+				If any of the rules above is not satisfied we change Pb's evaluation, 
+				if not possible to generate a new evaluation for Pb then we change 
+				Pa's evaluation and reset the Pb's evaluatuion to the 'first' one.
+
+				If again some rules is broken we change Pb's evaluation, etc. 
+				if we can't generate new evaluation for Pa then there is no satisfiable model.
+				\newline
+
+				Complexity for this step: O(2\^N * 2\^N * (G+M))
+				\newline
+				\newline
+				2) Creates a point for each a!=0 atomic formula - Pa, which satisfy the following rules:
+				\begin{itemize}
+					\item Pa[a] = 1
+					\item does not break any t=0 atomic formula, \\
+						i.e. Pa[t]=0
+					\item does not break the reflexivity part of all ~C(e,f) atomic formulas, \\
+						i.e. Pa[e]=0 \& Pa[f]=0
+				\end{itemize}
+
+				If any of the rules above is not satsfied with Pa, 
+				then we generate next Pa's evaluation and check them again. 
+				If not possible to generate next evaluation then there is no satisfiable model.
+				\newline
+
+				Complexity for this step: $O(2^N * (G+M))$
+				\newline
+				\newline
+				3) We create the contact connectivity matrix - 
+				PxP in a simple way because we know that only first 2K points are in contact.
+				0 <= i < K: set a contact relation between point i and i+1, 
+				i.e. we set the bit [i][i+1] to 1 and [i+1][i] to 1.
+				\newline
+
+				Complexity for this step: $O(P^2)$
+				\newline
+				\newline
+				5) We calculate the v(X) for each variable.
+				We create a vector of N bitsets. 
+				Each bitset will hold all points in the evaluation of that variable, 
+				i.e. bitset at position 'j' is the set v(j), where 'j' is some variable id.
+				\newline
+
+				For each point Pi, we iterate over the set bits in it's evaluation and 
+				if we have a set bit at position j we add that point to the evaluation 
+				of varialbe 'j', i.e. we set the bit 'i' in the variable's evaluation bitset.
+				\newline
+
+				Complexity for this step: O(P * N)
+				\newline
+				\newline
+
+				Overall Complexity: $O(2^N * 2^N * (G+M))$
+					% (I suppose that 2^N >>> P)
+
 	\newpage
 	\section{Rest Server}
 		The Web Server is used to serve:
