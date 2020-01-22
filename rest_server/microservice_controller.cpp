@@ -157,7 +157,7 @@ void microservice_controller::handle_task(const http_request& message)
 {
     {
         std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
-        if(op_id_to_task_info_.size() > concurrent_tasks_limit_)
+        if(op_id_to_task_info_.size() >= concurrent_tasks_limit_)
         {
             message.reply(status_codes::TooManyRequests, "There are too many requests, try again later.")
                 .then([](pplx::task<void> t) { handle_error(t); });
