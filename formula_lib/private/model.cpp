@@ -133,6 +133,7 @@ auto model::construct_contact_points(const formula* c, const formulas_t& contact
                 return true;
             }
         } while(generate_next_point_evaluation(right, right_eval, contacts_F, zero_terms_T));
+        TERMINATE_IF_NEEDED();
     } while(generate_next_point_evaluation(left, left_eval, contacts_F, zero_terms_T));
 
     return false;
