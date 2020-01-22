@@ -155,12 +155,14 @@ void microservice_controller::handle_delete(const http_request& message)
 
 void microservice_controller::handle_task(const http_request& message)
 {
-    // TODO: do we need a mutex lock for this ?
-    if(op_id_to_task_info_.size() > concurrent_tasks_limit_)
     {
-        message.reply(status_codes::TooManyRequests, "There are too many requests, try again later.")
-            .then([](pplx::task<void> t) { handle_error(t); });
-        return;
+        std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
+        if(op_id_to_task_info_.size() > concurrent_tasks_limit_)
+        {
+            message.reply(status_codes::TooManyRequests, "There are too many requests, try again later.")
+                .then([](pplx::task<void> t) { handle_error(t); });
+            return;
+        }
     }
 
     struct id_token
@@ -651,7 +653,8 @@ void microservice_controller::remove_non_active()
     }
 }
 
-void microservice_controller::print_info() const
+void microservice_controller::print_info()
 {
+    std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
     std::cout << "Running tasks: " << op_id_to_task_info_.size() << std::endl;
 }

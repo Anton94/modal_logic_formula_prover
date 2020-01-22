@@ -34,7 +34,7 @@ public:
 
     void remove_non_active();
 
-    void print_info() const;
+    void print_info();
 
 private:
     void handle_get(const http_request& message);
