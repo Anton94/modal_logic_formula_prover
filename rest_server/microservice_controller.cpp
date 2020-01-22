@@ -60,7 +60,6 @@ void handle_error(pplx::task<void>& t)
 
 void microservice_controller::handle_get(const http_request& message)
 {
-    ucout << message.to_string() << std::endl;
 
     std::string message_path = utility::conversions::to_utf8string(message.absolute_uri().path());
 
@@ -72,6 +71,7 @@ void microservice_controller::handle_get(const http_request& message)
             handle_ping(message);
             return;
         }
+        ucout << message.to_string() << std::endl;
 
         if(starts_with(message_path, "/rest/cancel"))
         {
@@ -82,6 +82,7 @@ void microservice_controller::handle_get(const http_request& message)
         message.reply(status_codes::OK);
         return;
     }
+    ucout << message.to_string() << std::endl;
 
     fs::path relative_file(CLIENT_DIR + message_path);
     if(fs::exists(relative_file))
@@ -440,6 +441,7 @@ void microservice_controller::handle_ping(const http_request& message)
         }
         else
         {
+            std::cout << "Received ping from " << op_id << std::endl;
             auto task_info_it = op_id_to_task_info_.find(op_id);
             if(task_info_it != op_id_to_task_info_.end())
             {
