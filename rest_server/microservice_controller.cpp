@@ -10,7 +10,6 @@
 
 #include <filesystem/filesystem.hpp>
 
-// using namespace std;
 using namespace web;
 using namespace utility;
 using namespace http;
@@ -25,15 +24,16 @@ bool starts_with(const std::string& s, const std::string& prefix)
 }
 }
 
-microservice_controller::microservice_controller(const utility::string_t& url)
-    : microservice_controller(url, 1000)
-{
-}
-
-microservice_controller::microservice_controller(const utility::string_t& url, size_t requests_limit)
+microservice_controller::microservice_controller(const utility::string_t& url, size_t concurrent_tasks_limit,
+                                                 const std::chrono::milliseconds& task_run_time_limit)
     : m_listener(url)
-    , requests_limit_(requests_limit)
+    , concurrent_tasks_limit_(concurrent_tasks_limit)
+    , task_run_time_limit_(task_run_time_limit)
 {
+    info() << "Creating a server with url " << utility::conversions::to_utf8string(url)
+           << ", concurrent tasks limit " << concurrent_tasks_limit_ << ", task run time limit "
+           << task_run_time_limit_.count() << "ms.";
+
     m_listener.support(methods::GET,
                        std::bind(&microservice_controller::handle_get, this, std::placeholders::_1));
     m_listener.support(methods::POST,
@@ -156,7 +156,7 @@ void microservice_controller::handle_delete(const http_request& message)
 void microservice_controller::handle_task(const http_request& message)
 {
     // TODO: do we need a mutex lock for this ?
-    if(op_id_to_task_info_.size() > requests_limit_)
+    if(op_id_to_task_info_.size() > concurrent_tasks_limit_)
     {
         message.reply(status_codes::TooManyRequests, "There are too many requests, try again later.")
             .then([](pplx::task<void> t) { handle_error(t); });
@@ -170,16 +170,17 @@ void microservice_controller::handle_task(const http_request& message)
     };
     auto generate_new_op_id_and_token = [&]() -> id_token {
         std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
-        while(true)
+        std::string op_id = generate_random_op_id(10);
+        while(op_id_to_task_info_.find(op_id) != op_id_to_task_info_.end())
         {
-            std::string op_id = generate_random_op_id(10);
-            if(op_id_to_task_info_.find(op_id) != op_id_to_task_info_.end())
-            {
-                continue;
-            }
-
-            return {op_id, op_id_to_task_info_[op_id].get_token()};
+            op_id = generate_random_op_id(10);
         }
+
+        auto& task_info = op_id_to_task_info_[op_id];
+        task_info.start =
+            std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now())
+                .time_since_epoch();
+        return {op_id, task_info.get_token()};
     };
 
     auto id_token = generate_new_op_id_and_token();
@@ -437,20 +438,38 @@ void microservice_controller::handle_ping(const http_request& message)
         }
         else
         {
-            // refactor this.
-            auto& info = op_id_to_task_info_.find(op_id)->second;
-            auto& res = info.result_;
-            info.activate();
-            message.reply(status_codes::OK, res.to_string()).then([](pplx::task<void> t) {
-                handle_error(t);
-            });
-
-            res.output.clear();
-            // send the output and clean it, in JS APPEND to the already accumulated
-
-            if(res.status_code == "FINISHED")
+            auto task_info_it = op_id_to_task_info_.find(op_id);
+            if(task_info_it != op_id_to_task_info_.end())
             {
-                remove_op_id(op_id);
+                auto& info = task_info_it->second;
+                auto& res = info.result_;
+                info.activate();
+
+                const auto now_ms =
+                    std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now())
+                        .time_since_epoch();
+                const auto ellapsed_time = now_ms - info.start;
+                const auto is_time_limit_reached = ellapsed_time > task_run_time_limit_;
+                if(is_time_limit_reached)
+                {
+                    std::cout << "Task with op_id:" << op_id << " is taking more than "
+                           << task_run_time_limit_.count() << "ms, so it will be terminated." << std::endl;
+                    res.output +=
+                        "nThe task is taking more than " + std::to_string(task_run_time_limit_.count()) +
+                        "ms and will be terminated. Try to simplify the formula or use a faster model "
+                        "algorithm(if available).";
+                }
+
+                message.reply(status_codes::OK, res.to_string()).then([](pplx::task<void> t) {
+                    handle_error(t);
+                });
+
+                res.output.clear();
+
+                if(res.status_code == "FINISHED" || is_time_limit_reached)
+                {
+                    remove_op_id(op_id);
+                }
             }
         }
     });

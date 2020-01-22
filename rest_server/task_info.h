@@ -3,6 +3,8 @@
 #include "library.h"
 #include "task_result.h"
 
+#include <chrono>
+
 class task_info
 {
 private:
@@ -11,6 +13,7 @@ private:
 
 public:
     task_result result_;
+    std::chrono::milliseconds start{};
 
     task_info();
 
