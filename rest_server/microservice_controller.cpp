@@ -324,7 +324,7 @@ void microservice_controller::handle_task(const http_request& message)
                             final_result.status_code = "FINISHED";
                             final_result.is_parsed = is_parsed;
                             final_result.is_satisfied = is_satisfiable;
-                            final_result.output = info_output.str();
+                            final_result.output.append(info_output.str());
 
                             if(is_parsed && is_satisfiable)
                             {
@@ -348,7 +348,7 @@ void microservice_controller::handle_task(const http_request& message)
                         {
                             auto& final_result = task_info_it->second.result_;
                             final_result.status_code = "CANCELED";
-                            final_result.output = info_output.str();
+                            final_result.output.append(info_output.str());
                         }
                         else
                         {
