@@ -7,6 +7,11 @@
 #include <cassert>
 #include <queue>
 
+connected_model::connected_model(size_t max_variables_count)
+    : max_variables_count_(max_variables_count)
+{
+}
+
 auto connected_model::create(const formulas_t& contacts_T, const formulas_t& contacts_F,
                              const terms_t& zero_terms_T, const terms_t& zero_terms_F,
                              const formulas_t&, const formulas_t&,
@@ -15,6 +20,13 @@ auto connected_model::create(const formulas_t& contacts_T, const formulas_t& con
     clear();
     used_variables_ = used_variables;
     mgr_ = mgr;
+
+    trace() << "Used variables are: " << used_variables_.count();
+    if(used_variables_.count() > max_variables_count_)
+    {
+        trace() << "Unable to create the model because the used variables are more than the preset maximal variables count of " << max_variables_count_;
+        return false;
+    }
 
     construct_all_valid_unique_points(contacts_F, zero_terms_T);
 
