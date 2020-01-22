@@ -114,9 +114,7 @@
 				$.get(IP_ADDRESS + "rest/cancel" + params, null)
 		            .done(function( data ) {
 		            	// return true if success, return false if the task was already canceled
-		              console.log(data);
-		              var jsonified = JSON.parse(data.replace(/'/g, "\""));
-		              valid_op_id = null;
+                              console.log('Cancel answer: ' + data);
 		              change_computing_components_availability(true);
 		            });
 			}
