@@ -40,7 +40,6 @@
 	\newpage
 	\section{Formula Representation}
 	Few paragraphs about the modal logic and basic story of how and what we are trying to accomplish	
-	\newpage
 	\subsection*{Def: Variable}
 		A sequence of characters and numbers compose a variable.
 	\newline
@@ -160,6 +159,60 @@
 			\item If x and y are terms, then $x \sigma y $ is a term as well,\\
 				where $\sigma \: \in \: \{\sqcap, \sqcup\}$
 		\end{itemize}	
+
+		\subsection*{Term Implementation Representation}
+			The term can be represented in memory recursively by analogy to the definition REF-DEF-TERM.
+
+		\begin{lstlisting}
+class Term 
+{
+	...
+
+	operation_t op_;
+	std::size_t hash_;
+	
+	struct childs
+	{
+		term* left;
+		term* right;
+	}
+	union 
+	{
+		childs childs_;
+		std::size_t variable_id_;
+	}
+
+	...
+}
+		\end{lstlisting}
+		The term is represented in a tree structural way, where each node is an operation and the leafs of the tree
+		are variables. In the above implementation the variables are represented by their index, which can be 
+		easily found with the Index Variable Function.
+
+		\subsection*{Term Set-Evaluation}
+			Let X be a set of variable Set-Substituitions, namely $ X = \{ x_0 \longmapsto b_0, x_1 \longmapsto b_1, ..., x_k \longmapsto b_k \}$,
+			then the Term Set-Evaluation is a function which produces a bitset for a given term by appling a set of substitutions.
+			The Term Set-Evaluation is applicable if and only if all variables from the term have a suitable substitution in X.
+			\newline
+			\newline
+			The Term Set-Evaluation will be notated as termSEval is defined recursively as follows:
+			\newline
+			Let $\tau$ be a term, then:
+			\begin{itemize}
+				\item if $\tau \equiv 1$, then \\
+					return the world bitset
+				\item if $\tau \equiv 0$, then \\
+					return the empty bitset
+				\item $\text{Let } v \in X \text{ and } \tau \equiv v$, then \\
+					return X[v]
+				\item $\text{Let } \tau_1, \tau_2 \text{ be two terms } \text{ and } \tau \equiv \tau_1 \sqcap \tau_2$, then \\
+					return $termSEval(\tau_1) \& termSEval(\tau_2)$
+				\item $\text{Let } \tau_1, \tau_2 \text{ be two terms } \text{ and } \tau \equiv \tau_1 \sqcup \tau_2$, then \\
+					return $termSEval(\tau_1) | termSEval(\tau_2)$
+			\end{itemize}
+				
+			
+
 	\newpage
 	\section{Formula Representation1}
 	Let $\mathbb{V}ar$ be the set of variables:
