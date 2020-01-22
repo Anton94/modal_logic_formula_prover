@@ -64,11 +64,11 @@ int main(int argc, char* argv[])
         utility::string_t address = U("http://localhost:");
         address.append(port);
 
-        on_init(address, 5, 30000ms, 10);
+        on_init(address, 8, 300000ms, 10);
 
         while(true)
         {
-            std::this_thread::sleep_for(1s);
+            std::this_thread::sleep_for(10s);
             g_http->remove_non_active();
             g_http->print_info();
         }
