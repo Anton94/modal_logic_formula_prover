@@ -22,6 +22,8 @@ bool starts_with(const std::string& s, const std::string& prefix)
 {
     return s.find(prefix) == 0;
 }
+
+static std::atomic_ulong running_tasks{};
 }
 
 microservice_controller::microservice_controller(const utility::string_t& url, size_t concurrent_tasks_limit,
@@ -158,14 +160,11 @@ void microservice_controller::handle_delete(const http_request& message)
 
 void microservice_controller::handle_task(const http_request& message)
 {
+    if(running_tasks >= concurrent_tasks_limit_)
     {
-        std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
-        if(op_id_to_task_info_.size() >= concurrent_tasks_limit_)
-        {
-            message.reply(status_codes::TooManyRequests, "There are too many requests, try again later.")
-                .then([](pplx::task<void> t) { handle_error(t); });
-            return;
-        }
+        message.reply(status_codes::TooManyRequests, "There are too many requests, try again later.")
+            .then([](pplx::task<void> t) { handle_error(t); });
+        return;
     }
 
     struct id_token
@@ -216,7 +215,10 @@ void microservice_controller::handle_task(const http_request& message)
 
         request.extract_string(true)
             .then(
-                [=](string_t res) {
+                [=](string_t res)
+                {
+                    ++running_tasks;
+
                     const auto formula = utility::conversions::to_utf8string(web::uri().decode(res));
 
                     bool is_task_info_removed = false;
@@ -361,6 +363,7 @@ void microservice_controller::handle_task(const http_request& message)
                     {
                         // TODO: add some general error??
                     }
+                    --running_tasks;
                 },
                 token)
             .then([=](pplx::task<void> t) {
@@ -661,5 +664,5 @@ void microservice_controller::remove_non_active()
 void microservice_controller::print_info()
 {
     std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
-    std::cout << "Running tasks: " << op_id_to_task_info_.size() << std::endl;
+    std::cout << "Running " << running_tasks << " concurrent tasks with task infos for " << op_id_to_task_info_.size() << " tasks." << std::endl;
 }
