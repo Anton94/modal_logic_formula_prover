@@ -605,15 +605,15 @@ auto microservice_controller::extract_formula_refiners(const std::string& formul
     std::string s = formula_filters;
     size_t pos = 0;
     std::string token;
-    std::vector<std::string> xxx;
+    std::vector<std::string> filters;
     while((pos = s.find(',')) != std::string::npos)
     {
         token = s.substr(0, pos);
-        xxx.push_back(token);
+        filters.push_back(token);
         s.erase(0, pos + 1);
     }
 
-    for(const auto& filter : xxx)
+    for(const auto& filter : filters)
     {
         if(filter == "convert_contact_less_eq_with_same_terms")
         {
