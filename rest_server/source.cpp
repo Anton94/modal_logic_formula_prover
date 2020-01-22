@@ -20,14 +20,14 @@ namespace
 {
 static std::unique_ptr<microservice_controller> g_http;
 
-void on_init(const string_t& address, size_t concurrent_tasks_limit, const std::chrono::milliseconds& task_run_time_limit)
+void on_init(const string_t& address, size_t concurrent_tasks_limit, const std::chrono::milliseconds& task_run_time_limit, size_t connected_model_max_used_variables)
 {
     // Build our listener's URI from the configured address and the hard coded path /foo/bar
 
     uri_builder uri(address);
 
     auto addr = uri.to_uri().to_string();
-    g_http = std::make_unique<microservice_controller>(addr, concurrent_tasks_limit, task_run_time_limit);
+    g_http = std::make_unique<microservice_controller>(addr, concurrent_tasks_limit, task_run_time_limit, connected_model_max_used_variables);
     g_http->open().wait();
 
     ucout << utility::string_t(U("Listening for requests at: ")) << addr << std::endl;
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
         utility::string_t address = U("http://localhost:");
         address.append(port);
 
-        on_init(address, 5, 30000ms);
+        on_init(address, 5, 30000ms, 10);
 
         while(true)
         {

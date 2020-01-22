@@ -21,7 +21,9 @@ using namespace http::experimental::listener;
 class microservice_controller
 {
 public:
-    microservice_controller(const utility::string_t& url, size_t concurrent_tasks_limit, const std::chrono::milliseconds& task_run_time_limit);
+    microservice_controller(const utility::string_t& url, size_t concurrent_tasks_limit,
+                            const std::chrono::milliseconds& task_run_time_limit,
+                            const size_t connected_model_max_used_variables);
 
     pplx::task<void> open()
     {
@@ -62,6 +64,7 @@ private:
     std::mutex requests_limit_mutex_;
     const size_t concurrent_tasks_limit_;
     const std::chrono::milliseconds task_run_time_limit_;
+    const size_t connected_model_max_used_variables_;
 
     std::string CLIENT_DIR = "../client/dist";
 };

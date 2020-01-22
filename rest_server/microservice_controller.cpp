@@ -25,10 +25,12 @@ bool starts_with(const std::string& s, const std::string& prefix)
 }
 
 microservice_controller::microservice_controller(const utility::string_t& url, size_t concurrent_tasks_limit,
-                                                 const std::chrono::milliseconds& task_run_time_limit)
+                                                 const std::chrono::milliseconds& task_run_time_limit,
+                                                 const size_t connected_model_max_used_variables)
     : m_listener(url)
     , concurrent_tasks_limit_(concurrent_tasks_limit)
     , task_run_time_limit_(task_run_time_limit)
+    , connected_model_max_used_variables_(connected_model_max_used_variables)
 {
     info() << "Creating a server with url " << utility::conversions::to_utf8string(url)
            << ", concurrent tasks limit " << concurrent_tasks_limit_ << ", task run time limit "
@@ -298,7 +300,7 @@ void microservice_controller::handle_task(const http_request& message)
                         }
                         else if(algorithm_type == "CONNECTIVITY")
                         {
-                            the_model = std::make_unique<connected_model>();
+                            the_model = std::make_unique<connected_model>(connected_model_max_used_variables_);
                         }
                         else if(algorithm_type == "BRUTEFORCE_MODEL")
                         {
