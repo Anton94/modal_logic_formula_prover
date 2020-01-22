@@ -217,7 +217,7 @@ void microservice_controller::handle_task(const http_request& message)
                 [=](string_t res) {
                     const auto formula = utility::conversions::to_utf8string(web::uri().decode(res));
 
-                    static bool is_task_info_removed = false;
+                    bool is_task_info_removed = false;
                     std::stringstream info_output;
 
                     auto stream_accumulated_output = [&]() {
@@ -229,14 +229,15 @@ void microservice_controller::handle_task(const http_request& message)
                         if(next_update < now)
                         {
                             std::lock_guard<std::mutex> op_id_to_ctx_guard(op_id_to_task_info_mutex_);
-                            if(op_id_to_task_info_.find(op_id) != op_id_to_task_info_.end())
+                            auto task_info_it = op_id_to_task_info_.find(op_id);
+                            if(task_info_it != op_id_to_task_info_.end())
                             {
-                                auto& final_result = op_id_to_task_info_.find(op_id)->second.result_;
+                                auto& final_result = task_info_it->second.result_;
                                 final_result.output.append(info_output.str());
                                 info_output.str(std::string());
                                 next_update = now + UPDATE_TIME;
                             }
-                            else
+                            else if(!is_task_info_removed)
                             {
                                 std::cout << "The task info for: " << op_id << " has been removed, so will terminate the algorithm's execution." << std::endl;
                                 is_task_info_removed = true;
@@ -335,7 +336,6 @@ void microservice_controller::handle_task(const http_request& message)
                         else
                         {
                             std::cout << "The task info for: " << op_id << " has been removed, so will not update it's result." << std::endl;
-                            is_task_info_removed = true;
                         }
                     }
                     catch(const TerminationException&)
