@@ -48,23 +48,58 @@ int main(int argc, char* argv[])
 
     try
     {
+        utility::string_t port = U("34567");
+        utility::string_t address = U("http://localhost:");
+        size_t concurrent_tasks_limit = 8ul;
+        std::chrono::milliseconds task_run_time_limit = 300s;
+        size_t connected_model_max_used_variables = 10ul;
+
         cxxopts::Options options("RestServer", "Server which provides the web resources and handles the heavy algortihm executions");
 
-        options.add_options()("h,help", "Print help");
+        options.add_options()("h,help", "Print help")
+                             ("p,port", "Port. Default is " + port, cxxopts::value<size_t>())
+                             ("a,address", "Address. Default is " + utility::conversions::to_utf8string(address), cxxopts::value<std::string>())
+                             ("c,concurrent_tasks_limit", "Concurrent tasks limit, i.e. the max number of tasks which can be ran in the same time. Default is " + std::to_string(concurrent_tasks_limit), cxxopts::value<size_t>())
+                             ("t,task_run_time_limit", "The time limit of the task's execution. Default is " + std::to_string(task_run_time_limit.count()) + "ms", cxxopts::value<size_t>())
+                             ("u,connected_model_max_used_variables", "The max number of used variables when tring to create a connected model. Default is " + std::to_string(connected_model_max_used_variables), cxxopts::value<size_t>());
 
         auto result = options.parse(argc, argv);
+        std::cout << "ARGS: ";
+        for(const auto& arg : result.arguments())
+        {
+            std::cout << "[" << arg.key() << " = " << arg.value() << "] ";
+        }
+        std::cout << std::endl;
 
         if(result.count("help"))
         {
             info() << options.help();
             return 0;
         }
+        if(result.count("port"))
+        {
+            port = utility::conversions::to_string_t(std::to_string(result["port"].as<size_t>()));
+        }
+        if(result.count("address"))
+        {
+            address = utility::conversions::to_string_t(result["address"].as<std::string>());
+        }
+        if(result.count("concurrent_tasks_limit"))
+        {
+            concurrent_tasks_limit = result["concurrent_tasks_limit"].as<size_t>();
+        }
+        if(result.count("task_run_time_limit"))
+        {
+            task_run_time_limit = std::chrono::milliseconds(result["task_run_time_limit"].as<size_t>());
+        }
+        if(result.count("connected_model_max_used_variables"))
+        {
+            connected_model_max_used_variables = result["connected_model_max_used_variables"].as<size_t>();
+        }
 
-        utility::string_t port = U("34567");
-        utility::string_t address = U("http://localhost:");
         address.append(port);
 
-        on_init(address, 8, 300000ms, 10);
+        on_init(address, concurrent_tasks_limit, task_run_time_limit, connected_model_max_used_variables);
 
         while(true)
         {
