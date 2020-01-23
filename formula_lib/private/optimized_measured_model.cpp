@@ -31,9 +31,9 @@ auto optimized_measured_model::create(const formulas_t& contacts_T, const formul
         return false;
     }
 
+    points_count_without_additional_ = points_.size();
     trace() << "Constructed a satisfiable model:\n" << *this;
 
-    points_count_without_additional_ = points_.size();
     measured_less_eq_T_ = measured_less_eq_T;
     measured_less_eq_F_ = measured_less_eq_F;
 
