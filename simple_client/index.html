@@ -434,23 +434,30 @@
                 <input id="formula" style="width: 100%; height: 20px;"/>
             </div>
             <div id="legend" style="float: right">
-                <h2 style="margin-left: 20px;">Legend</h2>
-                <code>F&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/bot.png" alt="Bottom"> - </code><label>False</label><br>
-                <code>T&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/top.png" alt="Top"> - </code><label>True</label><br>
-                <code>-&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Unary Complement</label><br>
-                <code>*&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Boolean Intersection</label><br>
-                <code>+&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Boolean Union</label><br>
-                <code>C&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp; &nbsp; </code><label>Contact, syntax:</label><code>&nbsp;C(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
-                <code>&lt;=&nbsp;&nbsp;-&nbsp;≤ - </code><label>Part Of</label><br>
-                <code>&amp;&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/and.png" alt="And"> - </code><label>Conjunction</label><br>
-                <code>|&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/or.png" alt="Or"> - </code><label>Disjunction</label><br>
-                <code>~&nbsp;&nbsp;&nbsp;-&nbsp;<img src="img/not.png" alt="Not"> - </code><label>Negation</label><br>
-                <code>-&gt;&nbsp;&nbsp;-&nbsp;</code><label>Implication</label><br>
-                <code>&lt;-&gt;&nbsp;-&nbsp;</code><label>Equivalence</label><br>
+                <h2 style="margin-left: 8px;">Term's legend</h2>
+                <code>0&nbsp;&nbsp;&nbsp;-&nbsp;&#x2205;&nbsp; - </code><label>Empty set constant</label><br>
+                <code>1&nbsp;&nbsp;&nbsp;-&nbsp;W&nbsp; - </code><label>Whole world constant</label><br>
+                <code>-&nbsp;&nbsp;&nbsp;-&nbsp;T<sup>c</sup> - </code><label>Unary Complement</label><br>
+                <code>*&nbsp;&nbsp;&nbsp;-&nbsp;&#x2229;&nbsp; - </code><label>Intersection</label><br>
+                <code>+&nbsp;&nbsp;&nbsp;-&nbsp;&#x222a;&nbsp; - </code><label>Union</label><br>
+                <code>()&nbsp;&nbsp;-&nbsp;() - </code><label>Parentheses</label><br>
+                <h2 style="margin-left: 8px;">Formula's legend</h2>
+                <code>F&nbsp;&nbsp;&nbsp;-&nbsp;&#8869;&nbsp; - </code><label>False constant</label><br>
+                <code>T&nbsp;&nbsp;&nbsp;-&nbsp;&#8868;&nbsp; - </code><label>True constant</label><br>
+                <code>&amp;&nbsp;&nbsp;&nbsp;-&nbsp;&and;&nbsp; - </code><label>Conjunction</label><br>
+                <code>|&nbsp;&nbsp;&nbsp;-&nbsp;&or;&nbsp; - </code><label>Disjunction</label><br>
+                <code>~&nbsp;&nbsp;&nbsp;-&nbsp;&#xac;&nbsp; - </code><label>Negation</label><br>
+                <code>-&gt;&nbsp;&nbsp;-&nbsp;<font size="+1">&#x21d2;</font>&nbsp;&nbsp;-&nbsp;</code><label>Implication</label><br>
+                <code>&lt;-&gt;&nbsp;-&nbsp;<font size="+1">&#x21D4;</font>&nbsp;&nbsp;-&nbsp;</code><label>Equivalence</label><br>
+                <code>C&nbsp;&nbsp;&nbsp;-&nbsp;&#x2201;&nbsp; - </code><label>Contact, syntax:</label><code>&nbsp;C(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
+                <code>&lt;=&nbsp;&nbsp;-&nbsp;&le;&nbsp; - </code><label>Part Of, syntax:</label><code>&nbsp;&lt;=(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
+                <code>&lt;=m&nbsp;-&nbsp;&le;<sub>m</sub> - </code><label>Measured Part Of, syntax:</label><code>&nbsp;&lt;=m(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
+                <code>=0&nbsp;&nbsp;-&nbsp;=0 - </code><label>Syntax suggar for zero term, syntax:</label><code>&nbsp;T=0</code><br>
+                <code>()&nbsp;&nbsp;-&nbsp;() - </code><label>Parentheses</label><br>
             </div>
             <div id="formula_filters" style="margin: 20px;">
                 Formula Filters:<br>
-                <input type="checkbox" id="convert_contact_less_eq_with_same_terms" checked> Convert Contacts in <=<br>
+                <input type="checkbox" id="convert_contact_less_eq_with_same_terms" checked> Convert Contacts in &lt;=<br>
                 <input type="checkbox" id="convert_disjunction_in_contact_less_eq" checked> Split Disjunctions in Atomic Formulas<br>
                 <input type="checkbox" id="reduce_constants" checked> Reduce Contacts<br>
                 <input type="checkbox" id="reduce_contacts_less_eq_with_constants" checked> Reduce Atomic Formulas with Contacts<br>
