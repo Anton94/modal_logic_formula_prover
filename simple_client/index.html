@@ -116,15 +116,22 @@
                         valid_op_id = null;
                         running_count = 0;
                         change_computing_components_availability(true);
-                    });;
+                    });
             }
 
             function cancel_task(op_id, timer_id) {
                 var params = "?op_id=" + valid_op_id;
+                let cancel_btn = document.getElementById("cancel_calculation");
+                cancel_btn.disabled = true;
                 $.get(IP_ADDRESS + "rest/cancel" + params, null)
                     .done(function (data) {
                         // return true if success, return false if the task was already canceled
                         console.log('Cancel answer: ' + data);
+                    })
+                    .fail(function() {
+                        document.getElementById("formula_output").innerText = "Sorry, the server is down, not able to cancel the task.";
+                        console.log("Unable to cancel a task because the server is down");
+                        cancel_btn.disabled = false;
                     });
             }
 
@@ -145,6 +152,7 @@
                     .done(function (data) {
                         change_computing_components_availability(false);
                         valid_op_id = data;
+                        console.log('Creating a task with algorithm: ' + algorithm_type + ' and op id: ' + valid_op_id);
 
                         function myFunction() {
                             var timer_id = setInterval(function () {
@@ -171,6 +179,8 @@
                 for (var i = 0; i < elems.length; i++) {
                     elems[i].disabled = !enable;
                 }
+                var cancel_btn = document.getElementById("cancel_calculation");
+                cancel_btn.disabled = enable; // cancel button should be enabled when the model buttons are disabled, i.e. when there is a runninng task
             }
 
             function get_formula_filters() {
@@ -483,7 +493,7 @@
             </div>
             <div id="algorithm_cancelations" style="margin: 20px;">
                 If the calculation takes too long, try to cancel it and it might help to optimize the input formula<br>
-                <button onclick="cancel_task('valid_op_id')">CANCEL CALCULATION</button>
+                <button id="cancel_calculation" onclick="cancel_task('valid_op_id')">CANCEL CALCULATION</button>
             </div>
             <div id="is_satisfied">
                 <pre id="is_satisfied_output"></pre>
