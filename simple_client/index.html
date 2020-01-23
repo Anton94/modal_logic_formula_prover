@@ -109,7 +109,14 @@
                             running_count += 1;
                             document.getElementById('formula_output').innerText = "Running" + dots;
                         }
-                    });
+                    })
+                    .fail(function () {
+                        document.getElementById("formula_output").innerText = "Sorry, the server is down, please try again after a few seconds.";
+                        clearInterval(timer_id);
+                        valid_op_id = null;
+                        running_count = 0;
+                        change_computing_components_availability(true);
+                    });;
             }
 
             function cancel_task(op_id, timer_id) {
@@ -150,6 +157,9 @@
                     .fail(function (data, xx, yyy) {
                         if (data.status === 429) {
                             document.getElementById("formula_output").innerText = "There are too many requests right now, please try again later.";
+                        }
+                        else {
+                            document.getElementById("formula_output").innerText = "Sorry, the server is down, please try again after a few seconds.";
                         }
                     });
 
