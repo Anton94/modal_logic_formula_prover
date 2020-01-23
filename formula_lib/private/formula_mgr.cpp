@@ -42,7 +42,7 @@ auto formula_mgr::build(const std::string& f, const formula_refiners& refiners_f
 
     // TODO: more detailed logs
     std::stringstream info_buff;
-    info_buff << "Parsed formula: ";
+    info_buff << "\nParsed formula            : ";
     VPrinter printer(info_buff);
     formula_AST->accept(printer);
     info_buff << "\n";
