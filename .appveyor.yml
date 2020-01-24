@@ -4,6 +4,9 @@ clone_folder:
   C:\projects\project
 
 environment:
+  # update the vcpkg cache even if build fails
+  APPVEYOR_SAVE_CACHE_ON_ERROR: true
+
   matrix:
 #Debug
   - COMPILER: MINGW_W64_5_3
@@ -109,6 +112,12 @@ install:
   - ninja --version
 
   #######################################################################################
+  # Install CppRestSDK
+  #######################################################################################
+  - cmd: vcpkg install cpprestsdk cpprestsdk:x64-windows
+  - cmd: vcpkg install cpprestsdk cpprestsdk:x86-windows
+
+  #######################################################################################
   # Install MinGW
   #######################################################################################
   #- IF "%COMPILER%" == "MINGW_W64" appveyor-retry appveyor DownloadFile http://downloads.sourceforge.net/mingw-w64/x86_64-5.3.0-release-posix-seh-rt_v4-rev0.7z
@@ -120,6 +129,13 @@ install:
   # CMake
   #######################################################################################
   - cmake --version
+
+
+  #######################################################################################
+  # Cache the installed vcpkg libraries (cpprestsdk)
+  #######################################################################################
+cache:
+#  - c:\Tools\vcpkg\installed
 
 
 before_build:
@@ -149,7 +165,7 @@ before_build:
 build_script:
   - mkdir build
   - cd build
-  - cmake -G "Ninja" -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ..
+  - cmake -G "Ninja" -DVCPKG_TARGET_TRIPLET=%ARCHITECTURE%-windows-static -DCMAKE_TOOLCHAIN_FILE=C:\Tools\vcpkg\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ..
   - cmake --build .
   - cd tests
   - if %IGNORE_TESTS_EXIT_CODE% EQU true (tests.exe -d yes & exit 0) else (tests.exe -d yes)
