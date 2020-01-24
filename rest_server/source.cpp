@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
         cxxopts::Options options("RestServer", "Server which provides the web resources and handles the heavy algortihm executions");
 
         options.add_options()("h,help", "Print help")
-                             ("p,port", "Port. Default is " + port, cxxopts::value<size_t>())
+                             ("p,port", "Port. Default is " + utility::conversions::to_utf8string(port), cxxopts::value<size_t>())
                              ("a,address", "Address. Default is " + utility::conversions::to_utf8string(address), cxxopts::value<std::string>())
                              ("c,concurrent_tasks_limit", "Concurrent tasks limit, i.e. the max number of tasks which can be ran in the same time. Default is " + std::to_string(concurrent_tasks_limit), cxxopts::value<size_t>())
                              ("t,task_run_time_limit", "The time limit of the task's execution. Default is " + std::to_string(task_run_time_limit.count()) + "ms", cxxopts::value<size_t>())

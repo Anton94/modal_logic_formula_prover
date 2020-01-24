@@ -16,6 +16,9 @@ void read_output(FILE* file, std::string& output)
 
 bool run(const std::string& cmd, std::string& output)
 {
+#ifdef __WIN32__
+#define popen  _popen
+#endif
     auto cmd_with_redirected_error_output = cmd + " 2>&1";
     FILE* file = popen(cmd_with_redirected_error_output.c_str(), "r");
     if(!file)
