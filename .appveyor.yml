@@ -114,8 +114,8 @@ install:
   #######################################################################################
   # Install CppRestSDK
   #######################################################################################
-  - cmd: vcpkg install cpprestsdk cpprestsdk:x64-windows
-  - cmd: vcpkg install cpprestsdk cpprestsdk:x86-windows
+  - cmd: vcpkg install cpprestsdk cpprestsdk:x64-windows-static
+  - cmd: vcpkg install cpprestsdk cpprestsdk:x86-windows-static
 
   #######################################################################################
   # Install MinGW
