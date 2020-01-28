@@ -1,4 +1,5 @@
 \documentclass{article}
+\usepackage{mathtools}
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{systeme}
@@ -209,13 +210,67 @@ class Term
 					return the empty bitset
 				\item $\text{Let } v \in X \text{ and } \tau \equiv v$, then \\
 					return X[v]
+				\item $\text{Let } \rho \text{ be a term } \text{ and } \tau \equiv \bar{\rho}$, then \\
+					return $!termSEval(\rho)$
 				\item $\text{Let } \tau_1, \tau_2 \text{ be two terms } \text{ and } \tau \equiv \tau_1 \sqcap \tau_2$, then \\
 					return $termSEval(\tau_1) \& termSEval(\tau_2)$
 				\item $\text{Let } \tau_1, \tau_2 \text{ be two terms } \text{ and } \tau \equiv \tau_1 \sqcup \tau_2$, then \\
 					return $termSEval(\tau_1) | termSEval(\tau_2)$
 			\end{itemize}
 				
-			
+	\subsection*{Def Formula definiton}
+		A formula is defined by the following recursive definition:
+		\begin{itemize}
+			\item T is a formula, which represents $\top$
+			\item F is a formula, which represents $\bot$
+			\item C(a, b) is a formula, where a and b are terms
+			\item a <= b is a formula, where a and b are terms
+			\item If $\varphi$ is a formula, then $\bar{\varphi}$ is a formula as well
+			\item If $\varphi$ and $\psi$ are formulas, then $\varphi \: \sigma \: \psi $ is a formula as well,\\
+				where $\sigma \in \{\vee, \wedge, \rightarrow, \leftrightarrow\}$
+		\end{itemize}
+	
+	\subsection*{Def: Zero term formula}
+		Let a and b be two terms, then
+		\begin{equation}
+			a \le b \iff a \sqcap \neg b = 0
+		\end{equation}
+
+		$a \sqcap \neg b = 0$ will be called zero term formula.
+		Since $a \sqcap \neg b$ is a new term, it can be assigned a variable $S = a \sqcap \neg b$, 
+		and now the zero term formula above can be written as $s  = 0$ which is with better readability and 
+		can be easirly grasped in proofs and definitions.
+
+
+	\subsection*{Def Atomic Formulas}
+		A formula $\varphi$ is called atomic, if and only if it is one of the followings:
+		\begin{itemize}
+			\item T
+			\item F
+			\item C(a, b), where a and b are terms
+			\item a <= b, where a and b are terms
+			\item a = 0, where a is term
+		\end{itemize}
+		
+	\paragraph{Less or Equal Formula} The less or equal formula describes the subregion operation and is notated as <=.
+	Let a and b be two regions, then a is subregion of b if all elements from a are in b.
+	Regions are described with the usage of terms, and since the terms are represented with k-bitsets it means that 
+	if at some position i, a[i] = 1 then b[i] = 1 as well, namely
+	\begin{equation}
+		a <= b \coloneqq \forall i < k : a[i] = 1 \implies b[i]=1
+	\end{equation}
+
+	The check if a is a subregion of b can be easily implemented with the following sequence of bitset operations
+	\begin{equation}
+		a \& b = a
+	\end{equation}
+
+	\paragraph{Contact Formula} The contact formula describes the relation between regions notated with C(a, b), where a and b are two terms.
+	A region is in a contact with another region if there exists at least one element from both regions which are in a relation, let us denote the relation with R.
+	\begin{equation}
+		C(a, b) \coloneqq \exists x \in a \exists y \in b xRy
+	\end{equation}
+
 
 	\newpage
 	\section{Formula Representation1}
