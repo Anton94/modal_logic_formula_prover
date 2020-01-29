@@ -114,9 +114,9 @@
 				1 & 1 & 1 \\
 			\end{tabular} 
 			\newline
-			bitset-OR operation is defined as:
+			bitset-NEG operation(inverse function) is defined as:
 			\begin{equation}
-				a \| b = \bar{a[0]}, .. , \bar{a[k]}
+				a = \bar{a[0]}, .. , \bar{a[k]}
 			\end{equation}
 			where the truth table for basic variable x is:
 			\newline
@@ -138,86 +138,132 @@
 					\end{equation}
 					The upper right index denotes the position in the bitset sequence.
 			\end{itemize}
-		\subsection*{Def: Variable bitset substitution}
-			Let $\mathbb{U}$ be a set of bitsets, then the Variable bitset substitution is a total mapping 
-			 $\rho : \mathbb{V} \longmapsto \mathbb{Ba}$ and the following notation will be used:
-			\begin{equation}
-				x \longmapsto b
-			\end{equation}
-			where x is a variable and b is a bitset.
-		\subsection*{Special types of bitsets}
-			Let x be a k-bitset, then x is called
-			\begin{itemize}
-				\item the world, if $\forall i<k : x[i] = 1$, denoted with 1
-				\item the empty k-bitset, if $\forall i<k : x[i] = 0$, denoted with 0
-			\end{itemize}
-		\subsection*{Term recursive definition}
+	\subsection*{Def: Variable bitset substitution}
+		Let $\mathbb{U}$ be a set of bitsets, then the Variable bitset substitution is a total mapping 
+		 $\rho : \mathbb{V} \longmapsto \mathbb{Ba}$ and the following notation will be used:
+		\begin{equation}
+			x \longmapsto b
+		\end{equation}
+		where x is a variable and b is a bitset.
+	\subsection*{Special types of bitsets}
+		Let x be a k-bitset, then x is called
 		\begin{itemize}
-			\item 1 is a term
-			\item 0 is a term
-			\item $p \in \mathbb{V}ar$ is a term
-			\item If x is a term, then $\bar{x}$ is a term as well
-			\item If x and y are terms, then $x \sigma y $ is a term as well,\\
-				where $\sigma \: \in \: \{\sqcap, \sqcup\}$
-		\end{itemize}	
+			\item the world, if $\forall i<k : x[i] = 1$, denoted with 1
+			\item the empty k-bitset, if $\forall i<k : x[i] = 0$, denoted with 0
+		\end{itemize}
+	\subsection*{Term recursive definition}
+	\begin{itemize}
+		\item 1 is a term
+		\item 0 is a term
+		\item $p \in \mathbb{V}ar$ is a term
+		\item If x is a term, then $\bar{x}$ is a term as well
+		\item If x and y are terms, then $x \sigma y $ is a term as well,\\
+			where $\sigma \: \in \: \{\sqcap, \sqcup\}$
+	\end{itemize}	
 
-		\subsection*{Term Implementation Representation}
-			The term can be represented in memory recursively by analogy to the definition REF-DEF-TERM.
+	\subsection*{Term Implementation Representation}
+		The term can be represented in memory recursively by analogy to the definition REF-DEF-TERM.
 
-		\begin{lstlisting}
+	\begin{lstlisting}
 class Term 
 {
-	...
+  ...
+  enum class operation_type : char
+  {
+    constant_true,
+    constant_false,
 
-	operation_t op_;
-	std::size_t hash_;
-	
-	struct childs
-	{
-		term* left;
-		term* right;
-	}
-	union 
-	{
-		childs childs_;
-		std::size_t variable_id_;
-	}
+    union_,
+    intersection,
+    complement,
+    variable,
 
-	...
+    invalid,
+  };
+  using operation_t = operation_type;
+  ...
+
+  operation_t op_;
+  std::size_t hash_;
+  
+  struct childs
+  {
+    term* left;
+    term* right;
+  }
+  union 
+  {
+    childs childs_;
+    std::size_t variable_id_;
+  }
+
+  ...
 }
-		\end{lstlisting}
-		The term is represented in a tree structural way, where each node is an operation and the leafs of the tree
-		are variables. In the above implementation the variables are represented by their index, which can be 
-		easily found with the Index Variable Function.
+	\end{lstlisting}
+	The term is represented in a tree structural way, where each node is a an operation over terms and the leafs of the tree
+	are variables. In the above implementation the variables are represented by their index, which can be 
+	easily found with the Index Variable Function. 
+
+	\paragraph{Term hash variable} Used for faster comaprison of terms, namely if the hash value of two terms 
+	differs then those terms have different structure. However if the hash variables of two terms are equal then the strustures 
+	of both terms are comapred. The following method is used to calculate the hash of a term.
+
+	\begin{lstlisting}
+void term_construct_hash()
+{
+  switch(op_)
+  {
+  case operation_t::constant_true:
+  case operation_t::constant_false:
+    break;
+  case operation_t::union_:
+  case operation_t::intersection:
+    hash_ = ((childs_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
+        childs_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
+    break;
+  case operation_t::complement:
+    hash_ = (childs_.left->get_hash() & 0xFFFFFFFF) * 2654435761;
+    break;
+  case operation_t::variable:
+    hash_ = (variable_id_ & 0xFFFFFFFF) * 2654435761;
+    break;
+  default:
+    assert(false && "Unrecognized.");
+  }
+
+  // add also the operation to the hash
+  const auto op_code = static_cast<unsigned>(op_) + 1;
+  hash_ += (op_code & 0xFFFFFFFF) * 2654435723;
+}
+	\end{lstlisting}
+
+	Include example for one term building
+	\newline
+	\newline
+	\subsection*{Term Set-Evaluation}
+		Let X be a set of variable Set-Substituitions, namely $ X = \{ x_0 \longmapsto b_0, x_1 \longmapsto b_1, ..., x_k \longmapsto b_k \}$,
+		then the Term Set-Evaluation is a function which produces a bitset for a given term by appling a set of substitutions.
+		The Term Set-Evaluation is applicable if and only if all variables from the term have a suitable substitution in X.
 		\newline
 		\newline
-		Include example for one term building
+		The Term Set-Evaluation will be notated as termSEval is defined recursively as follows:
 		\newline
-		\newline
-		\subsection*{Term Set-Evaluation}
-			Let X be a set of variable Set-Substituitions, namely $ X = \{ x_0 \longmapsto b_0, x_1 \longmapsto b_1, ..., x_k \longmapsto b_k \}$,
-			then the Term Set-Evaluation is a function which produces a bitset for a given term by appling a set of substitutions.
-			The Term Set-Evaluation is applicable if and only if all variables from the term have a suitable substitution in X.
-			\newline
-			\newline
-			The Term Set-Evaluation will be notated as termSEval is defined recursively as follows:
-			\newline
-			Let $\tau$ be a term, then:
-			\begin{itemize}
-				\item if $\tau \equiv 1$, then \\
-					return the world bitset
-				\item if $\tau \equiv 0$, then \\
-					return the empty bitset
-				\item $\text{Let } v \in X \text{ and } \tau \equiv v$, then \\
-					return X[v]
-				\item $\text{Let } \rho \text{ be a term } \text{ and } \tau \equiv \bar{\rho}$, then \\
-					return $!termSEval(\rho)$
-				\item $\text{Let } \tau_1, \tau_2 \text{ be two terms } \text{ and } \tau \equiv \tau_1 \sqcap \tau_2$, then \\
-					return $termSEval(\tau_1) \& termSEval(\tau_2)$
-				\item $\text{Let } \tau_1, \tau_2 \text{ be two terms } \text{ and } \tau \equiv \tau_1 \sqcup \tau_2$, then \\
-					return $termSEval(\tau_1) | termSEval(\tau_2)$
-			\end{itemize}
-				
+		Let $\tau$ be a term, then:
+		\begin{itemize}
+			\item if $\tau \equiv 1$, then \\
+				return the world bitset
+			\item if $\tau \equiv 0$, then \\
+				return the empty bitset
+			\item $\text{Let } v \in X \text{ and } \tau \equiv v$, then \\
+				return X[v]
+			\item $\text{Let } \rho \text{ be a term } \text{ and } \tau \equiv \bar{\rho}$, then \\
+				return $inverse(termSEval(\rho))$ 
+			\item $\text{Let } \tau_1, \tau_2 \text{ be two terms } \text{ and } \tau \equiv \tau_1 \sqcap \tau_2$, then \\
+				return $termSEval(\tau_1) \& termSEval(\tau_2)$
+			\item $\text{Let } \tau_1, \tau_2 \text{ be two terms } \text{ and } \tau \equiv \tau_1 \sqcup \tau_2$, then \\
+				return $termSEval(\tau_1) | termSEval(\tau_2)$
+		\end{itemize}
+			
 	\subsection*{Def Formula definiton}
 		A formula is defined by the following recursive definition:
 		\begin{itemize}
@@ -270,6 +316,95 @@ class Term
 	\begin{equation}
 		C(a, b) \coloneqq \exists x \in a \exists y \in b xRy
 	\end{equation}
+
+	\subsection*{Formula Implementation Representation}
+	The formula can be represented in memory recursively by analogy to the definition REF-DEF-FORMULA.
+
+	\begin{lstlisting}
+class Formula 
+{
+  ..
+  enum class operation_type : char
+  {
+    constant_true,
+    constant_false,
+
+    conjunction,
+    disjunction,
+    negation,
+
+    measured_less_eq,
+    eq_zero,
+    c,
+
+    invalid,
+  };
+  using operation_t = operation_type;
+  ...
+
+  operation_t op_;
+  std::size_t hash_;
+    
+  struct child_formulas
+  {
+    formula* left;
+    formula* right;
+  };
+  struct child_terms
+  {
+    term* left;
+    term* right;
+  };
+
+  union {
+    child_formulas child_f_;
+    child_terms child_t_;
+  };
+}
+	\end{lstlisting}
+	The formula analogous to the term implementation is represented in a tree structural way, where each node is an operation over formulas and the leafs of the tree
+	are atomic formulas. 
+
+	\paragraph{Formula hash variable} Used for faster comaprison of formulas, namely if the hash value of two formulas
+	differs then those formulas have different structure. However if the hash variables of two formulas are equal then the strustures 
+	of both formulas are comapred. The method which calculates the hash of a formula is similar to the one defined for the 
+	calculation of terms in REF-TERM-HASH-CALC, with the two differences that the formula operations are more than the 
+	operations over term and that for atomic formulas the hash from the term is used in order to construct the formula hash.
+
+	\subsection*{Formula Set-Evaluation}
+		Let X be a set of variable Set-Substituitions, namely $ X = \{ x_0 \longmapsto b_0, x_1 \longmapsto b_1, ..., x_k \longmapsto b_k \}$,
+		then the Formula Set-Evaluation is a function which determins the validity of a formula, namely for a given term 
+		produces a bolean result by appling a set of substitutions.
+		The Formula Set-Evaluation is applicable if and only if all variables from the term have a suitable substitution in X.
+		\newline
+		\newline
+		The Formula Set-Evaluation will be notated as formulaSEval is defined recursively as follows:
+		\newline
+		Let $\varphi$ be a formula, then:
+		\begin{itemize}
+			\item if $\varphi \equiv T$, then \\
+				return true
+			\item if $\varphi \equiv F$, then \\
+				return false
+			\item $\text{Let } \tau \text{ be a term } \text{ and } \varphi \equiv \tau = 0$, then \\
+				return $termSEval(\tau) = 0$
+			\item $\text{Let } \tau_1, \tau_2 \text{ be two terms } \text{ and }  \varphi \equiv C(\tau_1, \tau_2)$, then \\
+				let  $leftl = termSEval(\tau_1)$, \\
+				let  $right = termSEval(\tau_2)$, \\
+				return  left \& right or left is in relation with right
+			\item $\text{Let } \psi \text{ be a formula } \text{ and } \varphi \equiv \neg{\psi}$, then \\
+				return $!formulaSEval(\psi)$
+			\item $\text{Let } \psi_1, \psi_2 \text{ be two formulas } \text{ and } \varphi \equiv \psi_1 \wedge \psi_2$, then \\
+				return $formulaSEval(\psi_1) \& formulaSEval(\psi_2)$
+			\item $\text{Let } \psi_1, \psi_2 \text{ be two formulas } \text{ and } \varphi \equiv \psi_1 \vee \psi_2$, then \\
+				return $formulaSEval(\psi_1) | formulaSEval(\psi_2)$
+		\end{itemize}
+
+
+
+
+
+
 
 
 	\newpage
