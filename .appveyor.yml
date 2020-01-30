@@ -114,8 +114,8 @@ install:
   #######################################################################################
   # Install CppRestSDK
   #######################################################################################
-  - cmd: vcpkg install cpprestsdk cpprestsdk:x64-windows-static
-  - cmd: vcpkg install cpprestsdk cpprestsdk:x86-windows-static
+  - cmd: vcpkg install cpprestsdk cpprestsdk:x64-windows
+  - cmd: vcpkg install cpprestsdk cpprestsdk:x86-windows
 
   #######################################################################################
   # Install MinGW
@@ -165,7 +165,7 @@ before_build:
 build_script:
   - mkdir build
   - cd build
-  - cmake -G "Ninja" -DVCPKG_TARGET_TRIPLET=%ARCHITECTURE%-windows-static -DCMAKE_TOOLCHAIN_FILE=C:\Tools\vcpkg\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ..
+  - cmake -G "Ninja" -DVCPKG_TARGET_TRIPLET=%ARCHITECTURE%-windows -DCMAKE_TOOLCHAIN_FILE=C:\Tools\vcpkg\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ..
   - cmake --build .
   - cd tests
   - if %IGNORE_TESTS_EXIT_CODE% EQU true (tests.exe -d yes & exit 0) else (tests.exe -d yes)
