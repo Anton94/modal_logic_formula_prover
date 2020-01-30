@@ -10,82 +10,98 @@ environment:
   matrix:
 #Debug
   - COMPILER: MINGW_W64_5_3
+    VCPKG_TRIPLET: mingw
     ARCHITECTURE: x86
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
     BUILD_TYPE: Debug
     IGNORE_TESTS_EXIT_CODE: true
   - COMPILER: MINGW_W64_6_3
+    VCPKG_TRIPLET: mingw
     ARCHITECTURE: x86
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
     BUILD_TYPE: Debug
     IGNORE_TESTS_EXIT_CODE: true
   - COMPILER: MINGW_W64_6_3
+    VCPKG_TRIPLET: mingw
     ARCHITECTURE: x64
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
     BUILD_TYPE: Debug
     IGNORE_TESTS_EXIT_CODE: false
   - COMPILER: MINGW_W64_7_2
+    VCPKG_TRIPLET: mingw
     ARCHITECTURE: x64
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
     BUILD_TYPE: Debug
     IGNORE_TESTS_EXIT_CODE: false
   - COMPILER: MSVC_15
+    VCPKG_TRIPLET: windows
     ARCHITECTURE: x86
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
     BUILD_TYPE: Debug
     IGNORE_TESTS_EXIT_CODE: false
   - COMPILER: MSVC_15
+    VCPKG_TRIPLET: windows
     ARCHITECTURE: x64
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
     BUILD_TYPE: Debug
     IGNORE_TESTS_EXIT_CODE: false
   - COMPILER: MSVC_14
+    VCPKG_TRIPLET: windows
     ARCHITECTURE: x86
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
     BUILD_TYPE: Debug
     IGNORE_TESTS_EXIT_CODE: false
   - COMPILER: MSVC_14
+    VCPKG_TRIPLET: windows
     ARCHITECTURE: x64
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
     BUILD_TYPE: Debug
     IGNORE_TESTS_EXIT_CODE: false
 #Release
   - COMPILER: MINGW_W64_5_3
+    VCPKG_TRIPLET: mingw
     ARCHITECTURE: x86
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
     BUILD_TYPE: Release
     IGNORE_TESTS_EXIT_CODE: true
   - COMPILER: MINGW_W64_6_3
+    VCPKG_TRIPLET: mingw
     ARCHITECTURE: x86
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
     BUILD_TYPE: Release
     IGNORE_TESTS_EXIT_CODE: true
   - COMPILER: MINGW_W64_6_3
+    VCPKG_TRIPLET: mingw
     ARCHITECTURE: x64
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
     BUILD_TYPE: Release
     IGNORE_TESTS_EXIT_CODE: false
   - COMPILER: MINGW_W64_7_2
+    VCPKG_TRIPLET: mingw
     ARCHITECTURE: x64
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
     BUILD_TYPE: Release
     IGNORE_TESTS_EXIT_CODE: false
   - COMPILER: MSVC_15
+    VCPKG_TRIPLET: windows
     ARCHITECTURE: x86
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
     BUILD_TYPE: Release
     IGNORE_TESTS_EXIT_CODE: false
   - COMPILER: MSVC_15
+    VCPKG_TRIPLET: windows
     ARCHITECTURE: x64
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
     BUILD_TYPE: Release
     IGNORE_TESTS_EXIT_CODE: false
   - COMPILER: MSVC_14
+    VCPKG_TRIPLET: windows
     ARCHITECTURE: x86
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
     BUILD_TYPE: Release
     IGNORE_TESTS_EXIT_CODE: false
   - COMPILER: MSVC_14
+    VCPKG_TRIPLET: windows
     ARCHITECTURE: x64
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
     BUILD_TYPE: Release
@@ -112,10 +128,13 @@ install:
   - ninja --version
 
   #######################################################################################
-  # Install CppRestSDK
+  # Install CppRestSDK. TODO: the cpprestsdk should be built with the currently used compiler
   #######################################################################################
-  - cmd: vcpkg install cpprestsdk cpprestsdk:x64-windows
-  - cmd: vcpkg install cpprestsdk cpprestsdk:x86-windows
+  #- cmd: vcpkg help triplet
+  #- cmd: vcpkg install cpprestsdk cpprestsdk:x64-windows
+  #- cmd: vcpkg install cpprestsdk cpprestsdk:x86-windows
+  #- cmd: vcpkg install cpprestsdk cpprestsdk:x64-mingw # TODO: fix mingw triplet, not finiding it at the moment
+  #- cmd: vcpkg install cpprestsdk cpprestsdk:x86-mingw
 
   #######################################################################################
   # Install MinGW
@@ -135,7 +154,7 @@ install:
   # Cache the installed vcpkg libraries (cpprestsdk)
   #######################################################################################
 cache:
-#  - c:\Tools\vcpkg\installed
+  #- c:\Tools\vcpkg\installed
 
 
 before_build:
@@ -165,7 +184,11 @@ before_build:
 build_script:
   - mkdir build
   - cd build
-  - cmake -G "Ninja" -DVCPKG_TARGET_TRIPLET=%ARCHITECTURE%-windows -DCMAKE_TOOLCHAIN_FILE=C:\Tools\vcpkg\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ..
+  #- IF "%VCPKG_TRIPLET%" == "windows"
+  #  call cmake -G Ninja -DVCPKG_TARGET_TRIPLET=%ARCHITECTURE%-windows -DCMAKE_TOOLCHAIN_FILE=C:\Tools\vcpkg\scripts\buildsystems\vcpkg.cmake -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ..
+  #- IF "%VCPKG_TRIPLET%" == "mingw"
+  #  call cmake -G Ninja -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ..
+  - cmake -G Ninja -DCMAKE_BUILD_TYPE=%BUILD_TYPE% ..
   - cmake --build .
   - cd tests
   - if %IGNORE_TESTS_EXIT_CODE% EQU true (tests.exe -d yes & exit 0) else (tests.exe -d yes)
