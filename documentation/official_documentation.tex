@@ -84,6 +84,7 @@
 			Let x and y be two k-bitsets, where $k \in \mathbb{N}$, then: 
 			\newline
 			\newline
+			\paragraph{bitset-AND}
 			bitset-AND operation is defined as:
 			\begin{equation}
 				a \& b = a[0] \& b[0], a[1] \& b[1], .. , a[k] \& b[k]
@@ -99,6 +100,7 @@
 				1 & 1 & 1 \\
 			\end{tabular} 
 			\newline
+			\paragraph{bitset-OR}
 			bitset-OR operation is defined as:
 			\begin{equation}
 				a | b = a[0] | b[0], a[1] | b[1], .. , a[k] | b[k]
@@ -114,6 +116,7 @@
 				1 & 1 & 1 \\
 			\end{tabular} 
 			\newline
+			\paragraph{bitset-Neg}
 			bitset-NEG operation(inverse function) is defined as:
 			\begin{equation}
 				a = \bar{a[0]}, .. , \bar{a[k]}
@@ -127,7 +130,7 @@
 				1 & 0 \\
 			\end{tabular} 
 			\newline
-			bitset-PlusOne
+			\paragraph{bitset-PlusOne}
 			Deoted a + 1 represents the next bitset after a, which is constructed as follows:
 			\begin{itemize}
 				\item if $\forall i < k: a[i] \neq 0$, then there are no more k-bitsets, meaning that
@@ -138,6 +141,27 @@
 					\end{equation}
 					The upper right index denotes the position in the bitset sequence.
 			\end{itemize}
+			\paragraph{bitset-PlusOne over marked bits}
+			The PlusOne over marked bits deterministically produces a new bitset, which is denoted as the $\bigoplus 1$.
+			The $\bigoplus 1$ produced bitset is constructed by manipulating only the marked bits, namely:
+			Let a be a bitset representing the bitset from which the next bitset will be produced. \\
+			Let m be a bitset denoting the marked bits from a, which are allowed to be changed. \\
+			The next bitset is constructed from a with marked bits m as follows:
+			\begin{itemize}
+				\item if a \& m = a, then there are no more bitsets of size m.
+				\item otherwise \\ 
+					let i be the last index, such that:
+					\begin{equation}
+						a[i] =0 \textit{  and  } m[i] = 1
+					\end{equation}
+					then the next bitset is constructed as: 
+					\begin{equation}
+						a[0]^0, ..., a[i-1]^{i-1}, 1^i, 0^{i+1}, ...., 0^k
+					\end{equation}
+			\end{itemize}
+
+			It is obvious that the PlusOne can be represented with $\bigoplus 1$, where the marker bitset contains only ones.
+
 	\subsection*{Def: Variable bitset substitution}
 		Let $\mathbb{U}$ be a set of bitsets, then the Variable bitset substitution is a total mapping 
 		 $\rho : \mathbb{V} \longmapsto \mathbb{B}_{set}$ and the following notation will be used:
@@ -465,8 +489,37 @@ class Formula
 	calculation of terms in REF-TERM-HASH-CALC, with the two differences that the formula operations are more than the 
 	operations over term and that for atomic formulas the hash from the term is used in order to construct the formula hash.
 
+	\subsection{Model Point Representation}
+		A model point $p_0$ is represented as an integer number. The first constructed model point is represented with 0, the second with 1 and so on.
+
+	\subsection{Contact Matrix}
+		A matrix of $n_x n$ size, where the rows and columns are model points and has only boolean values is called Contact Matrix.
+		Contact matrices usually will be noted as $\mathbb{C}^m$. \\
+		The following property is always true for Contact Matrices. \\ 
+		\begin{equation}
+			\textit{There is a contact between model points i and j } \iff \mathbb{C}^m[i][j] = 1
+		\end{equation}
+		The Contact Matrix of size n is implemented with n bitsets and $\mathbb{C}^m[i]$ represents the $i^{th}$ bitset.
+
+	\subsection{Bitsets in Contact}
+	Let a, b be two bitsets \\
+	Let $\mathbb{C}^m$ be a Contact Matrix\\
+	then
+	\begin{align*}
+		C(a, b) \iff &any(a \& b) \textit{ or } \\
+		&\exists i < n : a[i]=1 \textit{ and } any(\mathbb{C}^m[i] \& b)
+	\end{align*}
+
+	\begin{enumerate}
+		\item $an(a \& b)$ is true if and only if a and b have a common point
+		\item $\exists i < n : a[i]=1 \textit{ and } any(\mathbb{C}^m[i] \& b)$ is true if and only if a contains a model point which is 
+			in contact with a model point from b according to the Contact Matrix.
+	\end{enumerate}
+			
+
 	\subsection*{Formula Set-Evaluation}
-		Let X be a set of variable Set-Substituitions, namely $ X = \{ x_0 \longmapsto b_0, x_1 \longmapsto b_1, ..., x_k \longmapsto b_k \}$,
+		Let X be a set of variable Set-Substituitions, namely $ X = \{ x_0 \longmapsto b_0, x_1 \longmapsto b_1, ..., x_k \longmapsto b_k \}$, 
+		Let $\mathbb{C}^m[i]$ be a contact matrix,
 		then the Formula Set-Evaluation is a function which determins the validity of a formula, namely for a given term 
 		produces a bolean result by appling a set of substitutions.
 		The Formula Set-Evaluation is applicable if and only if all variables from the term have a suitable substitution in X.
@@ -485,7 +538,11 @@ class Formula
 			\item $\text{Let } \tau_1, \tau_2 \text{ be two terms } \text{ and }  \varphi \equiv C(\tau_1, \tau_2)$, then \\
 				let  $leftl = termSEval(\tau_1)$, \\
 				let  $right = termSEval(\tau_2)$, \\
-				return  left \& right or left is in relation with right
+\[return  \begin{cases} 
+      1, & \textit{left and right bitsets are in contact according to } \mathbb{C}^m[i] \\
+      0, & otherwise
+   \end{cases}
+\]
 			\item $\text{Let } \psi \text{ be a formula } \text{ and } \varphi \equiv \neg{\psi}$, then \\
 				return $!formulaSEval(\psi)$
 			\item $\text{Let } \psi_1, \psi_2 \text{ be two formulas } \text{ and } \varphi \equiv \psi_1 \wedge \psi_2$, then \\
@@ -495,8 +552,7 @@ class Formula
 		\end{itemize}
 
 
-
-
+	
 
 
 
