@@ -140,11 +140,18 @@
 			\end{itemize}
 	\subsection*{Def: Variable bitset substitution}
 		Let $\mathbb{U}$ be a set of bitsets, then the Variable bitset substitution is a total mapping 
-		 $\rho : \mathbb{V} \longmapsto \mathbb{Ba}$ and the following notation will be used:
+		 $\rho : \mathbb{V} \longmapsto \mathbb{B}_{set}$ and the following notation will be used:
 		\begin{equation}
 			x \longmapsto b
 		\end{equation}
 		where x is a variable and b is a bitset.
+	\subsection*{Def: Variable boolean substitution}
+		The Variable boolean substitution is a total mapping 
+		 $\rho : \mathbb{V} \longmapsto \{0, 1\}$ and the following notation will be used:
+		\begin{equation}
+			x \longmapsto b
+		\end{equation}
+		where x is a variable and $b \in \{ 1, 0 \}$.
 	\subsection*{Special types of bitsets}
 		Let x be a k-bitset, then x is called
 		\begin{itemize}
@@ -241,7 +248,7 @@ void term_construct_hash()
 	\newline
 	\newline
 	\subsection*{Term Set-Evaluation}
-		Let X be a set of variable Set-Substituitions, namely $ X = \{ x_0 \longmapsto b_0, x_1 \longmapsto b_1, ..., x_k \longmapsto b_k \}$,
+		Let X be a set of variable Set-Substituitions, namely $ X = \{ x_0 \longmapsto s_0, x_1 \longmapsto s_1, ..., x_k \longmapsto s_k \}$,
 		then the Term Set-Evaluation is a function which produces a bitset for a given term by appling a set of substitutions.
 		The Term Set-Evaluation is applicable if and only if all variables from the term have a suitable substitution in X.
 		\newline
@@ -264,6 +271,93 @@ void term_construct_hash()
 				return $termSEval(\tau_1) | termSEval(\tau_2)$
 		\end{itemize}
 			
+	\subsection{Term Partial-Evaluation}
+		Let X be a set of variable Boolean-Substituitions, namely $ X = \{ x_0 \longmapsto b_0, x_1 \longmapsto b_1, ..., x_k \longmapsto b_k \}$,
+		then the Term Partial-Evaluation is a function which for a given term produces new term by appling a set of substituations.
+		After the substitutions are applied the returned term can be a constant term, namely true/false or can be a term with a simpler structure.
+
+		\subsubsection{Term Construction Functions}
+		A new term can be constructed in two ways: 
+		\begin{enumerate}
+			\item From a variable index
+			\item From operation and the terms involved in the operation
+		\end{enumerate}
+
+		\paragraph{create\_variable\_node} will denote the function which from a given variable index constructs a new term.
+		\paragraph{create\_node} will denote the function which constructs a new term from an operation $\sigma$ and the involved terms, namely 
+		\begin{itemize}
+			\item If $\sigma$ is the negation operation, and $\tau$ is a term, 
+				then the constructed term is $\bar{\tau}$
+			\item If $\sigma \in \{ \sqcup, \sqcap \}$, and $\tau_1, \tau_2$ are terms, 
+				then the constrcuted term is $\tau_1 \sigma \tau_2$
+		\end{itemize}
+
+		The Term Partial-Evaluation will be notated as termParEval is defined recursively as follows:
+		\newline
+		Let $\tau$ be a term, then:
+		\begin{itemize}
+			\item if $\tau \equiv 1$, then \\
+				return constant\_true
+			\item if $\tau \equiv 0$, then \\
+				return constant\_false
+			\item $\text{Let } v \in X \text{ and } \tau \equiv v$, then \\
+				return X[v]
+			\item $\text{Let } v \not\in X \text{ and } \tau \equiv v$, then \\
+				return create\_variable\_node(v)
+			\item $\text{Let } \rho \text{ be a term } \text{ and } \tau \equiv \bar{\rho}$, then \\
+				return eval\_negation($\rho$)
+			\item $\text{Let } \tau_1, \tau_2 \text{ be two terms } \text{ and } \tau \equiv \tau_1 \sqcap \tau_2$, then \\
+				return eval\_intersection($\tau_1, \tau_2$)
+			\item $\text{Let } \tau_1, \tau_2 \text{ be two terms } \text{ and } \tau \equiv \tau_1 \sqcup \tau_2$, then \\
+				return eval\_union($\tau_1, \tau_2$)
+		\end{itemize}
+		where eval\_negation, eval\_intersection and eval\_union are defined as follows:
+			
+		\paragraph{eval\_negation($\tau_1$)} Let
+			\begin{equation}
+				res = termParEval(\tau)
+			\end{equation}
+		\newline
+		And based on the evaluated result the following is returned.
+\[return  \begin{cases} 
+      0, & res = 1 \\
+      1, & res = 0 \\
+      \bar{\tau}, & otherwise 
+   \end{cases}
+\]
+
+		\paragraph{eval\_intersection($\tau_1, \tau_2$)}Let
+			\begin{align*}
+				left &= termParEval(\tau_1) \\
+				right &= termParEval(\tau_2)
+			\end{align*}
+		\newline
+		And based on the evaluated left and right values, the following is returned.
+\[return  \begin{cases} 
+      0, & left = 0 \textit{  or  } right = 0 \\
+      1, & left = 1  \textit{  and  } right = 1 \\
+      \kappa, & left = 1  \textit{  and  } right \equiv \kappa \\
+      \kappa, & left \equiv \kappa  \textit{  and  } right = 1\\
+      \tau_1 \sqcap \tau_2, & otherwise 
+   \end{cases}
+\]
+
+		\paragraph{eval\_union($\tau_1, \tau_2$)} Let
+			\begin{align*}
+				left &= termParEval(\tau_1) \\
+				right &= termParEval(\tau_2)
+			\end{align*}
+		\newline
+		And based on the evaluated left and right values, the following is returned.
+\[return  \begin{cases} 
+      1, & left = 1 \textit{  or  } right = 1 \\
+      0, & left = 0  \textit{  and  } right = 0 \\
+      \kappa, & left = 0  \textit{  and  } right \equiv \kappa \\
+      \kappa, & left \equiv \kappa  \textit{  and  } right = 0\\
+      \tau_1 \sqcup \tau_2, & otherwise 
+   \end{cases}
+\]
+
 	\subsection*{Def Formula definiton}
 		A formula is defined by the following recursive definition:
 		\begin{itemize}
