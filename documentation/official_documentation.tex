@@ -86,50 +86,62 @@
 			\newline
 			\paragraph{bitset-AND}
 			bitset-AND operation is defined as:
-			\begin{equation}
-				a \& b = a[0] \& b[0], a[1] \& b[1], .. , a[k] \& b[k]
-			\end{equation}
-			where the truth table for two basic variables x and y is:
 			\newline
-			\begin{tabular}{cc|c}
-				x & y & x \& y \\
-				\hline
-				0 & 0 & 0 \\
-				0 & 1 & 0 \\
-				1 & 0 & 0 \\
-				1 & 1 & 1 \\
-			\end{tabular} 
+			\begin{align*}
+				a_0 \: a_1 \: ... & \: a_n \\
+				b_0 \: b_1 \: ... & \: b_n \\
+				 \cline{1-2}
+				c_0 \: c_1 \: ... & \: c_n
+			\end{align*}
+			where $c_i = a_i \: \& \: b_i$, namely
 			\newline
+			\begin{center}
+				\begin{tabular}{cc|c}
+					$a_i$ & $b_i$ & $c_i$  \\
+					\hline
+					0 & 0 & 0 \\
+					0 & 1 & 0 \\
+					1 & 0 & 0 \\
+					1 & 1 & 1 \\
+				\end{tabular} 
+			\end{center}
 			\paragraph{bitset-OR}
 			bitset-OR operation is defined as:
-			\begin{equation}
-				a | b = a[0] | b[0], a[1] | b[1], .. , a[k] | b[k]
-			\end{equation}
-			where the truth table for two basic variables x and y is:
 			\newline
-			\begin{tabular}{cc|c}
-				x & y & x | y \\
-				\hline
-				0 & 0 & 0 \\
-				0 & 1 & 1 \\
-				1 & 0 & 1 \\
-				1 & 1 & 1 \\
-			\end{tabular} 
-			\newline
+			\begin{align*}
+				a_0 \: a_1 \: ... & \: a_n \\
+				b_0 \: b_1 \: ... & \: b_n \\
+				 \cline{1-2}
+				c_0 \: c_1 \: ... & \: c_n
+			\end{align*}
+			where $c_i = a_i \: | \: b_i$, namely
+			\begin{center}
+				\begin{tabular}{cc|c}
+					$a_i$ & $b_i$ & $c_i$  \\
+					\hline
+					0 & 0 & 0 \\
+					0 & 1 & 1 \\
+					1 & 0 & 1 \\
+					1 & 1 & 1 \\
+				\end{tabular} 
+			\end{center}
 			\paragraph{bitset-Neg}
 			bitset-NEG operation(inverse function) is defined as:
-			\begin{equation}
-				a = \bar{a[0]}, .. , \bar{a[k]}
-			\end{equation}
-			where the truth table for basic variable x is:
 			\newline
-			\begin{tabular}{c|c}
-				x & $\bar{x}$ \\
-				\hline
-				0  & 1 \\
-				1 & 0 \\
-			\end{tabular} 
-			\newline
+			\begin{align*}
+				a_0 \: a_1 \: ... & \: a_n \\
+				 \cline{1-2}
+				c_0 \: c_1 \: ... & \: c_n
+			\end{align*}
+			where $c_i = \bar{a_i}$, namely
+			\begin{center}
+				\begin{tabular}{c|c}
+					$a_i$ & $ c_i $ \\
+					\hline
+					0  & 1 \\
+					1 & 0 \\
+				\end{tabular} 
+			\end{center}
 			\paragraph{bitset-PlusOne}
 			Deoted a + 1 represents the next bitset after a, which is constructed as follows:
 			\begin{itemize}
@@ -550,64 +562,7 @@ class Formula
 			\item $\text{Let } \psi_1, \psi_2 \text{ be two formulas } \text{ and } \varphi \equiv \psi_1 \vee \psi_2$, then \\
 				return $formulaSEval(\psi_1) | formulaSEval(\psi_2)$
 		\end{itemize}
-
-
-	
-
-
-
-
 	\newpage
-	\section{Formula Representation1}
-	Let $\mathbb{V}ar$ be the set of variables:
-	\[ \mathbb{V}ar = \{p_0, p_1, p_2 ... \}\]
-	Let $\mathbb{C}_t$ be the set of Term constants:
-	\[ \mathbb{C}_t = \{0, 1 \}\]
-	\subsection{Term recursive definition}
-	\begin{itemize}
-		\item $a \in \mathbb{C}_t$ is a term
-		\item $p \in \mathbb{V}ar$ is a term
-		\item If x is a term, then $\bar{x}$ is a term as well
-		\item If x and y are terms, then $x \sigma y $ is a term as well,\\
-			where $\sigma \: \in \: \{\sqcap, \sqcup\}$
-	\end{itemize}
-	Parentheses are used to define the priority of an operation.
-	\newline
-	Let $\mathbb{C}_f$ be the set of formula constants:
-	\[ \mathbb{C}_f = \{T, F \}\]
-	\subsection{Formula recursive definition}
-	\begin{itemize}
-		\item $a \in \mathbb{C}_f$ is a formula
-		\item If x and y are terms, then C(x, y) is a formula
-		\item If x and y are terms, then $x \le y$ is a formula
-		\item If x and y are terms, then $x \le_m y$ is a formula
-		\item If $\varphi$ is a formula, then $\neg \varphi$ is a formula as well
-		\item If $\varphi$ and $\psi$ are formulas, then $\varphi \: \sigma \: \psi $ is a formula as well,\\
-			where $\sigma \in \{\vee, \wedge, \rightarrow, \leftrightarrow\}$
-	\end{itemize}
-
-	\subsubsection*{Formula Parentheses}
-		Parentheses are used to define the priority of an operation. They are defined for terms and formulae.
-	
-	\subsection{Definition: Atomic Formula}
-		A formula will be called atomic formula if it is one of the followings:
-		\begin{itemize}
-			\item T
-			\item F
-			\item C(x, y)
-			\item $x \le y$
-			\item $x \le_m y$
-		\end{itemize}
-		where x and y are terms.
-	
-	\subsection{Definition/Theorem: Zero Term Formula}
-		Let x and y be two terms, then:
-		\begin{equation}
-			x \le y  \iff x \sqcap \bar{y} = 0
-		\end{equation}
-		A formula in the form $x \sqcap \bar{y} = 0$ will be called Zero Term Formula.
-
-
 	\subsection{Parser}
 		Flex and Bison are used to generate a parser with the modal logic grammar.
 		Flex is used as a tokenizer while Bison is used as the parser.
