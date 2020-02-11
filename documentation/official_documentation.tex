@@ -86,62 +86,50 @@
 			\newline
 			\paragraph{bitset-AND}
 			bitset-AND operation is defined as:
+			\begin{equation}
+				a \& b = a[0] \& b[0], a[1] \& b[1], .. , a[k] \& b[k]
+			\end{equation}
+			where the truth table for two basic variables x and y is:
 			\newline
-			\begin{align*}
-				a_0 \: a_1 \: ... & \: a_n \\
-				b_0 \: b_1 \: ... & \: b_n \\
-				 \cline{1-2}
-				c_0 \: c_1 \: ... & \: c_n
-			\end{align*}
-			where $c_i = a_i \: \& \: b_i$, namely
+			\begin{tabular}{cc|c}
+				x & y & x \& y \\
+				\hline
+				0 & 0 & 0 \\
+				0 & 1 & 0 \\
+				1 & 0 & 0 \\
+				1 & 1 & 1 \\
+			\end{tabular} 
 			\newline
-			\begin{center}
-				\begin{tabular}{cc|c}
-					$a_i$ & $b_i$ & $c_i$  \\
-					\hline
-					0 & 0 & 0 \\
-					0 & 1 & 0 \\
-					1 & 0 & 0 \\
-					1 & 1 & 1 \\
-				\end{tabular} 
-			\end{center}
 			\paragraph{bitset-OR}
 			bitset-OR operation is defined as:
+			\begin{equation}
+				a | b = a[0] | b[0], a[1] | b[1], .. , a[k] | b[k]
+			\end{equation}
+			where the truth table for two basic variables x and y is:
 			\newline
-			\begin{align*}
-				a_0 \: a_1 \: ... & \: a_n \\
-				b_0 \: b_1 \: ... & \: b_n \\
-				 \cline{1-2}
-				c_0 \: c_1 \: ... & \: c_n
-			\end{align*}
-			where $c_i = a_i \: | \: b_i$, namely
-			\begin{center}
-				\begin{tabular}{cc|c}
-					$a_i$ & $b_i$ & $c_i$  \\
-					\hline
-					0 & 0 & 0 \\
-					0 & 1 & 1 \\
-					1 & 0 & 1 \\
-					1 & 1 & 1 \\
-				\end{tabular} 
-			\end{center}
+			\begin{tabular}{cc|c}
+				x & y & x | y \\
+				\hline
+				0 & 0 & 0 \\
+				0 & 1 & 1 \\
+				1 & 0 & 1 \\
+				1 & 1 & 1 \\
+			\end{tabular} 
+			\newline
 			\paragraph{bitset-Neg}
 			bitset-NEG operation(inverse function) is defined as:
+			\begin{equation}
+				a = \bar{a[0]}, .. , \bar{a[k]}
+			\end{equation}
+			where the truth table for basic variable x is:
 			\newline
-			\begin{align*}
-				a_0 \: a_1 \: ... & \: a_n \\
-				 \cline{1-2}
-				c_0 \: c_1 \: ... & \: c_n
-			\end{align*}
-			where $c_i = \bar{a_i}$, namely
-			\begin{center}
-				\begin{tabular}{c|c}
-					$a_i$ & $ c_i $ \\
-					\hline
-					0  & 1 \\
-					1 & 0 \\
-				\end{tabular} 
-			\end{center}
+			\begin{tabular}{c|c}
+				x & $\bar{x}$ \\
+				\hline
+				0  & 1 \\
+				1 & 0 \\
+			\end{tabular} 
+			\newline
 			\paragraph{bitset-PlusOne}
 			Deoted a + 1 represents the next bitset after a, which is constructed as follows:
 			\begin{itemize}
@@ -562,7 +550,60 @@ class Formula
 			\item $\text{Let } \psi_1, \psi_2 \text{ be two formulas } \text{ and } \varphi \equiv \psi_1 \vee \psi_2$, then \\
 				return $formulaSEval(\psi_1) | formulaSEval(\psi_2)$
 		\end{itemize}
-	\newpage
+
+	\subsection{Model Representation}
+		A model $\mathcal{M}$ can be decomposed to its key components and each of these components can be programmtically represented, namely 
+		a model is represented from the following components:
+		\begin{itemize}
+			\item W - is the set model points, where W is the whole world.
+			\item R - is the reflexive and symetric relation between model points.
+			\item $\boldsymbol{v}$ - is  an evaluation function which maps a variable to a set of points subset of W
+		\end{itemize}
+
+		In order to construct a model programatically each of these components has to be represented in a programmable way.
+
+		\paragraph{Model Points} Each model point is represented as an integer value, counting from zero to the size of the points.
+		Each model point's integer value is unique and is less than the number of model points. This allows compact storage and 
+		the representation is done with a simple integer value, which represents the number of the model point with highest integer value.
+		Referencing a model point is simply done with the integer value which represents that model point.
+
+		\paragraph{Model Points Relation} The relation might be between all points, namely one point might be in a relation with
+		all other points, including itself. To represent such conditions an adjacency matrix can be used, where the rows and columns of the 
+		adjacency matrix represent the integer representation of the model points and the adjacency matrix values are simple boolean values
+		indicating whether two model points are in relation.
+		Such adjacency matrix has been defined in [REF TO ABOVE MATRIX DEF.]
+		\newline
+		\newline
+		Maybe add an example matrix.
+	
+		\paragraph{Evaluation function} This function determines the mapping from formula variables to sets of model points which are subset of W.
+		The representation of such mapping is done with an associative array. Since the formula variables are numbered from zero to the size
+		of all different formula variables, the keys are expressed with integer values less than the size of all different formula variables.
+		The values of this associative array represent regions of model points, for which a detailed definition has been given in [REF TO BISET REGIONS]
+		\newline
+		\newline
+		Add example as well, or maybe an example for a model.
+
+	\subsection{Satisfiability Check Idea}
+		Let $\varphi$ be a modal formula.
+		\newline
+		\newline
+		Problem: Does there exists a model $\mathcal{M}$, such that:
+		\begin{equation}
+			\mathcal{M} \models \varphi
+		\end{equation}
+
+		This problem, namely to construct a valid model $\mathcal{M}$ in which the formula $\varphi$ is satisfiable is with NP O-complexity, which
+		means that for now a fast algorithm does not exist ( there will exist such algorithm if P = NP ).
+		Because of the hih complexity the algorithms in discussed in this paper are forced to do some exponential calculations in order to exhaust all possible solutions.
+		The idea of the algorithmic schema is to first determine the maximum model points W, needed to be able to satisfy a modal formula. Try to 
+		construct the relations matrix R from the modal formula context, and then to construct an evaluation function $\mathcal{v}$  such that:
+		\begin{equation}
+			<W, R, \boldsymbol{v}> \models \varphi
+		\end{equation}
+		This idea is used in several algorithms defined and explained in details in the following sections.
+		
+
 	\subsection{Parser}
 		Flex and Bison are used to generate a parser with the modal logic grammar.
 		Flex is used as a tokenizer while Bison is used as the parser.
