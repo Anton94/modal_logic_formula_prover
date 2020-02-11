@@ -604,25 +604,25 @@ class Formula
 		This idea is used in several algorithms defined and explained in details in the following sections.
 		
 
-	\subsection{Parser}
-		Flex and Bison are used to generate a parser with the modal logic grammar.
-		Flex is used as a tokenizer while Bison is used as the parser.
-		\newline
-		There are two types of building elements in the modal logic formula:
+	\section{Parser}
+		The idea behind the overall solution is to have a formula as an input string and to output whether the given formula is statisfiable maybe a more detailed output 
+		will contain a graph of the model or a proof why the formula is not satisfiable.
+		The first step in implementing such solution is to:
 		\begin{itemize}
-			\item terms, defined in \#REF Term Recursive Definition
-			\item formulae, defined in \#REF Formula Recursive Definition
+			\item choose a set of symbols for the representation of formula components and the operations over them.
+			\item translate the input formula string into a more readable format where the language symbols are determined. In this new format 
+				it should be easy to manipulate with the formula and even to have the ability to do transformation over the original formula.
 		\end{itemize}
-		
-	\subsubsection{Symbols Representation}
-		\subsubsection*{Atomic terms}
+
+	\subsection{Symbols Representation}
+		\paragraph{Atomic terms}
 		\begin{itemize}
 			\item 0 is the term constant False
 			\item 1 is the term constant True
 			\item Arbitrary string is used to represent a variable
 		\end{itemize}
 		
-		\subsubsection*{Terms operations}
+		\paragraph{Terms operations}
 		Let t1, t2 be terms, then the followings are the representations for term operations
 		\begin{itemize}
 			\item - t1 is used to represent the complement term operation, namely $\bar{t1}$
@@ -630,7 +630,7 @@ class Formula
 			\item t1 + t2 is used to represent the union term operation, namely $t1 \: \sqcup \: t2$
 		\end{itemize}
 		
-		\subsubsection*{Atomic formulae}
+		\paragraph{Atomic formulae}
 		Let t1, t2 be terms, then the followings are representation of atomic formulae
 		\begin{itemize}
 			\item T is the formula constant True
@@ -640,7 +640,14 @@ class Formula
 			\item <=m(t1, t2) is the measured less or equal operation
 			\item (t1)=0 is the equal to zero operation
 		\end{itemize}
-
+		Flex and Bison are used to generate a parser with the modal logic grammar.
+		Flex is used as a tokenizer while Bison is used as the parser.
+		\newline
+		There are two types of building elements in the modal logic formula:
+		\begin{itemize}
+			\item terms, defined in \#REF Term Recursive Definition
+			\item formulae, defined in \#REF Formula Recursive Definition
+		\end{itemize}
 	\subsection{Tokenizer}
 	\subsubsection*{Grammar}
 		The tokenizer's grammar is pretty simple and is explaned in details in the following table with Flex syntaxes:
