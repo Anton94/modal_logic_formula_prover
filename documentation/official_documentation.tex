@@ -182,17 +182,19 @@
 			\item the world, if $\forall i<k : x[i] = 1$, denoted with 1
 			\item the empty k-bitset, if $\forall i<k : x[i] = 0$, denoted with 0
 		\end{itemize}
-	\subsection*{Term recursive definition}
-	\begin{itemize}
-		\item 1 is a term
-		\item 0 is a term
-		\item $p \in \mathbb{V}ar$ is a term
-		\item If x is a term, then $\bar{x}$ is a term as well
-		\item If x and y are terms, then $x \sigma y $ is a term as well,\\
-			where $\sigma \: \in \: \{\sqcap, \sqcup\}$
-	\end{itemize}	
+	\subsection{Term recursive definition}
+	\label{sec:term-recursive-definition}
+		\begin{itemize}
+			\item 1 is a term
+			\item 0 is a term
+			\item $p \in \mathbb{V}ar$ is a term
+			\item If x is a term, then $\bar{x}$ is a term as well
+			\item If x and y are terms, then $x \sigma y $ is a term as well,\\
+				where $\sigma \: \in \: \{\sqcap, \sqcup\}$
+		\end{itemize}	
 
 	\subsection*{Term Implementation Representation}
+	\label{sec:term-implementation-representation}
 		The term can be represented in memory recursively by analogy to the definition REF-DEF-TERM.
 
 	\begin{lstlisting}
@@ -295,7 +297,7 @@ void term_construct_hash()
 				return $termSEval(\tau_1) | termSEval(\tau_2)$
 		\end{itemize}
 			
-	\subsection{Term Partial-Evaluation}
+	\subsection*{Term Partial-Evaluation}
 		Let X be a set of variable Boolean-Substituitions, namely $ X = \{ x_0 \longmapsto b_0, x_1 \longmapsto b_1, ..., x_k \longmapsto b_k \}$,
 		then the Term Partial-Evaluation is a function which for a given term produces new term by appling a set of substituations.
 		After the substitutions are applied the returned term can be a constant term, namely true/false or can be a term with a simpler structure.
@@ -382,7 +384,8 @@ void term_construct_hash()
    \end{cases}
 \]
 
-	\subsection*{Def Formula definiton}
+	\subsection{Formula Recursive Definition}
+	\label{sec:formula-recursive-definition}
 		A formula is defined by the following recursive definition:
 		\begin{itemize}
 			\item T is a formula, which represents $\top$
@@ -486,13 +489,27 @@ class Formula
 	\paragraph{Formula hash variable} Used for faster comaprison of formulas, namely if the hash value of two formulas
 	differs then those formulas have different structure. However if the hash variables of two formulas are equal then the strustures 
 	of both formulas are comapred. The method which calculates the hash of a formula is similar to the one defined for the 
-	calculation of terms in REF-TERM-HASH-CALC, with the two differences that the formula operations are more than the 
+	calculation of terms in the Term Implementation Representation \ref{sec:term-implementation-representation}, with the two differences that the formula operations are more than the 
 	operations over term and that for atomic formulas the hash from the term is used in order to construct the formula hash.
+	This comparison is used in all maps and sets where the key is a node. 
+	\newline
+	The contact operatior requires a special check because of the commutativity of Contacts is supported, namely
+	\newline
+	\newline
+	Let a, b be two terms, then
+	\begin{equation}
+		C(a, b) = C(b, a)
+	\end{equation}
+	therefore the check for equality will be done twice instead of once, namely
+	\begin{equation}
+		 C(a, b) = C(c, d) \rightarrow (a = c \wedge b = d) \vee (a = d \wedge b = c).
+	\end{equation}
 
 	\subsection{Model Point Representation}
 		A model point $p_0$ is represented as an integer number. The first constructed model point is represented with 0, the second with 1 and so on.
 
 	\subsection{Contact Matrix}
+	\label{sec:contact-matrix}
 		A matrix of $n_x n$ size, where the rows and columns are model points and has only boolean values is called Contact Matrix.
 		Contact matrices usually will be noted as $\mathbb{C}^m$. \\
 		The following property is always true for Contact Matrices. \\ 
@@ -571,7 +588,7 @@ class Formula
 		all other points, including itself. To represent such conditions an adjacency matrix can be used, where the rows and columns of the 
 		adjacency matrix represent the integer representation of the model points and the adjacency matrix values are simple boolean values
 		indicating whether two model points are in relation.
-		Such adjacency matrix has been defined in [REF TO ABOVE MATRIX DEF.]
+		Such adjacency matrix has been defined in the Contact Matrix section \ref{sec:contact-matrix}.
 		\newline
 		\newline
 		Maybe add an example matrix.
@@ -604,7 +621,7 @@ class Formula
 		This idea is used in several algorithms defined and explained in details in the following sections.
 		
 
-	\section{Parser}
+	\section{Input Formula Analyzation}
 		The idea behind the overall solution is to have a formula as an input string and to output whether the given formula is statisfiable maybe a more detailed output 
 		will contain a graph of the model or a proof why the formula is not satisfiable.
 		The first step in implementing such solution is to:
@@ -645,44 +662,62 @@ class Formula
 		\newline
 		There are two types of building elements in the modal logic formula:
 		\begin{itemize}
-			\item terms, defined in \#REF Term Recursive Definition
-			\item formulae, defined in \#REF Formula Recursive Definition
+			\item terms, defined in the Term Recursive Definition section \ref{sec:term-recursive-definition}
+			\item formulae, defined in the Formula Recursive Definition section \ref{sec:formula-recursive-definition}
 		\end{itemize}
-	\subsection{Tokenizer}
-	\subsubsection*{Grammar}
-		The tokenizer's grammar is pretty simple and is explaned in details in the following table with Flex syntaxes:
-		% Matched token |  token
-		\begin{flushleft}
-			\begin{tabular}{ | m{7em} | m{15em}| m{10em} | } 
-				\hline
-					Matched token & Formatted token & Description \\ [0.7ex] 
-				\hline
-					[ \textbackslash t \textbackslash  n] & ; & Returns nothing, ignore all whitespace \\ 
-				\hline
-					[,TF01()C\&|~*+-] 	& yytext[0]; & yytext[0] is the matched character. All single charecter tokens will be passed as their ASCIIs for an easier use in Bison \\
-				\hline
-				    "<="            &   T\_LESS\_EQ; & Returns a special literal which maps the '<=' sequence \\
-				\hline
-				    "<=m"           &   T\_MEASURED\_LESS\_EQ; & \\
-				\hline
-				    "=0"            &   T\_EQ\_ZERO; & \\
-				\hline
-				    "= 0"           &   T\_EQ\_ZERO; & \\
-				\hline
-				    "->"            &   T\_FORMULA\_OP\_IMPLICATION; & \\
-				\hline
-				    "<->"           &   T\_FORMULA\_OP\_EQUALITY; & \\
-				\hline
-				    [a-zA-Z0-9]+    &   T\_STRING; & Returns T\_STRING literal type and the string  value is written to yylval which can be later accessed from the parser. Note that it uses our simple memory manager to allocate this string in order to be able to safely free all allocated strings even when some syntax error occures \\
-				\hline
-				    .               &   yytext[0]; & bison will trigger an error if it's unrecognized symbol \\
-				\hline
 
+	\subsection{Tokenizer}
+		The tokenizer is responsible for demarcating the special sybmols in the input formula.
+		After the symbols are identified a token is created for each of them or at least for those significant to the semantic of the input formula.
+		For example the whitespaces are not significant and a tokens are not created for them.
+		In this solution Flex is used as a tokenizer.
+
+		\paragraph{Grammar} The tokenizer's grammar is composed from two types of symbols
+			\begin{itemize}
+				\item Single character tokens
+				\item Multi character tokens
+			\end{itemize}
+			The Single character tokens are directly matched in the input formula and are representing the token itself.
+			The Multi character tokens are a sequence of characters which have some meaning when bundled together.
+			This tokenizer's grammar is unambiguous and each input formula has only one meaning.
+
+			The tokens derivation is explaned in details in the following table with Flex syntaxes, the matched symbol represents the 
+			symbol from the input formula and the output token is the newly created token for the matched symbol.
+		\begin{flushleft}
+			\centering
+			\begin{tabular}{ | m{7em} | m{15em}| } 
+				\hline
+					\textbf{Matched sequence} & \textbf{Output token} \\ [0.7ex] 
+				\hline
+					[ \textbackslash t \textbackslash  n] & ; \\ 
+				\hline
+					[,TF01()C\&|~*+-] 	& yytext[0];  \\
+				\hline
+				    "<="            &   T\_LESS\_EQ; \\
+				\hline
+				    "<=m"           &   T\_MEASURED\_LESS\_EQ; \\
+				\hline
+				    "= 0"           &   T\_EQ\_ZERO; \\
+				\hline
+				    "->"            &   T\_FORMULA\_OP\_IMPLICATION; \\
+				\hline
+				    "<->"           &   T\_FORMULA\_OP\_EQUALITY; \\
+				\hline
+				    [a-zA-Z0-9]+    &   T\_STRING; \\
+				\hline
+				    .               &   yytext[0]; \\
+				\hline
 			\end{tabular}
 		\end{flushleft}
+		In the table above the do nothing token is marked as \textbf{ ; }, which means to ignore all whitespaces.
+		The yytext[0] is the matched character. All single charecter tokens are passed as their ASCIIs for an easier use in Bison.
+		The last matched symbol in the table represents everything else, if nothing has been matched then just return the text itself. 
+		Later on the parser will use it to promt where the unrecongized symbol was found and the symbol itself can be printed out.
+% Returns T\_STRING literal type and the string  value is written to yylval which can be later accessed from the parser. Note that it uses our simple memory manager to allocate this string in order to be able to safely free all allocated strings even when some syntax error occures 
 
-		\subsubsection*{Parser literals}
-			One character tokens are passed as their ASCII to Bison.
+		\paragraph{Parser literals}
+			The single character tokens are passed as their ASCII symbol to Bison. 
+			As discussed above the multi character tokens need more clearance in order to represent the literal from the input text symbols.
 			The followings are definition of literals for multi character tokens
 			\begin{itemize}
 				\item \%token <const char*> T\_STRING is the literal for "string"
@@ -692,8 +727,6 @@ class Formula
 				\item \%token T\_FORMULA\_OP\_IMPLICATION is the literal for "->"
 				\item \%token T\_FORMULA\_OP\_EQUALITY is the literal for "<->"
 			\end{itemize}
-
-		\subsubsection*{Parser literals}
 			The followings are definitions of priority and associativity of the operation tokens. 
 			The priority is from low to hight (w.r.t. the line order in which they are defined)
 			\begin{itemize}
@@ -704,28 +737,48 @@ class Formula
 				\item \%nonassoc '(' ')'
 			\end{itemize}
 
-		\subsubsection*{Parser grammar}
-			In the process of parsing the formula the Abstract Syntax Tree(AST) is built as well, 
-			which later is used to make formula modifications, for example converting X -> Y to \textasciitilde X | Y .
+		\paragraph{Parser grammar}
+			With the usage of the Parser literals, the input formula can be parsed and an Abstract Syntax Tree(AST) can be built from it.
+			The AST contains all the data from the input string formula in a more structed way. 
+			On the AST additional optimizations can be done which will simplify the initial formula and will produce better performance when 
+			a model is seeked in the satisfiability algorithms. For example the following formula 
+			\begin{equation}
+				X -> Y 
+			\end{equation}
+			can be transformed to 
+			\begin{equation}
+				\textasciitilde X | Y
+			\end{equation}
+			after the AST is built, and the impliciation operation can even be removed from the all the calculations in the satisfiability algorithms, 
+			since all implications can be transformed when the AST is built.
 			\newline
-			create\_formula\_node and create\_term\_node are two helper functions which construct AST nodes
-			% go into details here about the create_formula_node and term_node
+			The following construction methods will be used in the following parser algorithm:
+			\begin{itemize}
+				\item create\_term\_node 
+				\item create\_formula\_node 
+			\end{itemize}
+			Both methods construct AST nodes. The create\_term\_node method creates a term AST node from an operation and one or two other terms depending on the operation arity.
+			The create\_formula\_node analogious to the create\_term\_node method, creates a formula AST node from an operation and depending on the operation the followings can be arguments of create\_formula\_node 
+			\begin{itemize}
+				\item one or two terms
+				\item one or two formulas
+			\end{itemize}
+			Few special symbols to define beforehand:
+			\paragraph{Returned Value} \$\$ is the return value to the 'parent' who can use the matched subsequence
+			\paragraph{Matched Symbol at Position} \$i, where i is an integer value  represents the i-th matched symbol
 
+		\paragraph{Parser Algorithm} The following is the parser algorithm which produces an Abstract Sytax Tree. 
 
 		\begin{lstlisting}
 formula // 'formula' non-terminal
-    : 'T' { // trying to match token 'T'
-        // $$ is the return value to the 'parent' 
-        // who can use the matched subsequence
+    : 'T' { // matching token 'T'
+        
         $$ = create_formula_node(constant_true);   
     }
     | 'F' {
         $$ = create_formula_node(constant_false);
     }
-    | 'C' '(' term ',' term ')' {                  
-        // $3 and $5 gives the 'values' for the two 
-        // matched terms (3 and 5 are their positions) 
-        // and construct a contact node with them
+    | 'C' '(' term ',' term ')' {
         $$ = create_formula_node(contact, $3, $5); 
     }
     | "<=" '(' term ',' term ')' {
@@ -803,9 +856,8 @@ term
   ;
 		\end{lstlisting}
 
-		\subsubsection*{Abstract Syntax Tree}
-			The visitor pattern is used to modify the formula, namely it's AST tree.
-			\newline
+		\subsection{Abstract Syntax Tree}
+			The resulting AST can be easirly modified and optimized, this is best achived with the visitor pattern.
 			The visitor pattern uses double virtual dispatching.
 
 			\subsubsection*{Operation types in the formula/term nodes}
@@ -893,231 +945,82 @@ public:
 };
 				\end{lstlisting}
 
-				The visitor pattern gives us the ability to add new visitors in a very simple manner.
+				The visitor pattern allows for a new visitors to be added in a simple manner.
 				The new visitor should override the two visit methods and do whatever it wants with the ast nodes.
 				\newline
 				%intro on why are we doing all those modifications to the formula's AST
 
-			\subsubsection*{Visitors Implementation}
-				\subsubsection*{VReduceConstants}
-					Removes all unnecessary childs of And/Or/Negation operations of the following type:
-
-					\begin{table}[H]
-					  \centering
-					  \begin{tabular}{llll}
-					    \toprule
-					    \midrule
-					\tabitem \textasciitilde T $\equiv$ F & \tabitem C(0,0)  $\equiv$ F & \tabitem \textasciitilde F $\equiv$ T & \tabitem C(1,1) $\equiv$ T \\
-					\tabitem (T \& T) $\equiv$ T & \tabitem C(a,0)  $\equiv$ F & \tabitem (F | F) $\equiv$ F & \tabitem C(0,a) $\equiv$ F \\
-					\tabitem (g \& T) $\equiv$ g & \tabitem -1 $\equiv$ 0 & \tabitem (g | T) $\equiv$ T & \tabitem -0 $\equiv$ 1 \\
-					\tabitem (T \& g) $\equiv$ g & \tabitem (1 * 1) $\equiv$ 1 & \tabitem (T | g) $\equiv$ T & \tabitem (0 + 0) $\equiv$ 0 \\
-					\tabitem (g \& F) $\equiv$ F & \tabitem (t * 1) $\equiv$ t & \tabitem (g | F) $\equiv$ g & \tabitem (t + 1) $\equiv$ 1 \\
-					\tabitem (F \& g) $\equiv$ F & \tabitem (1 * t) $\equiv$ t & \tabitem (F | g) $\equiv$ g & \tabitem (1 + t) $\equiv$ 1 \\
-					\tabitem 0=0 $\equiv$ T & \tabitem (t * 0) $\equiv$ 0 & \tabitem 1=0 $\equiv$ F & \tabitem (t + 0) $\equiv$ t \\
-					\tabitem <=(0,a) $\equiv$ T & \tabitem (0 * t) $\equiv$ 0 & \tabitem <=(a,1) $\equiv$ T & \tabitem (0 + t) $\equiv$ t \\
+		\subsection{Visitors Implementation}
+		\label{sec:visitors-implementation}
+			\subsubsection*{VReduceConstants}
+				Removes all unnecessary childs of And/Or/Negation operations of the following type:
+		
+			\begin{table}[H]
+				  \centering
+				  \begin{tabular}{llll}
+				    \toprule
+				    \midrule
+				\tabitem \textasciitilde T $\equiv$ F & \tabitem C(0,0)  $\equiv$ F & \tabitem \textasciitilde F $\equiv$ T & \tabitem C(1,1) $\equiv$ T \\
+				\tabitem (T \& T) $\equiv$ T & \tabitem C(a,0)  $\equiv$ F & \tabitem (F | F) $\equiv$ F & \tabitem C(0,a) $\equiv$ F \\
+				\tabitem (g \& T) $\equiv$ g & \tabitem -1 $\equiv$ 0 & \tabitem (g | T) $\equiv$ T & \tabitem -0 $\equiv$ 1 \\
+				\tabitem (T \& g) $\equiv$ g & \tabitem (1 * 1) $\equiv$ 1 & \tabitem (T | g) $\equiv$ T & \tabitem (0 + 0) $\equiv$ 0 \\
+				\tabitem (g \& F) $\equiv$ F & \tabitem (t * 1) $\equiv$ t & \tabitem (g | F) $\equiv$ g & \tabitem (t + 1) $\equiv$ 1 \\
+				\tabitem (F \& g) $\equiv$ F & \tabitem (1 * t) $\equiv$ t & \tabitem (F | g) $\equiv$ g & \tabitem (1 + t) $\equiv$ 1 \\
+				\tabitem 0=0 $\equiv$ T & \tabitem (t * 0) $\equiv$ 0 & \tabitem 1=0 $\equiv$ F & \tabitem (t + 0) $\equiv$ t \\
+				\tabitem <=(0,a) $\equiv$ T & \tabitem (0 * t) $\equiv$ 0 & \tabitem <=(a,1) $\equiv$ T & \tabitem (0 + t) $\equiv$ t \\
 
 					    \bottomrule
-					  \end{tabular}
-					\end{table}
-				\subsubsection*{VConvertContactsWithConstantTerms}
-					Converts contacts with constant 1 terms in !=0 atomic formulas. 
-					This visitor is best used after the contacts are reduced, via VReduceConstants
-					\begin{itemize}
-						\item C(a,1) $\equiv$ ~(a=0)  
-						\item C(1,a) $\equiv$ ~(a=0)
-					\end{itemize}
-				\subsubsection*{VConvertLessEqContactWithEqualTerms}
-					Converts contacts and <= atomic formulas with same terms:
-					\begin{itemize}
-						\item <=(a,a) $\equiv$ T, \\
-							since (a * -a = 0))
-						\item C(a,a) $\equiv$ ~(a=0)
-					\end{itemize}
-				\subsubsection*{VReduceDoubleNegation}
-					Removes the double/tripple/etc negations. 
-					This visitor is best used after all visitors which might add additional negations!
-					\begin{itemize}
-						\item --g $\equiv$ g
-						\item --t $\equiv$ t
-					\end{itemize}
-				\subsubsection*{VConvertImplicationEqualityToConjDisj}
-					Converts all formula nodes of type implication and equality to nodes 
-					which are using just conjuction and disjunction. 
-					Main reason for that is to simplify the tableau method - 
-					to work only with conjunctions and disjunctions.
-					\begin{itemize}
-						\item (f -> g)  $\equiv$ (~f | g)
-						\item (f <-> g) $\equiv$ ((f \& g) | (~f \& ~g))
-					\end{itemize}
-				\subsubsection*{VConvertLessEqToEqZero}
-					Converts the less equal atomic formula to an equals to zero atomic formula
-					\begin{itemize}
-						\item <=(a,b) $\equiv$ (a * -b) = 0
-					\end{itemize}
-				\subsubsection*{VSplitDisjInLessEqAndContacts}
-					Converts the less equal atomic formula to an equals to zero atomic formula
-					\begin{itemize}
-						\item C(a + b, c) $\equiv$ C(a,c) | C(b,c)
-						\item <=(a + b, c) $\equiv$ <=(a,c) \& <=(b,c)
-					\end{itemize}
+				  \end{tabular}
+				\end{table}
+			\subsubsection*{VConvertContactsWithConstantTerms}
+				Converts contacts with constant 1 terms in !=0 atomic formulas. 
+				This visitor is best used after the contacts are reduced, via VReduceConstants
+				\begin{itemize}
+					\item C(a,1) $\equiv$ ~(a=0)  
+					\item C(1,a) $\equiv$ ~(a=0)
+				\end{itemize}
+			\subsubsection*{VConvertLessEqContactWithEqualTerms}
+				Converts contacts and <= atomic formulas with same terms:
+				\begin{itemize}
+					\item <=(a,a) $\equiv$ T, \\
+						since (a * -a = 0))
+					\item C(a,a) $\equiv$ ~(a=0)
+				\end{itemize}
+			\subsubsection*{VReduceDoubleNegation}
+				Removes the double/tripple/etc negations. 
+				This visitor is best used after all visitors which might add additional negations!
+				\begin{itemize}
+					\item --g $\equiv$ g
+					\item --t $\equiv$ t
+				\end{itemize}
+			\subsubsection*{VConvertImplicationEqualityToConjDisj}
+				Converts all formula nodes of type implication and equality to nodes 
+				which are using just conjuction and disjunction. 
+				Main reason for that is to simplify the tableau method - 
+				to work only with conjunctions and disjunctions.
+				\begin{itemize}
+					\item (f -> g)  $\equiv$ (~f | g)
+					\item (f <-> g) $\equiv$ ((f \& g) | (~f \& ~g))
+				\end{itemize}
+			\subsubsection*{VConvertLessEqToEqZero}
+				Converts the less equal atomic formula to an equals to zero atomic formula
+				\begin{itemize}
+					\item <=(a,b) $\equiv$ (a * -b) = 0
+				\end{itemize}
+			\subsubsection*{VSplitDisjInLessEqAndContacts}
+				Converts the less equal atomic formula to an equals to zero atomic formula
+				\begin{itemize}
+					\item C(a + b, c) $\equiv$ C(a,c) | C(b,c)
+					\item <=(a + b, c) $\equiv$ <=(a,c) \& <=(b,c)
+				\end{itemize}
 
-				There are few visitors which only collect or print information from the formula
-					\begin{itemize}
-						\item VVariablesGetter - gets all variables from the formula (as string)
-						\item VPrinter - prints the formula to some provided output stream
-					\end{itemize}
+			There are few visitors which only collect or print information from the formula
+				\begin{itemize}
+					\item VVariablesGetter - gets all variables from the formula (as string)
+					\item VPrinter - prints the formula to some provided output stream
+				\end{itemize}
 	
-	\newpage
-	\section{Formula Structure}
-		The formula structure is similar to the AST structure, but with restricted formula operations and additional information.
-		% intro that the formula is built recursively 
-		There are 2 types of nodes: 
-			\begin{itemize}
-				\item formula
-				\item term
-			\end{itemize}
-		Every member variable in the nodes is caluclated dulring its building,
-		this way getting the hash code of a node is done in a constant time.
-
-		\subsection*{Formula Node Structure}
-		\begin{lstlisting}
-class formula
-{
-public:
-    enum class operation_type : char
-    {
-        constant_true,
-        constant_false,
-        conjunction,
-        disjunction,
-        negation,
-        measured_less_eq,
-        eq_zero,
-        c
-    };
-
-    operation_type op_;
-    formula_mgr* formula_mgr_;
-    std::size_t hash_;
-
-    // For simplicity raw pointers and union, 
-    // a better solution would be unique pointers and variants
-    struct child_formulas
-    {
-        formula* left;
-        formula* right;
-    };
-    struct child_terms
-    {
-        term* left;
-        term* right;
-    };
-    union {
-        child_formulas child_f_;
-        child_terms child_t_;
-    };
-
-    auto build(const NFormula& f) -> bool;
-
-    auto operator==(const formula& rhs) const -> bool;
-    auto operator!=(const formula& rhs) const -> bool;
-
-    // Evalates the formula but ignores all measured less or equal 
-    // atomic formulas, as if there were not existing
-    auto evaluate(const variable_id_to_points_t& evals,
-		const contacts_t& contact_relations) const -> bool;
-};
-		\end{lstlisting}
-	
-		\subsection*{Term Node Structure}
-		\begin{lstlisting}
-class term
-{
-public:
-    enum class operation_type : char
-    {
-        constant_true,
-        constant_false,
-        union_,
-        intersection,
-        complement,
-        variable
-    };
-
-    operation_type op_;
-
-    // Used to make a bitmask for the used variables in the 
-    // term(w.r.t all variables in the whole formula) and to print the
-    // term with it's variable names instead of their (optimized) IDs.
-    const formula_mgr* formula_mgr_; 
-    variables_mask_t variables_; // All used variables in the term.
-
-    // For simplicity raw pointers and union, 
-    // a better solution would be unique pointers and variants
-    struct childs
-    {
-        term* left;
-        term* right;
-    };
-    union {
-        childs childs_;
-        size_t variable_id_;
-    };
-
-    std::size_t hash_;
-
-    auto build(const NTerm& t) -> bool;
-
-    auto operator==(const term& rhs) const -> bool;
-    auto operator!=(const term& rhs) const -> bool;
-
-    auto evaluate(const variable_id_to_points_t& variable_evaluations, 
-    	const size_t points_count) const -> model_points_set_t;
-
-    // Evaluates the term with the provided variables evaluations but if
-    // some of the used variables in the term do not have evaluations
-    // it creates a smaller subterm with the unknown variables.
-    // Note that it reduces the term's constants, e.g. '1 + X' -> '1'
-    // and does not look at the X's evaluation at all.
-    // With the latest algorithms, this is not used.
-    auto evaluate(const variables_evaluations_block& evaluation_block, 
-	bool skip_subterm_creation = false) const -> evaluation_result;
-};
-		\end{lstlisting}
-	
-
-	\subsection{Building a formula node}  % Add more information on how the formula is built.
-		The building of the formula structure is trivial, namely based on the AST node's operation types.
-		Few important specifications of a node 
-		\begin{itemize}
-			\item hash code
-			\item variable mask for all used variables in the term(and it's child terms)
-		\end{itemize}
-
-		\subsubsection*{Node's hash code}
-			The hash code of a node is mainly used to compare if two nodes are equal. 
-			This comparison is used in all maps and sets where the key is a node. 
-			
-			If for two formulas/terms nodes, their hash codes are same, then the content of the nodes is 
-			compared in order to verify that they are the same formulas/terms.
-			\newline
-			The contact operatior requires a special check since the commutativity of Contacts is supported.
-			\newline
-			% for this we should have an additional definition.
-
-			Let a, b be two terms, then
-			\begin{equation}
-				C(a, b) = C(b, a)
-			\end{equation}
-			therefore the check for equality will be done twice instead of once, namely
-			\begin{equation}
-				 C(a, b) = C(c, d) \rightarrow (a = c \wedge b = d) \vee (a = d \wedge b = c).
-			\end{equation}
-		
-
-		TODO Explain item variable mask for all used variables in the term(and it's child terms)
-
-		\subsubsection{Formula Refiners}
+		\subsection{Formula Refiners}
 			The formula refiners are an optional parameter when building a formula node.
 			They are a set of optional filters which may optimize the formula by reducing redundant parts of the 
 			formula or by transforming some nodes in a way that they will be easier to be evaluated later on.
@@ -1134,7 +1037,7 @@ public:
 			These formula refiners are done when the formula is built, meaning that after the 
 			AST tree is constructed each of these refiners enables or disabled a visitor. 
 			The formula refiners are mapped in a one to one manner to a subset of all the visitors defined 
-			in \#REF visitor.
+			in the Visitors section \ref{sec:visitors-implementation}.
 
 			\begin{itemize}
 				\item Convert Contacts and less or equal atomic formula which have same terms \\
