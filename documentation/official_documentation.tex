@@ -1769,13 +1769,46 @@ auto tableau::satisfiable_step() -> bool
 				\item Contact Matrix 
 			\end{itemize}
 				
-		\paragraph{Evaluation Function} The evaluation function is represented with a variable\_evaluations\_ variable which type is as defined in \ref{model-representation:evaluation-function}.
+		\paragraph{Evaluation Function} The evaluation function is represented with a variable\_evaluations\_ variable which type is as defined in \ref{model-representation:evaluation-function}, namely
+			an associative array of size the number of variables in the formula, each element is a set of points represented as a bitset. \\
+			Keeps the variable evaluations. i.e. $v(p)$. Model evaluation \textbf{v} which for a given term returns a subset of the model points: 
+			
 		\paragraph{Model points} Since the model points are numbered sequentually starting from zero, which means that having the number 
 			of all model points is sufficient to uniquely determin each model point.
 			The number of all model points can be easily extracted from the evaluation function which values represent regions of model points.
 			A region of model points is represented as bitset of ones and zeros with size the number of model points.
-		\paragraph{Contact Matrix} The contact matrix is represented with a contact\_relations\_variable which type is defined in \ref{sec:contact-matrix}.
+		\paragraph{Contact Matrix} The contact matrix is represented with a contact\_relations\_ variable which type is defined in \ref{sec:contact-matrix}.
+			The contact\_relations\_ variable is a symetric square matrix. contact\_relations\_[ i ] gives a bitset of all points which are in contact with the point \textbf{i}. \\
+			For example, let us have a model with 6 points:
+			\begin{itemize}
+				\item[] 0 ---- 1 	\:\:\:\:\:\:, contact between 0 and 1
+				\item[] 2 ---- 3 	\:\:\:\:\:\:, contact between 2 and 3
+				\item[] 4 		\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:, point created from $\neq 0$ term
+				\item[] 5 		\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:, point created from $\neq 0$ term
+			\end{itemize}
 
+			The contact\_relations\_ will be the following:
+			\begin{center}
+			\begin{tabular}{ |c||c|c|c|c|c|c|}
+				\hline
+			        	\ & 0 & 1 & 2 & 3 & 4 & 5 \\
+				\hline
+				\hline
+				0 & 1 & 1 & 0 & 0 & 0 & 0 \\
+				\hline
+				1 & 1 & 1 & 0 & 0 & 0 & 0 \\
+				\hline
+				2 & 0 & 0 & 1 & 1 & 0 & 0 \\
+				\hline
+				3 & 0 & 0 & 1 & 1 & 0 & 0 \\
+				\hline
+				4 & 0 & 0 & 0 & 0 & 1 & 0 \\
+				\hline
+				5 & 0 & 0 & 0 & 0 & 0 & 1 \\
+				\hline
+			\end{tabular}
+			\end{center}
+		\paragraph{Model Create}
 		All models can be created(or at least an attempt can be done for their creation) with the Tableaux branch output \ref{tableaux:branch:output} as its input parameters
 		this is achived via the 'create' method.
 		\begin{lstlisting}
@@ -1789,30 +1822,6 @@ virtual auto create(const formulas_t& contacts_T,
 	const formula_mgr* mgr)
     -> bool = 0;
 		\end{lstlisting}
-
-		When a final model $\mathcal{M}$ is constructed which models the inputed formula, the information which describes the model is stored in the following two variables.
-		\subsubsection*{Contact Matrix member variable}
-			\begin{lstlisting}
-/*
-    Symetric square bit matrix. contacts_[i] gives a bit mask
-    of all points which are in contact with the point 'i'.
-    For example, let us have a model with 6 points:
-        0---1  // contact between 0 and 1
-        2---3  // contact between 2 and 3
-        4      // point from !=0 term
-        5      // point from !=0 term
-
-    The bit matrix will be the following:
-        \ 012345
-        0 110000    // from 0---1 and reflexivity (0---0)
-        1 110000    // from 1---0 and reflexivity (1---1)
-        2 001100    // from 2---3 and reflexivity (2---2)
-        3 001100    // from 3---2 and reflexivity (3---3)
-        4 000010    // just reflexivity (4---4)
-        5 000001    // just reflexivity (5---5)
-*/
-contacts_t contact_relations_;
-			\end{lstlisting}
 
 		\subsubsection*{Variable Evaluations member variable}
 			\begin{lstlisting}
