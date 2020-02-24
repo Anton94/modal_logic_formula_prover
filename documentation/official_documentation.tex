@@ -569,6 +569,7 @@ class Formula
 		\end{itemize}
 
 	\subsection{Model Representation}
+	\label{sec:model-representation}
 		A model $\mathcal{M}$ can be decomposed to its key components and each of these components can be programmtically represented, namely 
 		a model is represented from the following components:
 		\begin{itemize}
@@ -593,7 +594,8 @@ class Formula
 		\newline
 		Maybe add an example matrix.
 	
-		\paragraph{Evaluation function} This function determines the mapping from formula variables to sets of model points which are subset of W.
+		\paragraph{Evaluation function}
+		\label{model-representation:evaluation-function} This function determines the mapping from formula variables to sets of model points which are subset of W.
 		The representation of such mapping is done with an associative array. Since the formula variables are numbered from zero to the size
 		of all different formula variables, the keys are expressed with integer values less than the size of all different formula variables.
 		The values of this associative array represent regions of model points, for which a detailed definition has been given in [REF TO BISET REGIONS]
@@ -621,6 +623,7 @@ class Formula
 		This idea is used in several algorithms defined and explained in details in the following sections.
 		
 
+	\newpage
 	\section{Input Formula Analyzation}
 		The idea behind the overall solution is to have a formula as an input string and to output whether the given formula is statisfiable maybe a more detailed output 
 		will contain a graph of the model or a proof why the formula is not satisfiable.
@@ -1194,9 +1197,9 @@ auto formula_mgr::build(const std::string& f,
 	\subsubsection*{Node evaluation}
 		TODO: this should be explained very well, and not just here but with multilpe definitions on theory level
 		
-
+	\newpage
 	\section{Tableaux}
-	The Tableaux process is decision procedure, which recursively breaks down a given formula into basic components 
+	The Tableaux process is a decision procedure, which recursively breaks down a given formula into basic components 
 	based on which a decision can be concluded. The recursive step which breaks down a formula creates one or two 
 	new formulas, which in terms of their structure are simpler then the initial formula. Since the recursive step can create
 	at most two new formulas, this means the recursive step will create at most two branches or a binary tree, where the nodes
@@ -1753,17 +1756,28 @@ auto tableau::satisfiable_step() -> bool
 
 	\section{Formula Model}
 		% What is a model ? 
-		Every model type has at least two things in common:
-		\begin{itemize}
-			\item Adjacency matrix for the contacts between the points
-			\item Vector of bitsets representing the value of v(p), namely the set of points which are in v(p)
-		\end{itemize}
+		Let $\mathcal{M}$ be a model, defined as in \ref{sec:model-representation}, let $\varphi$ be a formula, then 
+		$\mathcal{M}$ is a formula model for $\varphi$, if and only if 
+		\begin{equation}
+			\mathcal{M} \models \varphi
+		\end{equation}
+		A brief explanation on how a model can be represented has been given in \ref{sec:model-representation}. In this section the implementation details will be discussed in depth. All algorithms in this paper are seeking for a model which model the input formula, thus a common representation of the model representation can be done. This common model representation shall be used for all algorithms defined in the following sections.
+		\paragraph{Model Data} As per \ref{sec:model-representation} to represent a formula model the three components of the model shall be programatically represented, namely the: 
+			\begin{itemize}
+				\item Evaluation Function
+				\item Set of model points
+				\item Contact Matrix 
+			\end{itemize}
+				
+		\paragraph{Evaluation Function} The evaluation function is represented with a variable\_evaluations\_ variable which type is as defined in \ref{model-representation:evaluation-function}.
+		\paragraph{Model points} Since the model points are numbered sequentually starting from zero, which means that having the number 
+			of all model points is sufficient to uniquely determin each model point.
+			The number of all model points can be easily extracted from the evaluation function which values represent regions of model points.
+			A region of model points is represented as bitset of ones and zeros with size the number of model points.
+		\paragraph{Contact Matrix} The contact matrix is represented with a contact\_relations\_variable which type is defined in \ref{sec:contact-matrix}.
 
-		All models also have similar collection of points each of which has an evaluation for all 
-		used variables in the tableau's path (this evaluation identifies the point).
-		\newline
-		All models can be created(or at least tried to be created) via the signed formula collections and 
-		some meta information for the whole formula, via the 'create' method.
+		All models can be created(or at least an attempt can be done for their creation) with the Tableaux branch output \ref{tableaux:branch:output} as its input parameters
+		this is achived via the 'create' method.
 		\begin{lstlisting}
 virtual auto create(const formulas_t& contacts_T, 
 	const formulas_t& contacts_F, 
@@ -1776,7 +1790,8 @@ virtual auto create(const formulas_t& contacts_T,
     -> bool = 0;
 		\end{lstlisting}
 
-		\subsubsection*{Adjacency Matrix member variable}
+		When a final model $\mathcal{M}$ is constructed which models the inputed formula, the information which describes the model is stored in the following two variables.
+		\subsubsection*{Contact Matrix member variable}
 			\begin{lstlisting}
 /*
     Symetric square bit matrix. contacts_[i] gives a bit mask
@@ -1834,7 +1849,7 @@ contacts_t contact_relations_;
 */
 variable_id_to_points_t variable_evaluations_;
 			\end{lstlisting}
-
+	\newpage
 	\subsection{Connected Model}
 		NOTE Intro on what the connected model really is !
 		ADD Connectivity lemma.
@@ -2046,6 +2061,7 @@ variable_id_to_points_t variable_evaluations_;
 		Besides this anomaly, the precision is good enough for the purposes of finding solutions for the special type
 		of systems of inequalities defined above.
 
+	\newpage
 	\subsection{Measured Model}
 		% NOTE Intro on what the measured model really is !
 		Let us have $\varphi$ in the format defined in the definition of \hyperref[tableaux:branch:output]{the tableaux branch output}. % for now this is formula 4 
