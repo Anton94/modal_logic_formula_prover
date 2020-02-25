@@ -1853,9 +1853,10 @@ auto tableau::satisfiable_step() -> bool
 				\hline
 			\end{tabular}
 			\end{center}
+
 		\paragraph{Model Create}
-		All models can be created(or at least an attempt can be done for their creation) with the Tableaux branch output \ref{tableaux:branch:output} as its input parameters
-		this is achived via the 'create' method.
+		All models can be created(or at least an attempt can be done for their creation) with the Tableaux branch output \ref{tableaux:branch:output} as its input parameters.
+		This is achived via the 'create' method.
 		\begin{lstlisting}
 virtual auto create(const formulas_t& contacts_T, 
 	const formulas_t& contacts_F, 
@@ -1868,11 +1869,18 @@ virtual auto create(const formulas_t& contacts_T,
     -> bool = 0;
 		\end{lstlisting}
 
+		The creation of a model can be done with various algorithms. In this paper the following algorithms will be defined and described in details:
+		\begin{itemize} 
+			\item Connected Model
+			\item Measured Model
+			\item Fast Model
+		\end{itemize}
+
 	\newpage
 	\subsection{Connected Model}
 		NOTE Intro on what the connected model really is !
 		ADD Connectivity lemma.
-		Let us have $\varphi$ in the format defined in the definition of \hyperref[tableaux:branch:output]{the tableaux branch output}. % for now this is formula 4 
+		Let us have $\varphi$ as the input formula, on which the tableaux process is applied, thus returning the tableaux branch output \ref{tableaux:branch:output}.
 		Let us define few constants which will ease the annotation:
 		\begin{itemize}
 			\item N - number of variables in the atomic formulas
