@@ -12,6 +12,9 @@
 \usepackage{booktabs}% http://ctan.org/pkg/booktabs
 \usepackage{float}
 \usepackage{hyperref}
+\usepackage{tikz}
+
+\usetikzlibrary{arrows.meta}
 
 \restylefloat{table}
 \newcommand{\tabitem}{~~\llap{\textbullet}~~}
@@ -1890,7 +1893,7 @@ virtual auto create(const formulas_t& contacts_T,
 		\end{itemize}
 
 	\newpage
-		\subsubsection*{Fast Model Algorithm}
+		\subsection{Fast Model Algorithm}
 			A model is simply a set of points and contacts between them which satisfies the Contacts and Less or equal atomic formulas.
 
 			This model will be easirly explained with an example first:
@@ -1905,7 +1908,26 @@ virtual auto create(const formulas_t& contacts_T,
 				The model for this formula is constructed from seven modal points, namely two modal points for each
 				contact and one point for the not equal to zero term.
 				\newline
-				HERE DRAW SOMEHOW THE MODAL
+				\begin{tikzpicture}
+				\begin{scope}[every node/.style={circle,thick,draw}]
+				    \node[label={[label distance=0.5cm]180:\large (xxx...x)}]  (A) at (0,0) {a};
+				    \node[label={[label distance=0.5cm]0:\large (xxx...x)}]  (B) at (3,0) {b};
+				    \node[label={[label distance=0.5cm]180:\large (xxx...x)}]  (C) at (0,-1) {c};
+				    \node[label={[label distance=0.5cm]0:\large (xxx...x)}]  (D) at (3, -1) {d};
+				    \node[label={[label distance=0.5cm]180:\large (xxx...x)}]  (E) at (0,-2) {e};
+				    \node[label={[label distance=0.5cm]0:\large (xxx...x)}]  (F) at (3,-2) {f} ;
+				    \node[label={[label distance=0.5cm]180:\large (xxx...x)}]  (G) at (0,-3) {g};
+				\end{scope}
+
+				\begin{scope}[>={Stealth[black]},
+				              every node/.style={fill=white,circle},
+				              every edge/.style={draw=black,very thick}]
+				    \path [->] (A) edge (B);
+				    \path [->] (C) edge  (D);
+				    \path [->] (E) edge (F);
+				    \path [->] (G) edge[loop right] (G);
+				\end{scope}
+				\end{tikzpicture}
 				\newline
 				In the above graph the (xxx...x) is a bitset, for example (010...1) which gives zero/one evaluation
 				for the variables in the formula. Its size is the number of different variables in the formula.
@@ -1945,9 +1967,21 @@ virtual auto create(const formulas_t& contacts_T,
 				\end{equation*}
 				Then the model should be of the following type:
 				\newline
-				DRAW THIS
-				(P0 a)----(P1 b)
-				(P2 c)----(P3 d)
+				\begin{tikzpicture}
+				\begin{scope}[every node/.style={circle,thick,draw}]
+				    \node[label={[label distance=0.5cm]180:\large $P_0$}]  (A) at (0,0) {a};
+				    \node[label={[label distance=0.5cm]0:\large $P_1$}]  (B) at (3,0) {b};
+				    \node[label={[label distance=0.5cm]180:\large $P_2$}]  (C) at (0,-1) {c};
+				    \node[label={[label distance=0.5cm]0:\large $P_3$}]  (D) at (3, -1) {d};
+				\end{scope}
+
+				\begin{scope}[>={Stealth[black]},
+				              every node/.style={fill=white,circle},
+				              every edge/.style={draw=black,very thick}]
+				    \path [->] (A) edge (B);
+				    \path [->] (C) edge  (D);
+				\end{scope}
+				\end{tikzpicture}
 				\newline
 				NOTE that if Pi evaluates the term 't' to constant true then the model 
 				evaluation v(t) contains the point (Pi \_) (and vice versa)
@@ -1967,7 +2001,7 @@ virtual auto create(const formulas_t& contacts_T,
 				~(Pi evaluates g to constant true \&\& Pi evaluates h to constant true) \&\& \\
 				~(Pi evaluates i to constant true \&\& Pi evaluates j to constant true)
 
-			\subsubsection{Algorithm}
+			\paragraph{Algorithm}
 			% NOTE Intro on what the fast model really is !
 			Let us have $\varphi$ in the format defined in the definition of \hyperref[tableaux:branch:output]{the tableaux branch output}. % for now this is formula 4 
 			Let us define few constants which will ease the annotation:
