@@ -41,7 +41,7 @@
 	\newline
 	TODO \#REF should be replaced with the real reference of a definiton.
 	\newpage
-	\section{Formula Representation}
+	\section{Contact Logic Syntax Representation}
 	Few paragraphs about the modal logic and basic story of how and what we are trying to accomplish	
 	\subsection*{Def: Variable}
 		A sequence of characters and numbers compose a variable.
@@ -54,25 +54,12 @@
 		\item foo
 		\item obj111
 	\end{itemize} 
-	\subsection*{Def: Index Variable Function} 
-		Let ivf: $\mathbb{V} \longmapsto \mathbb{N}$ be a bijective function which maps a variable to an index integer number. This function is used to map a variable into a 
-		computer memory, since integers are easily stored and manipulated.
-	\subsection*{Def: Optimal Variables indexes set}
-		Let S be a set of unique variables with size k, then there exists a variable index function ivf such that:
-		\begin{equation}
-			\forall i < k \: \exists v \in S: ivf(v) = i.
-		\end{equation}
+	Let $\varphi$ be a formula. Then the set of all used variables in $\varphi$ will be denoted as $\mathbb{V}$.
+	From now on we shall use the enumeration of the set $\mathbb{V}$ for performance optimizations.
+	Namely instead of comparing and storing strings as variables we shall work with their integer enumerations.
 
-		\subsubsection*{Proof}
-			Arrange the variables from S in a sequence $x_0, x_1, ... x_k$, then take the index of the variable to be 
-			the value of the index variable function for that variable, namely:
-			\begin{equation}
-				\forall i < k \: : ivf(x_i) = i.
-			\end{equation}
 	\subsection*{Def: Bitset}
-		A sequence of zeros and ones compose a bitset.
-
-		If the sequence has size k, then it will be called k-bitset.
+		A sequence of 1s and 0s compose a bitset. If the sequence has size k, then it will be called k-bitset.
 		\newline
 		\newline
 		Let x be a bitset, namely $x = a_0, a_1, ...$, then the i-th element of the bitset x is $a_i$. 
@@ -84,38 +71,45 @@
 
 		\subsubsection*{Operations over bitsets}
 			The standard component-wise boolean operations shall be used. The standart operations include AND, OR and NEGATION.
+			
 			\paragraph{bitset-PlusOne}
-			Deoted a + 1 represents the next bitset after a, which is constructed as follows:
-			\begin{itemize}
-				\item if $\forall i < k: a[i] \neq 0$, then there are no more k-bitsets, meaning that
-					the next bitset has size k+1 and has only one one at position zero and all others are zeroes.
-				\item Otherwise let i be the index of the last zero position, then the next bitset is constructed as:
-					\begin{equation}
-						a[0]^0, ..., a[i-1]^{i-1}, 1^i, 0^{i+1}, ...., 0^k
-					\end{equation}
-					The upper right index denotes the position in the bitset sequence.
-			\end{itemize}
+			Let A be a bitset. Then the operation plus one will be denoted as A + 1. The bitset A + 1 is simply a binary addition of A and 1.
+			The followings are examples for the plus one operation:
+			\begin{align*}
+			A &= 0001 \\
+			A + 1 &= 0010
+			\end{align*}
+			\begin{align*}
+			A  = 1010 \\
+			A + 1 = 1011
+			\end{align*}
+			\begin{align*}
+			A = 1011 \\
+			A + 1 = 1100
+			\end{align*}
+
 			\paragraph{bitset-PlusOne over marked bits}
-			The PlusOne over marked bits deterministically produces a new bitset, which is denoted as the $\bigoplus 1$.
-			The $\bigoplus 1$ produced bitset is constructed by manipulating only the marked bits, namely:
-			Let a be a bitset representing the bitset from which the next bitset will be produced. \\
-			Let m be a bitset denoting the marked bits from a, which are allowed to be changed. \\
-			The next bitset is constructed from a with marked bits m as follows:
-			\begin{itemize}
-				\item if a \& m = a, then there are no more bitsets of size m.
-				\item otherwise \\ 
-					let i be the last index, such that:
-					\begin{equation}
-						a[i] =0 \textit{  and  } m[i] = 1
-					\end{equation}
-					then the next bitset is constructed as: 
-					\begin{equation}
-						a[0]^0, ..., a[i-1]^{i-1}, 1^i, 0^{i+1}, ...., 0^k
-					\end{equation}
-			\end{itemize}
+			Let A be a bitset. A represents the bitset from which the next bitset will be produced.
+			Let M be a bitset denoting the marked bits.
+			The PlusOne over marked bitset is denoted as  $A \oplus_M 1$.
+			The $A \oplus_M 1$ is constructed as A + 1 operation but only on the marked by M bits:
 
-			It is obvious that the PlusOne can be represented with $\bigoplus 1$, where the marker bitset contains only ones.
-
+			The followings are examples for the plus one operation:
+			\begin{align*}
+			A &= 0011 \\
+			M &= 1111 \\
+			A \oplus_M 1 &= 0100
+			\end{align*}
+			\begin{align*}
+			A &= 0001 \\
+			M &= 0101 \\
+			A \oplus_M 1 &= 0100
+			\end{align*}
+			\begin{align*}
+			A &= 0011 \\
+			M &= 1011 \\
+			A \oplus_M 1 &= 1000
+			\end{align*}
 	\subsection*{Def: Variable bitset substitution}
 		Let $\mathbb{B}_{set}$ be a set of bitsets, then the Variable bitset substitution is a total mapping 
 		 $\rho : \mathbb{V} \longmapsto \mathbb{B}_{set}$ and the following notation will be used:
@@ -131,26 +125,26 @@
 		\end{equation}
 		where x is a variable and $b \in \{ 1, 0 \}$.
 	\subsection*{Special types of bitsets}
-		Let x be a k-bitset, then x is called
+		Let A be a k-bitset, then A is called
 		\begin{itemize}
-			\item the world, if $\forall i<k : x[i] = 1$, denoted with 1
-			\item the empty k-bitset, if $\forall i<k : x[i] = 0$, denoted with 0
+			\item the universe k-bitset, if $\forall 0 \leq i<k : A[i] = 1$, denoted with 1
+			\item the empty k-bitset, if $\forall 0 \leq i<k : A[i] = 0$, denoted with 0
 		\end{itemize}
 	\subsection{Term inductive definition}
 	\label{sec:term-inductive-definition}
 		\begin{itemize}
-			\item 1 is a term
-			\item 0 is a term
+			\item 1 is a constat term
+			\item 0 is a constant term
 			\item $p \in \mathbb{V}ar$ is a term
 			\item If x is a term, then $\overline{x}$ is a term as well
 			\item If x and y are terms, then $x \sigma y $ is a term as well,\\
 				where $\sigma \: \in \: \{\sqcap, \sqcup\}$
 		\end{itemize}	
-
+	%TODO:THEORY move the above in theory section.
 	\subsection*{Term Implementation Representation}
 	\label{sec:term-implementation-representation}
-		The term can be represented in memory inductively by analogy to the definition REF-DEF-TERM. %TODO:THEORY
-
+		The term is represented inductively by analogy to the definition REF-DEF-TERM. %TODO:THEORY
+		Namely the term is represented as a binary tree. A inner node represent a term operation( union, intersection, complement). A leaf node represent a variable or a constant.
 	\begin{lstlisting}
 class Term 
 {
@@ -187,26 +181,26 @@ class Term
   ...
 }
 	\end{lstlisting}
-	The term is represented in a tree structural way, where each node is a an operation over terms and the leafs of the tree
-	are variables. In the above implementation the variables are represented by their index, which can be 
-	easily found with the Index Variable Function. 
 
 	\paragraph{Term hash variable} 
-		Conducting a test whether two terms are equal in lexical way is an important procedure for the sake of performant satisfiability algorithms.
+		Conducting a test whether two terms are equal in a lexical way is an important procedure for the sake of performant satisfiability algorithms.
 		Such equality checks are required in various situations, such as:
 		\begin{itemize}
 			\item testing if two terms are equal
 			\item checking if a term exists in a set of terms
 		\end{itemize}
+
+
+
 		Have in mind that the naive solution to do an equality check has complexity of O(n), where n is the size of the term. This solution is to 
-		compare the whole structure of the terms. With the use of precalcaulated hash value this complexity can be reduced to an amortized complexity of O(1).
+		compare the whole structure of the terms. To reduce this complexity a precalcaulated hash value shall be used.
 		For each term one additional variable is stored. This variable is the hashed term. The hash is computed recursively through the term structure, which means 
 		that the hash of a term depends on the hashes of its subterms ( if any ). 
 		Let $\tau_1$ and $\tau_2$ be two terms. Let $h_1$ be the precalculated hash of $\tau_1$ and $h_2$ be the precalculated hash of $\tau_2$.
 		The equality check procedure follows the following steps:
 		\begin{itemize}
 			\item if $h_1 \neq h_2$, then the terms are not equal
-			\item if $h_1 = h_2$, then the structures of both terms are compared.
+			\item if $h_1 = h_2$, then the full structure of the terms is compared.
 		\end{itemize}
 		\noindent
 		The following is the implemented hash construction procedure:
@@ -238,10 +232,7 @@ void term_construct_hash()
   hash_ += (op_code & 0xFFFFFFFF) * 2654435723;
 }
 	\end{lstlisting}
-
-	Include example for one term building
-	\newline
-	\newline
+	%TODO:  Include example for one term building
 	\subsection*{Term Set-Evaluation}
 		Let X be a set of variable Set-Substituitions, namely $ X = \{ x_0 \longmapsto s_0, x_1 \longmapsto s_1, ..., x_k \longmapsto s_k \}$,
 		then the Term Set-Evaluation is a function which produces a bitset for a given term by appling a set of substitutions.
@@ -265,93 +256,30 @@ void term_construct_hash()
 			\item $\text{Let } \tau_1, \tau_2 \text{ be two terms } \text{ and } \tau \equiv \tau_1 \sqcup \tau_2$, then \\
 				return $termSEval(\tau_1) | termSEval(\tau_2)$
 		\end{itemize}
-			
-	\subsection*{Term Partial-Evaluation}
-		Let X be a set of variable Boolean-Substituitions, namely $ X = \{ x_0 \longmapsto b_0, x_1 \longmapsto b_1, ..., x_k \longmapsto b_k \}$,
-		then the Term Partial-Evaluation is a function which for a given term produces new term by appling a set of substituations.
-		After the substitutions are applied the returned term can be a constant term, namely true/false or can be a term with a simpler structure.
 
-		\subsubsection{Term Construction Functions}
-		A new term can be constructed in two ways: 
-		\begin{enumerate}
-			\item From a variable index
-			\item From operation and the terms involved in the operation
-		\end{enumerate}
-
-		\paragraph{create\_variable\_node} will denote the function which from a given variable index constructs a new term.
-		\paragraph{create\_node} will denote the function which constructs a new term from an operation $\sigma$ and the involved terms, namely 
-		\begin{itemize}
-			\item If $\sigma$ is the negation operation, and $\tau$ is a term, 
-				then the constructed term is $\overline{\tau}$
-			\item If $\sigma \in \{ \sqcup, \sqcap \}$, and $\tau_1, \tau_2$ are terms, 
-				then the constrcuted term is $\tau_1 \sigma \tau_2$
-		\end{itemize}
-
-		The Term Partial-Evaluation will be notated as termParEval is defined recursively as follows:
+	\subsection*{Term Binary-Evaluation}
+		Let X be a set of variable Boolean-Substituitions, namely $ X = \{ x_0 \longmapsto b_0, x_1 \longmapsto b_1, ..., x_k \longmapsto b_k \}$, where $b_i$ is 0 or 1.
+		Thus the boolean variable $X[i] \textit{ is } b_i$.
+		The Term Binary-Evaluation is a function. For a given term and a set of variable Boolean-Substitutions it produces 0 or 1.
+		\newline
+		\newline
+		The Term Binary-Evaluation will be notated as termBinEval is defined recursively as follows:
 		\newline
 		Let $\tau$ be a term, then:
 		\begin{itemize}
 			\item if $\tau \equiv 1$, then \\
-				return constant\_true
+				return 1
 			\item if $\tau \equiv 0$, then \\
-				return constant\_false
+				return 0
 			\item $\text{Let } v \in X \text{ and } \tau \equiv v$, then \\
 				return X[v]
-			\item $\text{Let } v \not\in X \text{ and } \tau \equiv v$, then \\
-				return create\_variable\_node(v)
 			\item $\text{Let } \rho \text{ be a term } \text{ and } \tau \equiv \overline{\rho}$, then \\
-				return eval\_negation($\rho$)
+				return $\sim(termBinEval(\rho))$ 
 			\item $\text{Let } \tau_1, \tau_2 \text{ be two terms } \text{ and } \tau \equiv \tau_1 \sqcap \tau_2$, then \\
-				return eval\_intersection($\tau_1, \tau_2$)
+				return $termBinEval(\tau_1)\ \  \&\ \  termBinEval(\tau_2)$
 			\item $\text{Let } \tau_1, \tau_2 \text{ be two terms } \text{ and } \tau \equiv \tau_1 \sqcup \tau_2$, then \\
-				return eval\_union($\tau_1, \tau_2$)
+				return $termBinEval(\tau_1)\ \  |\ \  termBinEval(\tau_2)$
 		\end{itemize}
-		where eval\_negation, eval\_intersection and eval\_union are defined as follows:
-			
-		\paragraph{eval\_negation($\tau_1$)} Let
-			\begin{equation}
-				res = termParEval(\tau)
-			\end{equation}
-		\newline
-		And based on the evaluated result the following is returned.
-\[return  \begin{cases} 
-      0, & res = 1 \\
-      1, & res = 0 \\
-      \overline{\tau}, & otherwise 
-   \end{cases}
-\]
-
-		\paragraph{eval\_intersection($\tau_1, \tau_2$)}Let
-			\begin{align*}
-				left &= termParEval(\tau_1) \\
-				right &= termParEval(\tau_2)
-			\end{align*}
-		\newline
-		And based on the evaluated left and right values, the following is returned.
-\[return  \begin{cases} 
-      0, & left = 0 \textit{  or  } right = 0 \\
-      1, & left = 1  \textit{  and  } right = 1 \\
-      \kappa, & left = 1  \textit{  and  } right \equiv \kappa \\
-      \kappa, & left \equiv \kappa  \textit{  and  } right = 1\\
-      \tau_1 \sqcap \tau_2, & otherwise 
-   \end{cases}
-\]
-
-		\paragraph{eval\_union($\tau_1, \tau_2$)} Let
-			\begin{align*}
-				left &= termParEval(\tau_1) \\
-				right &= termParEval(\tau_2)
-			\end{align*}
-		\newline
-		And based on the evaluated left and right values, the following is returned.
-\[return  \begin{cases} 
-      1, & left = 1 \textit{  or  } right = 1 \\
-      0, & left = 0  \textit{  and  } right = 0 \\
-      \kappa, & left = 0  \textit{  and  } right \equiv \kappa \\
-      \kappa, & left \equiv \kappa  \textit{  and  } right = 0\\
-      \tau_1 \sqcup \tau_2, & otherwise 
-   \end{cases}
-\]
 
 	\subsection{Formula Inductive Definition}
 	\label{sec:formula-inductive-definition}
@@ -365,7 +293,7 @@ void term_construct_hash()
 			\item If $\varphi$ and $\psi$ are formulas, then $\varphi \: \sigma \: \psi $ is a formula as well,\\
 				where $\sigma \in \{\vee, \wedge, \rightarrow, \leftrightarrow\}$
 		\end{itemize}
-	
+	%TODO:THEORY
 	\subsection*{Def: Zero term formula}
 		Let a and b be two terms, then
 		\begin{equation}
@@ -482,7 +410,7 @@ class Formula
 		\begin{equation}
 			C(a, b) = C(b, a)
 		\end{equation}
-		therefore the check for equality will be done twice instead of once, namely
+		Checking whether two atomic contact formulas are lexically equal is done as follows:
 		\begin{equation}
 			 C(a, b) = C(c, d) \rightarrow (a = c \wedge b = d) \vee (a = d \wedge b = c).
 		\end{equation}
@@ -1402,7 +1330,7 @@ auto has_broken_contact_rule(const formula* f) const -> bool;
 				\begin{lstlisting}
 auto find_in_T(const formula* f) const -> bool
 				\end{lstlisting}
-                			Checks if the formula $\varphi$ exists in any positive collection depending on the type of $\varphi$.
+                			Checks existance of formula $\varphi$ in any positive collection depending on the type of $\varphi$.
                 			Namely if $\varphi$ is of type:
                 			\begin{itemize}
                     				\item C(x, y), then return true $\iff \varphi$ belongs to contacts\_T
@@ -1415,7 +1343,7 @@ auto find_in_T(const formula* f) const -> bool
                 			\begin{lstlisting}
 auto find_in_F(const formula* f) const -> bool
                 			\end{lstlisting}
-                			Checks if the formula $\varphi$ exists in any negative collection depending on the type of $\varphi$.
+                			Checks existance of formula $\varphi$ in any negative collection depending on the type of $\varphi$.
 				Namely if $\varphi$ is of type:
                 			\begin{itemize}
                     				\item C(x, y), then return true $\iff \varphi$ belongs to contacts\_F
