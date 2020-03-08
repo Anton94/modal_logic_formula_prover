@@ -83,55 +83,7 @@
 		which returns the $a_i$ element.
 
 		\subsubsection*{Operations over bitsets}
-			Let x and y be two k-bitsets, where $k \in \mathbb{N}$, then: 
-			\newline
-			\newline
-			\paragraph{bitset-AND}
-			bitset-AND operation is defined as:
-			\begin{equation}
-				a \& b = a[0] \& b[0], a[1] \& b[1], .. , a[k] \& b[k]
-			\end{equation}
-			where the truth table for two basic variables x and y is:
-			\newline
-			\begin{tabular}{cc|c}
-				x & y & x \& y \\
-				\hline
-				0 & 0 & 0 \\
-				0 & 1 & 0 \\
-				1 & 0 & 0 \\
-				1 & 1 & 1 \\
-			\end{tabular} 
-			\newline
-			\paragraph{bitset-OR}
-			bitset-OR operation is defined as:
-			\begin{equation}
-				a | b = a[0] | b[0], a[1] | b[1], .. , a[k] | b[k]
-			\end{equation}
-			where the truth table for two basic variables x and y is:
-			\newline
-			\begin{tabular}{cc|c}
-				x & y & x | y \\
-				\hline
-				0 & 0 & 0 \\
-				0 & 1 & 1 \\
-				1 & 0 & 1 \\
-				1 & 1 & 1 \\
-			\end{tabular} 
-			\newline
-			\paragraph{bitset-Neg}
-			bitset-NEG operation(inverse function) is defined as:
-			\begin{equation}
-				a = \bar{a[0]}, .. , \bar{a[k]}
-			\end{equation}
-			where the truth table for basic variable x is:
-			\newline
-			\begin{tabular}{c|c}
-				x & $\bar{x}$ \\
-				\hline
-				0  & 1 \\
-				1 & 0 \\
-			\end{tabular} 
-			\newline
+			The standard component-wise boolean operations shall be used. The standart operations include AND, OR and NEGATION.
 			\paragraph{bitset-PlusOne}
 			Deoted a + 1 represents the next bitset after a, which is constructed as follows:
 			\begin{itemize}
@@ -165,7 +117,7 @@
 			It is obvious that the PlusOne can be represented with $\bigoplus 1$, where the marker bitset contains only ones.
 
 	\subsection*{Def: Variable bitset substitution}
-		Let $\mathbb{U}$ be a set of bitsets, then the Variable bitset substitution is a total mapping 
+		Let $\mathbb{B}_{set}$ be a set of bitsets, then the Variable bitset substitution is a total mapping 
 		 $\rho : \mathbb{V} \longmapsto \mathbb{B}_{set}$ and the following notation will be used:
 		\begin{equation}
 			x \longmapsto b
@@ -184,20 +136,20 @@
 			\item the world, if $\forall i<k : x[i] = 1$, denoted with 1
 			\item the empty k-bitset, if $\forall i<k : x[i] = 0$, denoted with 0
 		\end{itemize}
-	\subsection{Term recursive definition}
-	\label{sec:term-recursive-definition}
+	\subsection{Term inductive definition}
+	\label{sec:term-inductive-definition}
 		\begin{itemize}
 			\item 1 is a term
 			\item 0 is a term
 			\item $p \in \mathbb{V}ar$ is a term
-			\item If x is a term, then $\bar{x}$ is a term as well
+			\item If x is a term, then $\overline{x}$ is a term as well
 			\item If x and y are terms, then $x \sigma y $ is a term as well,\\
 				where $\sigma \: \in \: \{\sqcap, \sqcup\}$
 		\end{itemize}	
 
 	\subsection*{Term Implementation Representation}
 	\label{sec:term-implementation-representation}
-		The term can be represented in memory recursively by analogy to the definition REF-DEF-TERM.
+		The term can be represented in memory inductively by analogy to the definition REF-DEF-TERM. %TODO:THEORY
 
 	\begin{lstlisting}
 class Term 
@@ -239,10 +191,25 @@ class Term
 	are variables. In the above implementation the variables are represented by their index, which can be 
 	easily found with the Index Variable Function. 
 
-	\paragraph{Term hash variable} Used for faster comaprison of terms, namely if the hash value of two terms 
-	differs then those terms have different structure. However if the hash variables of two terms are equal then the strustures 
-	of both terms are comapred. The following method is used to calculate the hash of a term.
-
+	\paragraph{Term hash variable} 
+		Conducting a test whether two terms are equal in lexical way is an important procedure for the sake of performant satisfiability algorithms.
+		Such equality checks are required in various situations, such as:
+		\begin{itemize}
+			\item testing if two terms are equal
+			\item checking if a term exists in a set of terms
+		\end{itemize}
+		Have in mind that the naive solution to do an equality check has complexity of O(n), where n is the size of the term. This solution is to 
+		compare the whole structure of the terms. With the use of precalcaulated hash value this complexity can be reduced to an amortized complexity of O(1).
+		For each term one additional variable is stored. This variable is the hashed term. The hash is computed recursively through the term structure, which means 
+		that the hash of a term depends on the hashes of its subterms ( if any ). 
+		Let $\tau_1$ and $\tau_2$ be two terms. Let $h_1$ be the precalculated hash of $\tau_1$ and $h_2$ be the precalculated hash of $\tau_2$.
+		The equality check procedure follows the following steps:
+		\begin{itemize}
+			\item if $h_1 \neq h_2$, then the terms are not equal
+			\item if $h_1 = h_2$, then the structures of both terms are compared.
+		\end{itemize}
+		\noindent
+		The following is the implemented hash construction procedure:
 	\begin{lstlisting}
 void term_construct_hash()
 {
@@ -291,7 +258,7 @@ void term_construct_hash()
 				return the empty bitset
 			\item $\text{Let } v \in X \text{ and } \tau \equiv v$, then \\
 				return X[v]
-			\item $\text{Let } \rho \text{ be a term } \text{ and } \tau \equiv \bar{\rho}$, then \\
+			\item $\text{Let } \rho \text{ be a term } \text{ and } \tau \equiv \overline{\rho}$, then \\
 				return $inverse(termSEval(\rho))$ 
 			\item $\text{Let } \tau_1, \tau_2 \text{ be two terms } \text{ and } \tau \equiv \tau_1 \sqcap \tau_2$, then \\
 				return $termSEval(\tau_1) \& termSEval(\tau_2)$
@@ -315,7 +282,7 @@ void term_construct_hash()
 		\paragraph{create\_node} will denote the function which constructs a new term from an operation $\sigma$ and the involved terms, namely 
 		\begin{itemize}
 			\item If $\sigma$ is the negation operation, and $\tau$ is a term, 
-				then the constructed term is $\bar{\tau}$
+				then the constructed term is $\overline{\tau}$
 			\item If $\sigma \in \{ \sqcup, \sqcap \}$, and $\tau_1, \tau_2$ are terms, 
 				then the constrcuted term is $\tau_1 \sigma \tau_2$
 		\end{itemize}
@@ -332,7 +299,7 @@ void term_construct_hash()
 				return X[v]
 			\item $\text{Let } v \not\in X \text{ and } \tau \equiv v$, then \\
 				return create\_variable\_node(v)
-			\item $\text{Let } \rho \text{ be a term } \text{ and } \tau \equiv \bar{\rho}$, then \\
+			\item $\text{Let } \rho \text{ be a term } \text{ and } \tau \equiv \overline{\rho}$, then \\
 				return eval\_negation($\rho$)
 			\item $\text{Let } \tau_1, \tau_2 \text{ be two terms } \text{ and } \tau \equiv \tau_1 \sqcap \tau_2$, then \\
 				return eval\_intersection($\tau_1, \tau_2$)
@@ -350,7 +317,7 @@ void term_construct_hash()
 \[return  \begin{cases} 
       0, & res = 1 \\
       1, & res = 0 \\
-      \bar{\tau}, & otherwise 
+      \overline{\tau}, & otherwise 
    \end{cases}
 \]
 
@@ -386,15 +353,15 @@ void term_construct_hash()
    \end{cases}
 \]
 
-	\subsection{Formula Recursive Definition}
-	\label{sec:formula-recursive-definition}
-		A formula is defined by the following recursive definition:
+	\subsection{Formula Inductive Definition}
+	\label{sec:formula-inductive-definition}
+		A formula is defined by the following inductive definition:
 		\begin{itemize}
 			\item T is a formula, which represents $\top$
 			\item F is a formula, which represents $\bot$
 			\item C(a, b) is a formula, where a and b are terms
 			\item a <= b is a formula, where a and b are terms
-			\item If $\varphi$ is a formula, then $\bar{\varphi}$ is a formula as well
+			\item If $\varphi$ is a formula, then $\overline{\varphi}$ is a formula as well
 			\item If $\varphi$ and $\psi$ are formulas, then $\varphi \: \sigma \: \psi $ is a formula as well,\\
 				where $\sigma \in \{\vee, \wedge, \rightarrow, \leftrightarrow\}$
 		\end{itemize}
@@ -441,7 +408,7 @@ void term_construct_hash()
 	\end{equation}
 
 	\subsection*{Formula Implementation Representation}
-	The formula can be represented in memory recursively by analogy to the definition REF-DEF-FORMULA.
+	The formula can be represented in memory inductively by analogy to the definition REF-DEF-FORMULA.
 
 	\begin{lstlisting}
 class Formula 
@@ -488,24 +455,38 @@ class Formula
 	The formula analogous to the term implementation is represented in a tree structural way, where each node is an operation over formulas and the leafs of the tree
 	are atomic formulas. 
 
-	\paragraph{Formula hash variable} Used for faster comaprison of formulas, namely if the hash value of two formulas
-	differs then those formulas have different structure. However if the hash variables of two formulas are equal then the strustures 
-	of both formulas are comapred. The method which calculates the hash of a formula is similar to the one defined for the 
-	calculation of terms in the Term Implementation Representation \ref{sec:term-implementation-representation}, with the two differences that the formula operations are more than the 
-	operations over term and that for atomic formulas the hash from the term is used in order to construct the formula hash.
-	This comparison is used in all maps and sets where the key is a node. 
-	\newline
-	The contact operatior requires a special check because of the commutativity of Contacts is supported, namely
-	\newline
-	\newline
-	Let a, b be two terms, then
-	\begin{equation}
-		C(a, b) = C(b, a)
-	\end{equation}
-	therefore the check for equality will be done twice instead of once, namely
-	\begin{equation}
-		 C(a, b) = C(c, d) \rightarrow (a = c \wedge b = d) \vee (a = d \wedge b = c).
-	\end{equation}
+	\paragraph{Formula hash variable} 
+		The importance of the formula hash variable is analogous to the Term hash variable.
+		Conducting a test whether two formulas are equal in lexical way is an important procedure for the sake of performant satisfiability algorithms.
+		Such equality checks are required in various situations, such as:
+		\begin{itemize}
+			\item testing if two formulas are equal
+			\item checking if a formula exists in a set of terms
+		\end{itemize}
+		Have in mind that the naive solution to do an equality check has complexity of O(n), where n is the size of the formula. This solution is to 
+		compare the whole structure of the formulas. With the use of precalcaulated hash value this complexity can be reduced to an amortized complexity of O(1).
+		For each formula one additional variable is stored. This variable is the hashed formula. The hash is computed recursively through the formula structure, which means 
+		that the hash of a formula depends on the hashes of its subformulas or subterms ( if any ).
+		Let $\varphi_1$ and $\varphi_2$ be two formulas. Let $h_1$ be the precalculated hash of $\varphi_1$ and $h_2$ be the precalculated hash of $\varphi_2$.
+		The equality check procedure follows the following steps:
+		\begin{itemize}
+			\item if $h_1 \neq h_2$, then the formulas are not equal
+			\item if $h_1 = h_2$, then the structures of both formulas are compared.
+		\end{itemize}
+		\noindent
+		\newline
+		The contact operatior requires a special check because of the commutativity of Contacts is supported, namely
+		\newline
+		\newline
+		Let a, b be two terms, then
+		\begin{equation}
+			C(a, b) = C(b, a)
+		\end{equation}
+		therefore the check for equality will be done twice instead of once, namely
+		\begin{equation}
+			 C(a, b) = C(c, d) \rightarrow (a = c \wedge b = d) \vee (a = d \wedge b = c).
+		\end{equation}
+		The implementation of the formula hash construction procedure is analogous to the term hash construction defined in Term Implementation Representation.
 
 	\subsection{Model Point Representation}
 		A model point $p_0$ is represented as an integer number. The first constructed model point is represented with 0, the second with 1 and so on.
@@ -525,8 +506,8 @@ class Formula
 	Let $\mathbb{C}^m$ be a Contact Matrix\\
 	then
 	\begin{align*}
-		C(a, b) \iff &any(a \& b) \textit{ or } \\
-		&\exists i < n : a[i]=1 \textit{ and } any(\mathbb{C}^m[i] \& b)
+		C(a, b) \iff & (a \& b \neq 0) \textit{ or } \\
+		&\exists i < n : a[i]=1 \textit{ and } (\mathbb{C}^m[i] \& b \neq 0)
 	\end{align*}
 
 	\begin{enumerate}
@@ -614,9 +595,8 @@ class Formula
 			\mathcal{M} \models \varphi
 		\end{equation}
 
-		This problem, namely to construct a valid model $\mathcal{M}$ in which the formula $\varphi$ is satisfiable is with NP O-complexity, which
-		means that for now a fast algorithm does not exist ( there will exist such algorithm if P = NP ).
-		Because of the hih complexity the algorithms in discussed in this paper are forced to do some exponential calculations in order to exhaust all possible solutions.
+		This problem, namely to construct a valid model $\mathcal{M}$ in which the formula $\varphi$ is satisfiable is with NP-complete problem.
+		In any case of algorithm selection there will be exponentially complex case.
 		The idea of the algorithmic schema is to first determine the maximum model points W, needed to be able to satisfy a modal formula. Try to 
 		construct the relations matrix R from the modal formula context, and then to construct an evaluation function $\mathcal{v}$  such that:
 		\begin{equation}
@@ -645,37 +625,37 @@ class Formula
 		\end{itemize}
 		
 		\paragraph{Terms operations}
-		Let t1, t2 be terms, then the followings are the representations for term operations
+		Let $t_1$, $t_2$ be terms, then the followings are the representations for term operations
 		\begin{itemize}
-			\item - t1 is used to represent the complement term operation, namely $\bar{t1}$
-			\item t1 * t2 is used to represent the intersection term operation, namely $t1 \: \sqcap \: t2$
-			\item t1 + t2 is used to represent the union term operation, namely $t1 \: \sqcup \: t2$
+			\item - $t_1$ is used to represent the complement term operation, namely $\overline{t_1}$
+			\item $t_1$ * $t_2$ is used to represent the intersection term operation, namely $t_1 \: \sqcap \: t_2$
+			\item $t_1$ + $t_2$ is used to represent the union term operation, namely $t_1 \: \sqcup \: t_2$
 		\end{itemize}
 		
 		\paragraph{Atomic formulae}
-		Let t1, t2 be terms, then the followings are representation of atomic formulae
+		Let $t_1$, $t_2$ be terms, then the followings are representation of atomic formulae
 		\begin{itemize}
 			\item T is the formula constant True
 			\item F is the formula constant False
-			\item C(t1, t2) is the contact operation
-			\item <=(t1, t2) is the less or equal operation
-			\item <=m(t1, t2) is the measured less or equal operation
-			\item (t1)=0 is the equal to zero operation
+			\item $C(t_1, t_2)$ is the contact operation
+			\item $<=(t_1, t_2)$ is the less or equal operation
+			\item $<=m(t_1, t_2)$ is the measured less or equal operation
+			\item $(t_1)=0$ is the equal to zero operation
 		\end{itemize}
 		Flex and Bison are used to generate a parser with the modal logic grammar.
 		Flex is used as a tokenizer while Bison is used as the parser.
 		\newline
 		There are two types of building elements in the modal logic formula:
 		\begin{itemize}
-			\item terms, defined in the Term Recursive Definition section \ref{sec:term-recursive-definition}
-			\item formulae, defined in the Formula Recursive Definition section \ref{sec:formula-recursive-definition}
+			\item terms, defined in the Term Inductive Definition section \ref{sec:term-inductive-definition}
+			\item formulae, defined in the Formula Inductive Definition section \ref{sec:formula-inductive-definition}
 		\end{itemize}
 
 	\subsection{Tokenizer}
 		The tokenizer is responsible for demarcating the special sybmols in the input formula.
 		After the symbols are identified a token is created for each of them or at least for those significant to the semantic of the input formula.
 		For example the whitespaces are not significant and a tokens are not created for them.
-		In this solution Flex is used as a tokenizer.
+		We shall use Flex as a tokenizer.
 
 		\paragraph{Grammar} The tokenizer's grammar is composed from two types of symbols
 			\begin{itemize}
@@ -683,14 +663,14 @@ class Formula
 				\item Multi character tokens
 			\end{itemize}
 			The Single character tokens are directly matched in the input formula and are representing the token itself.
-			The Multi character tokens are a sequence of characters which have some meaning when bundled together.
-			This tokenizer's grammar is unambiguous and each input formula has only one meaning.
+			The multi character token is a sequence of characters which have some meaning when bundled together.
+			This tokenizer's grammar is unambiguous and each input formula is uniquely tokenized.
 
-			The tokens derivation is explaned in details in the following table with Flex syntaxes, the matched symbol represents the 
+			The tokens derivation is explaned in details in the following table with Flex syntax. The matched symbol represents the 
 			symbol from the input formula and the output token is the newly created token for the matched symbol.
 		\begin{flushleft}
 			\centering
-			\begin{tabular}{ | m{7em} | m{15em}| } 
+			\begin{tabular}{ | m{10em} | m{15em}| } 
 				\hline
 					\textbf{Matched sequence} & \textbf{Output token} \\ [0.7ex] 
 				\hline
@@ -714,8 +694,8 @@ class Formula
 				\hline
 			\end{tabular}
 		\end{flushleft}
-		In the table above the do nothing token is marked as \textbf{ ; }, which means to ignore all whitespaces.
-		The yytext[0] is the matched character. All single charecter tokens are passed as their ASCIIs for an easier use in Bison.
+		In the above table the do nothing token is marked as \textbf{ ; }, which means to ignore all whitespaces.
+		The yytext[0] is the matched character. All single character tokens are passed as their ASCII code for an easier use in Bison.
 		The last matched symbol in the table represents everything else, if nothing has been matched then just return the text itself. 
 		Later on the parser will use it to promt where the unrecongized symbol was found and the symbol itself can be printed out.
 % Returns T\_STRING literal type and the string  value is written to yylval which can be later accessed from the parser. Note that it uses our simple memory manager to allocate this string in order to be able to safely free all allocated strings even when some syntax error occures 
@@ -2091,7 +2071,7 @@ virtual auto create(const formulas_t& contacts_T,
 		A Connected model is called a formula model for which the following lemma is true.
 		\subsubsection*{Connectivity Lemma}
 		\begin{equation}
-			\forall a \in R: a \neq \emptyset \vee a \neq \mathbb{W} \leftarrow C(a, \bar{a})
+			\forall a \in R: a \neq \emptyset \vee a \neq \mathbb{W} \leftarrow C(a, \overline{a})
 		\end{equation}
 		\paragraph{Connected Model Algorithm}
 		Let $\varphi$ be the input formula, on which the tableaux process is applied, thus returning the tableaux branch output \ref{tableaux:branch:output}.
