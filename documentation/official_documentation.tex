@@ -621,7 +621,7 @@ class Formula
 		\begin{itemize}
 			\item 0 is the term constant False
 			\item 1 is the term constant True
-			\item Arbitrary string is used to represent a variable
+			\item Identifier containing only letters and numbers represents a variable. Lowercase and uppercase letter are allowed.
 		\end{itemize}
 		
 		\paragraph{Terms operations}
@@ -632,8 +632,8 @@ class Formula
 			\item $t_1$ + $t_2$ is used to represent the union term operation, namely $t_1 \: \sqcup \: t_2$
 		\end{itemize}
 		
-		\paragraph{Atomic formulae}
-		Let $t_1$, $t_2$ be terms, then the followings are representation of atomic formulae
+		\paragraph{Atomic formulas}
+		Let $t_1$, $t_2$ be terms, then the followings are representation of atomic formulas
 		\begin{itemize}
 			\item T is the formula constant True
 			\item F is the formula constant False
@@ -642,13 +642,22 @@ class Formula
 			\item $<=m(t_1, t_2)$ is the measured less or equal operation
 			\item $(t_1)=0$ is the equal to zero operation
 		\end{itemize}
+
+		\paragraph{Formula operations}
+		Let $\varphi_1$, $\varphi_2$ be terms, then the followings are the representations for term operations
+		\begin{itemize}
+			\item \textasciitilde $\varphi_1$ is used to represent $\overline{\varphi_1}$
+			\item $\varphi_1$ \& $\varphi_2$ is used to represent $\varphi_1 \: \wedge \: \varphi_2$
+			\item $\varphi_1$ | $\varphi_2$ is used to represent $\varphi_1 \: \vee \: \varphi_2$
+		\end{itemize}
+
 		Flex and Bison are used to generate a parser with the modal logic grammar.
 		Flex is used as a tokenizer while Bison is used as the parser.
 		\newline
 		There are two types of building elements in the modal logic formula:
 		\begin{itemize}
 			\item terms, defined in the Term Inductive Definition section \ref{sec:term-inductive-definition}
-			\item formulae, defined in the Formula Inductive Definition section \ref{sec:formula-inductive-definition}
+			\item formulas, defined in the Formula Inductive Definition section \ref{sec:formula-inductive-definition}
 		\end{itemize}
 
 	\subsection{Tokenizer}
@@ -694,7 +703,7 @@ class Formula
 				\hline
 			\end{tabular}
 		\end{flushleft}
-		In the above table the do nothing token is marked as \textbf{ ; }, which means to ignore all whitespaces.
+		In the above table the `do nothing` token is marked as \textbf{ ; }, which means to ignore all whitespaces.
 		The yytext[0] is the matched character. All single character tokens are passed as their ASCII code for an easier use in Bison.
 		The last matched symbol in the table represents everything else, if nothing has been matched then just return the text itself. 
 		Later on the parser will use it to promt where the unrecongized symbol was found and the symbol itself can be printed out.
@@ -728,11 +737,11 @@ class Formula
 			On the AST additional optimizations can be done which will simplify the initial formula and will produce better performance when 
 			a model is seeked in the satisfiability algorithms. For example the following formula 
 			\begin{equation}
-				X -> Y 
+				X\  \textit{->}\  Y 
 			\end{equation}
 			can be transformed to 
 			\begin{equation}
-				\textasciitilde X | Y
+				\sim X | Y
 			\end{equation}
 			after the AST is built, and the impliciation operation can even be removed from the all the calculations in the satisfiability algorithms, 
 			since all implications can be transformed when the AST is built.
@@ -842,10 +851,11 @@ term
 		\end{lstlisting}
 
 		\subsection{Abstract Syntax Tree}
-			The resulting AST can be easirly modified and optimized, this is best achived with the visitor pattern.
+			The resulting AST can be easirly modified and optimized, this is best achieved with the visitor pattern.
 			The visitor pattern uses double virtual dispatching.
 
-			\subsubsection*{Operation types in the formula/term nodes}
+			\subsubsection{Operation types in the formula/term nodes}
+				\paragraph{Operation types}  Enum structure is used to represent the type of terms and formulas in a memory efficient way.
 				\begin{lstlisting}
 enum class formula_operation_t
 {
@@ -871,7 +881,10 @@ enum class term_operation_t
     complement,
     variable
 };
+				\end{lstlisting}
 
+				\paragraph{Term and formula types} These two types are defined with a separate class one for term and one for formula.
+				\begin{lstlisting}
 class Node
 {
 public:
@@ -905,8 +918,12 @@ public:
     std::string variable;
 };
 				\end{lstlisting}
-	
-			\subsubsection*{Visitor Structure}
+
+			\paragraph{Visitor Structure} The visitor design pattern is a way of separating an algorithm from an object structure on which it operates. 
+				The visitor pattern allows for a new visitors to be added in a simple manner.
+				The new visitor should override the two visit methods and can read or modify the AST nodes.
+				%intro on why are we doing all those modifications to the formula's AST
+				
 				\begin{lstlisting}
 class Visitor
 {
@@ -929,11 +946,6 @@ public:
     }
 };
 				\end{lstlisting}
-
-				The visitor pattern allows for a new visitors to be added in a simple manner.
-				The new visitor should override the two visit methods and do whatever it wants with the ast nodes.
-				\newline
-				%intro on why are we doing all those modifications to the formula's AST
 
 		\subsection{Visitors Implementation}
 		\label{sec:visitors-implementation}
@@ -958,44 +970,44 @@ public:
 				  \end{tabular}
 				\end{table}
 			\subsubsection*{VConvertContactsWithConstantTerms}
-				Converts contacts with constant 1 terms in !=0 atomic formulas. 
+				Converts C with constant 1 terms in !=0 atomic formulas. 
 				This visitor is best used after the contacts are reduced, via VReduceConstants
 				\begin{itemize}
-					\item C(a,1) $\equiv$ ~(a=0)  
-					\item C(1,a) $\equiv$ ~(a=0)
+					\item C(a,1) $\equiv$ \textasciitilde(a=0)  
+					\item C(1,a) $\equiv$ \textasciitilde(a=0)
 				\end{itemize}
 			\subsubsection*{VConvertLessEqContactWithEqualTerms}
-				Converts contacts and <= atomic formulas with same terms:
+				Converts C and <= atomic formulas with identical terms:
 				\begin{itemize}
 					\item <=(a,a) $\equiv$ T, \\
 						since (a * -a = 0))
-					\item C(a,a) $\equiv$ ~(a=0)
+					\item C(a,a) $\equiv$ \textasciitilde(a=0)
 				\end{itemize}
 			\subsubsection*{VReduceDoubleNegation}
 				Removes the double/tripple/etc negations. 
 				This visitor is best used after all visitors which might add additional negations!
 				\begin{itemize}
-					\item --g $\equiv$ g
-					\item --t $\equiv$ t
+					\item -(-g) $\equiv$ g
+					\item -(-t) $\equiv$ t
 				\end{itemize}
 			\subsubsection*{VConvertImplicationEqualityToConjDisj}
 				Converts all formula nodes of type implication and equality to nodes 
-				which are using just conjuction and disjunction. 
-				Main reason for that is to simplify the tableau method - 
-				to work only with conjunctions and disjunctions.
+				which are using just conjuction and disjunction. The main reason for this visitor is to simplify the formula operations. 
+				This visitor simplifies the formula to contain only conjunctions, disjunctions and negation operations.
 				\begin{itemize}
-					\item (f -> g)  $\equiv$ (~f | g)
-					\item (f <-> g) $\equiv$ ((f \& g) | (~f \& ~g))
+					\item (f -> g)  $\equiv$ (\textasciitilde f | g)
+					\item (f <-> g) $\equiv$ ((f \& g) | (\textasciitilde f \& \textasciitilde g))
 				\end{itemize}
 			\subsubsection*{VConvertLessEqToEqZero}
-				Converts the less equal atomic formula to an equals to zero atomic formula
+				Converts a <= formula to an equals to zero atomic formula
 				\begin{itemize}
 					\item <=(a,b) $\equiv$ (a * -b) = 0
 				\end{itemize}
 			\subsubsection*{VSplitDisjInLessEqAndContacts}
-				Converts the less equal atomic formula to an equals to zero atomic formula
+				Divides C and <= atomic formulas with a disjunction term into two simpler formulas
 				\begin{itemize}
-					\item C(a + b, c) $\equiv$ C(a,c) | C(b,c)
+					\item C(a + b, c) $\equiv$ C(a, c) | C(b, c)
+					\item C(a, b + c) $\equiv$ C(a, b) | C(a, c)
 					\item <=(a + b, c) $\equiv$ <=(a,c) \& <=(b,c)
 				\end{itemize}
 
@@ -1012,15 +1024,15 @@ public:
 			
 			Most important formula refiners:
 			\begin{itemize}
-				\item Convert Contacts and less or equal atomic formas which have same terms
-				\item Convert disjunction in contacts and less or equal atomic formulas
+				\item Convert C and <= atomic formulas which have identical terms
+				\item Convert disjunction in C and <= atomic formulas
 				\item Reduce constants
-				\item Reduce contacts with constants
+				\item Reduce C with constants
 				\item Remove double negation
 			\end{itemize}
 
 			These formula refiners are done when the formula is built, meaning that after the 
-			AST tree is constructed each of these refiners enables or disabled a visitor. 
+			AST tree is constructed each of these refiners enables or disables a visitor. 
 			The formula refiners are mapped in a one to one manner to a subset of all the visitors defined 
 			in the Visitors section \ref{sec:visitors-implementation}.
 
@@ -1183,16 +1195,16 @@ auto formula_mgr::build(const std::string& f,
 	\section{Tableaux}
 	The Tableaux process is a decision procedure, which recursively breaks down a given formula into basic components 
 	based on which a decision can be concluded. The recursive step which breaks down a formula creates one or two 
-	new formulas, which in terms of their structure are simpler then the initial formula. Since the recursive step can create
-	at most two new formulas, this means the recursive step will create at most two branches or a binary tree, where the nodes
-	are the formulas and the links represent the recursive step. The different branches are considered to be disjuncted while
-   	nodes of the same branch are considered in conjunction. The procedure modifies the tableau in such a way that the 
-	formula represented by the resulting tableau is equivalent to the original one.
+	new formulas, which in terms of their structure are simpler then the initial formula. The recursive step can create
+	at most two new formulas. This means that at most two branches can be created. Continuously appling the recursive step produces a binary tree, where the nodes
+	are the formulas and the links represent the recursive step.
+	In each branch a set of formula is obtained which are considered to be in conjunction.
+	The set of formulas from different branches are considered to be in disjunction.
 
-	Contradiction may arise when in the same branch, on some step there exists a formula and the negation of the same formula.
+	Contradiction may arise when in the same branch, on some step there exists a formula and its negation.
 	If in some branch there exists a contradiction, then that branch closes. If all branches close then the proof is complete.
 	
-	The main principle of the tableaux is to break complex formulae into smaller ones until complementary pairs of literals are
+	The main principle of the tableaux is to break complex formula into smaller ones until complementary pairs of literals are
 	produced or no further expansion is possible.
 
 	\subsection{Definition: Tableaux Step}
@@ -1204,12 +1216,12 @@ auto formula_mgr::build(const std::string& f,
 				\item $\mathbb{F}\varphi$ signs $\varphi$ as false
 			\end{itemize}
 
-		\subsubsection*{Definition: Signed Formulae set}
-			The signed formulae set consists only of signed formulae and the letter X will be usually used for its representation.
+		\subsubsection*{Definition: Signed formulas set}
+			The signed formulas set consists only of signed formulas and the letter X will be usually used for its representation.
 
-		The Tableaux Step takes as input a formula and a signed formulae set and produces as 
-		output one or two new formulae, depending on the operation.
-		The signed formulae set consists of the broken down formulae by previous tableaux steps.
+		The Tableaux Step takes as input a formula and a signed formulas set and produces as 
+		output one or two new formulas, depending on the operation.
+		The signed formulas set consists of the broken down formulas by previous tableaux steps.
 		The output of the tableaux step depends on the rule applied to the formula.
 
 		\subsubsection{Rules}
@@ -1280,10 +1292,10 @@ auto formula_mgr::build(const std::string& f,
 		\newline
 		\newline
 		\newline
-		The final output of the Tableaux process is "False" when all branches are closed or a set of atomic formulae, when there exists a branch which is not closed.
+		The final output of the Tableaux process is "False" when all branches are closed or a set of atomic formulas, when there exists a branch which is not closed.
 		\newline
 	
-		For our usecases the functionality of the tableaux process shall be extended to achive better results, since if the branch is not closed, there are 
+		For our usecases the functionality of the tableaux process shall be extended to achieve better results, since if the branch is not closed, there are 
 		additional calculations needed in order to verify that there is no contradiction, namely to verify that there is no contradiction on Term level which means 
 		that there exists a satisfiable model.
 		This verification can be done in different manners, depending on the algorithm type. The best way to think about it is that the tableaux process returns a 
@@ -1291,50 +1303,49 @@ auto formula_mgr::build(const std::string& f,
 		with the next not-closed branch. If such branch does not exist then the formula is not satisfiable. 
 
 	\subsection{Tableaux implementation}
-		The programming implementation of the tableaux method follows the standard tableaux process explaned above.
+		The program implementation of the tableaux method follows the standard tableaux process. For detailed explanation see TODO:THEORY.
 
-		First interesting design decision is to keep all true signed formulae in one data set, and all false signed formulae in another data set.
+		First interesting design decision is to keep all true signed formulas in one data set, and all false signed formulas in another data set.
 		This enables fast searches wheter a formula has been signed as true or false.
 		
 		\subsubsection*{Definition: Signed Formula Collection}
-			Let X be a set of formulae, then X is called signed formula collection if and only if all formulae in X are signed as true 
-			or all formulae are signed as false.
+			Let X be a set of formulas, then X is called signed formula collection if and only if all formulas in X are signed as true 
+			or all formulas are signed as false.
 
 			This collection is implemented with unordered\_map (hashmap),
-			which stores the formulae by pointers to them, uses their precalculated hash and operator== to compare them.
+			which stores the formulas by pointers to them, uses their precalculated hash and operator== to compare them.
 			The average complexity for search, insert and erase in this collection is O(1).
 		\newline
 		\newline
 		There exist 8 important signed formula collections:
 %Note add definition for positive and negative collections !!!
 		\begin{itemize}
-			\item formulas\_T - contains only non-atomic formulae signed as true
-			\item formulas\_F - contains only non-atomic formulae signed as false, \\
+			\item formulas\_T - contains only non-atomic formulas signed as true
+			\item formulas\_F - contains only non-atomic formulas signed as false, \\
 				For example, if $\neg\varphi$ is encountered as an output of the tableaux step, then only $\varphi$ is inserted into the formula\_F
-			\item contacts\_T - contains only contacts formulae signed as true
-			\item contacts\_F - contains only contacts formulae signed as false
-			\item zero\_terms\_T - contains only formulae of type $\varphi \le \psi$ signed as true
-			\item zero\_terms\_F - contains only formulae of type $\varphi \le \psi$ signed as false
-			\item measured\_less\_eq\_T - contains only formulae of type $\varphi \le_m \psi$ signed as true
-			\item measured\_less\_eq\_F - contains only formulae of type $\varphi \le_m \psi$ signed as false
+			\item contacts\_T - contains only contacts formulas signed as true
+			\item contacts\_F - contains only contacts formulas signed as false
+			\item zero\_terms\_T - contains only formulas of type $\varphi \le \psi$ signed as true
+			\item zero\_terms\_F - contains only formulas of type $\varphi \le \psi$ signed as false
+			\item measured\_less\_eq\_T - contains only formulas of type $\varphi \le_m \psi$ signed as true
+			\item measured\_less\_eq\_F - contains only formulas of type $\varphi \le_m \psi$ signed as false
 		\end{itemize}
 
 		\subsubsection*{Definition: Formula Contradiction}
-			Let $\varphi$ be a signed formula, then $\varphi$ is causing a contradiction if any of the followings is true:
-			\begin{itemize}
-				\item $\varphi$ is a non-atomic signed as true and $\varphi \in$ formulas\_F
-				\item $\varphi$ is a non-atomic signed as false and $\varphi \in$ formulas\_T
-				\item $\varphi$ is a contact formula signed as true and $\varphi \in$ contacts\_F
-				\item $\varphi$ is a contact formula signed as false and $\varphi \in$ contacts\_T
-				\item $\varphi$ is a zero terms formula signed as true and $\varphi \in$ zero\_terms\_F
-				\item $\varphi$ is a zero terms formula signed as false and $\varphi \in$ zero\_terms\_T
-				\item $\varphi$ is a measured less formula signed as true and $\varphi \in$ measured\_less\_eq\_F
-				\item $\varphi$ is a measured less formula signed as false and $\varphi \in$ measured\_less\_eq\_T
-
-			\end{itemize}
+          	 		Let $\varphi$ be a signed formula, then $\varphi$ is causing a contradiction if any of the followings is true:
+	  		\begin{itemize}
+                		\item $\varphi$ is a non-atomic signed as true and $\varphi$ belongs to formulas\_F
+			\item $\varphi$ is a non-atomic signed as false and $\varphi$ belongs to formulas\_T
+                		\item $\varphi$ is a contact formula signed as true and $\varphi$ belongs to contacts\_F
+               		\item $\varphi$ is a contact formula signed as false and $\varphi$ belongs to contacts\_T
+                		\item $\varphi$ is a zero terms formula signed as true and $\varphi$ belongs to zero\_terms\_F
+                		\item $\varphi$ is a zero terms formula signed as false and $\varphi$ belongs to zero\_terms\_T
+                		\item $\varphi$ is a measured less formula signed as true and $\varphi$ belongs to measured\_less\_eq\_F
+                		\item $\varphi$ is a measured less formula signed as false and $\varphi$ belongs to measured\_less\_eq\_T
+            	\end{itemize}
 
 		\subsubsection*{Invariant}
-			At any time, all formulae in all eight signed formula collections do not contradict.
+			At any time, all formulas in all eight signed formula collections do not contradict.
 
 			A contradiction may occure if a formula is split and some of the resulting components causes a contradiction.
 
@@ -1344,10 +1355,10 @@ auto formula_mgr::build(const std::string& f,
 			By the rules of decomposition, namely the ( $\wedge$ ) rule produces $\mathbb{T}T \text{ and } \mathbb{T}\neg C(a,b)$. 
 
 			Then the $\mathbb{T}\neg C(a,b)$ will be decomposed to $\mathbb{F} C(a,b)$ by the ( $\neg$ ) rule, which causes a contradiction
-			since C(a,b) is already present in contacts\_T formulae
+			since C(a,b) is already present in contacts\_T formulas
 
 		\subsubsection*{Tableaux Algorithm}
-			Given a formula $\varphi$, the following algorithm determines the atomic formulae in all branches of the tableaux process.
+			Given a formula $\varphi$, the following algorithm determines the atomic formulas in all branches of the tableaux process.
 
 			As a first step if the formula $\varphi$ is the constant F, then false is returned directly, otherwise the whole formula $\varphi$ is inserted in formulas\_T.
 		\newline
@@ -1355,27 +1366,27 @@ auto formula_mgr::build(const std::string& f,
 			\begin{itemize}
 				\item true boolean value is used to represent the formula constant T
 				\item false boolean value is used to represent the formula constant F
-				\item Contact atomic formula is commutativity, meaning that: C(a,b) == C(b,a)
+				\item Contact atomic formula is commutative, meaning that: $C(a,b) \iff C(b,a)$
 			\end{itemize}
 			Few lemmas which will provide a much more efficient contradiction finding in the tableaux process.
 			\subsubsection*{Lemma: A}
-				Let x be a term, suppose that the atomic formula x = 0 has already been signed as true,
-				then marking the following formulae as true will lead to contradiction:
+				Let x be a term. Suppose that the atomic formula x = 0 has already been signed as true.
+				Then marking the following formulas as true will lead to contradiction:
 				\begin{itemize}
 					\item C(x,y)
 					\item C(y,x)
 				\end{itemize}
-				for some arbitrary term y.
+				for any term y.
 
 			\subsubsection*{Lemma: A-inverse}
-				Let x, y and z be terms, suppose that the atomic formulae C(x,y) or C(z, x) has already been signed as true,
+				Let x, y and z be terms, suppose that the atomic formulas C(x,y) or C(z, x) has already been signed as true,
 				then marking the formula x = 0 as true will lead to contradiction.
 				\newline
 				TODO: addd short proof.
 			\subsubsection*{Time Complexity A and A-inverse} 
 				The algorithmic complexity to check whether a new formula leads to contradiction by Lemma A and Lemma A-inverse is done
 				effectively, namely in constant time with the usage of one new collection contact\_T\_terms\_ which keeps the terms of 
-				the true contacts, namely the contacts in in the collection contacts\_T. This means that for each $\mathbb{T}(C(x, y))$, the 
+				the true contacts, namely the contacts in the collection contacts\_T. This means that for each $\mathbb{T}(C(x, y))$, the 
 				terms x and y are in the mentioned collection of true terms. The contact\_T\_terms\_  is a multiset and keeps track 
 				of all added terms, meaning that if the term x is added twice and then removed only once there will still be an entry of 
 				that x in the contact\_T\_terms\_ collection.
@@ -1391,35 +1402,35 @@ auto has_broken_contact_rule(const formula* f) const -> bool;
 				\begin{lstlisting}
 auto find_in_T(const formula* f) const -> bool
 				\end{lstlisting}
-				Checks if the formula $\varphi$ exists in any positive collection depending on the type of $\varphi$, namely
-				if $\varphi$ is of type:
-				\begin{itemize}
-					\item C(x, y), then return true $\iff \varphi \in contacts\_T$
-					\item $x \le y$, then return true $\iff \varphi \in zero_terms\_T$
-					\item $x \le_m y$, then return true $\iff \varphi \in measured_less_eq\_T$
-					\item $\neg \psi$, then return true $\iff \varphi \in formulas\_T$
-					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then return true $\iff \varphi \in formulas\_T$
-				\end{itemize}
-			\subsubsection*{Find formula signed as false}
-				\begin{lstlisting}
+                			Checks if the formula $\varphi$ exists in any positive collection depending on the type of $\varphi$.
+                			Namely if $\varphi$ is of type:
+                			\begin{itemize}
+                    				\item C(x, y), then return true $\iff \varphi$ belongs to contacts\_T
+                    				\item $x \le y$, then return true $\iff \varphi$ belongs to zero\_terms\_T
+                    				\item $x \le_m y$, then return true $\iff \varphi$ belongs to measured\_less\_eq\_T
+                    				\item $\neg \psi$, then return true $\iff \varphi$ belongs to formulas\_T
+                    				\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then return true $\iff \varphi$ belongs to formulas\_T
+                			\end{itemize}
+            		\subsubsection*{Find formula signed as false}
+                			\begin{lstlisting}
 auto find_in_F(const formula* f) const -> bool
-				\end{lstlisting}
-				Checks if the formula $\varphi$ exists in any negative collection depending on the type of $\varphi$, namely
-				if $\varphi$ is of type:
-				\begin{itemize}
-					\item C(x, y), then return true $\iff \varphi \in contacts\_F$
-					\item $x \le y$, then return true $\iff \varphi \in zero_terms\_F$
-					\item $x \le_m y$, then return true $\iff \varphi \in measured_less_eq\_F$
-					\item $\neg \psi$, then return true $\iff \varphi \in formulas\_F$
-					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then return true $\iff \varphi \in formulas\_F$
-				\end{itemize}
+                			\end{lstlisting}
+                			Checks if the formula $\varphi$ exists in any negative collection depending on the type of $\varphi$.
+				Namely if $\varphi$ is of type:
+                			\begin{itemize}
+                    				\item C(x, y), then return true $\iff \varphi$ belongs to contacts\_F
+					\item $x \le y$, then return true $\iff \varphi$ belongs to zero\_terms\_F
+					\item $x \le_m y$, then return true $\iff \varphi$ belongs to measured\_less\_eq\_F
+					\item $\neg \psi$, then return true $\iff \varphi$ belongs to formulas\_F
+                    				\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then return true $\iff \varphi$ belongs to formulas\_F
+                			\end{itemize}
 			\subsubsection*{Add formula}
 			\subsubsection*{Mark formula as true}
 				\begin{lstlisting}
 void add_formula_to_T(const formula* f)
 				\end{lstlisting}
-				Adds the formula $\varphi$ as true in in the respective positive collection, namely
-				if $\varphi$ is of type:
+				Adds the formula $\varphi$ as true in in the respective positive collection.
+				Namely if $\varphi$ is of type:
 				\begin{itemize}
 					\item C(x, y), then $\varphi$ is added to contacts\_T, and the terms x and y are added to the contact\_T\_terms\_ collection.
 					\item $x = 0$, then x is added in zero\_terms\_T
@@ -1431,8 +1442,8 @@ void add_formula_to_T(const formula* f)
 				\begin{lstlisting}
 void add_formula_to_F(const formula* f)
 				\end{lstlisting}
-				Adds the formula $\varphi$ as false in in the respective negative collection, namely
-				if $\varphi$ is of type:
+				Adds the formula $\varphi$ as false in the respective negative collection.
+				Namely if $\varphi$ is of type:
 				\begin{itemize}
 					\item C(x, y), then $\varphi$ is added to contacts\_F.
 					\item $x = 0$, then x is added in zero\_terms\_F
@@ -1445,8 +1456,8 @@ void add_formula_to_F(const formula* f)
 				\begin{lstlisting}
 void remove_formula_from_T(const formula* f)
 				\end{lstlisting}
-				Removes the formula $\varphi$ from the respective positive collection, namely
-				if $\varphi$ is of type:
+				Removes the formula $\varphi$ from the respective positive collection.
+				Namely if $\varphi$ is of type:
 				\begin{itemize}
 					\item C(x, y), then $\varphi$ is removed from contacts\_T, and the terms x and y are removed from the contact\_T\_terms\_ collection.
 					\item $x = 0$, then x is removed from zero\_terms\_T
@@ -1458,8 +1469,8 @@ void remove_formula_from_T(const formula* f)
 				\begin{lstlisting}
 void remove_formula_from_F(const formula* f)
 				\end{lstlisting}
-				Removes the formula $\varphi$ from the respective negative collection, namely
-				if $\varphi$ is of type:
+				Removes the formula $\varphi$ from the respective negative collection.
+				Namely if $\varphi$ is of type:
 				\begin{itemize}
 					\item C(x, y), then $\varphi$ is removed from contacts\_F
 					\item $x = 0$, then x is removed from zero\_terms\_F
@@ -1479,7 +1490,7 @@ void remove_formula_from_F(const formula* f)
 					\item Meassured Equal to Zero Terms
 					\item Meassured Not Equal to Zero Terms
 				\end{itemize}
-				These four groups can be represented with the following formula:
+				These groups can be represented with the following formula:
 				\begin{align*}
 					\bigwedge\nolimits_{i} \; C(a_i, b_i) \:\: \wedge \:\: &
 					\bigwedge\nolimits_{j} \; \neg C(e_j, f_j) \:\: \wedge \:\: \\
@@ -1736,20 +1747,24 @@ auto tableau::satisfiable_step() -> bool
 	\newpage
 
 
-	\section{Formula Model}
+	\section{Model of formula}
 		% What is a model ? 
-		Let $\mathcal{M}$ be a model, defined as in \ref{sec:model-representation}, let $\varphi$ be a formula, then 
-		$\mathcal{M}$ is a formula model for $\varphi$, if and only if 
+		Let $\mathcal{M}$ be a model, defined as in \ref{sec:model-representation}. Let $\varphi$ be a formula. Then 
+		$\mathcal{M}$ is a model for $\varphi$, if and only if 
 		\begin{equation}
 			\mathcal{M} \models \varphi
 		\end{equation}
 		A brief explanation on how a model can be represented has been given in \ref{sec:model-representation}. In this section the implementation details will be discussed in depth. All algorithms in this paper are seeking for a model which model the input formula, thus a common representation of the model representation can be done. This common model representation shall be used for all algorithms defined in the following sections.
-		\paragraph{Model Data} As per \ref{sec:model-representation} to represent a formula model the three components of the model shall be programatically represented, namely the: 
+		\paragraph{Model Data} As per \ref{sec:model-representation} to represent a model the three components of the model need to be represented, namely the: 
 			\begin{itemize}
-				\item Evaluation Function
 				\item Set of model points
+				\item Evaluation Function
 				\item Contact Matrix 
 			\end{itemize}
+		\paragraph{Points} The points are numbered sequentually starting from zero. This means that having the number 
+			of the points in the universe is sufficient to uniquely determine each model point.
+			A region in the described Kripke style semantics is a subset of the universe. So, the regions are represented as bitsets with size
+			equal to the size of the model (the number of the points).
 				
 		\paragraph{Evaluation Function} The evaluation function is represented with a variable\_evaluations\_ variable which type is as defined in \ref{model-representation:evaluation-function}, namely
 			an associative array of size the number of variables in the formula, each element is a set of points represented as a bitset. \\
@@ -1771,6 +1786,23 @@ auto tableau::satisfiable_step() -> bool
 				\item[] (011) \:\: (c) \:   2
 				\item[] (000) \:\:(-a) \:  3
 			\end{itemize}
+			\begin{tikzpicture}
+			\begin{scope}[every node/.style={circle,thick,draw}]
+			    \node[label={[label distance=0.5cm]180:\large (110)  (a*b)}]  (A) at (0,0) {0};
+			    \node[label={[label distance=0.5cm]0:\large (c) (001)}]  (B) at (3,0) {1};
+			    \node[label={[label distance=0.5cm]180:\large (011) \ \ \ (c)}]  (C) at (0,-1) {2};
+			    \node[label={[label distance=0.5cm]180:\large (000) \ \ (-a)}]  (D) at (0, -2) {3};
+			\end{scope}
+
+			\begin{scope}[>={Stealth[black]},
+			              every node/.style={fill=white,circle},
+			              every edge/.style={draw=black,very thick}]
+			    \path [->] (A) edge (B);
+			    \path [->] (C) edge[loop right] (C);
+			    \path [->] (D) edge[loop right] (D);
+			\end{scope}
+			\end{tikzpicture}
+			\newline
 			Let us assume that the variable ids are as:
 			\begin{itemize} 
 				\item `a` has variable id 0
@@ -1800,12 +1832,9 @@ auto tableau::satisfiable_step() -> bool
 				\item v(b) = \{ 0, 2 \}
 				\item v(c) = \{ 1, 2 \}
 			\end{itemize}
-		\paragraph{Model points} Since the model points are numbered sequentually starting from zero, which means that having the number 
-			of all model points is sufficient to uniquely determin each model point.
-			The number of all model points can be easily extracted from the evaluation function which values represent regions of model points.
-			A region of model points is represented as bitset of ones and zeros with size the number of model points.
+
 		\paragraph{Contact Matrix} The contact matrix is represented with a contact\_relations\_ variable which type is defined in \ref{sec:contact-matrix}.
-			The contact\_relations\_ variable is a symetric square matrix. contact\_relations\_[ i ] gives a bitset of all points which are in contact with the point \textbf{i}. \\
+			The contact\_relations\_ variable is a symmetric square matrix. The matrix row contact\_relations\_[ i ] gives a bitset of all points which are in contact with the point \textbf{i}. \\
 			For example, let us have a model with 6 points:
 			\begin{itemize}
 				\item[] 0 ---- 1 	\:\:\:\:\:\:, contact between 0 and 1
@@ -1837,8 +1866,8 @@ auto tableau::satisfiable_step() -> bool
 			\end{center}
 
 		\paragraph{Model Create}
-		All models can be created(or at least an attempt can be done for their creation) with the Tableaux branch output \ref{tableaux:branch:output} as its input parameters.
-		This is achived via the 'create' method.
+		All models can be created(or at least an attempt can be done for their creation) with the Tableaux branch output \ref{tableaux:branch:output} as its input arguments.
+		This is achieved via the 'create' method.
 		\begin{lstlisting}
 virtual auto create(const formulas_t& contacts_T, 
 	const formulas_t& contacts_F, 
@@ -1852,16 +1881,16 @@ virtual auto create(const formulas_t& contacts_T,
 		\end{lstlisting}
 		
 		For simpler explanations in the following algorithms for formula model construction the following constants are introduced. 
-		They represent the sizes for the formulas collections which are passed as parameters to the create method of each model construction algorithm.
+		They represent the sizes for the formulas collections which are passed as an argument to the create method of each model construction algorithm.
 		\begin{itemize}
 			\item N - number of variables in the atomic formulas
 			\item M - number of atomic formulas
-			\item I - number of Contact atomic formulae
-			\item J - number of Non Contact atomic formulae
-			\item K - number of Not Equal to Zero atomic formulae
-			\item L - number of Equal to Zero atomic formulae
-			\item S - number of Measured Not Equal to Zero atomic formulae
-			\item U - number of Measured Equal to Zero atomic formulae
+			\item I - number of Contact atomic formulas
+			\item J - number of Non Contact atomic formulas
+			\item K - number of Not Equal to Zero atomic formulas
+			\item L - number of Equal to Zero atomic formulas
+			\item S - number of Measured Not Equal to Zero atomic formulas
+			\item U - number of Measured Equal to Zero atomic formulas
 		\end{itemize}
 
 		The creation of a model can be done with various algorithms. In this paper the following algorithms will be defined and described in details:
@@ -1987,10 +2016,10 @@ virtual auto create(const formulas_t& contacts_T,
 			\begin{itemize}
 				\item N - number of variables in the atomic formulas
 				\item M - number of atomic formulas
-				\item I - number of Contact atomic formulae
-				\item J - number of Non Contact atomic formulae
-				\item K - number of Not Equal to Zero atomic formulae
-				\item L - number of Equal to Zero atomic formulae
+				\item I - number of Contact atomic formulas
+				\item J - number of Non Contact atomic formulas
+				\item K - number of Not Equal to Zero atomic formulas
+				\item L - number of Equal to Zero atomic formulas
 			\end{itemize}
 			
 			Note: The term evaluation is with an accumulated complexity of O(L) which is not included in the O notation bellow.
