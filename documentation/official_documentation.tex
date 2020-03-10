@@ -579,8 +579,8 @@ class Formula
 			\item $\varphi_1$ | $\varphi_2$ is used to represent $\varphi_1 \: \vee \: \varphi_2$
 		\end{itemize}
 
-		Flex and Bison are used to generate a parser with the modal logic grammar.
-		Flex is used as a tokenizer while Bison is used as the parser.
+		Flex \cite{flex-tokenizer} and Bison \cite{bison-parser} are used to generate a parser with the modal logic grammar.
+		Flex is used as a tokenizer. Bison is used as the parser.
 		\newline
 		There are two types of building elements in the modal logic formula:
 		\begin{itemize}
@@ -592,7 +592,7 @@ class Formula
 		The tokenizer is responsible for demarcating the special sybmols in the input formula.
 		After the symbols are identified a token is created for each of them or at least for those significant to the semantic of the input formula.
 		For example the whitespaces are not significant and a tokens are not created for them.
-		We shall use Flex as a tokenizer.
+		We shall use Flex as a tokenizer \cite{flex-tokenizer}.
 
 		\paragraph{Grammar} The tokenizer's grammar is composed from two types of symbols
 			\begin{itemize}
@@ -779,7 +779,7 @@ term
 		\end{lstlisting}
 
 		\subsection{Abstract Syntax Tree}
-			The resulting AST can be easirly modified and optimized, this is best achieved with the visitor pattern.
+			The resulting AST can be easirly modified and optimized, this is best achieved with the visitor pattern \cite{visitor-pattern}.
 			The visitor pattern uses double virtual dispatching.
 
 			\subsubsection{Operation types in the formula/term nodes}
@@ -2402,6 +2402,20 @@ virtual auto create(const formulas_t& contacts_T,
 			\item Visualized graph - This is the end result of the model, if such model exists \\
 				The visualization is done with a JavaScript third party library for drawing graphs.
 		\end{itemize}
+	\newpage
+	\begin{thebibliography}{9}
+	\bibitem{flex-tokenizer} 
+		Flex Tokenizer,
+		\\\texttt{http://web.mit.edu/gnu/doc/html/flex\_1.html}
+
+	\bibitem{bison-parser} 
+		Bison Parser,
+		\\\texttt{https://www.gnu.org/software/bison/}
+
+	\bibitem{visitor-pattern} 
+		Visitor Pattern,
+		\\\texttt{https://en.wikipedia.org/wiki/Visitor\_pattern}
+	\end{thebibliography}
 \end{document}
 
 
