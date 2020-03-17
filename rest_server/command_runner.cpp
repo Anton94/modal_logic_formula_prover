@@ -28,6 +28,6 @@ bool run(const std::string& cmd, std::string& output)
 
 //    read_output(file, output);
 
-//    return pclose(file) == 0;
+//    return _pclose(file) == 0;
 }
 }

@@ -238,6 +238,7 @@ void microservice_controller::handle_task(const http_request& message)
                             {
                                 auto& final_result = task_info_it->second.result_;
                                 final_result.output.append(info_output.str());
+
                                 info_output.str(std::string());
                                 next_update = now + UPDATE_TIME;
                             }
@@ -245,6 +246,9 @@ void microservice_controller::handle_task(const http_request& message)
                             {
                                 std::cout << "The task info for: " << op_id << " has been removed, so will terminate the algorithm's execution." << std::endl;
                                 is_task_info_removed = true;
+
+                                info_output.clear();
+                                next_update = now + 1s;
                             }
                         }
                     };
@@ -490,7 +494,7 @@ void microservice_controller::handle_formula_generation(const http_request& mess
         auto query_params = uri::split_query(request.request_uri().query());
 
         auto get_param = [&](const std::string& param, std::string& param_value) {
-            auto op_id_u = query_params.find(U(param));
+            auto op_id_u = query_params.find(utility::conversions::to_string_t(param));
             if(op_id_u == query_params.end())
             {
                 message.reply(status_codes::BadRequest, "Missing 'op_id' query parameter.")
