@@ -19,6 +19,11 @@
 \restylefloat{table}
 \newcommand{\tabitem}{~~\llap{\textbullet}~~}
 
+\newcommand\eqdef{\mathrel{\overset{\makebox[0pt]{\mbox{\normalfont\scriptsize\sffamily def}}}{=\joinrel=}}}
+
+\newcommand\M{\mathcal{M}}
+\newcommand\F{\mathcal{F}}
+
 \lstset { %
     language=C++,
     backgroundcolor=\color{black!5}, % set backgroundcolor
@@ -37,11 +42,202 @@
 
 	\newpage
 
-	\section{Tableaux Method}
+	\section{Tableau Method For Classic Propositional Logic}
+
+	\subsection{What Is A Tableau?}
+	A tableau method is a formal proof procedure. First, it could be used as a refutation procedure: to show a formula X is valid we begin with some syntactical expression intended to assert it is not. This expression is broken down syntactically, generally splitting things into several cases. This part of a tableau procedure - the tableau expansion stage - can be thought of as a generalization of disjunctive normal form expansion. Generally, it moves from formulas to subformulas. Finally, there are rules for closing cases: impossibility conditions based on syntax. If each case closes, the tableau itself is said to be closed. A closed tableau beginning with an expression asserting that X is not valid is a tableau proof of X. \par	
+	There is a second way of thinking about the tableau method: as a search procedure for models meeting certain conditions. Each branch of a tableau can be considered to be a partial description of a model. In automated theorem-proving, tableaus can be used to generate counter-examples. \par	
+	The connection between the two roles for tableaus - as a proof procedure and as a model search procedure - is simple. If we use tableaus to search for a model in which X is false, and we produce a closed tableau, no such model exists, so X must be valid.
+
+	\subsection{Classical Propositional Tableaus}
+	We will look into the signed tableau system for classical propositional logic.
+
+	\par
+	First, we need syntactical machinery for asserting the invalidity of a formula, and for doing case analysis. For this purpose two signs are introduced: $T$ and $F$, where these are simply two new symbols, not part of the language of formulas. \textit{Signed formulas} are expressions of the form $F X$ and $T X$, where X is a formula. The intuitive meaning of $F X$ is that X is \textit{false} (in some model). Similarly, $T X$ intuitively asserts that X is \textit{true}. Then $F X$ is the syntactical device for (informally) asserting the invalidity of X. A tableau proof of X begins with $F X$.
+
+	\par
+	Next, we need machinery (rules) for breaking signed formulas down and doing a case division. We will define rules for each logical operator ($\neg \land \lor \Rightarrow \Leftrightarrow$).
+
+	\par
+	The treatment of \textbf{negation} is straightforward: from \textit{T $\neg$X} we get \textit{F X} and from \textit{F $\neg$X} we get \textit{T X}. These rules can be conveniently presented as follows.
+
+	\[
+		\frac{T \neg X}{F X}\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{F \neg X}{T X}
+	\]
+
+	\par
+
+	The rules for \textbf{conjunction} are somewhat more complex. From truth tables we know that if $X \land Y$ is \textit{true}, X must be \textit{true} and Y must be \textit{true}. Likewise, if $X \land Y$ is \textit{false}, eigher X is \textit{false} or Y is \textit{false}. This involves a split into two cases. Corresponding syntactic rules are as follows.
+	\[
+		\frac{T X \land Y}{\displaystyle{T X \atop T Y}}\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{F X \land Y}{F X \mid F Y}
+	\]
+
+	The rules for \textbf{disjunction} are similar. From truth tables we know that if $X \lor Y$ is \textit{true}, eigher X is \textit{true} or Y is \textit{true}. This involves a split into two cases. Likewise, if $X \lor Y$ is \textit{false}, X must be \textit{false} and Y must be \textit{false}. Corresponding syntactic rules are as follows.
+	\[
+		\frac{T X \lor Y}{T X \mid T Y}\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{F X \lor Y}{\displaystyle{F X \atop F Y}}
+	\]
+
+	\par
+	The rules for \textbf{implication}. From truth tables we know that if $X \Rightarrow Y$ is \textit{true}, eigher X is \textit{false} or Y is \textit{true}. Likewise, if $X \Rightarrow Y$ is \textit{false}, X must be \textit{true} and Y must be \textit{false}. Corresponding syntactic rules are as follows.
+	\[
+		\frac{T X \Rightarrow Y}{F X \mid T Y}\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{F X \Rightarrow Y}{\displaystyle{T X \atop F Y}}
+	\]
+
+	\par
+	The rules for \textbf{equivalence}. From truth tables we know that if $X \Leftrightarrow Y$ is \textit{true}, eigher X is \textit{true} and Y is \textit{true} or X is \textit{false} and Y is \textit{false}. Likewise, if $X \Rightarrow Y$ is \textit{false}, eigher X is \textit{true} and Y is \textit{false} or X is \textit{false} and Y is \textit{true}. Corresponding syntactic rules are as follows.
+	\[
+		\frac{T X \Leftrightarrow Y}{\left.\displaystyle{T X \atop T Y}\right\vert\displaystyle{F X \atop F Y}}\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{F X \Leftrightarrow Y}{\left.\displaystyle{T X \atop F Y}\right\vert\displaystyle{F X \atop T Y}}
+	\]
+
+	\par
+	The standard way of displaying tableaus is as downward branching trees with signed formulas as node labels. Indeed, the tableau method is often referred to as the tree method. Think of a tree as representing the disjunction of its branches, and a branch as representing the conjunction of the signed formulas on it.
+
+	\par
+	When using a tree display, a tableau expansion is thought of temporally, and one talks about the stages of constructing a tableau, meaning the stages of growing a tree. The rules given above are thought of as branch-lengthening rules. Thus, a branch containing \textit{T $\neg$ X} can be lengthened by adding a new node to its end, with \textit{F X} as a label. Likewise a branch containing \textit{F X $\lor$ Y} can be lengthened with two new nodes, labelled \textit{F X} and \textit{F Y} (take the node with \textit{F Y} as the child of the one labelled \textit{F X}). A branch containing \textit{T X $\lor$ Y} can be split - its leaf is given a new left and a new right child, with one labelled \textit{T X}, the other \textit{T Y}. This is how the schematic rules above are applied to trees.
+	\par
+	An important point to note is that the tableau rules are non-deterministic. They say what can be done, not what must be done. At each stage, we choose a signed formula occurrence on a branch and apply a rule to it. Since the order of choice is arbitrary, there can be many tableaus for a single signed formula.
+	\par
+	Here is the final stage of a tableau expansion beginning with the signed formula $F (X \land Y) \Rightarrow (\neg X \land \neg Y)$.
+	\\\indent\indent\indent\indent 1. $F(X \land Y) \Rightarrow \neg(\neg X \lor \neg Y)$
+	\\\indent\indent\indent\indent 2. $TX \land Y$
+	\\\indent\indent\indent\indent 3. $F\neg(\neg X \lor \neg Y)$
+	\\\indent\indent\indent\indent 4. $T X$
+	\\\indent\indent\indent\indent 5. $T Y$
+	\\\indent\indent\indent\indent 6. $T\neg X \lor \neg Y$
+	\\
+	\begin{tikzpicture}[scale = 0.8]
+		\draw (-4,0) (4,1);
+        \draw[thick] (-1.5,0) -- (0,1) -- (1.5,0);
+    \end{tikzpicture}
+	\\\indent\indent\;\;  7. $T \neg X$  \indent \indent\indent 8. $T \neg Y$
+	\\\indent\indent\;\; 9. $F X$ \indent\indent\indent 10. $F Y$
+
+	\par
+	In this we have added numbers for reference purposes. Items 2 and 3 are from 1 by $F \Rightarrow $. 4 and 5 are from 2 by $T \land$. 6 is from 3 by $F \neg$. 7 and 8 are from 6 by $T \lor$. 9 is from 7 by $T \neg$. 10 is from 8 by $T \neg$.
+	\par
+	Finaly, the conditions for closing off a case (declaring a branch closed) are	simple. A \textbf{branch is closed} if it contains $T A$ and $F A$ for some formula $A$. If each branch is closed, then the \textbf{tableau is closed}. A closed tableau for $F X$ is a tableau proof of $X$, meaning that A is a tautology. The tableau displayed above is closed, so the formula $(X \land Y) \Rightarrow (\neg X \land \neg Y)$ has a tableau proof.
+	\par
+	It may happen that no tableau proof is forthcoming, and we can think of the tableau construction as providing us with contraexamples. Consider the following attempt to prove $(X \Rightarrow Y) \Rightarrow ((Y \Rightarrow X) \Rightarrow \neg Y)$
+	\\\indent\indent\indent\indent\indent\indent 1. $F (X \Rightarrow Y) \Rightarrow ((Y \Rightarrow X) \Rightarrow \neg Y)$
+	\\\indent\indent\indent\indent\indent\indent 2. $T X \Rightarrow Y$
+	\\\indent\indent\indent\indent\indent\indent 3. $F (Y \Rightarrow X) \Rightarrow \neg Y$
+	\\\indent\indent\indent\indent\indent\indent 4. $T Y \Rightarrow X$
+	\\\indent\indent\indent\indent\indent\indent 5. $F \neg Y$
+	\\\indent\indent\indent\indent\indent\indent 6. $T Y$
+	\\
+	\begin{tikzpicture}[scale = 0.8]
+		\draw (-5,0) (5,1);
+        \draw[thick] (-2,0) -- (-0.4,1) -- (1.6,0);
+    \end{tikzpicture}
+	\\\indent\indent\indent 7. $F X$  \indent\indent\indent\indent\;\; 8. $T Y$
+	\\
+	\begin{tikzpicture}[scale = 0.8]
+		\draw (-5,0) (5,1);
+        \draw[thick] (-3.2,0) -- (-2.3,1) -- (-1.4,0);
+        \draw[thick] (1,0) -- (2,1) -- (3,0);
+    \end{tikzpicture}
+	\\\indent\;\; 9. $F Y$ \indent 10. $T X$  \indent 11. $F Y$ \indent 12. $T X$
+	\par
+	Item 2 and 3 are from 1 by $F \Rightarrow$, as are 4 and 5 from 3. Item 6 is from 5 by $F \neg$. Items 7 and 8 are from 2 by $T \Rightarrow$, as are 9 and 10 from 4. Items 11 and 12 are also from 4 by $T \Rightarrow$. The leftmost branch is closed because of 6 and 9. The left-right branch is closed because of 7 and 10. The right-left branch is closed because of 8 and 11. But the rightmost branch is not closed. Notice that every non-atomic signed formula has had a rule applied to it on this branch and there is nothing left to do. (For clasical propositional logic it is sufficient to apply a rule to a formula on a branch only once.) In fact the branch yields a counterexample, as follows. Let $\upsilon$ be a propositional valuation that maps X to \textit{true} and Y to \textit{true} in accordance to 8 and 12. Now, we work our way back up the branch. Since $\upsilon(Y) = true$, $\upsilon(\neg Y) = false$, item 5. From $\upsilon(X) = true$ follows that $\upsilon(Y \Rightarrow X) = true$, item 4. From $\upsilon(Y) = true$ follows that $\upsilon(X \Rightarrow Y) = true$, item 2. Since $\upsilon(Y \Rightarrow X) = true$ and $\upsilon(\neg Y) = false$ we have $\upsilon((Y \Rightarrow X) \Rightarrow \neg Y) = false$, item 3. Finally, $\upsilon((X \Rightarrow Y) \Rightarrow ((Y \Rightarrow X) \Rightarrow \neg Y)) = false$, item 1.
+	\par
+	Later, we are going to use the tableau method to produce a model in which the initial formula is valid.
+	\par
+	From a different point of view, we can think of a classical tableau simply as a set of sets of signed formulas: a tableau is the set of its all branches, and a branch is the set of signed formulas that occur on it. Semantically, we think of the outer set as the disjunction of its members, and these members, the inner sets, as conjunctions of signed formulas they contain. Considered this way, a tableau is a generalization of disjunctive normal form (a generalization because of formulas more complex than literals can occur). Now, the tableau construction process can be thought of as a variation of the process of converting a formula into a disjunctive normal form. 	
 
 	\newpage
 	\section{Contact Logics}
-	
+	\subsection{Syntax}
+	The language of contact logic consist of:
+	\begin{itemize}
+		\item \textit{Boolean variables} (a denumeratable set)
+		\item \textit{Boolean constants}: 0 and 1
+		\item \textit{Boolean operations}:
+		\begin{itemize}
+			\item $\sqcap$ boolean meat
+			\item $\sqcup$ boolean join
+			\item \textbf{*} boolean complement
+		\end{itemize}
+		\item \textit{Boolean terms} (or simply \textit{terms})
+		\item \textit{Propositional connectivies}: $\neg$, $\land$, $\lor$, $\Rightarrow$, $\Leftrightarrow$
+		\item \textit{Propositional constants}: $\top$ and $\bot$
+		\item \textit{Modal connectives}: $\leq$(part-of) and $C$(contact)
+		\item \textit{Complex formulas} (or simply \textit{formulas})
+	\end{itemize}
+
+	\noindent\textbf{\textit{Terms}} are defined in the following inductive process:
+	\begin{itemize}
+		\item Each Boolean variable is a term
+		\item Each Boolean constant is a term
+		\item If $a$ is a term then $a*$ is a term
+		\item If $a$ and $b$ are terms then $a \sqcap b$ and $a \sqcup b$ are terms
+	\end{itemize}
+
+	\noindent\textbf{\textit{Atomic formulas}} are of the form $a \leq b$ and $aCb$, where $a$ and $b$ are terms.
+
+	\noindent\textbf{\textit{Formulas}} are defined in the following inductive process:
+	\begin{itemize}
+		\item Each propositional constant is a formula
+		\item Each atomic formula is a formula
+		\item If $\phi$ is a formula then $\neg\phi$ is a formula
+		\item If $\phi$ and $\psi$ are formulas then ($\phi \land \psi$), ($\phi \lor \psi$), ($\phi \Rightarrow \psi$) and ($\phi \Leftrightarrow \psi$) are formulas
+	\end{itemize}
+
+	\noindent\textbf{\textit{Abbreviations}}:
+		$a = b \eqdef (a \leq b) \land (b \leq a)$,
+		$a \nleq b \eqdef \neg(a \leq b)$,
+		$a \neq b \eqdef \neg(a = b)$
+
+	\subsection{Relational semantics}
+
+	\par
+	Let $\F$ = (W, R) be a relational system with W $\neq$ $\varnothing$ and R $\subseteq$ $W^2$. We call such systems \textit{frames}. Following Galton[TODO] we may give a spatial meaning of frames naming the elements of W, \textit{cells} and the relation R, \textit{adjacency relation}. Then $\F$ is called \textit{adjacency space}. An example of adjacency space is the chess-board table, the cells are the squares, and two squares are adjacent if they have a common point.
+
+	\par
+	Originally Galton assumed R to be a reflexive and symmetric relation but it is more natural for R to be an arbitrary relation. \textit{Regions} in an adjacency space are arbitrary subsets of W and two sets $a$ and $b$ are in \textit{contact} ($aC_Rb$) if for some $x \in a$ and $y \in b$ we have $xRy$. Another way to define this relation is the following. For a subset $a \subseteq W$ define as in modal logic $\langle R \rangle a = \{ x \in W : (\exists y \in W)(xRy$ and $y \in a)\}$. Then $aC_Rb$ iff $a \cap \langle R \rangle b \neq \emptyset$ iff $\langle R^{-1} \rangle a \cap b \neq \emptyset$, where $R^{-1}$ is the converse relation of R. Note that if R is a symmetric relation then $aCb$ iff $a \cap \langle R \rangle b \neq \emptyset$ iff $\langle R \rangle a \cap b \neq \emptyset$.
+
+	\par
+	By a \textbf{\textit{valuation}} of the Boolean variables in $\F$ we mean any function $\upsilon$ assigning to each Boolean variable $a$ a subset $\upsilon(a) \subseteq W$. The valuation $\upsilon$ is then extended inductively to all Boolean terms as follows:
+
+	\begin{itemize}
+		\item $\upsilon(0) = \emptyset$
+		\item $\upsilon(1) = W$
+		\item $\upsilon(a \sqcap b) = \upsilon(a) \cap \upsilon(b)$
+		\item $\upsilon(a \sqcup b) = \upsilon(a) \cup \upsilon(b)$
+		\item $\upsilon(a*) = W \setminus \upsilon(a) = -\upsilon(a)$
+	\end{itemize}
+
+	\par
+	The pair $\M$ = ($\F, \upsilon$) is called \textbf{\textit{model}}. The truth of a formula $\phi$ in $\M$ ($\M \models \phi$ or $\F, \upsilon \models \phi$) is defined inductively as follows:xtended inductively to all Boolean terms as follows:
+	\begin{itemize}
+		\item For atomic formulas:
+			\begin{itemize}
+				\item $\M \models \top$
+				\item $\M \not\models \bot$
+				\item $\M \models a \leq b \iff \upsilon(a) \subseteq \upsilon(b)$
+				\item $\M \models aCb \iff \upsilon(a)$ $C_R$ $\upsilon(b$ $\iff (\exists x \in \upsilon(a))(\exists y \in \upsilon(b))(xRy)$
+			\end{itemize}
+		\item For complex formulas:
+			\begin{itemize}
+				\item $\M \models \neg \phi \iff \M \not\models \phi$
+				\item $\M \models \phi \land \psi \iff \M \models \phi$ and $\M \models \psi$
+				\item $\M \models \phi \lor \psi \iff \M \models \phi$ or $\M \models \psi$
+				\item $\M \models \phi \Rightarrow \psi \iff \M \not\models \phi$ or $\M \models \psi$
+				\item $\M \models \phi \Leftrightarrow \psi \iff$ ($\M \models \phi$ and $\M \models \psi$) or ($\M \not\models \phi$ and $\M \not\models \psi$)
+			\end{itemize}
+	\end{itemize}
+
+	\par
+	Let us note that in the above semantics we evaluate formulas not locally at points[ TODO ??], as it is in the standard modal semantics, but globally in the whole model and this is one of the main differences of the present modal approach with the standard Kripke approach.
+
+	\par
+	A model $\M$ is a \textit{\textbf{model of a formula}} $\phi$ if $\phi$ is \textit{true} in $\M$.
+
+	\par
+	$\M$ is a model of a set of formulas $A$ if $\M$ is a model of all formulas from A.
+
+	\par
+	A formula $\phi$ is \textit{true} (or valid) in a frame $\F$ ($\F \models \phi$), if $\M \models \phi$ for all models $\M$ based on $\F$, i.e. for all valuations $\upsilon$ we have $\F$,$\upsilon \models \phi$.
+
 	\newpage
 	\section{Connected Contact Logics}
 
@@ -57,4 +253,13 @@
 	\newpage
 	\section{Connected Contact Logics Implementation}
 	
+	\newpage
+	\begin{thebibliography}{9}
+	\bibitem{Handbook-of-Tableau-Methods}
+		Handbook of Tableau Methods
+		M. D’Agostino, D. M. Gabbay, R. H¨ahnle and J. Posegga, eds.
+	\bibitem{modal-logics-space}
+		Modal Logics for Region-based Theories of Space
+		Philippe Balbiani, Thinko Tinchev, Dimiter Vakarelov
+	\end{thebibliography}
 \end{document}
