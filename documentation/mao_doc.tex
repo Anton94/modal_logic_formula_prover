@@ -13,6 +13,7 @@
 \usepackage{float}
 \usepackage{hyperref}
 \usepackage{tikz}
+\usepackage{multicol}
 
 \usetikzlibrary{arrows.meta}
 
@@ -38,7 +39,199 @@
 	\newpage
 
 	\section{Tableaux Method}
+When working with logical formula it is best to define a structural way to decomposition the formula and validate some properties on parts of the whole formula.
+The ability from parts of the formula to conclude properties for the formula itself leads to well structured and performant algorithms.
 
+The Tableau method is a formal proof procedure and can be found in many variants. Formally, this procedure is used to refute the validity of formulas. Specifically, if a formula X is given and we want to prove that X is valid, then we construct a new formula that will represent the invalidity of X. This new formula is usually created with additional syntactic expressions. Proving that the newly created formula is not valid, it implies proof of the validity of X. The proofing process uses steps to break down the given formula into simpler formulas. If these steps are applied multiple times, the proof of the initial complex formula comes down to a proof using syntactic comparisons of simple formulas.
+
+For our purposes, we will use a slightly different version of the method described above, namely with the help of the decomposition steps we will try to find a model with certain properties in which the given formula will not be valid.
+
+		\subsection{Propositional logic tableau}
+The tableau for propositional logic comes down to decomposing the operations {a, b, c. Contained in the formula itself. To reach this goal we need to improve our syntactical arsenal, namely to add the ability for asserting the validity of a formula. In order to do this we shall introduce two signs. These signs when combined with a formula will assert wheter the formula is true or false. Formally, the two signs are \{ T, F \}. Let $\varphi$ be a formula, then
+\begin{itemize}
+	\item T$\varphi$ - asserts the validity of the formula $\varphi$
+	\item F$\varphi$ - asserts the invalidity of the formula $\varphi$
+\end{itemize} 
+
+The tableau of a formula $\varphi$ begins with F$\varphi$. The intuition behind it is that we start with an assertion that $\varphi$ is not valid in some model, and by continuing the tablea process we seek for contradictions in the subformals. If such contradiction exists then the initial guess that the formula is not valid is not true meaning that the formula is valid. On the other hand if a contradiction does not exist then the formula is not valid, additionaly a model can be constructed in which the formula $\varphi$ is not valid.
+
+Next we need to add the decomposition process in our arsenal, thus beeing able to apply the complete tableau process on a propositional formula.
+One formula is decomposed into subformulas by one of the tableau rules. There are two rules for each operation in the logic. In the case of propositional logic with the following operations $\{ \neg, \vee, \wedge, \rightarrow, \leftrightarrow \}$ there are ten rules. Each rule decomposes the formula in at most two subformulas which depends on the arity of the operation. The decompositioning process forms a branch. A branch contains all signed subformulas which have been asserted in the decompositioning process.
+
+A tableau rule which decomposes the formula in two subformulas may require the assertion of only one of the subformulas to be satisfied. In this case we will say that the branch is split into two branches. However in some terminologies this is noted as a new branch spawned from the original branch, or that two new branches are created . For the sake of simplicity we will use the terminology of branch splitting. In a scenario where the branch is split all asserted formulas in the branch are copied in the splitted branch together with the newly asserted subformula from the tableau rule.The newly asserted subformulas depend on the tableau rule.
+
+	\subsubsection{Rules}
+		\paragraph{Negation}
+The rules for negations are straightforward. When a negation operation is encountered the sign of captured the formula changes.
+		\newline
+		\noindent\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \mathbb{T}(\neg \varphi), X \\
+				      \cline{2-2}
+				      & \mathbb{F}(\varphi), X
+			\end{array}
+		\end{align*}
+		\end{minipage}%
+		\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \mathbb{F}(\neg \varphi), X \\
+			      \cline{2-2}
+			      & \mathbb{T}(\varphi), X
+			\end{array}
+		\end{align*}
+		\end{minipage}
+		
+		\paragraph{Conjunction}
+This is a binary operation which means that the output of these rules is more complex than the negation rules.
+The conjunction rule for a formula signed as valid decomposes the formula in two subformulas and assert the validity of both of them.
+On the other hand the conjunction rule for a formula signed as invalid splits the branch into two branches and asserts the invalidity of the subformulas in each branch respectively.
+		\newline
+		\noindent\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \mathbb{T}(\varphi \: \wedge \: \psi), X \\
+			      \cline{2-2}
+			      & \mathbb{T}\varphi, \mathbb{T}\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}%
+		\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \:\:\: \mathbb{F}(\varphi \: \wedge \: \psi), X \\
+			      \cline{2-2}
+			      & \mathbb{F}\varphi, X \:\:\:\:\:\:\:\: \mathbb{F}\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}
+
+		\paragraph{Disjunction}
+This is a binary operation which means that the output of these rules is more complex than the negation rules.
+The disjunction rule for a formula signed as valid splits the branch into two branches and asserts the validity of the subformulas in each branch respectively.
+On the other hand the disjunction rule for a formula signed as invalid decomposes the formula in two subformulas and assert the invalidity of both of them.
+		\newline
+		\noindent\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \:\:\: \mathbb{T}(\varphi \: \vee \: \psi), X \\
+			      \cline{2-2}
+			      & \mathbb{T}\varphi, X \:\:\:\:\:\:\:\: \mathbb{T}\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}%
+		\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \mathbb{F}(\varphi \: \vee \: \psi), X \\
+			      \cline{2-2}
+			      & \mathbb{F}\varphi, \mathbb{F}\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}
+		
+		\paragraph{Implication}
+The implication as well is a binary operation and depending on the asserting sign it decomposes the formula in two subformulas or splits into two separate branches.
+		\newline
+		\noindent\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \:\:\: \mathbb{T}(\varphi \: \rightarrow \: \psi), X \\
+			      \cline{2-2}
+			      & \mathbb{F}\varphi, X \:\:\:\:\:\:\:\: \mathbb{T}\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}%
+		\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \mathbb{F}(\varphi \: \rightarrow \: \psi), X \\
+			      \cline{2-2}
+			      & \mathbb{T}\varphi, \mathbb{F}\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}
+		
+		\paragraph{Equivalence}
+Both of the equivalence rules split the branch into separate branches, the details can be observed in the following equations.
+		\newline
+		\noindent\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \:\:\:\:\:\:\:\: \mathbb{T}(\varphi \: \leftrightarrow \: \psi), X \\
+			      \cline{2-2}
+			      & \mathbb{T}\varphi, \mathbb{T}\psi, X \:\:\:\:\:\:\:\: \mathbb{F}\varphi, \mathbb{F}\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}%
+		\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \:\:\:\:\:\:\:\: \mathbb{F}(\varphi \: \leftrightarrow \: \psi), X \\
+			      \cline{2-2}
+			      & \mathbb{T}\varphi, \mathbb{F}\psi, X \:\:\:\:\:\:\:\: \mathbb{F}\varphi, \mathbb{T}\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}
+		\newline
+		\paragraph{Closed branch}
+A branch is said to be closed if and only if it contains the same formula signed as valid and invalid.
+
+		\paragraph{Closed tableau}
+A tableau is said to be closed if after the decomposition process all branches are closed.
+
+		\paragraph{Tautology formula} 
+Now we have the total arsenal required to validate if one propositional formula is tautology or not. The process to determin if a formula is tautology is as follows:
+Let $\varphi$ be a formula 
+\begin{enumerate}
+	\item Sign the formula as invalid, namely let $\mathbb{F}\varphi$ bet the initial formula in the tableau process
+	\item Execute the tableau process until the tableau contains only simple formulas in each branch
+	\item If all branches are closed, then the formula is a tautology otherwise it is not.
+\end{enumerate}
+
+	The tableau method is best explained through examples. First let us see an example of a formula which is a tautology.
+		\par
+	Consider the following formula $((\neg X \wedge (Y \rightarrow X)) \rightarrow \neg Y$
+	\newline
+	\\\indent\indent\indent\indent\indent\indent 1. $\mathbb{F} (((\neg X \wedge (Y \rightarrow X)) \rightarrow \neg Y)$
+	\\\indent\indent\indent\indent\indent\indent 2. $\mathbb{T} ((\neg X \wedge (Y \rightarrow X)),  \mathbb{F}\neg Y$
+	\\\indent\indent\indent\indent\indent\indent 3. $\mathbb{T} ((\neg X \wedge (Y \rightarrow X)),  \mathbb{T} Y$
+	\\\indent\indent\indent\indent\indent\indent 4. $\mathbb{T}\neg X , \mathbb{T} (Y \rightarrow X),  \mathbb{T} Y$
+	\\\indent\indent\indent\indent\indent\indent 5. $\mathbb{F} X , \mathbb{T} (Y \rightarrow X),  \mathbb{T} Y$
+	\\
+	\begin{tikzpicture}[scale = 0.8]
+		\draw (-6.5,0) (5,1);
+        \draw[thick] (-2,0) -- (-0.4,1) -- (1.6,0);
+    \end{tikzpicture}
+	\\\indent\indent\indent\indent\indent\;\; 6. $\mathbb{F} Y$  \indent\indent\indent\indent\;\; 7. $\mathbb{T} X$
+	\par
+	
+		\par
+		Detailed explanation
+	\newpage
+	The following tableau method is not closed and after the tableau process reaches all simple formulas a model in which the formula is not 
+	valid can be constructed. The formula used is $X \rightarrow (Y \vee (\neg(X \vee Y) \wedge Y))$.
+	\newline
+	\\\indent\indent\indent\indent\indent\indent 1. $\mathbb{F} (X \rightarrow (Y \vee (\neg(X \vee Y) \wedge Y)))$
+	\\\indent\indent\indent\indent\indent\indent 2. $\mathbb{T} X, \mathbb{F} (Y \vee (\neg(X \vee Y) \wedge Y)))$
+	\\\indent\indent\indent\indent\indent\indent 3. $\mathbb{T} X, \mathbb{F} Y,  \mathbb{F} (\neg(X \vee Y) \wedge Y)))$
+	\\\indent\indent\indent\indent\indent\indent 4. $\mathbb{T} X, \mathbb{F} Y,  \mathbb{F} (\neg(X \vee Y) \wedge Y)))$
+	\\
+	\begin{tikzpicture}[scale = 0.8]
+		\draw (-7,0) (5,1);
+        \draw[thick] (-2,0) -- (-0.4,1) -- (1.6,0);
+    \end{tikzpicture}
+	\\\indent\indent\indent\indent\indent\; 5. $\mathbb{F}\neg (X \vee Y)$  \indent\indent\indent\;\; 6. $\mathbb{F} Y$
+	\\\indent\indent\indent\indent\indent\; 7. $\mathbb{T} X \vee Y$
+	\\
+		\begin{tikzpicture}[scale = 0.8]
+		\draw (-7,0) (5,1);
+        \draw[thick] (-3.2,0) -- (-2.3,1) -- (-1.4,0);
+    \end{tikzpicture}
+	\\\indent\indent\indent\indent 8. $\mathbb{T} X$  \indent\indent\;\; 9. $\mathbb{T} Y$
+	Detailed explanation of the graph.
+	\par
 	\newpage
 	\section{Contact Logics}
 	
