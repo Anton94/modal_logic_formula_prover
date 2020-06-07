@@ -23,6 +23,9 @@
 
 \newcommand\M{\mathcal{M}}
 \newcommand\F{\mathcal{F}}
+\newcommand\Def{\noindent \textbf{Def: }}
+\newcommand\Lemma{\noindent \textbf{Lemma: }}
+\newcommand\Axiom{\noindent \textbf{Axiom: }}
 
 \lstset { %
     language=C++,
@@ -207,7 +210,7 @@
 	\end{itemize}
 
 	\par
-	The pair $\M$ = ($\F, \upsilon$) is called \textbf{\textit{model}}. The truth of a formula $\phi$ in $\M$ ($\M \models \phi$ or $\F, \upsilon \models \phi$) is defined inductively as follows:xtended inductively to all Boolean terms as follows:
+	The pair $\M$ = ($\F, \upsilon$) is called \textbf{\textit{model}}. The truth of a formula $\phi$ in $\M$ ($\M \models \phi$ or $\F, \upsilon \models \phi$) is defined inductively as follows: extended inductively to all Boolean terms as follows:
 	\begin{itemize}
 		\item For atomic formulas:
 			\begin{itemize}
@@ -230,16 +233,68 @@
 	Let us note that in the above semantics we evaluate formulas not locally at points[ TODO ??], as it is in the standard modal semantics, but globally in the whole model and this is one of the main differences of the present modal approach with the standard Kripke approach.
 
 	\par
-	A model $\M$ is a \textit{\textbf{model of a formula}} $\phi$ if $\phi$ is \textit{true} in $\M$.
+	\Def A model $\M$ is a \textit{\textbf{model of a formula}} $\phi$ if $\phi$ is \textit{true} in $\M$.
+
 
 	\par
-	$\M$ is a model of a set of formulas $A$ if $\M$ is a model of all formulas from A.
+	\Def $\M$ is a \textbf{model of a set of formulas} $A$ if $\M$ is a model of all formulas from A.
 
 	\par
-	A formula $\phi$ is \textit{true} (or valid) in a frame $\F$ ($\F \models \phi$), if $\M \models \phi$ for all models $\M$ based on $\F$, i.e. for all valuations $\upsilon$ we have $\F$,$\upsilon \models \phi$.
+	\Def A formula $\phi$ \textbf{is \textit{true}} (or \textbf{valid}) in a frame $\F$ ($\F \models \phi$), if $\M \models \phi$ for all models $\M$ based on $\F$, i.e. for all valuations $\upsilon$ we have $\F$,$\upsilon \models \phi$.\
+
+	\par
+	\Lemma (Equality of formulas) Let f and g are formulas. Then \par $f = g \implies \upsilon(f) = \upsilon(g)$.
+
+	\par
+	\Lemma (Equality of terms) Let a and b are terms. Then \par $a = b \implies \upsilon(a) = \upsilon(b)$.
+
+	TODO: axiom or lemma or neither??
+	\par
+	\Axiom (Reflexivity) Let a be a term. Then \par $ a \neq 0 \implies aCa$.
+
+	\par
+	\Axiom (Symmetry) Let a and b are terms. Then \par $aCb \iff bCa$.
+
+	\par
+	\Lemma (Monotonicity) Let a and b are terms. Then \par $aCb \land a \leq a' \land b \leq b' \implies a'Cb'$.
+
+	\par
+	\Lemma (Distributivity) Let a and b are terms. Then \par $aC(b \sqcup c) \iff aCb \lor aCc$, \; $aC(b \sqcup c) \iff aCb \lor aCc$.
+
+	\par
+	\Lemma Let a, b, c are terms and f, g are formulas. The following formulas are true:
+	\begin{itemize}
+		\item $f \land T \implies f$, $T \land f \implies f$
+		\item $f \land F \implies F$, $F \land f \implies F$
+		\item $f \lor T \implies T$, $T \lor f \implies T$
+		\item $f \lor F \implies f$, $F \lor f \implies f$
+		\item $a \sqcap 0 \implies 0$, $0 \sqcap a \implies 0$
+		\item $a \sqcup 0 \implies a$, $0 \sqcup a \implies a$
+		\item $a \sqcap 1 \implies a$, $1 \sqcap a \implies a$
+		\item $a \sqcup 1 \implies 1$, $1 \sqcup a \implies 1$
+		\item $a \leq b \implies a \sqcap b = 0$
+		\item $\neg(a \leq b) \implies a \sqcap b \neq 0$
+		\item $(a \sqcup b)Cc \iff aCc \lor bCc$
+		\item $(a \sqcup b) \leq c \iff a \leq c \land b \leq c$
+		\item $aCb \implies a \neq 0 \land b \neq 0$
+		\item $a \sqcap b \neq 0 \implies aCb$
+		\item $a = 0 \lor b = 0 \implies \neg(aCb)$
+		\item $0 \leq a \implies T$
+		\item $a \leq 1 \implies T$
+		\item $0C0 \implies F$
+		\item $aC0 \implies F$
+		\item $1C1 \implies T$
+		\item $aC1 \implies a \neq 0$
+		\item $a \neq 0 \implies aCa$
+
+	\end{itemize}
 
 	\newpage
 	\section{Connected Contact Logics}
+	TODO: Add more info, this is just too little
+
+	\par
+	\Lemma (Connectivity) Let a is a term. Then \par $a \neq 0 \land a \neq 1 \implies aCa*$
 
 	\newpage
 	\section{Implementation Introduction}
