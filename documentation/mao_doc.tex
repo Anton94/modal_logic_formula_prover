@@ -208,33 +208,111 @@ Let $\varphi$ be a formula
 	\par
 	
 		\par
-		Detailed explanation
-	\newpage
+The first step of our tableau method for proving if a formula is a tautology is to sign it as not valid and analyze it. This means that at 1. this signed formula is added to the root of the tableau method. In the next step there is only one possibility, namely to decompose the only formula currently in the tableau process. This formula is decomposed to two formulas present in 2. 
+At this point there are 2 possible outcomes, the first one is to decompose the formula $\mathbb{T} ((\neg X \wedge (Y \rightarrow X))$. The second one is to decompose the formula $\mathbb{F}\neg Y$. In this example we have chosen the second approach and the result is present in step 3, namely $\mathbb{F}\neg Y$ after a tableau step is $\mathbb{T} Y$. From step 3 to step 4 there is only one possibility. The simple $\mathbb{T}\neg X$ formula is decomposed to $\mathbb{F} X$. in step 5. Now the decomposition of the formula $\mathbb{T} (Y \rightarrow X)$ will split the tableau branch into two branches. $\mathbb{F} Y$ will be added in the one of the branches, which in turn will contradict with $\mathbb{T} Y$ which can be observed from step 3. This means that the branch closes. In the other branch $\mathbb{T} X$ is added which contradicts with $\mathbb{F} X$ from the previous step. This as well means that the second branch closes. Having a tableau with all branches closed proves that the initial assumption to sign the formula as invalid was wrong, hence the formula is a tautology.
+	
 	The following tableau method is not closed and after the tableau process reaches all simple formulas a model in which the formula is not 
 	valid can be constructed. The formula used is $X \rightarrow (Y \vee (\neg(X \vee Y) \wedge Y))$.
 	\newline
 	\\\indent\indent\indent\indent\indent\indent 1. $\mathbb{F} (X \rightarrow (Y \vee (\neg(X \vee Y) \wedge Y)))$
 	\\\indent\indent\indent\indent\indent\indent 2. $\mathbb{T} X, \mathbb{F} (Y \vee (\neg(X \vee Y) \wedge Y)))$
 	\\\indent\indent\indent\indent\indent\indent 3. $\mathbb{T} X, \mathbb{F} Y,  \mathbb{F} (\neg(X \vee Y) \wedge Y)))$
-	\\\indent\indent\indent\indent\indent\indent 4. $\mathbb{T} X, \mathbb{F} Y,  \mathbb{F} (\neg(X \vee Y) \wedge Y)))$
 	\\
 	\begin{tikzpicture}[scale = 0.8]
 		\draw (-7,0) (5,1);
         \draw[thick] (-2,0) -- (-0.4,1) -- (1.6,0);
     \end{tikzpicture}
-	\\\indent\indent\indent\indent\indent\; 5. $\mathbb{F}\neg (X \vee Y)$  \indent\indent\indent\;\; 6. $\mathbb{F} Y$
-	\\\indent\indent\indent\indent\indent\; 7. $\mathbb{T} X \vee Y$
+	\\\indent\indent\indent\indent\indent\; 4. $\mathbb{F}\neg (X \vee Y)$  \indent\indent\indent\;\; 5. $\mathbb{F} Y$
+	\\\indent\indent\indent\indent\indent\; 6. $\mathbb{T} X \vee Y$
 	\\
 		\begin{tikzpicture}[scale = 0.8]
 		\draw (-7,0) (5,1);
         \draw[thick] (-3.2,0) -- (-2.3,1) -- (-1.4,0);
     \end{tikzpicture}
 	\\\indent\indent\indent\indent 8. $\mathbb{T} X$  \indent\indent\;\; 9. $\mathbb{T} Y$
-	Detailed explanation of the graph.
+	\par
+	\par
+In step 1 the input formula is signed as not valid and added to the tableau. This signed formula is decomposed to two signed formulas in step 2. Where one of them is already a simple formula and can not be decomposed in simpler signed formulas. The second one is decomposed and the results can be seein in step 3. Again one of the new signed formulas is a simple formula. The only formula that can  be decomposed is $\mathbb{F} (\neg(X \vee Y) \wedge Y)))$ which splits the tableau branch.In the splitted branch $\mathbb{F} Y$ is added, this is step 5. This formula does not cause a contradiction in the branch and since thiere are no more possible decompositions it follows that the branch is not closed. At this point we knoww that the tableau is not closed. However for the purposes of this example let us examine the rest of the tableau process. In step 4 we can observe the additional signed formula which was added to the main branch. This signed formula is decomposed with the usage of one of the negation rules, as seen in step 6. Applying the disjunction rule for a formula signed as true on the formula in step 6 cases a branch split. Only one of the branches closes, namely the formula added in step 8. From this follows that the tableau is not closed and that the initial assumtion was true, namely the formula is not a tautology.
 	\par
 	\newpage
-	\section{Contact Logics}
-	
+	\section{Region-based Contact Logics}
+The region-based theory of space has the notion of region and relations between regions as one of the basic primitive notions of the theory.
+A region is simply defined as a set of elements in some space. Union and intersection are used as primary operations over regions.
+Two basic relations are introduced such as part-of and the contact relation. 
+The part-of relation constructs the structural dependencies between regions, namely the part-of relations defines the mereology of reagions.
+The contact relation defines the topological relation of connection. We will abstract ourselfs from the inner relation between two connected regions, namely
+this relation might be defined as "region A and region B are neightbours". What we will use for this inner relation is its reflexivity and symmetry.
+%talk about terms
+%talk about formulas
+	\subsection{Syntax}
+
+	\paragraph{Variable} 
+represents a region. Two predefined variables shall be used in order to simplify the notation. 
+		\begin{itemize}
+			\item W represents the whole world, namely the biggest region which contains all elements.
+			\item $\emptyset$ represents the empty region
+		\end{itemize}
+Let $\mathbb{V}ar$ be a countable set of all variables.
+
+	\paragraph{Boolean constants}
+Boolean constants are defined for W and $\emptyset$, namely 1 represents the world, while 0 represents the empty region.
+
+	\paragraph{Boolean operations}
+are operations over regions. The followings are boolean operations:
+		\begin{itemize}
+			\item $\sqcap$, denotes boolean intersection
+			\item $\sqcup$, denotes boolean union
+			\item * , denotes boolean complement
+		\end{itemize}
+
+	\paragraph{Term} 
+is defined with the following inductive definitions:
+	\label{sec:term-inductive-definition}
+		\begin{itemize}
+			\item Boolean constant is a term
+			\item $p \in \mathbb{V}ar$ is a term
+			\item If x is a term, then *x is a term
+			\item If x and y are terms, then $x \; \sigma \; y $ is a term,\\
+				where $\sigma \: \in \: \{\sqcap, \sqcup\}$
+		\end{itemize}	
+
+	\paragraph{Propositional constants}
+$\top$ and $\bot$ 
+
+	\paragraph{Propositional connectives} 
+$\neg, \vee, \wedge, \rightarrow, \leftrightarrow$
+
+	\paragraph{Atomic Formulas}
+		A formula $\varphi$ is called atomic, if it has one of the following forms:
+		\begin{itemize}
+			\item C(a, b), where a and b are terms
+			\item a <= b, where a and b are terms
+		\end{itemize}
+
+	\paragraph{Formula}
+is defined by the following inductive definition:
+	\label{sec:formula-inductive-definition}
+		\begin{itemize}
+			\item Each propositional Constant is a formula
+			\item Each atomic formula is a formula 
+			\item If $\varphi$ is a formula, then $\neg{\varphi}$ is a formula as well
+			\item If $\varphi$ and $\psi$ are formulas, then $\varphi \: \sigma \: \psi $ is a formula as well,\\
+				where $\sigma \in \{\vee, \wedge, \rightarrow, \leftrightarrow\}$
+		\end{itemize}
+
+	\paragraph{Zero term formula}
+		Let a and b be two terms, then
+		\begin{equation}
+			a \le b \iff a \sqcap \neg b = \emptyset
+		\end{equation}
+
+		$a \sqcap \neg b = \emptyset$ will be called zero term formula.
+		Since $a \sqcap \neg b$ is a new term, it can be assigned a variable $s = a \sqcap \neg b$, 
+		and now the zero term formula above can be written as $s  = 0$ which is with better readability and 
+		can be easirly grasped in proofs and definitions.
+
+
+	\subsection{Semantics}
 	\newpage
 	\section{Quantative Contact Logics}
 
