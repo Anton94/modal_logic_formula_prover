@@ -2,6 +2,7 @@
 \usepackage{mathtools}
 \usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage{amsthm}
 \usepackage{systeme}
 \usepackage{newtxtext}
 \usepackage{newtxmath}
@@ -23,9 +24,10 @@
 
 \newcommand\M{\mathcal{M}}
 \newcommand\F{\mathcal{F}}
-\newcommand\Def{\noindent \textbf{Def: }}
-\newcommand\Lemma{\noindent \textbf{Lemma: }}
-\newcommand\Axiom{\noindent \textbf{Axiom: }}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{defn}[theorem]{Deffinition}
 
 \lstset { %
     language=C++,
@@ -232,37 +234,28 @@
 	\par
 	Let us note that in the above semantics we evaluate formulas not locally at points[ TODO ??], as it is in the standard modal semantics, but globally in the whole model and this is one of the main differences of the present modal approach with the standard Kripke approach.
 
-	\par
-	\Def A model $\M$ is a \textit{\textbf{model of a formula}} $\phi$ if $\phi$ is \textit{true} in $\M$.
+	\defn A model $\M$ is a \textit{\textbf{model of a formula}} $\phi$ if $\phi$ is \textit{true} in $\M$.
 
+	\defn If $\phi$ has a model $\M$, then $\phi$ is \textbf{satisfiable}.
 
-	\par
-	\Def $\M$ is a \textbf{model of a set of formulas} $A$ if $\M$ is a model of all formulas from A.
+	\defn $\M$ is a \textbf{model of a set of formulas} $A$ if $\M$ is a model of all formulas from A.
 
-	\par
-	\Def A formula $\phi$ \textbf{is \textit{true}} (or \textbf{valid}) in a frame $\F$ ($\F \models \phi$), if $\M \models \phi$ for all models $\M$ based on $\F$, i.e. for all valuations $\upsilon$ we have $\F$,$\upsilon \models \phi$.\
+	\defn A formula $\phi$ \textbf{is \textit{true}} (or \textbf{valid}) in a frame $\F$ ($\F \models \phi$), if $\M \models \phi$ for all models $\M$ based on $\F$, i.e. for all valuations $\upsilon$ we have $\F$,$\upsilon \models \phi$.\
 
-	\par
-	\Lemma (Equality of formulas) Let f and g are formulas. Then \par $f = g \implies \upsilon(f) = \upsilon(g)$.
+	\lemma (Equality of formulas) Let f and g are formulas. Then \par $f = g \implies \upsilon(f) = \upsilon(g)$.
 
-	\par
-	\Lemma (Equality of terms) Let a and b are terms. Then \par $a = b \implies \upsilon(a) = \upsilon(b)$.
+	\lemma (Equality of terms) Let a and b are terms. Then \par $a = b \implies \upsilon(a) = \upsilon(b)$.
 
 	TODO: axiom or lemma or neither??
-	\par
-	\Axiom (Reflexivity) Let a be a term. Then \par $ a \neq 0 \implies aCa$.
+	\axiom (Reflexivity) Let a be a term. Then \par $ a \neq 0 \implies aCa$.
 
-	\par
-	\Axiom (Symmetry) Let a and b are terms. Then \par $aCb \iff bCa$.
+	\axiom (Symmetry) Let a and b are terms. Then \par $aCb \iff bCa$.
 
-	\par
-	\Lemma (Monotonicity) Let a and b are terms. Then \par $aCb \land a \leq a' \land b \leq b' \implies a'Cb'$.
+	\lemma (Monotonicity) Let a and b are terms. Then \par $aCb \land a \leq a' \land b \leq b' \implies a'Cb'$.
 
-	\par
-	\Lemma (Distributivity) Let a and b are terms. Then \par $aC(b \sqcup c) \iff aCb \lor aCc$, \; $aC(b \sqcup c) \iff aCb \lor aCc$.
+	\lemma (Distributivity) Let a and b are terms. Then \par $aC(b \sqcup c) \iff aCb \lor aCc$, \; $aC(b \sqcup c) \iff aCb \lor aCc$.
 
-	\par
-	\Lemma Let a, b, c are terms and f, g are formulas. The following formulas are true:
+	\lemma Let a, b, c are terms and f, g are formulas. The following formulas are true:
 	\begin{itemize}
 		\item $f \land T \implies f$, $T \land f \implies f$
 		\item $f \land F \implies F$, $F \land f \implies F$
@@ -291,10 +284,18 @@
 
 	\newpage
 	\section{Connected Contact Logics}
-	TODO: Add more info, this is just too little
 
-	\par
-	\Lemma (Connectivity) Let a is a term. Then \par $a \neq 0 \land a \neq 1 \implies aCa*$
+	In topology and related branches of mathematics, a connected space is a topological space that cannot be represented as the union of two or more disjoint non-empty open subsets. Connectedness is one of the principal topological properties that are used to distinguish topological spaces.
+
+	\theorem (Connectivity) Let b is a term. Then \par $b \neq 0 \land b \neq 1 \implies bCb*$
+
+	\paragraph{} Let $\F$ = (W, R) be a relational system with W $\neq$ $\varnothing$ and R $\subseteq$ $W^2$. Let us recall the deficition of C: \par $aCb \iff (\exists x \in \upsilon(a)) (\exists y \in \upsilon(b))(xRy)$, where a and b are terms
+
+	\paragraph{} The connectivity theorem can be written as follows:
+	\par$\upsilon(b) \neq \emptyset \land \upsilon(b) \neq W \implies (\exists x \in \upsilon(b)) (\exists y \in W \setminus \upsilon(b))(xRy)$
+
+	\paragraph{} Let us think of W and R as an undirected graph $G = (W, R)$. $W$ is the set of vertexes and R the set of edges. A path $\pi(v_1, v_n)$ is a sequence of vertexes $(v_1, v_2, \dotsc , v_n)$ such that $v_iRv_{i+1}$, for $i \in \{1,\dotsc,n-1\}$. The connectivity theorem implies that the graph $G$ should be connected, i.e. for each vertex $x \in W$ there should be a path to each vertex in $W$. 
+	\par$(\forall x \in W)(\forall y \in W)(\exists \pi(x, y))$ ($\pi$ is a path in $G$)
 
 	\newpage
 	\section{Implementation Introduction}
@@ -309,12 +310,16 @@
 	\section{Connected Contact Logics Implementation}
 	
 	\newpage
+	TODO: separate line for the authors
 	\begin{thebibliography}{9}
-	\bibitem{Handbook-of-Tableau-Methods}
-		Handbook of Tableau Methods
-		M. D’Agostino, D. M. Gabbay, R. H¨ahnle and J. Posegga, eds.
-	\bibitem{modal-logics-space}
-		Modal Logics for Region-based Theories of Space
-		Philippe Balbiani, Thinko Tinchev, Dimiter Vakarelov
+		\bibitem{Handbook-of-Tableau-Methods}
+			Handbook of Tableau Methods
+			M. D’Agostino, D. M. Gabbay, R. H¨ahnle and J. Posegga, eds.
+		\bibitem{modal-logics-space}
+			Modal Logics for Region-based Theories of Space
+			Philippe Balbiani, Thinko Tinchev, Dimiter Vakarelov
+		\bibitem{connected-space}
+			\href{https://en.wikipedia.org/wiki/Connected_space}{Connected Space}
+			or go to the next url: \url{https://en.wikipedia.org/wiki/Connected_space}
 	\end{thebibliography}
 \end{document}
