@@ -24,6 +24,7 @@
 
 \newcommand\M{\mathcal{M}}
 \newcommand\F{\mathcal{F}}
+\newcommand\p{\mathcal{P}}
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{axiom}[theorem]{Axiom}
@@ -160,7 +161,7 @@
 		\begin{itemize}
 			\item $\sqcap$ boolean meat
 			\item $\sqcup$ boolean join
-			\item \textbf{*} boolean complement
+			\item $^*$ boolean complement
 		\end{itemize}
 		\item \textit{Boolean terms} (or simply \textit{terms})
 		\item \textit{Propositional connectivies}: $\neg$, $\land$, $\lor$, $\Rightarrow$, $\Leftrightarrow$
@@ -173,7 +174,7 @@
 	\begin{itemize}
 		\item Each Boolean variable is a term
 		\item Each Boolean constant is a term
-		\item If $a$ is a term then $a*$ is a term
+		\item If $a$ is a term then $a^*$ is a term
 		\item If $a$ and $b$ are terms then $a \sqcap b$ and $a \sqcup b$ are terms
 	\end{itemize}
 
@@ -195,7 +196,7 @@
 	\subsection{Relational semantics}
 
 	\par
-	Let $\F$ = (W, R) be a relational system with W $\neq$ $\varnothing$ and R $\subseteq$ $W^2$. We call such systems \textit{frames}. Following Galton[TODO] we may give a spatial meaning of frames naming the elements of W, \textit{cells} and the relation R, \textit{adjacency relation}. Then $\F$ is called \textit{adjacency space}. An example of adjacency space is the chess-board table, the cells are the squares, and two squares are adjacent if they have a common point.
+	Let $\F$ = (W, R) be a relational system with W $\neq$ $\emptyset$ and R $\subseteq$ $W^2$. We call such systems \textit{frames}. Following Galton[TODO] we may give a spatial meaning of frames naming the elements of W, \textit{cells} and the relation R, \textit{adjacency relation}. Then $\F$ is called \textit{adjacency space}. An example of adjacency space is the chess-board table, the cells are the squares, and two squares are adjacent if they have a common point.
 
 	\par
 	Originally Galton assumed R to be a reflexive and symmetric relation but it is more natural for R to be an arbitrary relation. \textit{Regions} in an adjacency space are arbitrary subsets of W and two sets $a$ and $b$ are in \textit{contact} ($aC_Rb$) if for some $x \in a$ and $y \in b$ we have $xRy$. Another way to define this relation is the following. For a subset $a \subseteq W$ define as in modal logic $\langle R \rangle a = \{ x \in W : (\exists y \in W)(xRy$ and $y \in a)\}$. Then $aC_Rb$ iff $a \cap \langle R \rangle b \neq \emptyset$ iff $\langle R^{-1} \rangle a \cap b \neq \emptyset$, where $R^{-1}$ is the converse relation of R. Note that if R is a symmetric relation then $aCb$ iff $a \cap \langle R \rangle b \neq \emptyset$ iff $\langle R \rangle a \cap b \neq \emptyset$.
@@ -208,7 +209,7 @@
 		\item $\upsilon(1) = W$
 		\item $\upsilon(a \sqcap b) = \upsilon(a) \cap \upsilon(b)$
 		\item $\upsilon(a \sqcup b) = \upsilon(a) \cup \upsilon(b)$
-		\item $\upsilon(a*) = W \setminus \upsilon(a) = -\upsilon(a)$
+		\item $\upsilon(a^*) = W \setminus \upsilon(a) = -\upsilon(a)$
 	\end{itemize}
 
 	\par
@@ -234,68 +235,112 @@
 	\par
 	Let us note that in the above semantics we evaluate formulas not locally at points[ TODO ??], as it is in the standard modal semantics, but globally in the whole model and this is one of the main differences of the present modal approach with the standard Kripke approach.
 
-	\defn A model $\M$ is a \textit{\textbf{model of a formula}} $\phi$ if $\phi$ is \textit{true} in $\M$.
+	\begin{defn}
+		A model $\M$ is a \textit{\textbf{model of a formula}} $\phi$ if $\phi$ is \textit{true} in $\M$.
+	\end{defn}
 
-	\defn If $\phi$ has a model $\M$, then $\phi$ is \textbf{satisfiable}.
+	\begin{defn}
+		If $\phi$ has a model $\M$, then $\phi$ is \textbf{satisfiable}.
+	\end{defn}
 
-	\defn $\M$ is a \textbf{model of a set of formulas} $A$ if $\M$ is a model of all formulas from A.
+	\begin{defn}
+		$\M$ is a \textbf{model of a set of formulas} $A$ if $\M$ is a model of all formulas from A.
+	\end{defn}
 
-	\defn A formula $\phi$ \textbf{is \textit{true}} (or \textbf{valid}) in a frame $\F$ ($\F \models \phi$), if $\M \models \phi$ for all models $\M$ based on $\F$, i.e. for all valuations $\upsilon$ we have $\F$,$\upsilon \models \phi$.\
+	\begin{defn} A formula $\phi$ \textbf{is \textit{true}} (or \textbf{valid}) in a frame $\F$ ($\F \models \phi$), if $\M \models \phi$ for all models $\M$ based on $\F$, i.e. for all valuations $\upsilon$ we have $\F$,$\upsilon \models \phi$.
+	\end{defn}
 
-	\lemma (Equality of formulas) Let f and g are formulas. Then \par $f = g \implies \upsilon(f) = \upsilon(g)$.
+	\begin{lemma}
+		(Equality of formulas) Let f and g are formulas. Then \par $f = g \implies \upsilon(f) = \upsilon(g)$.
+	\end{lemma}
 
-	\lemma (Equality of terms) Let a and b are terms. Then \par $a = b \implies \upsilon(a) = \upsilon(b)$.
+	\begin{lemma}
+		(Equality of terms) Let a and b are terms. Then \par $a = b \implies \upsilon(a) = \upsilon(b)$.
+	\end{lemma}
+
+	\begin{lemma} (Zero term) Let a and b are terms. Then \par $a \leq b \implies a \sqcap b^*=0$
+	\end{lemma}
+
+	\begin{lemma} (Non-zero term) Let a and b are terms. Then \par $\neg(a \leq b) \implies a \sqcap b^* \neq 0$
+	\end{lemma}
 
 	TODO: axiom or lemma or neither??
-	\axiom (Reflexivity) Let a be a term. Then \par $ a \neq 0 \implies aCa$.
+	\begin{axiom}
+		(Reflexivity) Let a be a term. Then \par $ a \neq 0 \implies aCa$.
+	\end{axiom}
 
-	\axiom (Symmetry) Let a and b are terms. Then \par $aCb \iff bCa$.
+	\begin{axiom}
+		(Symmetry) Let a and b are terms. Then \par $aCb \iff bCa$.
+	\end{axiom}
 
-	\lemma (Monotonicity) Let a and b are terms. Then \par $aCb \land a \leq a' \land b \leq b' \implies a'Cb'$.
+	\begin{lemma}
+		(Monotonicity) Let a and b are terms. Then \par $aCb \land a \leq a' \land b \leq b' \implies a'Cb'$.
+	\end{lemma}
 
-	\lemma (Distributivity) Let a and b are terms. Then \par $aC(b \sqcup c) \iff aCb \lor aCc$, \; $aC(b \sqcup c) \iff aCb \lor aCc$.
+	\begin{lemma}
+		(Distributivity) Let a and b are terms. Then \par $aC(b \sqcup c) \iff aCb \lor aCc$, \; $aC(b \sqcup c) \iff aCb \lor aCc$.
+	\end{lemma}
 
-	\lemma Let a, b, c are terms and f, g are formulas. The following formulas are true:
-	\begin{itemize}
-		\item $f \land T \implies f$, $T \land f \implies f$
-		\item $f \land F \implies F$, $F \land f \implies F$
-		\item $f \lor T \implies T$, $T \lor f \implies T$
-		\item $f \lor F \implies f$, $F \lor f \implies f$
-		\item $a \sqcap 0 \implies 0$, $0 \sqcap a \implies 0$
-		\item $a \sqcup 0 \implies a$, $0 \sqcup a \implies a$
-		\item $a \sqcap 1 \implies a$, $1 \sqcap a \implies a$
-		\item $a \sqcup 1 \implies 1$, $1 \sqcup a \implies 1$
-		\item $a \leq b \implies a \sqcap b = 0$
-		\item $\neg(a \leq b) \implies a \sqcap b \neq 0$
-		\item $(a \sqcup b)Cc \iff aCc \lor bCc$
-		\item $(a \sqcup b) \leq c \iff a \leq c \land b \leq c$
-		\item $aCb \implies a \neq 0 \land b \neq 0$
-		\item $a \sqcap b \neq 0 \implies aCb$
-		\item $a = 0 \lor b = 0 \implies \neg(aCb)$
-		\item $0 \leq a \implies T$
-		\item $a \leq 1 \implies T$
-		\item $0C0 \implies F$
-		\item $aC0 \implies F$
-		\item $1C1 \implies T$
-		\item $aC1 \implies a \neq 0$
-		\item $a \neq 0 \implies aCa$
-
-	\end{itemize}
+	\begin{lemma}
+		Let a, b, c are terms and f, g are formulas. The following formulas are true:
+		\begin{itemize}
+			\item $f \land T \implies f$, $T \land f \implies f$
+			\item $f \land F \implies F$, $F \land f \implies F$
+			\item $f \lor T \implies T$, $T \lor f \implies T$
+			\item $f \lor F \implies f$, $F \lor f \implies f$
+			\item $a \sqcap 0 \implies 0$, $0 \sqcap a \implies 0$
+			\item $a \sqcup 0 \implies a$, $0 \sqcup a \implies a$
+			\item $a \sqcap 1 \implies a$, $1 \sqcap a \implies a$
+			\item $a \sqcup 1 \implies 1$, $1 \sqcup a \implies 1$
+			\item $(a \sqcup b)Cc \iff aCc \lor bCc$
+			\item $(a \sqcup b) \leq c \iff a \leq c \land b \leq c$
+			\item $aCb \implies a \neq 0 \land b \neq 0$
+			\item $a \sqcap b \neq 0 \implies aCb$
+			\item $a = 0 \lor b = 0 \implies \neg(aCb)$
+			\item $0 \leq a \implies T$
+			\item $a \leq 1 \implies T$
+			\item $0C0 \implies F$
+			\item $aC0 \implies F$
+			\item $1C1 \implies T$
+			\item $aC1 \implies a \neq 0$
+			\item $a \neq 0 \implies aCa$
+		\end{itemize}
+	\end{lemma}
 
 	\newpage
 	\section{Connected Contact Logics}
 
+	\par
 	In topology and related branches of mathematics, a connected space is a topological space that cannot be represented as the union of two or more disjoint non-empty open subsets. Connectedness is one of the principal topological properties that are used to distinguish topological spaces.
 
-	\theorem (Connectivity) Let b is a term. Then \par $b \neq 0 \land b \neq 1 \implies bCb*$
+	\begin{theorem}
+		(Connectivity) Let b is a term. Then
+		\label{connectivity-theorem}\begin{equation}
+			b \neq 0 \land b \neq 1 \implies bCb^*
+		\end{equation}
+	\end{theorem}
 
-	\paragraph{} Let $\F$ = (W, R) be a relational system with W $\neq$ $\varnothing$ and R $\subseteq$ $W^2$. Let us recall the deficition of C: \par $aCb \iff (\exists x \in \upsilon(a)) (\exists y \in \upsilon(b))(xRy)$, where a and b are terms
+	\paragraph{} Let $\F$ = (W, R) be a relational system with W $\neq$ $\emptyset$, R $\subseteq$ $W^2$ and a, b are terms. Let us recall the deficition of C:
+	\begin{equation}
+		aCb \iff (\exists x \in \upsilon(a)) (\exists y \in \upsilon(b))(xRy)
+	\end{equation}
 
 	\paragraph{} The connectivity theorem can be written as follows:
-	\par$\upsilon(b) \neq \emptyset \land \upsilon(b) \neq W \implies (\exists x \in \upsilon(b)) (\exists y \in W \setminus \upsilon(b))(xRy)$
+	\begin{equation}
+		\upsilon(b) \neq \emptyset \land \upsilon(b) \neq W \implies (\exists x \in \upsilon(b)) (\exists y \in W \setminus \upsilon(b))(xRy)
+	\end{equation}
 
 	\paragraph{} Let us think of W and R as an undirected graph $G = (W, R)$. $W$ is the set of vertexes and R the set of edges. A path $\pi(v_1, v_n)$ is a sequence of vertexes $(v_1, v_2, \dotsc , v_n)$ such that $v_iRv_{i+1}$, for $i \in \{1,\dotsc,n-1\}$. The connectivity theorem implies that the graph $G$ should be connected, i.e. for each vertex $x \in W$ there should be a path to each vertex in $W$. 
-	\par$(\forall x \in W)(\forall y \in W)(\exists \pi(x, y))$ ($\pi$ is a path in $G$)
+	\begin{equation}
+		\label{connectivity-theorem-graph}
+		(\forall x \in W)(\forall y \in W)(\exists \pi(x, y)) (\pi(x, y)\;is\;a\;path\;in\;G)
+	\end{equation}
+
+	\begin{defn}
+		A \textbf{connected model} is a model which satisfies the connectivity theorem(\ref{connectivity-theorem}).
+	\end{defn}
+
+	\paragraph{} Let $\M$ = ($\F, \upsilon$) be a model, where $\upsilon$ is an valuation. In order $\M$ to be a \textit{connected model} the graph $G$ should be connected.
 
 	\newpage
 	\section{Implementation Introduction}
@@ -308,7 +353,62 @@
 
 	\newpage
 	\section{Connected Contact Logics Implementation}
-	
+		Let $\phi$ is a path in the tableau of the following type:
+		\begin{align*}
+			\bigwedge\nolimits_{i} \; C(a_i, b_i) \:\: \wedge \:\: &
+			\bigwedge\nolimits_{j} \; \neg C(e_j, f_j) \:\: \wedge \:\: \\
+			\bigwedge\nolimits_{k} \; d_k = 0 \:\: \wedge \:\: &
+			\bigwedge\nolimits_{l} \; g_l \neq 0 \:\: \wedge \:\: \\
+			\bigwedge\nolimits_{s} \; <=_m(H_s, O_s) \:\: \wedge \:\: &
+			\bigwedge\nolimits_{u} \; \neg (<=_m(Q_u, R_u) )
+		\end{align*}
+
+		Let $\F$ = (W, R) be a relational system with W $\neq$ $\emptyset$, R $\subseteq$ $W^2$ and $\M$ = ($\F, \upsilon$) be a model for some formula $\phi$. In order $\M$ to be a connected model for $\phi$ the graph $G=(W, R)$ should be connected (from \ref{connectivity-theorem-graph}). The main idea for building a connected model is as follows:
+		\begin{itemize}
+			\item Create all possible points, w.r.t. the variables of $\phi$ in the set $W_{all}$.
+
+			\item Create a set $W$ from all points in $W_{all}$ which does not interfere with the zero terms in $\phi$:
+			\begin{equation}
+				W = \{ p \mid p \in W_{all} \land (\forall_k)(p \notin \upsilon(d_k)) \}
+			\end{equation}
+
+			\item Validate that all non-zero terms are satisfied:
+			\begin{equation}
+				(\forall_t)(\forall_{p \in W})(p \notin \upsilon(g_t))
+			\end{equation}
+
+			\item Validate that all contact terms are non-zero:
+			\begin{equation}
+				(\forall_i)(\forall_{p \in W})(p \notin \upsilon(a_i) \land p \notin \upsilon(b_i))
+			\end{equation}
+
+			\item Create relations between all points but skip those which interfere with $\neg C$ actomic formulas:
+			\begin{align*}
+				R = \{<x, y> \mid x, y \in W \land \neg(\exists_j)((x \in \upsilon(e_j) \land y \in \upsilon(f_j)) \:\lor \\
+				(x \in \upsilon(f_j) \land y \in \upsilon(e_j)) \:\lor \\
+				(x \in \upsilon(e_j) \land y \in \upsilon(e_j)) \:\lor \\
+				(x \in \upsilon(f_j) \land y \in \upsilon(f_j))) \}
+			\end{align*}
+
+			\item Validate that all atomic contact formulas in $\phi$ are satisfied:
+			\begin{equation}
+				(\forall_i)(\exists_{x \in \upsilon(a_i)})(\exists_{y \in \upsilon(b_i)})(xRy \lor yRx)
+			\end{equation}
+			Note that now $\M$ is a model of $\phi$.
+
+			\item Get all connected components of $G$ in the set $Comp$:
+			\begin{equation}
+				Comp = \{G'=(W', R') \mid W' \subseteq W \land R' \subseteq R \land G'\;is\;connected \}
+			\end{equation}
+
+			\item If Comp has a graph G' which defines a model of $\phi$ $\M' = (W', R', \upsilon')$, then $\M'$ is a connected model. Note that we only have to check the non-zero terms and the contact atomic formulas because, in some snese, we are removing points and contacts between them:
+			\begin{equation}
+			\begin{split}
+				(\exists_{G'=(W', R') \in Comp})((\forall_t)(\exists_{p \in W'})(p \in \upsilon(g_t))) \land ((\exists_{x \in \upsilon(a_i)})(\exists_{y \in \upsilon(b_i)})(xR'y \lor yR'x))
+			\end{split}
+			\end{equation}
+		\end{itemize}
+
 	\newpage
 	TODO: separate line for the authors
 	\begin{thebibliography}{9}
