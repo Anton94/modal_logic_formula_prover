@@ -313,6 +313,64 @@ is defined by the following inductive definition:
 
 
 	\subsection{Semantics}
+Our goal is to define the semantics of a formula and to answer the question when a formula satisfiable.
+When trying to define the satisfiability of a formula, couple of questions arise, such as:
+		\begin{itemize}
+			\item How is a region represented 
+			\item What does it mean for two regions to be in contact
+			\item In which scope is the formula satisfiable
+		\end{itemize}
+Let us first define the semantics of a formula which will lead us to its evaluation and satisfiability.
+\newline
+Let W be a countable set and $W \neq \emptyset$. This set will represent all elements in the world.
+A region will be a subset of W. Namely a set of elements represents a region.
+Let $R \subseteq W^2$ be a binary relation over regions. The relation R defines the contacts between regions.
+The relation R is a reflexive and symmetric relation. \\
+For example let us take:
+		\begin{equation*}
+			W = \text{"the set of all countries in the world"}
+		\end{equation*}
+With the above W, we can define the relation R, for example let $x, y \in W$, then:
+		\begin{equation*}
+			R = \text{"x has similar population count with y"}
+		\end{equation*}
+
+Having (W, R) as defined above, we conclude the followings: 
+		\begin{equation*}
+			R(\text{ Germany, Turkey })
+		 \end{equation*}
+		\begin{equation*}
+			R(\text{ Bulgaria } \sqcup \text{ Macedonia , Austria })
+		 \end{equation*}
+A relation system is defined as $\mathcal{F} = (W, R)$, where $W \neq \emptyset$. $\mathcal{F}$ is usually called a frame.
+
+	\paragraph{Boolean variable Evaluation}
+By  an evaluation of the Boolean variables in $'\mathcal{F}$ we mean any function $\mathscr{v}$ assignig to each Boolean variable a a subset $v(a) \subseteq W$. The evaluation is then extended inductively to all Boolean terms as follows
+		\begin{itemize}
+			\item $v(0) = \emptyset$
+			\item $v(1) = W$
+			\item $v(a \sqcap b) = v(a) \cap v(b)$
+			\item $v(a \sqcup b) = v(a) \cup v(b)$
+			\item $v(a*) = W \ v(a)$
+		\end{itemize}
+
+The pair $\mathcal{M} = (\mathcal{F}, \mathscr{v})$ is called a model. The truth of a formula $\varphi$ in $\mathcal{M}$ ( in symbols $\mathcal{M} \models \varphi$) is defined inductively as follows:
+		\begin{itemize}
+			\item $\mathcal{M} \not\models \bot$ 
+			\item $\mathcal{M} \models \top$
+			\item $\mathcal{M} \models a \leq b \text{ iff } v(a) \subseteq v(b)$
+			\item $\mathcal{M} \models aCb \text{ iff } v(a) \text{ iff } (\exists x \in v(a)), (\exists y \in v(b)) (xRy)$
+			\item $\mathcal{M} \models \neg \varphi \text{ iff } \mathcal{M} \not\models \varphi$
+			\item $\mathcal{M} \models a \; \sigma \; b \text{ iff } \mathcal{M} \models a \: \sigma \: \mathcal{M} \models b$, where $\sigma \in \{ \vee, \wedge \}$
+		\end{itemize}
+Let us note that in the above semantics we evaluate formulas not locally at points, as it is in the standard modal semantics, but globally in the whole model and this is one of the main differences of the present modal approach with the standard Kripke approach.
+
+A model $\mathcal{M}$ is a model of a formula $\varphi$  if $\varphi$ is true in $\mathcal{M}$; $\mathcal{M}$ is a model of a set of formulas A if $\mathcal{M}$ is 
+a model of all formulas from A. A formula $\varphi$ is true in a frame $\mathcal{F}$, or that $\mathcal{F}$ is a frame for $\varphi$, in symbols $\mathcal{F} \models \varphi$,
+if $\mathcal{M} \models \varphi$ for all models $\mathcal{M}$ based on $\mathcal{F}$, i.e. for all evaluations $\mathscr{v}$ we have $\mathcal{F}, \mathscr{v} \models \varphi$.
+If $\Sigma$ is a class of frames, we say that $\varphi$ is true in $\Sigma$, in symbols $\Sigma \models \varphi$, if $\varphi$ is true in all frames in $\Sigma$. We say that a set of 
+formulas A is satisfiable in $\Sigma$, or A is $\Sigma$-consistent, if there is a model $\mathcal{M} = (\mathcal{F}, \mathscr{v})$ with $\mathcal{F} \in \Sigma$ such that $\mathcal{M}$
+is a model of A.
 	\newpage
 	\section{Quantative Contact Logics}
 
@@ -329,6 +387,34 @@ is defined by the following inductive definition:
 	\section{Quantative Contact Logics Implementation}
 	
 	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 \end{document}
