@@ -25,10 +25,20 @@
 \newcommand\M{\mathcal{M}}
 \newcommand\F{\mathcal{F}}
 \newcommand\p{\mathcal{P}}
+\newcommand\V{\mathcal{V}}
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{axiom}[theorem]{Axiom}
 \newtheorem{defn}[theorem]{Deffinition}
+\newcommand{\BranchConjunction}{%
+\begin{alignat}{2}
+			\bigwedge_{i=1}^{I} \; C(a_i, b_i) \:\: \wedge \:\: &
+			\bigwedge_{j=1}^{J} \; d_j \neq 0 \:\: \wedge \:\:
+			\bigwedge_{k=1}^{K} \; \neg C(e_k, f_k) \:\: \wedge \:\: &
+			\bigwedge_{l=1}^{L} \; g_l = 0 \:\:
+\end{alignat}%
+}
+
 
 \lstset { %
     language=C++,
@@ -121,7 +131,7 @@
 	\par
 	In this we have added numbers for reference purposes. Items 2 and 3 are from 1 by $F \Rightarrow $. 4 and 5 are from 2 by $T \land$. 6 is from 3 by $F \neg$. 7 and 8 are from 6 by $T \lor$. 9 is from 7 by $T \neg$. 10 is from 8 by $T \neg$.
 	\par
-	Finaly, the conditions for closing off a case (declaring a branch closed) are	simple. A \textbf{branch is closed} if it contains $T A$ and $F A$ for some formula $A$. If each branch is closed, then the \textbf{tableau is closed}. A closed tableau for $F X$ is a tableau proof of $X$, meaning that A is a tautology. The tableau displayed above is closed, so the formula $(X \land Y) \Rightarrow (\neg X \land \neg Y)$ has a tableau proof.
+	Finaly, the conditions for closing off a case (declaring a branch closed) are	simple. A \textbf{branch is closed} if it contains a contradiction, i.e. $T A$ and $F A$ for some formula $A$. A \textbf{branch is opened} if it does not contain any contradiction. If each branch is closed, then the \textbf{tableau is closed}. A closed tableau for $F X$ is a tableau proof of $X$, meaning that A is a tautology. The tableau displayed above is closed, so the formula $(X \land Y) \Rightarrow (\neg X \land \neg Y)$ has a tableau proof.
 	\par
 	It may happen that no tableau proof is forthcoming, and we can think of the tableau construction as providing us with contraexamples. Consider the following attempt to prove $(X \Rightarrow Y) \Rightarrow ((Y \Rightarrow X) \Rightarrow \neg Y)$
 	\\\indent\indent\indent\indent\indent\indent 1. $F (X \Rightarrow Y) \Rightarrow ((Y \Rightarrow X) \Rightarrow \neg Y)$
@@ -155,7 +165,7 @@
 	\subsection{Syntax}
 	The language of contact logic consist of:
 	\begin{itemize}
-		\item \textit{Boolean variables} (a denumeratable set)
+		\item \textit{Boolean variables} (a denumeratable set $\V$)
 		\item \textit{Boolean constants}: 0 and 1
 		\item \textit{Boolean operations}:
 		\begin{itemize}
@@ -201,37 +211,38 @@
 	\par
 	Originally Galton assumed R to be a reflexive and symmetric relation but it is more natural for R to be an arbitrary relation. \textit{Regions} in an adjacency space are arbitrary subsets of W and two sets $a$ and $b$ are in \textit{contact} ($aC_Rb$) if for some $x \in a$ and $y \in b$ we have $xRy$. Another way to define this relation is the following. For a subset $a \subseteq W$ define as in modal logic $\langle R \rangle a = \{ x \in W : (\exists y \in W)(xRy$ and $y \in a)\}$. Then $aC_Rb$ iff $a \cap \langle R \rangle b \neq \emptyset$ iff $\langle R^{-1} \rangle a \cap b \neq \emptyset$, where $R^{-1}$ is the converse relation of R. Note that if R is a symmetric relation then $aCb$ iff $a \cap \langle R \rangle b \neq \emptyset$ iff $\langle R \rangle a \cap b \neq \emptyset$.
 
-	\par
-	By a \textbf{\textit{valuation}} of the Boolean variables in $\F$ we mean any function $\upsilon$ assigning to each Boolean variable $a$ a subset $\upsilon(a) \subseteq W$. The valuation $\upsilon$ is then extended inductively to all Boolean terms as follows:
+	\begin{defn}
+		By a \textbf{\textit{valuation}} of the Boolean variables in $\F$ we mean any function $\upsilon : \V \rightarrow \p(W)$ assigning to each Boolean variable $b$ a subset $\upsilon(b) \subseteq W$. The valuation $\upsilon$ is then extended inductively to all Boolean terms as follows:
 
-	\begin{itemize}
-		\item $\upsilon(0) = \emptyset$
-		\item $\upsilon(1) = W$
-		\item $\upsilon(a \sqcap b) = \upsilon(a) \cap \upsilon(b)$
-		\item $\upsilon(a \sqcup b) = \upsilon(a) \cup \upsilon(b)$
-		\item $\upsilon(a^*) = W \setminus \upsilon(a) = -\upsilon(a)$
-	\end{itemize}
+		\begin{itemize}
+			\item $\upsilon(0) = \emptyset$
+			\item $\upsilon(1) = W$
+			\item $\upsilon(a \sqcap b) = \upsilon(a) \cap \upsilon(b)$
+			\item $\upsilon(a \sqcup b) = \upsilon(a) \cup \upsilon(b)$
+			\item $\upsilon(a^*) = W \setminus \upsilon(a) = -\upsilon(a)$
+		\end{itemize}
+	\end{defn}
 
-	\par
-	The pair $\M$ = ($\F, \upsilon$) is called \textbf{\textit{model}}. The truth of a formula $\phi$ in $\M$ ($\M \models \phi$ or $\F, \upsilon \models \phi$) is defined inductively as follows: extended inductively to all Boolean terms as follows:
-	\begin{itemize}
-		\item For atomic formulas:
-			\begin{itemize}
-				\item $\M \models \top$
-				\item $\M \not\models \bot$
-				\item $\M \models a \leq b \iff \upsilon(a) \subseteq \upsilon(b)$
-				\item $\M \models aCb \iff \upsilon(a)$ $C_R$ $\upsilon(b$ $\iff (\exists x \in \upsilon(a))(\exists y \in \upsilon(b))(xRy)$
-			\end{itemize}
-		\item For complex formulas:
-			\begin{itemize}
-				\item $\M \models \neg \phi \iff \M \not\models \phi$
-				\item $\M \models \phi \land \psi \iff \M \models \phi$ and $\M \models \psi$
-				\item $\M \models \phi \lor \psi \iff \M \models \phi$ or $\M \models \psi$
-				\item $\M \models \phi \Rightarrow \psi \iff \M \not\models \phi$ or $\M \models \psi$
-				\item $\M \models \phi \Leftrightarrow \psi \iff$ ($\M \models \phi$ and $\M \models \psi$) or ($\M \not\models \phi$ and $\M \not\models \psi$)
-			\end{itemize}
-	\end{itemize}
-
+	\begin{defn}
+		The pair $\M$ = ($\F, \upsilon$) is called \textbf{\textit{model}}. The truth of a formula $\phi$ in $\M$ ($\M \models \phi$ or $\F, \upsilon \models \phi$) is extended inductively to all Boolean terms as follows:
+		\begin{itemize}
+			\item For atomic formulas:
+				\begin{itemize}
+					\item $\M \models \top$
+					\item $\M \not\models \bot$
+					\item $\M \models a \leq b \iff \upsilon(a) \subseteq \upsilon(b)$
+					\item $\M \models aCb \iff \upsilon(a)$ $C_R$ $\upsilon(b$ $\iff (\exists x \in \upsilon(a))(\exists y \in \upsilon(b))(xRy)$
+				\end{itemize}
+			\item For complex formulas:
+				\begin{itemize}
+					\item $\M \models \neg \phi \iff \M \not\models \phi$
+					\item $\M \models \phi \land \psi \iff \M \models \phi$ and $\M \models \psi$
+					\item $\M \models \phi \lor \psi \iff \M \models \phi$ or $\M \models \psi$
+					\item $\M \models \phi \Rightarrow \psi \iff \M \not\models \phi$ or $\M \models \psi$
+					\item $\M \models \phi \Leftrightarrow \psi \iff$ ($\M \models \phi$ and $\M \models \psi$) or ($\M \not\models \phi$ and $\M \not\models \psi$)
+				\end{itemize}
+		\end{itemize}
+	\end{defn}
 	\par
 	Let us note that in the above semantics we evaluate formulas not locally at points[ TODO ??], as it is in the standard modal semantics, but globally in the whole model and this is one of the main differences of the present modal approach with the standard Kripke approach.
 
@@ -307,10 +318,46 @@
 		\end{itemize}
 	\end{lemma}
 
+	\subsection{Formula satsfiability}
+		Let $\psi$ is a propositional formula. Let us build a tableau beginning with $\psi$. If the tableau has an opened branch then $\psi$ is satisfiable. Unfortunately, for contact logics this is not enough because we need to verify the modal connectives ($\leq and C$).
+		\paragraph{}
+		Let $\phi$ is a formula. Let us build a tableau beginning with $\phi$. If the tableau has an opened branch then it means that there is no lexical contradiction in it.   The branch is a set of signed atomic formulas of the following type: $T C(a,b)$ $F C(e,f)$ $T a \leq b$ and $F a \leq b$, where a and b are terms. The signed atomic formulas could be written as atomic formulas as follows:
+		\begin{itemize}
+			\item $T C(a,b)$ $\rightarrow$ $C(a,b)$
+			\item $F C(a,b)$ $\rightarrow$ $\neg C(a,b)$
+			\item $T a \leq b$ $\rightarrow$ $a \leq b$ $\rightarrow$ $a \sqcap b^*=0$ $\rightarrow$ $g = 0$ (zero term)
+			\item $F a \leq b$ $\rightarrow$ $\neg (a \leq b)$ $\rightarrow$ $a \sqcap b^* \neq 0$ $\rightarrow$ $d \neq 0$ (non-zero term)
+		\end{itemize}
+			\noindent where a,b,d and g are terms.
+
+		All atomic formulas in the branch should be satisfied, so we can think of it as a conjunction of them. Let's call it a \textbf{branch conjunction}. It is sufficient to build a satisfiable model for the branch conjuction to verify that $\phi$ is satisfiable. Building  such a model could be done a lot more effective than building a model for an arbitrary formula because it is just a conjuction.
+		\begin{defn}
+			\label{branch-conjunction}
+			Let $\phi$ be a formula. Let T be a tableau beginning with $\phi$. Let X be a set of all atomic signed formulas in a branch of T, as follows:
+			\begin{alignat}{2}
+				X = \{T C(a_i, b_i) \mid i \in \{1, \cdots, I\} \} \cup
+					\{F C(e_k, f_k) \mid k \in \{1, \cdots, K\} \} \cup \\\nonumber
+					\{T g_l \mid l \in \{1, \cdots, L\} \} \cup
+					\{F d_j \mid j \in \{1, \cdots, J\} \}
+			\end{alignat}
+		\end{defn}
+		A \textbf{branch cojnuction} is the following formula:
+		\begin{alignat}{2}
+			\bigwedge_{i=1}^{I} \; C(a_i, b_i) \:\: \wedge \:\: &
+			\bigwedge_{j=1}^{J} \; d_j \neq 0 \:\: \wedge \:\:
+			\bigwedge_{k=1}^{K} \; \neg C(e_k, f_k) \:\: \wedge \:\: &
+			\bigwedge_{l=1}^{L} \; g_l = 0 \:\:
+		\end{alignat}
+
+	\subsection{Model building}
+
+		Let $\phi$ be a branch conjunction as in \ref{branch-conjunction}
+		\nonumber\BranchConjunction
+
 	\newpage
 	\section{Connected Contact Logics}
 
-	\par
+	\subsection{Connectivity}
 	In topology and related branches of mathematics, a connected space is a topological space that cannot be represented as the union of two or more disjoint non-empty open subsets. Connectedness is one of the principal topological properties that are used to distinguish topological spaces.
 
 	\begin{theorem}
@@ -342,18 +389,9 @@
 
 	\paragraph{} Let $\M$ = ($\F, \upsilon$) be a model, where $\upsilon$ is an valuation. In order $\M$ to be a \textit{connected model} the graph $G$ should be connected.
 
-	\newpage
-	\section{Implementation Introduction}
+	\subsection{Connected model building}
 
-	\newpage
-	\section{Tableaux Implementation}
-
-	\newpage
-	\section{Model Implementation}
-
-	\newpage
-	\section{Connected Contact Logics Implementation}
-		Let $\phi$ is a path in the tableau of the following type:
+		Let $\phi$ be a path in the tableau(a formula) of the following type:
 		\begin{align*}
 			\bigwedge\nolimits_{i} \; C(a_i, b_i) \:\: \wedge \:\: &
 			\bigwedge\nolimits_{j} \; \neg C(e_j, f_j) \:\: \wedge \:\: \\
@@ -408,6 +446,18 @@
 			\end{split}
 			\end{equation}
 		\end{itemize}
+
+	\newpage
+	\section{Implementation Introduction}
+
+	\newpage
+	\section{Tableaux Implementation}
+
+	\newpage
+	\section{Model Implementation}
+
+	\newpage
+	\section{Connected Contact Logics Implementation}
 
 	\newpage
 	TODO: separate line for the authors
