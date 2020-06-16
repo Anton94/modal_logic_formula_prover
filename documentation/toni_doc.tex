@@ -319,9 +319,10 @@
 	\end{lemma}
 
 	\subsection{Formula satsfiability}
-		Let $\psi$ is a propositional formula. Let us build a tableau beginning with $\psi$. If the tableau has an opened branch then $\psi$ is satisfiable. Unfortunately, for contact logics this is not enough because we need to verify the modal connectives ($\leq and C$).
+		Let $\psi$ be a propositional formula. Let us build a tableau beginning with $\psi$. If the tableau has an opened branch then $\psi$ is satisfiable. Unfortunately, for the contact logic this is not enough because we need to verify the modal connectives ($\leq$ and $C$).
 		\paragraph{}
-		Let $\phi$ is a formula. Let us build a tableau beginning with $\phi$. If the tableau has an opened branch then it means that there is no lexical contradiction in it.   The branch is a set of signed atomic formulas of the following type: $T C(a,b)$ $F C(e,f)$ $T a \leq b$ and $F a \leq b$, where a and b are terms. The signed atomic formulas could be written as atomic formulas as follows:
+		Let $\phi$ be a formula. Let us build a tableau beginning with $\phi$. Let the tableau has an opened branch $B$. The branch $B$ is a set of signed atomic formulas of the following type: $T C(a,b)$ $F C(e,f)$ $T a \leq b$ and $F a \leq b$, where a and b are terms. $B$ is an opened branch, so there are no contradicting formulas in it, i.e. $(\neg \exists X)(T X \in B \land F X \in B)$.
+		The signed atomic formulas could be written as atomic formulas as follows:
 		\begin{itemize}
 			\item $T C(a,b)$ $\rightarrow$ $C(a,b)$
 			\item $F C(a,b)$ $\rightarrow$ $\neg C(a,b)$
@@ -342,17 +343,30 @@
 			\end{alignat}
 		\end{defn}
 		A \textbf{branch cojnuction} is the following formula:
-		\begin{alignat}{2}
-			\bigwedge_{i=1}^{I} \; C(a_i, b_i) \:\: \wedge \:\: &
-			\bigwedge_{j=1}^{J} \; d_j \neq 0 \:\: \wedge \:\:
-			\bigwedge_{k=1}^{K} \; \neg C(e_k, f_k) \:\: \wedge \:\: &
-			\bigwedge_{l=1}^{L} \; g_l = 0 \:\:
-		\end{alignat}
+		\BranchConjunction
 
 	\subsection{Model building}
-
 		Let $\phi$ be a branch conjunction as in \ref{branch-conjunction}
 		\nonumber\BranchConjunction
+
+		TODO: add info for the atomic formulas which require point creation
+
+		Let $\F$ = (W, R) be a relational system with W $\neq$ $\emptyset$, R $\subseteq$ $W^2$ and $\M$ = ($\F, \upsilon$) be a model. The main idea for building $\M$ as a model of $\phi$ is as follows:
+		\begin{itemize}
+			\item For each atomic contact C(a,b) in $\phi$ we will create two points x and y such that $x \in \upsilon(a)$ and $y \in \upsilon(b)$. If they does not break any zero term or $\neg C$ atomic, then we will add them to $W$. If there are no such points, then there is no $\M$ model of $\phi$. The following formula verifies that x and y does not break any zero term or $\neg C$:
+			\begin{alignat}{3}
+				(\forall k \in \{1, \cdots , K \})(\neg((x \in \upsilon(e_k) \land x \in \upsilon(f_k)) \:\lor \\
+				(y \in \upsilon(e_k) \land y \in \upsilon(f_k)) \:\lor \\
+				(x \in \upsilon(e_k) \land y \in \upsilon(f_k)) \:\lor \\
+				(y \in \upsilon(e_k) \land x \in \upsilon(f_k)))) \: \\ \land \\
+				(\forall l \in \{1, \cdots , L \})(x \notin \upsilon(d_l) \land y \notin \upsilon(g_l))
+			\end{alignat}
+			\item For each non-zero term $d \neq 0$ in $\phi$ we will create a point x such that $x \in \upsilon(d)$. If the point x does not break any zero term or $\neg C$ atomic, then we will add it to $W$. If there is no such point, then there is no $\M$ model of $\phi$. The following formula verifies that x does not break any zero term or $\neg C$:
+			\begin{alignat}{3}
+				(\forall k \in \{1, \cdots , K \})(\neg((x \in \upsilon(e_k) \land x \in \upsilon(f_k)) \: \\ \land \\
+				(\forall l \in \{1, \cdots , L \})(x \notin \upsilon(d_l))
+			\end{alignat}
+		\end{itemize}
 
 	\newpage
 	\section{Connected Contact Logics}
@@ -391,17 +405,10 @@
 
 	\subsection{Connected model building}
 
-		Let $\phi$ be a path in the tableau(a formula) of the following type:
-		\begin{align*}
-			\bigwedge\nolimits_{i} \; C(a_i, b_i) \:\: \wedge \:\: &
-			\bigwedge\nolimits_{j} \; \neg C(e_j, f_j) \:\: \wedge \:\: \\
-			\bigwedge\nolimits_{k} \; d_k = 0 \:\: \wedge \:\: &
-			\bigwedge\nolimits_{l} \; g_l \neq 0 \:\: \wedge \:\: \\
-			\bigwedge\nolimits_{s} \; <=_m(H_s, O_s) \:\: \wedge \:\: &
-			\bigwedge\nolimits_{u} \; \neg (<=_m(Q_u, R_u) )
-		\end{align*}
+		Let $\phi$ be a branch conjunction as in \ref{branch-conjunction}
+		\nonumber\BranchConjunction
 
-		Let $\F$ = (W, R) be a relational system with W $\neq$ $\emptyset$, R $\subseteq$ $W^2$ and $\M$ = ($\F, \upsilon$) be a model for some formula $\phi$. In order $\M$ to be a connected model for $\phi$ the graph $G=(W, R)$ should be connected (from \ref{connectivity-theorem-graph}). The main idea for building a connected model is as follows:
+		Let $\F$ = (W, R) be a relational system with W $\neq$ $\emptyset$, R $\subseteq$ $W^2$ and $\M$ = ($\F, \upsilon$) be a model. In order $\M$ to be a connected model for $\phi$ the graph $G=(W, R)$ should be connected (from \ref{connectivity-theorem-graph}). The main idea for building a connected model is as follows:
 		\begin{itemize}
 			\item Create all possible points, w.r.t. the variables of $\phi$ in the set $W_{all}$.
 
