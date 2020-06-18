@@ -1,4 +1,7 @@
 \documentclass{article}
+
+\usepackage{algorithm2e}
+\usepackage[noend]{algpseudocode}
 \usepackage{mathtools}
 \usepackage{amssymb}
 \usepackage{amsmath}
@@ -15,6 +18,12 @@
 \usepackage{hyperref}
 \usepackage{tikz}
 
+\SetKw{KwBy}{by}
+\newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
+\SetCommentSty{mycommfont}
+\algnewcommand{\algorithmicgoto}{\textbf{go to}}%
+\algnewcommand{\Goto}[1]{\algorithmicgoto~\ref{#1}}
+
 \usetikzlibrary{arrows.meta}
 
 \restylefloat{table}
@@ -26,6 +35,7 @@
 \newcommand\F{\mathcal{F}}
 \newcommand\p{\mathcal{P}}
 \newcommand\V{\mathcal{V}}
+\newcommand\E{\mathcal{E}}
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{axiom}[theorem]{Axiom}
@@ -336,37 +346,147 @@
 			\label{branch-conjunction}
 			Let $\phi$ be a formula. Let T be a tableau beginning with $\phi$. Let X be a set of all atomic signed formulas in a branch of T, as follows:
 			\begin{alignat}{2}
-				X = \{T C(a_i, b_i) \mid i \in \{1, \cdots, I\} \} \cup
-					\{F C(e_k, f_k) \mid k \in \{1, \cdots, K\} \} \cup \\\nonumber
-					\{T g_l \mid l \in \{1, \cdots, L\} \} \cup
-					\{F d_j \mid j \in \{1, \cdots, J\} \}
+				X = \{T C(a_i, b_i) \mid i \in \{1, \ldots, I\} \} \cup
+					\{F C(e_k, f_k) \mid k \in \{1, \ldots, K\} \} \cup \\\nonumber
+					\{T g_l \mid l \in \{1, \ldots, L\} \} \cup
+					\{F d_j \mid j \in \{1, \ldots, J\} \}
 			\end{alignat}
 		\end{defn}
 		A \textbf{branch cojnuction} is the following formula:
 		\BranchConjunction
 
+	\subsection{Modal points}
+		Before we start with model building we need to define a modal point representation. With $n$ boolean variables we can uniquely identify $2^n$ objects. It is sufficient to define a modal point representation which satisfies it. For $n$ variables it should be able to give $2^n$ unique points.
+		\begin{defn}
+			Let $\V_n$ be a denumeratable set of $n$ boolean variables, as follows:
+			\begin{equation}
+				\label{boolean-evaluation}
+				\V_n = \{x_1, x_2, \ldots , x_n \}
+			\end{equation}
+			A \textbf{boolean evaluation $\E_n$} for $n$ variables is a sequence of 1s and 0s, as follows:
+			\begin{equation}
+				\E_n = \; < e_1, e_2, \ldots , e_n > \; where \; e_1, \ldots, e_n \in \{0, 1 \}
+			\end{equation}
+		\end{defn}
+		For $n$ boolean variables there are $2^n$ unique boolean evaluations. We will define the modal points as boolean evaluations, i.e. each modal point is an unique boolean evaluation.
+		\begin{defn}
+			Let $\V_n$ be a denumeratable set of $n$ boolean variables. The set of \textbf{all unique points $W_n$} over $n$ variables is defined as follows:
+			\begin{equation}
+				W_n = \{< e_1, e_2, \ldots , e_n > \mid e_1, \ldots, e_n \in \{0, 1 \} \}
+			\end{equation}
+		\end{defn}
+
+		\begin{defn}
+			Let $\E_n$ be a boolean evaluation for $n$ variables. Then $(\E_n)^i$ is the i-th element in the sequence $\E_n$.
+		\end{defn}
+
+		\begin{defn}
+			\label{valuation-modal-points}
+			Let $\V_n$ be a denumeratable set of $n$ boolean variables, as in \ref{boolean-evaluation}. We will define a \textbf{valuation $\upsilon_n : \V_n \rightarrow \p(W_n)$} inductively as follows:
+			\begin{itemize}
+				\item Boolean constants
+					\begin{itemize}
+						\item $\upsilon_n(0) = \emptyset$
+						\item $\upsilon_n(1) = W_n$
+					\end{itemize}
+				\item Boolean variables
+					\begin{itemize}
+						\item $\upsilon_n(x_i) = \{ \E_n \mid \E_n \in W_n \land (\E_n)^i = 1 \}$, for $i \in \{1, \ldots , n \}$
+					\end{itemize}
+				\item Boolean terms
+					\begin{itemize}
+						\item $\upsilon_n(a \sqcap b) = \upsilon_n(a) \cap \upsilon_n(b)$
+						\item $\upsilon_n(a \sqcup b) = \upsilon_n(a) \cup \upsilon_n(b)$
+						\item $\upsilon_n(a^*) = W \setminus \upsilon_n(a) = -\upsilon_n(a)$
+					\end{itemize}
+			\end{itemize}
+		\end{defn}
+
 	\subsection{Model building}
-		Let $\phi$ be a branch conjunction as in \ref{branch-conjunction}
+		Let $\phi$ be a branch conjunction as in \ref{branch-conjunction} :
 		\nonumber\BranchConjunction
 
-		TODO: add info for the atomic formulas which require point creation
+		Let $\V_n$ be the set of variables in $\phi$. Let $\F$ = (W, R) be a relational system with $W \subseteq W_n$ and $R \subseteq$ $W_n^2$. Let $\M$ = ($\F, \upsilon$) be a model, where $\upsilon : \V_N \rightarrow \p(W)$ is a valuation defined as in \ref{valuation-modal-points} over $W$. There are four types of atomic formulas: contacts $C$, $\neg C$, zero terms and non-zero terms. Only the contacts and non-zero terms requires point existence. We will create points only for them. The pseudocode bellow implements the main idea for building $\M$ as a model of $\phi$. Note that there are some more details and optimizations which will be shown in the implementation section.
+		\LinesNumbered
+		\DontPrintSemicolon
+		\begin{algorithm}
+			\SetKwFunction{CheckNegContact}{CheckNegContact}
+			\SetKwFunction{CheckZeroTerms}{CheckZeroTerms}
+			\SetKwProg{Fn}{Function}{:}{}
 
-		Let $\F$ = (W, R) be a relational system with W $\neq$ $\emptyset$, R $\subseteq$ $W^2$ and $\M$ = ($\F, \upsilon$) be a model. The main idea for building $\M$ as a model of $\phi$ is as follows:
-		\begin{itemize}
-			\item For each atomic contact C(a,b) in $\phi$ we will create two points x and y such that $x \in \upsilon(a)$ and $y \in \upsilon(b)$. If they does not break any zero term or $\neg C$ atomic, then we will add them to $W$. If there are no such points, then there is no $\M$ model of $\phi$. The following formula verifies that x and y does not break any zero term or $\neg C$:
-			\begin{alignat}{3}
-				(\forall k \in \{1, \cdots , K \})(\neg((x \in \upsilon(e_k) \land x \in \upsilon(f_k)) \:\lor \\
-				(y \in \upsilon(e_k) \land y \in \upsilon(f_k)) \:\lor \\
-				(x \in \upsilon(e_k) \land y \in \upsilon(f_k)) \:\lor \\
-				(y \in \upsilon(e_k) \land x \in \upsilon(f_k)))) \: \\ \land \\
-				(\forall l \in \{1, \cdots , L \})(x \notin \upsilon(d_l) \land y \notin \upsilon(g_l))
-			\end{alignat}
-			\item For each non-zero term $d \neq 0$ in $\phi$ we will create a point x such that $x \in \upsilon(d)$. If the point x does not break any zero term or $\neg C$ atomic, then we will add it to $W$. If there is no such point, then there is no $\M$ model of $\phi$. The following formula verifies that x does not break any zero term or $\neg C$:
-			\begin{alignat}{3}
-				(\forall k \in \{1, \cdots , K \})(\neg((x \in \upsilon(e_k) \land x \in \upsilon(f_k)) \: \\ \land \\
-				(\forall l \in \{1, \cdots , L \})(x \notin \upsilon(d_l))
-			\end{alignat}
-		\end{itemize}
+			\Fn{\CheckNegContact{$p$}}{
+				\For{$k\gets1$ \KwTo $K$ \KwBy $1$}{
+					\tcc{Checking $\neg C(e_k, f_k)$}
+					\uIf{$(p \in \upsilon_n(e_k) \land p \in \upsilon_n(f_k)$}{
+						\KwRet false
+					}
+				}
+				\KwRet true
+			}
+
+			\Fn{\CheckNegContact{$p_1$, $p_2$}}{
+				\For{$k\gets1$ \KwTo $K$ \KwBy $1$}{
+					\tcc{Checking $\neg C(e_k, f_k)$}
+					\uIf{$(p_1 \in \upsilon_n(e_k) \land p_1 \in \upsilon_n(f_k)) \lor
+						(p_2 \in \upsilon_n(e_k) \land p_2 \in \upsilon_n(f_k)) \lor
+						(p_1 \in \upsilon_n(e_k) \land p_2 \in \upsilon_n(f_k)) \lor
+						(p_2 \in \upsilon_n(e_k) \land p_1 \in \upsilon_n(f_k))))
+						$}{
+						\KwRet false
+					}
+				}
+				\KwRet true
+			}
+
+			\Fn{\CheckZeroTerms{$p$}}{
+				\For{$l\gets1$ \KwTo $L$ \KwBy $1$}{
+					\tcc{Checking $g_l = 0$}
+					\uIf{$(x \in \upsilon_n(g_l)$}{
+						\KwRet false
+					}
+				}
+				\KwRet true
+			}
+			\;
+			$R \gets \emptyset$
+			\;
+			$W \gets \emptyset$
+			\;
+			\tcc{Create points for the contacts}
+			\For{$i\gets1$ \KwTo $I$ \KwBy $1$}{\label{contacts}
+				\tcc{Processing $C(a_i, b_i)$}
+
+				\For{$x \in \upsilon_n(a_i)$}{
+					\For{$y \in \upsilon_n(b_i)$}{
+						\tcc{Verify that the pair <x, y> does not breaks any $\neg C$ and zero term}
+						\uIf{$\CheckNegContact(x, y) \land \CheckZeroTerms(x) \land \CheckZeroTerms(y)$}{
+							$W \gets W \cup \{x, y \}$
+							\;
+							$R \gets R \cup \{<x,x>, <y,y>, <x,y>, <y,x> \}$
+							\;
+							\Goto{contacts}
+						}
+					}
+				}
+				Model building fails.
+			}
+			\tcc{Create points for the non-zero terms}
+			\For{$j\gets1$ \KwTo $J$ \KwBy $1$}{\label{non-zero-terms}
+				\tcc{Processing $d_j \neq 0$}
+
+				\For{$x \in \upsilon_n(d_j)$}{
+					\tcc{Verify that x does not breaks any $\neg C$ and zero term}
+					\uIf{$\CheckNegContact(x) \land \CheckZeroTerms(x)$}{
+						$W \gets W \cup \{ x \}$
+						\;
+						$R \gets R \cup \{ <x,x> \}$
+						\;
+						\Goto{non-zero-terms}
+					}
+				}
+				Model building fails.
+			}
+		\end{algorithm}
 
 	\newpage
 	\section{Connected Contact Logics}
