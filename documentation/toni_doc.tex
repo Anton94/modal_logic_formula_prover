@@ -406,7 +406,7 @@
 		Let $\phi$ be a branch conjunction as in \ref{branch-conjunction} :
 		\nonumber\BranchConjunction
 
-		Let $\V_n$ be the set of variables in $\phi$. Let $\F$ = (W, R) be a relational system with $W \subseteq W_n$ and $R \subseteq$ $W_n^2$. Let $\M$ = ($\F, \upsilon$) be a model, where $\upsilon : \V_N \rightarrow \p(W)$ is a valuation defined as in \ref{valuation-modal-points} over $W$. There are four types of atomic formulas: contacts $C$, $\neg C$, zero terms and non-zero terms. Only the contacts and non-zero terms requires point existence. We will create points only for them. The pseudocode bellow implements the main idea for building $\M$ as a model of $\phi$. Note that there are some more details and optimizations which will be shown in the implementation section.
+		Let $\V_n$ be the set of variables in $\phi$. Let $\F$ = (W, R) be a relational system with $W \subseteq W_n$ and $R \subseteq$ $W^2$. Let $\M$ = ($\F, \upsilon$) be a model, where $\upsilon : \V_N \rightarrow \p(W)$ is a valuation defined as in \ref{valuation-modal-points} over $W$. There are four types of atomic formulas: contacts $C$, $\neg C$, zero terms and non-zero terms. Only the contacts and non-zero terms requires point existence. We will create points only for them. The pseudocode bellow implements the main idea for building $\M$ as a model of $\phi$. Note that there are some more details and optimizations which will be shown in the implementation section.
 		\LinesNumbered
 		\DontPrintSemicolon
 		\begin{algorithm}
@@ -525,26 +525,19 @@
 
 	\subsection{Connected model building}
 
-		Let $\phi$ be a branch conjunction as in \ref{branch-conjunction}
+		Let $\phi$ be a branch conjunction as in \ref{branch-conjunction} :
 		\nonumber\BranchConjunction
 
-		Let $\F$ = (W, R) be a relational system with W $\neq$ $\emptyset$, R $\subseteq$ $W^2$ and $\M$ = ($\F, \upsilon$) be a model. In order $\M$ to be a connected model for $\phi$ the graph $G=(W, R)$ should be connected (from \ref{connectivity-theorem-graph}). The main idea for building a connected model is as follows:
+		Let $\V_n$ be the set of variables in $\phi$. Let $\F$ = (W, R) be a relational system with $W \subseteq W_n$ and $R \subseteq$ $W^2$. Let $\M$ = ($\F, \upsilon$) be a model, where $\upsilon : \V_N \rightarrow \p(W)$ is a valuation defined as in \ref{valuation-modal-points} over $W$. In order $\M$ to be a connected model for $\phi$ $W$ should be non-empty and the graph $G=(W, R)$ should be connected (from \ref{connectivity-theorem-graph}). The main idea for building a connected model is as follows:
 		\begin{itemize}
-			\item Create all possible points, w.r.t. the variables of $\phi$ in the set $W_{all}$.
-
-			\item Create a set $W$ from all points in $W_{all}$ which does not interfere with the zero terms in $\phi$:
+			\item Create the set $W$ from all points in $W_n$ which does not interfere with the $\neg C$ and zero terms in $\phi$:
 			\begin{equation}
-				W = \{ p \mid p \in W_{all} \land (\forall_k)(p \notin \upsilon(d_k)) \}
-			\end{equation}
-
-			\item Validate that all non-zero terms are satisfied:
-			\begin{equation}
-				(\forall_t)(\forall_{p \in W})(p \notin \upsilon(g_t))
+				W = \{ p \mid p \in W_n \land (\forall_l)(p \notin \upsilon_n(g_l)) \land (\forall_k)(p \notin \upsilon_n(e_k) \lor p \notin \upsilon_n(f_k))\}
 			\end{equation}
 
 			\item Validate that all contact terms are non-zero:
 			\begin{equation}
-				(\forall_i)(\forall_{p \in W})(p \notin \upsilon(a_i) \land p \notin \upsilon(b_i))
+				(\forall_i)(\exists_{p_1 \in W})(\exists_{p_2 \in W})(p_1 \in \upsilon(a_i) \land p_2 \in \upsilon(b_i))
 			\end{equation}
 
 			\item Create relations between all points but skip those which interfere with $\neg C$ actomic formulas:
@@ -566,10 +559,10 @@
 				Comp = \{G'=(W', R') \mid W' \subseteq W \land R' \subseteq R \land G'\;is\;connected \}
 			\end{equation}
 
-			\item If Comp has a graph G' which defines a model of $\phi$ $\M' = (W', R', \upsilon')$, then $\M'$ is a connected model. Note that we only have to check the non-zero terms and the contact atomic formulas because, in some snese, we are removing points and contacts between them:
+			\item If Comp has a graph G' which defines a model of $\phi$ $\M' = (W', R', \upsilon')$, then $\M'$ is a connected model. $\upsilon' : \V_N \rightarrow \p(W')$ is defained as $\upsilon$ but over $W'$. Note that we only have to check the non-zero terms and the contact atomic formulas because $\M'$ does not introduce new points or relations:
 			\begin{equation}
 			\begin{split}
-				(\exists_{G'=(W', R') \in Comp})((\forall_t)(\exists_{p \in W'})(p \in \upsilon(g_t))) \land ((\exists_{x \in \upsilon(a_i)})(\exists_{y \in \upsilon(b_i)})(xR'y \lor yR'x))
+				(\exists_{(W', R') \in Comp})((\forall_j)(\exists_{p \in W'})(p \in \upsilon(d_j))) \land ((\exists_{x \in \upsilon'(a_i)})(\exists_{y \in \upsilon'(b_i)})(xR'y \lor yR'x))
 			\end{split}
 			\end{equation}
 		\end{itemize}
