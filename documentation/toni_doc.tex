@@ -331,7 +331,16 @@
 	\subsection{Formula satsfiability}
 		Let $\psi$ be a propositional formula. Let us build a tableau beginning with $\psi$. If the tableau has an opened branch then $\psi$ is satisfiable. Unfortunately, for the contact logic this is not enough because we need to verify the modal connectives ($\leq$ and $C$).
 		\paragraph{}
-		Let $\phi$ be a formula. Let us build a tableau beginning with $\phi$. Let the tableau has an opened branch $B$. The branch $B$ is a set of signed atomic formulas of the following type: $T C(a,b)$ $F C(e,f)$ $T a \leq b$ and $F a \leq b$, where a and b are terms. $B$ is an opened branch, so there are no contradicting formulas in it, i.e. $(\neg \exists X)(T X \in B \land F X \in B)$.
+		Let $\phi$ be a formula. Let us build a tableau beginning with $\phi$. Let the tableau has an opened branch $B$. The branch $B$ is a set of signed atomic formulas of the following type:
+		\begin{itemize}
+			\item $T C(a,b)$
+			\item $F C(e,f)$
+			\item $T a \leq b$
+			\item $F a \leq b$
+		\end{itemize}
+		where a and b are terms.
+
+		\noindent $B$ is an opened branch, so there are no contradicting formulas in it, i.e. $(\neg \exists X)(T X \in B \land F X \in B)$.
 		The signed atomic formulas could be written as atomic formulas as follows:
 		\begin{itemize}
 			\item $T C(a,b)$ $\rightarrow$ $C(a,b)$
@@ -344,12 +353,12 @@
 		All atomic formulas in the branch should be satisfied, so we can think of it as a conjunction of them. Let's call it a \textbf{branch conjunction}. It is sufficient to build a satisfiable model for the branch conjuction to verify that $\phi$ is satisfiable. Building  such a model could be done a lot more effective than building a model for an arbitrary formula because it is just a conjuction.
 		\begin{defn}
 			\label{branch-conjunction}
-			Let $\phi$ be a formula. Let T be a tableau beginning with $\phi$. Let X be a set of all atomic signed formulas in a branch of T, as follows:
+			Let $\phi$ be a formula. Let T be a tableau beginning with $\phi$. Let B be a set of all atomic signed formulas in a branch of T, as follows:
 			\begin{alignat}{2}
-				X = \{T C(a_i, b_i) \mid i \in \{1, \ldots, I\} \} \cup
-					\{F C(e_k, f_k) \mid k \in \{1, \ldots, K\} \} \cup \\\nonumber
-					\{T g_l \mid l \in \{1, \ldots, L\} \} \cup
-					\{F d_j \mid j \in \{1, \ldots, J\} \}
+				B = \{T C(a_i, b_i) \mid i \in \{1, \ldots, I\} \} \cup
+					\{F d_j = 0 \mid j \in \{1, \ldots, J\} \} \cup \\\nonumber
+					\{F C(e_k, f_k) \mid k \in \{1, \ldots, K\} \} \cup
+					\{T g_l = 0 \mid l \in \{1, \ldots, L\} \}
 			\end{alignat}
 		\end{defn}
 		A \textbf{branch cojnuction} is the following formula:
@@ -365,13 +374,14 @@
 			\end{equation}
 			A \textbf{boolean evaluation $\E_n$} for $n$ variables is a sequence of 1s and 0s, as follows:
 			\begin{equation}
-				\E_n = \; < e_1, e_2, \ldots , e_n > \; where \; e_1, \ldots, e_n \in \{0, 1 \}
+				\E_n = \; < e_1, e_2, \ldots , e_n >, \; where \; e_1, \ldots, e_n \in \{0, 1 \}
 			\end{equation}
 		\end{defn}
 		For $n$ boolean variables there are $2^n$ unique boolean evaluations. We will define the modal points as boolean evaluations, i.e. each modal point is an unique boolean evaluation.
 		\begin{defn}
 			Let $\V_n$ be a denumeratable set of $n$ boolean variables. The set of \textbf{all unique points $W_n$} over $n$ variables is defined as follows:
 			\begin{equation}
+				\label{all-unique-points}
 				W_n = \{< e_1, e_2, \ldots , e_n > \mid e_1, \ldots, e_n \in \{0, 1 \} \}
 			\end{equation}
 		\end{defn}
@@ -382,7 +392,7 @@
 
 		\begin{defn}
 			\label{valuation-modal-points}
-			Let $\V_n$ be a denumeratable set of $n$ boolean variables, as in \ref{boolean-evaluation}. We will define a \textbf{valuation $\upsilon_n : \V_n \rightarrow \p(W_n)$} inductively as follows:
+			Let $\V_n$ be a denumeratable set of $n$ boolean variables, as in \ref{boolean-evaluation}. Let $W_n$ be the set of all unique points over n variables as in \ref{all-unique-points}.We will define a \textbf{valuation $\upsilon_n : \V_n \rightarrow \p(W_n)$} inductively as follows:
 			\begin{itemize}
 				\item Boolean constants
 					\begin{itemize}
@@ -397,7 +407,7 @@
 					\begin{itemize}
 						\item $\upsilon_n(a \sqcap b) = \upsilon_n(a) \cap \upsilon_n(b)$
 						\item $\upsilon_n(a \sqcup b) = \upsilon_n(a) \cup \upsilon_n(b)$
-						\item $\upsilon_n(a^*) = W \setminus \upsilon_n(a) = -\upsilon_n(a)$
+						\item $\upsilon_n(a^*) = W_n \setminus \upsilon_n(a) = -\upsilon_n(a)$
 					\end{itemize}
 			\end{itemize}
 		\end{defn}
@@ -406,7 +416,7 @@
 		Let $\phi$ be a branch conjunction as in \ref{branch-conjunction} :
 		\nonumber\BranchConjunction
 
-		Let $\V_n$ be the set of variables in $\phi$. Let $\F$ = (W, R) be a relational system with $W \subseteq W_n$ and $R \subseteq$ $W^2$. Let $\M$ = ($\F, \upsilon$) be a model, where $\upsilon : \V_N \rightarrow \p(W)$ is a valuation defined as in \ref{valuation-modal-points} over $W$. There are four types of atomic formulas: contacts $C$, $\neg C$, zero terms and non-zero terms. Only the contacts and non-zero terms requires point existence. We will create points only for them. The pseudocode bellow implements the main idea for building $\M$ as a model of $\phi$. Note that there are some more details and optimizations which will be shown in the implementation section.
+		Let $\V_n$ be the set of variables in $\phi$. Let $\F$ = (W, R) be a relational system with $W \subseteq W_n$ and $R \subseteq$ $W^2$. Let $\M$ = ($\F, \upsilon$) be a model, where $\upsilon : \V_n \rightarrow \p(W)$ is a valuation defined as in \ref{valuation-modal-points} over $W$. There are four types of atomic formulas: contacts $C$, $\neg C$, zero terms and non-zero terms. Only the contacts and non-zero terms requires point existence. We will create points only for them. The pseudocode bellow implements the main idea for building $\M$ as a model of $\phi$. Note that there are some more details and optimizations which will be shown in the implementation section.
 		\LinesNumbered
 		\DontPrintSemicolon
 		\begin{algorithm}
@@ -511,7 +521,11 @@
 		\upsilon(b) \neq \emptyset \land \upsilon(b) \neq W \implies (\exists x \in \upsilon(b)) (\exists y \in W \setminus \upsilon(b))(xRy)
 	\end{equation}
 
-	\paragraph{} Let us think of W and R as an undirected graph $G = (W, R)$. $W$ is the set of vertexes and R the set of edges. A path $\pi(v_1, v_n)$ is a sequence of vertexes $(v_1, v_2, \dotsc , v_n)$ such that $v_iRv_{i+1}$, for $i \in \{1,\dotsc,n-1\}$. The connectivity theorem implies that the graph $G$ should be connected, i.e. for each vertex $x \in W$ there should be a path to each vertex in $W$. 
+	\begin{defn}
+		Let G = (W, R) be a graph. W is the set of vertexes and R the set of edges. A \textbf{path} $\pi(v_1, v_n)$ is a sequence of vertexes $(v_1, v_2, \dotsc , v_n)$ such that $v_1,\dotsc,v_n \in V$ and $v_iRv_{i+1}$, for $i \in \{1,\dotsc,n-1\}$.
+	\end{defn}
+
+	\paragraph{} Let us think of W and R as an undirected graph $G = (W, R)$. $W$ is the set of vertexes and R the set of edges. The connectivity theorem implies that the graph $G$ should be connected, i.e. for each vertex $x \in W$ there should be a path to each vertex in $W$.
 	\begin{equation}
 		\label{connectivity-theorem-graph}
 		(\forall x \in W)(\forall y \in W)(\exists \pi(x, y)) (\pi(x, y)\;is\;a\;path\;in\;G)
@@ -521,14 +535,14 @@
 		A \textbf{connected model} is a model which satisfies the connectivity theorem(\ref{connectivity-theorem}).
 	\end{defn}
 
-	\paragraph{} Let $\M$ = ($\F, \upsilon$) be a model, where $\upsilon$ is an valuation. In order $\M$ to be a \textit{connected model} the graph $G$ should be connected.
+	\paragraph{} Let $\F$ = (W, R) be a relational system with W $\neq$ $\emptyset$, R $\subseteq$ $W^2$. Let $\M$ = ($\F, \upsilon$) be a model, where $\upsilon$ is an valuation. In order $\M$ to be a \textit{connected model} the graph $G=(W,R)$ should be connected.
 
 	\subsection{Connected model building}
 
 		Let $\phi$ be a branch conjunction as in \ref{branch-conjunction} :
 		\nonumber\BranchConjunction
 
-		Let $\V_n$ be the set of variables in $\phi$. Let $\F$ = (W, R) be a relational system with $W \subseteq W_n$ and $R \subseteq$ $W^2$. Let $\M$ = ($\F, \upsilon$) be a model, where $\upsilon : \V_N \rightarrow \p(W)$ is a valuation defined as in \ref{valuation-modal-points} over $W$. In order $\M$ to be a connected model for $\phi$ $W$ should be non-empty and the graph $G=(W, R)$ should be connected (from \ref{connectivity-theorem-graph}). The main idea for building a connected model is as follows:
+		Let $\V_n$ be the set of variables in $\phi$. Let $\F$ = (W, R) be a relational system with $W \subseteq W_n$ and $R \subseteq$ $W^2$. Let $\M$ = ($\F, \upsilon$) be a model, where $\upsilon : \V_n \rightarrow \p(W)$ is a valuation defined as in \ref{valuation-modal-points} over $W$. In order $\M$ to be a connected model for $\phi$, $W$ should be non-empty and the graph $G=(W, R)$ should be connected (from \ref{connectivity-theorem-graph}). The main idea for building a connected model is as follows:
 		\begin{itemize}
 			\item Create the set $W$ from all points in $W_n$ which does not interfere with the $\neg C$ and zero terms in $\phi$:
 			\begin{equation}
@@ -562,7 +576,7 @@
 			\item If Comp has a graph G' which defines a model of $\phi$ $\M' = (W', R', \upsilon')$, then $\M'$ is a connected model. $\upsilon' : \V_N \rightarrow \p(W')$ is defained as $\upsilon$ but over $W'$. Note that we only have to check the non-zero terms and the contact atomic formulas because $\M'$ does not introduce new points or relations:
 			\begin{equation}
 			\begin{split}
-				(\exists_{(W', R') \in Comp})((\forall_j)(\exists_{p \in W'})(p \in \upsilon(d_j))) \land ((\exists_{x \in \upsilon'(a_i)})(\exists_{y \in \upsilon'(b_i)})(xR'y \lor yR'x))
+				(\exists_{(W', R') \in Comp})((\forall_j)(\exists_{p \in W'})(p \in \upsilon(d_j))) \land (\forall_i)((\exists_{x \in \upsilon'(a_i)})(\exists_{y \in \upsilon'(b_i)})(xR'y \land yR'x))
 			\end{split}
 			\end{equation}
 		\end{itemize}
