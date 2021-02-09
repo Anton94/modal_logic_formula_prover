@@ -31,6 +31,7 @@ void on_init(const string_t& address, size_t concurrent_tasks_limit, const std::
     g_http->open().wait();
 
     ucout << utility::string_t(U("Listening for requests at: ")) << addr << std::endl;
+    ucout << utility::string_t(U("Open: ")) << addr << utility::string_t(U("index.html")) << std::endl;
 }
 
 //void on_shutdown()
