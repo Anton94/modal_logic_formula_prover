@@ -214,6 +214,7 @@
 		$a \neq b \eqdef \neg(a = b)$
 
 	\subsection{Relational semantics}
+	\label{relational-system}
 
 	\par
 	Let $\F$ = (W, R) be a relational system with W $\neq$ $\emptyset$ and R $\subseteq$ $W^2$. We call such systems \textit{frames}. Following Galton[TODO] we may give a spatial meaning of frames naming the elements of W, \textit{cells} and the relation R, \textit{adjacency relation}. Then $\F$ is called \textit{adjacency space}. An example of adjacency space is the chess-board table, the cells are the squares, and two squares are adjacent if they have a common point.
@@ -222,6 +223,7 @@
 	Originally Galton assumed R to be a reflexive and symmetric relation but it is more natural for R to be an arbitrary relation. \textit{Regions} in an adjacency space are arbitrary subsets of W and two sets $a$ and $b$ are in \textit{contact} ($aC_Rb$) if for some $x \in a$ and $y \in b$ we have $xRy$. Another way to define this relation is the following. For a subset $a \subseteq W$ define as in modal logic $\langle R \rangle a = \{ x \in W : (\exists y \in W)(xRy$ and $y \in a)\}$. Then $aC_Rb$ iff $a \cap \langle R \rangle b \neq \emptyset$ iff $\langle R^{-1} \rangle a \cap b \neq \emptyset$, where $R^{-1}$ is the converse relation of R. Note that if R is a symmetric relation then $aCb$ iff $a \cap \langle R \rangle b \neq \emptyset$ iff $\langle R \rangle a \cap b \neq \emptyset$.
 
 	\begin{defn}
+		\label{valuation}
 		By a \textbf{\textit{valuation}} of the Boolean variables in $\F$ we mean any function $\upsilon : \V \rightarrow \p(W)$ assigning to each Boolean variable $b$ a subset $\upsilon(b) \subseteq W$. The valuation $\upsilon$ is then extended inductively to all Boolean terms as follows:
 
 		\begin{itemize}
@@ -299,7 +301,7 @@
 	\end{lemma}
 
 	\begin{lemma}
-		(Distributivity) Let a and b are terms. Then \par $aC(b \sqcup c) \iff aCb \lor aCc$, \; $aC(b \sqcup c) \iff aCb \lor aCc$.
+		(Distributivity) Let a and b are terms. Then \par $aC(b \sqcup c) \iff aCb \lor aCc$, \; TODO what is the other one? $aC(b \sqcup c) \iff aCb \lor aCc$.
 	\end{lemma}
 
 	\begin{lemma}
@@ -361,11 +363,31 @@
 					\{T g_l = 0 \mid l \in \{1, \ldots, L\} \}
 			\end{alignat}
 		\end{defn}
-		A \textbf{branch cojnuction} is the following formula:
-		\BranchConjunction
+		A \textbf{branch cojnuction} $\beta$ is the following formula:
+		 \BranchConjunction
 
-	\subsection{Modal points}
-		Before we start with model building we need to define a modal point representation. With $n$ boolean variables we can uniquely identify $2^n$ objects. It is sufficient to define a modal point representation which satisfies it. For $n$ variables it should be able to give $2^n$ unique points.
+	\subsection{Branch conjunction model building}
+		The branch conjunction formula $\beta$ is satisfiable if $\beta$ has a model $\M$. We have to construct such a model $\M$ = ($\F, \upsilon$) = ((W, R), $\upsilon$). The contacts and non-zero terms in $\beta$ require an existence of points. Let $C(a_i, b_i)$ be a conjunct in $\beta$. $C(a_i, b_i)$ implies the existence of two points 
+		
+		
+		TODO: zapiski sa tova. != 0 implies the existence of one point. So, we need to be able to construct points on demand belonging to arbitary term. The point representation should be a convinenient one to be able to do that thing. Fix the N sets and just extend them on demand.
+		We will look at the points in W not as individual cells, but as in which sets they participate in.		
+		Find an easy way of adding points to the sets. With N sets there are $2^n$ combinations between them. So, the new point could be one of the $2^n$ variations.
+		
+		
+		Let n be the number of the unique boolean variables in $\beta$. Let $\V_n$ be the set of them. 
+		
+		
+		
+		
+		In order to define $\upsilon$ we need to assing a set of modal points to each boolean variable $x \in \V_n$. 
+		
+		The modal connectives $\leq$ and C are over the valuations of the terms in them. 
+
+	\subsubsection{Modal points}
+		
+		
+		With $n$ boolean variables we can uniquely identify $2^n$ objects. It is sufficient to define a modal point representation which satisfies it. For $n$ variables it should be able to give $2^n$ unique points.
 		\begin{defn}
 			Let $\V_n$ be a denumeratable set of $n$ boolean variables, as follows:
 			\begin{equation}
@@ -606,4 +628,4 @@
 			\href{https://en.wikipedia.org/wiki/Connected_space}{Connected Space}
 			or go to the next url: \url{https://en.wikipedia.org/wiki/Connected_space}
 	\end{thebibliography}
-\end{document}
+\end{document}\grid
