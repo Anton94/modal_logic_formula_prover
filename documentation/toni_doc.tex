@@ -36,6 +36,9 @@
 \newcommand\p{\mathcal{P}}
 \newcommand\V{\mathcal{V}}
 \newcommand\E{\mathcal{E}}
+\newcommand\VXi{X_i}
+\newcommand\VX{X}
+\newcommand\Tn{\mathcal{T}_n}
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{axiom}[theorem]{Axiom}
@@ -367,41 +370,68 @@
 		 \BranchConjunction
 
 	\subsection{Branch conjunction model building}
-		The branch conjunction formula $\beta$ is satisfiable if $\beta$ has a model $\M$. We have to construct such a model $\M$ = ($\F, \upsilon$) = ((W, R), $\upsilon$). The contacts and non-zero terms in $\beta$ require an existence of points. Let $C(a_i, b_i)$ be a conjunct in $\beta$. $C(a_i, b_i)$ implies the existence of two points 
-		
-		
-		TODO: zapiski sa tova. != 0 implies the existence of one point. So, we need to be able to construct points on demand belonging to arbitary term. The point representation should be a convinenient one to be able to do that thing. Fix the N sets and just extend them on demand.
-		We will look at the points in W not as individual cells, but as in which sets they participate in.		
-		Find an easy way of adding points to the sets. With N sets there are $2^n$ combinations between them. So, the new point could be one of the $2^n$ variations.
-		
-		
-		Let n be the number of the unique boolean variables in $\beta$. Let $\V_n$ be the set of them. 
-		
-		
-		
-		
-		In order to define $\upsilon$ we need to assing a set of modal points to each boolean variable $x \in \V_n$. 
-		
-		The modal connectives $\leq$ and C are over the valuations of the terms in them. 
-
-	\subsubsection{Modal points}
-		
-		
-		With $n$ boolean variables we can uniquely identify $2^n$ objects. It is sufficient to define a modal point representation which satisfies it. For $n$ variables it should be able to give $2^n$ unique points.
+		The branch conjunction formula $\beta$ is satisfiable if $\beta$ has a model $\M$. We have to construct such a model $\M$ = ($\F, \upsilon$) = ((W, R), $\upsilon$). 
 		\begin{defn}
-			Let $\V_n$ be a denumeratable set of $n$ boolean variables, as follows:
+			A denumeratable set of $n$ boolean variables $\V_n$ is defined as follows:
 			\begin{equation}
 				\label{boolean-evaluation}
 				\V_n = \{x_1, x_2, \ldots , x_n \}
 			\end{equation}
-			A \textbf{boolean evaluation $\E_n$} for $n$ variables is a sequence of 1s and 0s, as follows:
+		\end{defn}
+		Let n be the number of the unique boolean variables in $\beta$. Let $\V_n$ be the set of them. Out of the four types of atomic formulas in $\beta$ only two require existance of modal points. These are the contacts and non-zero terms. The valuation $\upsilon$ should assign a set of modal points to each boolean variable $x \in \V_n$. One way to define $\upsilon$ and W is the following: 
+		
+		\begin{itemize}
+			\item Assign an empty set of modal points for each boolean variable $x \in \V_n$.
+	
+			$\upsilon$ = \{ <x, $\emptyset$> $\mid$ $ x \in \V_n$ \}
+			
+			\item Add a modal point for each term in the contacts and non-zero terms of $\beta$. 
+			
+			W = \{ $p_i$ $\mid$ C($a_i$, $b_i$) $\in$ $\beta$ \} $\cup$ \{ $p_{I+i}$ $\mid$ C($a_i$, $b_i$) $\in$ $\beta$ \} $\cup$ \{ $p_{I*2+j}$ $\mid$ $d_j \neq 0$ $\in$ $\beta$ \}
+						
+			\item Extend $\upsilon$ such as:
+			
+			\begin{itemize}
+				\item $p_i$ $\in$ $\upsilon(a_i)$ for each C($a_i$, $b_i$) $\in$ $\beta$ 
+				\item $p_{I+i}$ $\in$ $\upsilon(b_i)$ for each C($a_i$, $b_i$) $\in$ $\beta$ 
+				\item $p_{I*2+j}$ $\in$ $\upsilon(d_j)$ for each $d_j$  $\neq$ 0 $\in$ $\beta$ 
+			\end{itemize}
+		\end{itemize}
+				
+		\begin{defn}
+			Let $\V_n$ be a denumeratable set of $n$ boolean variables. Let W be a set of modal points. Let $\upsilon$ be a valuation over $\V_n$ and W. Then $\VXi$ $\subseteq$ W is the evaluation set of the boolean variable $x_i$ in $\V_n$.
+			\begin{equation}
+				\VXi = \upsilon(x_i) \;for x_i \in \V_n
+			\end{equation}
+		\end{defn}
+		
+		\begin{defn}
+			Let $\V_n$ be a denumeratable set of $n$ boolean variables. Let W be a set of modal points. Let $\upsilon$ be a valuation over $\V_n$ and W. 
+			Then $\VX$ is the union of all evaluations of boolean variables in $\V_n$.
+			\begin{equation}
+				\VX = \{\upsilon(x_i) \mid x_i \in \V_n \} = \{ \VXi \mid x_i \in \V_n \}
+			\end{equation}
+		\end{defn}
+		
+		Let t be an arbitrary term. Let p $\notin$ W be a new modal point. Let us extend $\upsilon$ such as p $\in$ $\upsilon(t)$. By the valuation definition  $\upsilon(t)$ is a composition of interesections, unions and compliments of some $\VXi$ $\subseteq$ W. Therefore, the modal point p should be added to zero or more $\VXi$ depending on the boolean operations in the term t. With n boolean variables there are $2^n$ ways of adding the point p.
+		
+		
+		
+		\begin{defn}
+			A \textbf{variable evaluation $\E_n$} for $n$ boolean variables is a sequence of 1s and 0s, as follows:
 			\begin{equation}
 				\E_n = \; < e_1, e_2, \ldots , e_n >, \; where \; e_1, \ldots, e_n \in \{0, 1 \}
 			\end{equation}
 		\end{defn}
-		For $n$ boolean variables there are $2^n$ unique boolean evaluations. We will define the modal points as boolean evaluations, i.e. each modal point is an unique boolean evaluation.
+		
+		For $n$ boolean variables there are $2^n$ unique variable evaluations. We will define the modal points as variable evaluations. By the definition of the valuation, it is not possible to distinguish two or more different modal points in some subsets. For example, the W $\setminus$ $\VX$ subset. The modal point representation also have this limitaion. The modal connectives require existence of a point in those sets. It is sufficient to work with only one point from them.
+
 		\begin{defn}
-			Let $\V_n$ be a denumeratable set of $n$ boolean variables. The set of \textbf{all unique points $W_n$} over $n$ variables is defined as follows:
+			Let $\E_n$ be a variable evaluation for $n$ boolean variables. Then $(\E_n)^i$ is the i-th element in the sequence $\E_n$.
+		\end{defn}
+			
+		\begin{defn}
+			Let $\V_n$ be a denumeratable set of $n$ boolean variables. The set of \textbf{all unique variable evaluations $W_n$} over $n$ variables is defined as follows:
 			\begin{equation}
 				\label{all-unique-points}
 				W_n = \{< e_1, e_2, \ldots , e_n > \mid e_1, \ldots, e_n \in \{0, 1 \} \}
@@ -409,36 +439,85 @@
 		\end{defn}
 
 		\begin{defn}
-			Let $\E_n$ be a boolean evaluation for $n$ variables. Then $(\E_n)^i$ is the i-th element in the sequence $\E_n$.
-		\end{defn}
-
-		\begin{defn}
 			\label{valuation-modal-points}
-			Let $\V_n$ be a denumeratable set of $n$ boolean variables, as in \ref{boolean-evaluation}. Let $W_n$ be the set of all unique points over n variables as in \ref{all-unique-points}.We will define a \textbf{valuation $\upsilon_n : \V_n \rightarrow \p(W_n)$} inductively as follows:
+			Let $\V_n$ be a denumeratable set of $n$ boolean variables. Let $W_n$ be the set of all unique points over n variables. Let W $\subseteq$ $W_n$. Then the \textbf{valuation $\upsilon_n : \V_n \rightarrow \p(W)$} is inductively defined as follows:
 			\begin{itemize}
 				\item Boolean constants
 					\begin{itemize}
 						\item $\upsilon_n(0) = \emptyset$
-						\item $\upsilon_n(1) = W_n$
+						\item $\upsilon_n(1) = W$
 					\end{itemize}
 				\item Boolean variables
 					\begin{itemize}
-						\item $\upsilon_n(x_i) = \{ \E_n \mid \E_n \in W_n \land (\E_n)^i = 1 \}$, for $i \in \{1, \ldots , n \}$
+						\item $\upsilon_n(x_i) = \{ \E_n \mid \E_n \in W \land (\E_n)^i = 1 \}$, for $i \in \{1, \ldots , n \}$
 					\end{itemize}
 				\item Boolean terms
 					\begin{itemize}
 						\item $\upsilon_n(a \sqcap b) = \upsilon_n(a) \cap \upsilon_n(b)$
 						\item $\upsilon_n(a \sqcup b) = \upsilon_n(a) \cup \upsilon_n(b)$
-						\item $\upsilon_n(a^*) = W_n \setminus \upsilon_n(a) = -\upsilon_n(a)$
+						\item $\upsilon_n(a^*) = W \setminus \upsilon_n(a) = -\upsilon_n(a)$
 					\end{itemize}
 			\end{itemize}
 		\end{defn}
+		
+		TODO: move to each definition which uses this things somehow..
+		Let $\beta$ be a branch conjunction as in \ref{branch-conjunction} . Let W be a set of modal points. Let $\V_n$ be the set of boolean variables in $\beta$. Let $\upsilon_n$ be a valuation as in \ref{valuation-modal-points} . Let R $\subseteq$ $W^2$ be a relation.
+		
+		\begin{defn}
+			The zero terms in $\beta$ are satisfied iff each zero term's evaluation is the empty set.
+			\begin{equation}
+				(\forall g_l \in \beta)(\upsilon_n(g_l) = \emptyset)
+			\end{equation}
+		\end{defn}
+		
+		\begin{defn}
+			The non contacts in $\beta$ are satisfied iff:
+			\begin{equation}
+				(\forall_{\neg C(e_k, f_k) \in \beta})\neg(\exists x \in \upsilon_n(e_k))(\exists y \in \upsilon_n(f_k))(xRy)
+			\end{equation}
+		\end{defn}
+			
+		\begin{lemma}
+			The valuations of the non contact terms in $\beta$ does not have a common modal point. Follows from the reflexivity of R.
+			\begin{equation}
+				(\forall_{\neg C(e_k, f_k) \in \beta})(\upsilon_n(e_k) \cap \upsilon_n(f_k) = \emptyset)
+			\end{equation}
+		\end{lemma}
+		
+		\begin{defn}
+			Let t be an arbitrary boolean term. Then $\V_t$ is the set of the boolean variables used in t.
+		\end{defn}
+		
+		\begin{defn}
+			Let $\V_n$ be a denumeratable set of boolean variables. Then $\Tn$ is the set of all boolean terms with variables of $\V_n$.
+			\begin{equation}
+				\Tn = \{t \mid t \;is\; a \;boolean \;term \;and \;\V_t \subseteq \V_n \}
+			\end{equation}
+		\end{defn}
+		
+		\begin{defn}
+			Let $\V_n$ be a denumeratable set of boolean variables. Let $\Tn$ be the set of all boolean terms with variables of $\V_n$. Let $W_n$ be the set of all unique variable evaluations for n varialbes. By a \textbf{boolean valuation} of a boolean term in $\Tn$ we mean the function $\eta$. It assigns a boolean constant for each pair of term t $\in$ $\Tn$ and variable evaluation $\E_n$ $\in$ $W_n$.
+			\begin{equation}
+				\eta(t, \E_n) \in \{0, 1\}
+			\end{equation}
+			Let t $\in$ $\Tn$. Let $\E_n$ $\in$ $W_n$. The inductively definition of $\eta$ on the structure of the term t is as follows:
+			\begin{itemize}
+				\item $\eta(0, E_n) = 0$
+				\item $\eta(1, E_n) = 1$
+				\item $\eta(x_i, E_n) = (E_n)^i$		
+				\item $\eta(a \sqcap b, E_n) = \eta(a, E_n) \land \upsilon(b, E_n)$
+				\item $\eta(a \sqcup b, E_n) = \upsilon(a, E_n) \lor \upsilon(b, E_n)$
+				\item $\eta(a^*, E_n) = \lnot \eta(a, E_n)$
+			\end{itemize}
+		\end{defn}
+		
+		TODO: define the set of all variables evaluations which evaluates term t to 1 
 
 	\subsection{Model building}
-		Let $\phi$ be a branch conjunction as in \ref{branch-conjunction} :
+		Let $\beta$ be a branch conjunction as in \ref{branch-conjunction} :
 		\nonumber\BranchConjunction
 
-		Let $\V_n$ be the set of variables in $\phi$. Let $\F$ = (W, R) be a relational system with $W \subseteq W_n$ and $R \subseteq$ $W^2$. Let $\M$ = ($\F, \upsilon$) be a model, where $\upsilon : \V_n \rightarrow \p(W)$ is a valuation defined as in \ref{valuation-modal-points} over $W$. There are four types of atomic formulas: contacts $C$, $\neg C$, zero terms and non-zero terms. Only the contacts and non-zero terms requires point existence. We will create points only for them. The pseudocode bellow implements the main idea for building $\M$ as a model of $\phi$. Note that there are some more details and optimizations which will be shown in the implementation section.
+		Let $\V_n$ be the set of variables in $\beta$. Let $\F$ = (W, R) be a relational system with $W \subseteq W_n$ and $R \subseteq$ $W^2$. Let $\M$ = ($\F, \upsilon$) be a model, where $\upsilon : \V_n \rightarrow \p(W)$ is a valuation defined as in \ref{valuation-modal-points} over $W$. There are four types of atomic formulas: contacts $C$, $\neg C$, zero terms and non-zero terms. Only the contacts and non-zero terms requires point existence. We will create points only for them. The pseudocode bellow implements the main idea for building $\M$ as a model of $\beta$. Note that there are some more details and optimizations which will be shown in the implementation section.
 		\LinesNumbered
 		\DontPrintSemicolon
 		\begin{algorithm}
