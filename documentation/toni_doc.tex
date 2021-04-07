@@ -409,7 +409,7 @@
 			Let $\V_n$ be a denumeratable set of $n$ boolean variables. Let W be a set of modal points. Let $\upsilon$ be a valuation over $\V_n$ and W. 
 			Then $\VX$ is the union of all evaluations of boolean variables in $\V_n$.
 			\begin{equation}
-				\VX = \{\upsilon(x_i) \mid x_i \in \V_n \} = \{ \VXi \mid x_i \in \V_n \}
+				\VX = \bigcup\limits_{x_i \in \V_n}\upsilon(x_i) = \bigcup\limits_{x_i \in \V_n}\VXi
 			\end{equation}
 		\end{defn}
 		
@@ -423,13 +423,13 @@
 				\E_n = \; < e_1, e_2, \ldots , e_n >, \; where \; e_1, \ldots, e_n \in \{0, 1 \}
 			\end{equation}
 		\end{defn}
-		
+
 		For $n$ boolean variables there are $2^n$ unique variable evaluations. We will define the modal points as variable evaluations. By the definition of the valuation, it is not possible to distinguish two or more different modal points in some subsets. For example, the W $\setminus$ $\VX$ subset. The modal point representation also have this limitaion. The modal connectives require existence of a point in those sets. It is sufficient to work with only one point from them.
 
 		\begin{defn}
 			Let $\E_n$ be a variable evaluation for $n$ boolean variables. Then $(\E_n)^i$ is the i-th element in the sequence $\E_n$.
 		\end{defn}
-			
+
 		\begin{defn}
 			Let $\V_n$ be a denumeratable set of $n$ boolean variables. The set of \textbf{all unique variable evaluations $W_n$} over $n$ variables is defined as follows:
 			\begin{equation}
@@ -449,7 +449,7 @@
 					\end{itemize}
 				\item Boolean variables
 					\begin{itemize}
-						\item $\upsilon_n(x_i) = \{ \E_n \mid \E_n \in W \land (\E_n)^i = 1 \}$, for $i \in \{1, \ldots , n \}$
+						\item $\upsilon_n(x_i) = \{ \E_n \mid \E_n \in W \land (\E_n)^i = 1 \}$, for $x_i \in \V_n$
 					\end{itemize}
 				\item Boolean terms
 					\begin{itemize}
@@ -459,59 +459,174 @@
 					\end{itemize}
 			\end{itemize}
 		\end{defn}
-		
+
 		TODO: move to each definition which uses this things somehow..
 		Let $\beta$ be a branch conjunction as in \ref{branch-conjunction} . Let W be a set of modal points. Let $\V_n$ be the set of boolean variables in $\beta$. Let $\upsilon_n$ be a valuation as in \ref{valuation-modal-points} . Let R $\subseteq$ $W^2$ be a relation.
-		
+
 		\begin{defn}
-			The zero terms in $\beta$ are satisfied iff each zero term's evaluation is the empty set.
+			The zero terms in $\beta$ are satisfied iff each zero term's valuation is the empty set.
 			\begin{equation}
-				(\forall g_l \in \beta)(\upsilon_n(g_l) = \emptyset)
+				(\forall (g_l = 0) \in \beta)(\upsilon_n(g_l) = \emptyset)
 			\end{equation}
 		\end{defn}
-		
+
 		\begin{defn}
 			The non contacts in $\beta$ are satisfied iff:
 			\begin{equation}
 				(\forall_{\neg C(e_k, f_k) \in \beta})\neg(\exists x \in \upsilon_n(e_k))(\exists y \in \upsilon_n(f_k))(xRy)
 			\end{equation}
 		\end{defn}
-			
+
 		\begin{lemma}
 			The valuations of the non contact terms in $\beta$ does not have a common modal point. Follows from the reflexivity of R.
 			\begin{equation}
 				(\forall_{\neg C(e_k, f_k) \in \beta})(\upsilon_n(e_k) \cap \upsilon_n(f_k) = \emptyset)
 			\end{equation}
 		\end{lemma}
-		
+
 		\begin{defn}
 			Let t be an arbitrary boolean term. Then $\V_t$ is the set of the boolean variables used in t.
 		\end{defn}
-		
+
 		\begin{defn}
 			Let $\V_n$ be a denumeratable set of boolean variables. Then $\Tn$ is the set of all boolean terms with variables of $\V_n$.
 			\begin{equation}
 				\Tn = \{t \mid t \;is\; a \;boolean \;term \;and \;\V_t \subseteq \V_n \}
 			\end{equation}
 		\end{defn}
-		
+
 		\begin{defn}
-			Let $\V_n$ be a denumeratable set of boolean variables. Let $\Tn$ be the set of all boolean terms with variables of $\V_n$. Let $W_n$ be the set of all unique variable evaluations for n varialbes. By a \textbf{boolean valuation} of a boolean term in $\Tn$ we mean the function $\eta$. It assigns a boolean constant for each pair of term t $\in$ $\Tn$ and variable evaluation $\E_n$ $\in$ $W_n$.
+			Let $\V_n$ be a denumeratable set of boolean variables. Let $\Tn$ be the set of all boolean terms with variables of $\V_n$. Let W $\subseteq$ $W_n$. By a \textbf{boolean valuation} of a boolean term in $\Tn$ we mean the function $\eta$. It assigns a boolean constant for each pair of term t $\in$ $\Tn$ and variable evaluation $\E_n$ $\in$ W.
 			\begin{equation}
 				\eta(t, \E_n) \in \{0, 1\}
 			\end{equation}
-			Let t $\in$ $\Tn$. Let $\E_n$ $\in$ $W_n$. The inductively definition of $\eta$ on the structure of the term t is as follows:
+			Let t $\in$ $\Tn$. Let $\E_n$ $\in$ W. The inductive definition of $\eta$ on the structure of the term t is as follows:
 			\begin{itemize}
 				\item $\eta(0, E_n) = 0$
 				\item $\eta(1, E_n) = 1$
 				\item $\eta(x_i, E_n) = (E_n)^i$		
-				\item $\eta(a \sqcap b, E_n) = \eta(a, E_n) \land \upsilon(b, E_n)$
-				\item $\eta(a \sqcup b, E_n) = \upsilon(a, E_n) \lor \upsilon(b, E_n)$
-				\item $\eta(a^*, E_n) = \lnot \eta(a, E_n)$
+				\item $\eta(a \sqcap b, E_n) = \eta(a, E_n) \sqcap \eta(b, E_n)$
+				\item $\eta(a \sqcup b, E_n) = \eta(a, E_n) \sqcup \eta(b, E_n)$
+				\item $\eta(a^*, E_n) = \;^*\eta(a, E_n)$
 			\end{itemize}
 		\end{defn}
-		
-		TODO: define the set of all variables evaluations which evaluates term t to 1 
+
+		\begin{lemma}
+			Let t $\in \Tn$ be an arbitrary term. Let W $\subseteq$ $W_n$. Let $\E_n$ $\in$ W. Let $\eta$ be a boolean valuation. Let $\upsilon_n$ be a valuation as in \ref{valuation-modal-points} . By the definition of $\eta$ and $\upsilon_n$ follows:
+			\begin{equation}
+				\eta(t, \E_n) = 1 \iff \E_n \in \upsilon_n(t)
+			\end{equation}
+		\end{lemma}
+
+		\begin{defn}
+			Let t $\in \Tn$ be an arbitrary term. Let $\eta$ be a boolean valuation. Let $\E_n$ $\in$ $W_n$. Then $\mathbf{\E_n \; satisfies \; t}$ iff $\E_n$ evaluates t to the constant 1.
+			\begin{equation}
+				\E_n \; satisfies \; t \iff \eta(t, \E_n) = 1
+			\end{equation}
+		\end{defn}
+
+		\begin{defn}
+			Let t $\in \Tn$ be an arbitrary term. Let $\eta$ be a boolean valuation. The set of all variable evaluations $\E_t$ which satisfies t is defined as follow:
+			\begin{equation}
+				\E_t = \{ \E_n \mid \E_n \in W_n \land \eta(t, \E_n) = 1 \}
+			\end{equation}
+		\end{defn}
+
+		\begin{lemma}
+			Let t $\in \Tn$ be an arbitrary term. Let W $\subseteq$ $W_n$. Let $\eta$ be a boolean valuation. Let $\upsilon_n$ be a valuation as in \ref{valuation-modal-points} . Let $\E_n \in W_n$. Then $\mathbf{\E_n \; extends \; \upsilon_n \; and \; W}$ as follows:
+			\begin{align*}
+				\E_n \; extends \; \upsilon_n \; and \; W \iff \eta(t, \E_n) = 1 & \\
+				\iff E_n \in \upsilon_n(t) & \\
+				\iff \E_n \in \E_t
+			\end{align*}
+		\end{lemma}
+
+		\begin{defn}
+			Let $\E_n \in W_n$. Let W $\subseteq W_n$. Let W = $W \cup {\E_n}$. Then $\E_n$ is a $\mathbf{valid \; modal \; point \; of \; \beta}$ if it does not break the satisfaction of the zero terms and non contacts in $\beta$:
+			\begin{align*}
+				(\forall (g_l = 0) \in \beta)(\E_n \notin \upsilon_n(g_l)) \land
+				(\forall_{\neg C(e_k, f_k) \in \beta})(\E_n \notin \upsilon_n(e_k) \cap \upsilon_n(f_k)) \iff \\
+				(\forall (g_l = 0) \in \beta)(\eta(g_l, \E_n) = 0) \land
+				(\forall_{\neg C(e_k, f_k) \in \beta})(\eta(e_k, \E_n) = 0 \land \eta(f_k, \E_n) = 0)
+			\end{align*}
+		\end{defn}
+
+		\begin{defn}
+			Let $W^v \subseteq W_n$ be the set of all valid modal points of $\beta$.
+			\begin{equation}
+				W^v = \{ \E_n \mid \E_n \in W_n \land \E_n \; is \; a \; valid \; modal \; point \; of \; \beta \}
+			\end{equation}
+		\end{defn}
+
+		\begin{defn}
+			Let x, y $\in W^v$. Then <x, y> is a $\mathbf{valid \; connected \; pair \; of \; \beta}$ modal points if does not break the satisfaction of non contacts in $\beta$.
+			\begin{align*}
+			(\forall_{\neg C(e_k, f_k) \in \beta})\neg(
+			(x \in \upsilon_n(e_k) \land y \in \upsilon_n(f_k)) \:\lor \\
+			(x \in \upsilon_n(f_k) \land y \in \upsilon_n(e_k)) \:\lor \\
+			(x \in \upsilon_n(e_k) \land y \in \upsilon_n(e_k)) \:\lor \\
+			(x \in \upsilon_n(f_k) \land y \in \upsilon_n(f_k))) \\ \:\iff \\
+			(\forall_{\neg C(e_k, f_k) \in \beta})\neg(
+			(\eta(e_k, x) = 1 \land \eta(f_k, y) = 1) \:\lor \\
+			(\eta(f_k, x) = 1 \land \eta(e_k, y) = 1) \:\lor \\
+			(\eta(e_k, x) = 1 \land \eta(e_k, y) = 1) \:\lor \\
+			(\eta(f_k, x) = 1 \land \eta(f_k, y) = 1))
+			\end{align*}
+		\end{defn}
+
+		\begin{defn}
+			Let $R^v \subseteq {W^v}^2$ be the set of all valid connected pairs of $\beta$ modal points.
+			\begin{equation}
+				R^v = \{ <x, y\> \mid x, y \in W^v \land <x, y> \; is \; a \; valid \; connected \; pair \; of \; \beta \; modal \; points\}
+			\end{equation}
+		\end{defn}
+
+			Let $\M = (W^v, R^v), \upsilon_n)$. Then $\M$ is a model of $\beta$ if the non-zero terms and contacts are satisfied:
+			\begin{align*}
+				(\forall (d_j \neq 0) \in \beta)(\exists \E_n \in W^v)(\E_n \in \upsilon_n(d_j)) \: \land \\
+				(\forall_{C(a_i, b_i) \in \beta})(\exists <x, y> \in R^v)(x \in \upsilon_n(a_i) \land y \in \upsilon_n(b_i)) \\ \iff \\
+				(\forall (d_j \neq 0) \in \beta)(\exists \E_n \in W^v)(\eta(d_j, \E_n) = 1 \: \land \\
+				(\forall_{C(a_i, b_i) \in \beta})(\exists <x, y> \in R^v)(\eta(a_i, x) = 1 \land \eta(b_i, y) = 1)
+			\end{align*}
+			The model $\M$ is not convenient. It might have a lot of modal points and connections between them. For example, let $\beta = C((x \sqcap y) \sqcap z, t \sqcup e)$. Then $\V_n = \{x, y, z, t, e\}$. There are no zero terms and non contacts, so $W^v$ is the same as $W_n$. Therefore, $|W^v|= 32$ and $|R^v| = 32^2$.
+
+	The following algorithm builds a more convenient model. Creates modal points and connections only for the non zero and contact terms in $\beta$.
+		\newpage
+		\LinesNumbered
+		\DontPrintSemicolon
+		\begin{algorithm}
+			$W \gets \emptyset$
+			\;
+			$R \gets \emptyset$
+			\;
+			\tcc{Process the non zero terms in $\beta$}
+			\For{$d_j \neq 0 \in \beta$}{\label{non-zero-terms}
+				\For{$\E_n \in W^v$}{
+					\uIf{$\eta(d_j, \E_n) = 1$}{
+						$W \gets W \cup \{ x \}$
+						\;
+						$R \gets R \cup \{ <x,x> \}$
+						\;
+						\Goto{non-zero-terms}
+					}
+				}
+				Model building fails.
+			}
+			\tcc{Process the contacts in $\beta$}
+			\For{$C(a_i, b_i) \in \beta$}{\label{contacts}
+				\For{$<x, y> \in R^v$}{
+					\uIf{$\eta(a_i, x) = 1 \land \eta(b_i, x) = 1$}{
+						$W \gets W \cup \{x, y \}$
+						\;
+						$R \gets R \cup \{<x,x>, <y,y>, <x,y>, <y,x> \}$
+						\;
+						\Goto{contacts}
+					}
+				}
+				Model building fails.
+			}
+			Model building finished.
+		\end{algorithm}
 
 	\subsection{Model building}
 		Let $\beta$ be a branch conjunction as in \ref{branch-conjunction} :
@@ -564,7 +679,7 @@
 			$W \gets \emptyset$
 			\;
 			\tcc{Create points for the contacts}
-			\For{$i\gets1$ \KwTo $I$ \KwBy $1$}{\label{contacts}
+			\For{$i\gets1$ \KwTo $I$ \KwBy $1$}{\label{contacts-old}
 				\tcc{Processing $C(a_i, b_i)$}
 
 				\For{$x \in \upsilon_n(a_i)$}{
@@ -575,14 +690,14 @@
 							\;
 							$R \gets R \cup \{<x,x>, <y,y>, <x,y>, <y,x> \}$
 							\;
-							\Goto{contacts}
+							\Goto{contacts-old}
 						}
 					}
 				}
 				Model building fails.
 			}
 			\tcc{Create points for the non-zero terms}
-			\For{$j\gets1$ \KwTo $J$ \KwBy $1$}{\label{non-zero-terms}
+			\For{$j\gets1$ \KwTo $J$ \KwBy $1$}{\label{non-zero-terms-old}
 				\tcc{Processing $d_j \neq 0$}
 
 				\For{$x \in \upsilon_n(d_j)$}{
@@ -592,7 +707,7 @@
 						\;
 						$R \gets R \cup \{ <x,x> \}$
 						\;
-						\Goto{non-zero-terms}
+						\Goto{non-zero-terms-old}
 					}
 				}
 				Model building fails.
