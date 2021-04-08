@@ -657,7 +657,19 @@
 		\end{equation}
 	\end{defn}
 
-	The connectivity theorem implies that the evaluation sets are connected. The modal point representation is as variable evaluation. So, the non distinguishable modal points are treated as one modal point. Therefore, the connectivity theorem implies that the graph $G = (W, R)$ is connected.
+	Let $G = (W, R)$. The connectivity theorem implies that there is a connection out of each evaluation set(except the $\emptyset$ and W). Mind that the modal point representation is a variable evaluation. Thus, the set of all evaluations is  $\p(W)$.
+
+	If G is connected, then there is a path between each two points. Therefore, there is a connection out of each $W' \in \p(W)$.
+		\begin{equation}
+			(\forall W' \in \p(W))(W' \neq \emptyset \land W' \neq W \implies(\exists x \in W')(\exists y \in W \setminus W)(xRy))
+		\end{equation}
+
+	If G is disconnected, then G has a not connected components. Let G'=(W', R') be such a component. Thus, $W' \subseteq W$ and $W' \in \p(W)$. There are no outgoing connections from W'. Otherwise, G' would be connected with at least one more point from $W \setminus W'$.
+		\begin{equation}
+			(\exists W' \in \p(W))(W' \neq \emptyset \land W' \neq W \land (\not\exists y \in W \setminus W')(xRy))
+		\end{equation}
+
+	Therefore, the connectivity theorem implies that the graph G is connected.
 
 	\begin{defn}
 		Let $\F$ = (W, R) be a relational system. Let $\M = (\F, \upsilon_n)$ be a model of $\beta$. $\M$ is a \textbf{connected model} if $G = (W, R)$ is connected.
