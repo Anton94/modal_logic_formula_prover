@@ -17,6 +17,9 @@
 \usepackage{float}
 \usepackage{hyperref}
 \usepackage{tikz}
+\usepackage{multirow}
+
+\usetikzlibrary{trees}
 
 \SetKw{KwBy}{by}
 \newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
@@ -178,7 +181,7 @@
 	\subsection{Syntax}
 	The language of contact logic consist of:
 	\begin{itemize}
-		\item \textit{Boolean variables} (a denumeratable set $\V$)
+		\item \textit{Boolean variables} (a denumerable set $\V$)
 		\item \textit{Boolean constants}: 0 and 1
 		\item \textit{Boolean operations}:
 		\begin{itemize}
@@ -348,8 +351,8 @@
 		\noindent $B$ is an opened branch, so there are no contradicting formulas in it, i.e. $(\neg \exists X)(T X \in B \land F X \in B)$.
 		The signed atomic formulas could be written as atomic formulas as follows:
 		\begin{itemize}
-			\item $T C(a,b)$ $\rightarrow$ $C(a,b)$
-			\item $F C(a,b)$ $\rightarrow$ $\neg C(a,b)$
+			\item $T C(a,b)$ $\rightarrow$ $C(a,b)$ (contact)
+			\item $F C(a,b)$ $\rightarrow$ $\neg C(a,b)$ (non-contact)
 			\item $T a \leq b$ $\rightarrow$ $a \leq b$ $\rightarrow$ $a \sqcap b^*=0$ $\rightarrow$ $g = 0$ (zero term)
 			\item $F a \leq b$ $\rightarrow$ $\neg (a \leq b)$ $\rightarrow$ $a \sqcap b^* \neq 0$ $\rightarrow$ $d \neq 0$ (non-zero term)
 		\end{itemize}
@@ -372,13 +375,13 @@
 	\subsection{Branch conjunction model building}
 		The branch conjunction formula $\beta$ is satisfiable if $\beta$ has a model $\M$. We have to construct such a model $\M$ = ($\F, \upsilon$) = ((W, R), $\upsilon$). 
 		\begin{defn}
-			A denumeratable set of $n$ boolean variables $\V_n$ is defined as follows:
+			A denumerable set of $n$ boolean variables $\V_n$ is defined as follows:
 			\begin{equation}
 				\label{boolean-evaluation}
 				\V_n = \{x_1, x_2, \ldots , x_n \}
 			\end{equation}
 		\end{defn}
-		Let n be the number of the unique boolean variables in $\beta$. Let $\V_n$ be the set of them. Out of the four types of atomic formulas in $\beta$ only two require existance of modal points. These are the contacts and non-zero terms. The valuation $\upsilon$ should assign a set of modal points to each boolean variable $x \in \V_n$. One way to define $\upsilon$ and W is the following: 
+		Let n be the number of the unique boolean variables in $\beta$. Let $\V_n$ be the set of them. There are four types of atomic formulas in $\beta$, namely contacts, non-contacts, zero terms and non-zero terms. Only contacts and non-zero terms require existance of modal points. The valuation $\upsilon$ should assign a set of modal points to each boolean variable $x \in \V_n$. One way to define $\upsilon$ and W is the following:
 		
 		\begin{itemize}
 			\item Assign an empty set of modal points for each boolean variable $x \in \V_n$.
@@ -399,14 +402,14 @@
 		\end{itemize}
 				
 		\begin{defn}
-			Let $\V_n$ be a denumeratable set of $n$ boolean variables. Let W be a set of modal points. Let $\upsilon$ be a valuation over $\V_n$ and W. Then $\VXi$ $\subseteq$ W is the evaluation set of the boolean variable $x_i$ in $\V_n$.
+			Let $\V_n$ be a denumerable set of $n$ boolean variables. Let W be a set of modal points. Let $\upsilon$ be a valuation over $\V_n$ and W. Then $\VXi$ $\subseteq$ W is the evaluation set of the boolean variable $x_i$ in $\V_n$.
 			\begin{equation}
 				\VXi = \upsilon(x_i) \;for x_i \in \V_n
 			\end{equation}
 		\end{defn}
 		
 		\begin{defn}
-			Let $\V_n$ be a denumeratable set of $n$ boolean variables. Let W be a set of modal points. Let $\upsilon$ be a valuation over $\V_n$ and W. 
+			Let $\V_n$ be a denumerable set of $n$ boolean variables. Let W be a set of modal points. Let $\upsilon$ be a valuation over $\V_n$ and W.
 			Then $\VX$ is the union of all evaluations of boolean variables in $\V_n$.
 			\begin{equation}
 				\VX = \bigcup\limits_{x_i \in \V_n}\upsilon(x_i) = \bigcup\limits_{x_i \in \V_n}\VXi
@@ -431,7 +434,7 @@
 		\end{defn}
 
 		\begin{defn}
-			Let $\V_n$ be a denumeratable set of $n$ boolean variables. The set of \textbf{all unique variable evaluations $W_n$} over $n$ variables is defined as follows:
+			Let $\V_n$ be a denumerable set of $n$ boolean variables. The set of \textbf{all unique variable evaluations $W_n$} over $n$ variables is defined as follows:
 			\begin{equation}
 				\label{all-unique-points}
 				W_n = \{< e_1, e_2, \ldots , e_n > \mid e_1, \ldots, e_n \in \{0, 1 \} \}
@@ -440,7 +443,7 @@
 
 		\begin{defn}
 			\label{valuation-modal-points}
-			Let $\V_n$ be a denumeratable set of $n$ boolean variables. Let $W_n$ be the set of all unique points over n variables. Let W $\subseteq$ $W_n$. Then the \textbf{valuation $\upsilon_n : \V_n \rightarrow \p(W)$} is inductively defined as follows:
+			Let $\V_n$ be a denumerable set of $n$ boolean variables. Let $W_n$ be the set of all unique points over n variables. Let W $\subseteq$ $W_n$. Then the \textbf{valuation $\upsilon_n : \V_n \rightarrow \p(W)$} is inductively defined as follows:
 			\begin{itemize}
 				\item Boolean constants
 					\begin{itemize}
@@ -488,14 +491,14 @@
 		\end{defn}
 
 		\begin{defn}
-			Let $\V_n$ be a denumeratable set of boolean variables. Then $\Tn$ is the set of all boolean terms with variables of $\V_n$.
+			Let $\V_n$ be a denumerable set of boolean variables. Then $\Tn$ is the set of all boolean terms with variables of $\V_n$.
 			\begin{equation}
 				\Tn = \{t \mid t \;is\; a \;boolean \;term \;and \;\V_t \subseteq \V_n \}
 			\end{equation}
 		\end{defn}
 
 		\begin{defn}
-			Let $\V_n$ be a denumeratable set of boolean variables. Let $\Tn$ be the set of all boolean terms with variables of $\V_n$. Let W $\subseteq$ $W_n$. By a \textbf{boolean valuation} of a boolean term in $\Tn$ we mean the function $\eta$. It assigns a boolean constant for each pair of term t $\in$ $\Tn$ and variable evaluation $\E_n \in W_n$.
+			Let $\V_n$ be a denumerable set of boolean variables. Let $\Tn$ be the set of all boolean terms with variables of $\V_n$. Let W $\subseteq$ $W_n$. By a \textbf{boolean valuation} of a boolean term in $\Tn$ we mean the function $\eta$. It assigns a boolean constant for each pair of term t $\in$ $\Tn$ and variable evaluation $\E_n \in W_n$.
 			\begin{equation}
 				\eta(t, \E_n) \in \{0, 1\}
 			\end{equation}
@@ -629,12 +632,12 @@
 	\subsection{Connectivity}
 	In topology and related branches of mathematics, a connected space is a topological space that cannot be represented as the union of two or more disjoint non-empty open subsets. Connectedness is one of the principal topological properties that are used to distinguish topological spaces.
 
-	\begin{theorem}
+	\begin{axiom}
 		(Connectivity) Let b is a term. Then
 		\label{connectivity-theorem}\begin{equation}
 			b \neq 0 \land b \neq 1 \implies bCb^*
 		\end{equation}
-	\end{theorem}
+	\end{axiom}
 
 	\paragraph{} Let $\F$ = (W, R) be a relational system with W $\neq$ $\emptyset$, R $\subseteq$ $W^2$ and a, b are terms. Let us recall the deficition of C:
 	\begin{equation}
@@ -707,6 +710,112 @@
 	\newpage
 	\section{Implementation Introduction}
 
+		It should be easy and intuitive to write a formula. Only the keyboard keys should be used. The legend bellow describes the formula's syntaxis:
+
+	\begin{center}
+	\begin{tabular}{ |c|c|c| }
+		\hline
+		\multicolumn{3}{|c|}{\textbf{Terms}} \\
+		\hline
+		0 				    & 0      & Boolean constant 0 \\
+		1 					& 1      & Boolean constant 1 \\
+		- 					& *      & Boolean complement \\
+		*				 	& $\cap$ & Boolean meat \\
+		+ 					& $\cup$ & Boolean join \\
+		()                  & ()     & Parentheses \\
+		\text{[a-zA-Z0-9]+} & $x_1$  & Boolean variable. Syntax $x1$, $Y42$, $Var101$ \\
+		\hline
+		\hline
+		\multicolumn{3}{|c|}{\textbf{Formulas}} \\
+		\hline
+		F      & $\bot$            & Propositional constant false \\
+		T      & $\top$            & Propositional constant true \\
+		$\sim$ & $\neg$            & Negation \\
+		$\&$   & $\land$           & Conjunction \\
+		$|$    & $\lor$            & Disjunction \\
+		->     & $\Rightarrow$     & Implication \\
+		<->    & $\Leftrightarrow$ & Equivalence \\
+		C      & C                 & Contact, syntax C($t_1$, $t_2$) \\
+		<=     & $\leq$            & Part of , syntax <=($t_1$, $t_2$) \\
+		<=m    & $\leq m$          & Measured Part of, syntax <=m($t_1$, $t_2$) \\
+		=0     & =0                & Zero term, syntax $t_1=0$ \\
+		()     & ()                & Parentheses \\
+		\hline
+	\end{tabular}
+	\end{center}
+
+	These are a few examples of formulas:
+	\begin{itemize}
+		\item $C(x1 * 1, x2 + y1)$
+		\item $C(x1 + 0, (-x2 + x3) * x1)$
+		\item $C(x1,x2) \;\&\; C(x2, x3) \;\& \sim C(x1,x3)$
+		\item $C(x1,x2) \;\& <=(x1,x3) \;\& \sim C(x2,x3)$
+		\item $C(x1,x2) \text{ -> } C(x2, x1)$
+		\item $C(x1,x2) \;\&\; C(x2, x3) => C(x1, x3)$
+		\item $F \text{ -> } C(x1,x2) \;\& \sim C(x1,x2)$
+	\end{itemize}
+
+		The formula is a sequence of characters. These characters does not give us any information for the formula's structure. Flex \& Bison is used to parse it into an AST (Abstract Syntax Tree). 
+
+		Let $\phi = C(x1,x2) \;\& <=(x1, x3) => C(x1, x3)$. The following AST is for the formula $\phi$:
+
+\begin{tikzpicture}[
+  tlabel/.style={pos=0.6,right=-1pt,font=\footnotesize\color{red!70!black}},
+]
+\node{=>}
+child {node {$\&$}
+  child {node {C}
+    child {node {x1}}
+    child {node {x2}}
+  }
+  child[missing] {}
+  child {node {<=}
+    child {node {x1}}
+    child {node {x3}}
+  }
+}
+child[missing] {}
+child[missing] {}
+child {node {C}
+  child {node {x1}}
+  child {node {x3}}
+};
+\end{tikzpicture}
+
+	THE FOLLOWING ARE NOTES WHICH WILL BE REMOVED \\
+Contents: (notes)
+	Parsing:
+	- Formula legend
+		- Variables - Definition, what can be variables. (sequence of characters, etc..)
+	- Flex \& Bison for parsing.
+	- AST building from it.
+	- Reducing some constants, using the AST and virtual dispatching.
+
+	 Converstion from AST to more suitable formula representation:
+	- Variables - Oтъждествяваме я с поредния номер в списъка с променливи(i.e. instead of the variables their corresponding number) The variable names does not change durring the formula satisfiability checking, so their corresponding "idexes " could be used...
+	- Term representation.
+	- Formula representation.
+
+
+	- variable evaluations - representation
+		- plus one operation (Next)
+		- marked bits only for the used variables
+		- plus one on marked bits
+	 - contact matrix representation
+
+
+	 \iffalse
+		Notes for the official documentation
+	 - bitset-Next instead of bitet-PlusOne on marked and explain the marked before defining the
+	 - variable bitset/boolean substitution does now explains anything and is confusing.
+	 - Variable boolean substitution - how the substitution is done? And why we need it? What it's going to be used for?
+	 - Term hash variable -> without 'variable', maybe 'member'.
+	 - Term Set-Evaluation -> Maybe boolean valuation should be the correct name
+	 - Variable Set-Substituitons -> maybe variable evalualuation instead of substituion. Now it's too complicated with this substituioning
+	 - Term Set-Evaluation : $& |$ as cup and cap symbols maybe?
+	  -
+	  \fi
+
 	\newpage
 	\section{Tableaux Implementation}
 
@@ -715,6 +824,11 @@
 
 	\newpage
 	\section{Connected Contact Logics Implementation}
+
+	TODOs:
+	 - inductive def. for structures, e.g. terms
+	 - recursive for functions
+	 - R is reflexive and symetric - somewhere to mention it.
 
 	\newpage
 	TODO: separate line for the authors
