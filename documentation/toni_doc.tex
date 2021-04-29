@@ -150,9 +150,9 @@
 	Finaly, the conditions for closing off a case (declaring a branch closed) are	simple. A \textbf{branch is closed} if it contains a contradiction, i.e. $T A$ and $F A$ for some formula $A$. A \textbf{branch is opened} if it does not contain any contradiction. If each branch is closed, then the \textbf{tableau is closed}. A closed tableau for $F X$ is a tableau proof of $X$, meaning that A is a tautology. The tableau displayed above is closed, so the formula $(X \land Y) \Rightarrow (\neg X \land \neg Y)$ has a tableau proof.
 	\par
 	It may happen that no tableau proof is forthcoming, and we can think of the tableau construction as providing us with contraexamples. Consider the following attempt to prove $(X \Rightarrow Y) \Rightarrow ((Y \Rightarrow X) \Rightarrow \neg Y)$
-	\\\indent\indent\indent\indent\indent\indent 1. $F (X \Rightarrow Y) \Rightarrow ((Y \Rightarrow X) \Rightarrow \neg Y)$
+	\\\indent\indent\indent\indent\indent\indent 1. $F ((X \Rightarrow Y) \Rightarrow ((Y \Rightarrow X) \Rightarrow \neg Y))$
 	\\\indent\indent\indent\indent\indent\indent 2. $T X \Rightarrow Y$
-	\\\indent\indent\indent\indent\indent\indent 3. $F (Y \Rightarrow X) \Rightarrow \neg Y$
+	\\\indent\indent\indent\indent\indent\indent 3. $F ((Y \Rightarrow X) \Rightarrow \neg Y)$
 	\\\indent\indent\indent\indent\indent\indent 4. $T Y \Rightarrow X$
 	\\\indent\indent\indent\indent\indent\indent 5. $F \neg Y$
 	\\\indent\indent\indent\indent\indent\indent 6. $T Y$
@@ -709,8 +709,12 @@
 
 	\newpage
 	\section{Implementation Introduction}
-
-		It should be easy and intuitive to write a formula. Only the keyboard keys should be used. The legend bellow describes the formula's syntaxis:
+	The main programming language is C++. Flex \& Bison are used to parse the input formula. The formula proover is a C++ library. The unit and performance tests are C++ applications.
+	The user application is a Web page. For the Web server is implemented with the third party CppRestSDK library. The satisfiability checking runs on the server. There is a feature to interupt an ongoing process. Can be triggered by the user via a button. There is a user disconnecting detection which cancels the requested formula prooving.
+	TODO: something more? maybe some screenshots from the web application or in it's section is enough?
+		
+	\subsection{Syntax}
+	The formula should be easy and intuitive to write. Only the keyboard keys should be used. The legend bellow describes the formula's syntaxis:
 
 	\begin{center}
 	\begin{tabular}{ |c|c|c| }
@@ -737,7 +741,7 @@
 		<->    & $\Leftrightarrow$ & Equivalence \\
 		C      & C                 & Contact, syntax C($t_1$, $t_2$) \\
 		<=     & $\leq$            & Part of , syntax <=($t_1$, $t_2$) \\
-		<=m    & $\leq m$          & Measured Part of, syntax <=m($t_1$, $t_2$) \\
+		<=m    & $\leq$$m$$$       & Measured Part of, syntax <=m($t_1$, $t_2$) \\
 		=0     & =0                & Zero term, syntax $t_1=0$ \\
 		()     & ()                & Parentheses \\
 		\hline
@@ -755,9 +759,10 @@
 		\item $F \text{ -> } C(x1,x2) \;\& \sim C(x1,x2)$
 	\end{itemize}
 
-		The formula is a sequence of characters. These characters does not give us any information for the formula's structure. Flex \& Bison is used to parse it into an AST (Abstract Syntax Tree). 
-
-		Let $\phi = C(x1,x2) \;\& <=(x1, x3) => C(x1, x3)$. The following AST is for the formula $\phi$:
+	\subsection{Formula parsing}
+	The formula is a sequence of characters. These characters does not give us any information for the formula's structure. It should be analyzed. Flex \cite{flex-tokenizer} and Bison \cite{bison-parser} are used to parse it into an AST (Abstract Syntax Tree). Flex is used as a tokenizer. Bison is used as the parser. The AST holds the formula's operations in the inner nodes. The terms are in the leaves.
+	
+	Let $\phi = (C(x1,x2) \;\& <=(x2, x3)) => C(x1, x3)$. The following is an AST of $\phi$:
 
 \begin{tikzpicture}[
   tlabel/.style={pos=0.6,right=-1pt,font=\footnotesize\color{red!70!black}},
@@ -770,7 +775,7 @@ child {node {$\&$}
   }
   child[missing] {}
   child {node {<=}
-    child {node {x1}}
+    child {node {x2}}
     child {node {x3}}
   }
 }
@@ -781,6 +786,239 @@ child {node {C}
   child {node {x3}}
 };
 \end{tikzpicture}
+
+	\subsubsection{Tokenizer}
+	The tokenizer is responsible for demarcating the special sybmols in the input formula.
+	After the symbols are identified a token is created for each of them or at least for those significant to the semantic of the input formula.
+	For example, the whitespaces are not significant and a tokens are not created for them.
+	We shall use Flex as a tokenizer \cite{flex-tokenizer}.
+
+		\paragraph{Grammar} The tokenizer's grammar is composed from two types of symbols
+			\begin{itemize}
+				\item Single character tokens
+				\item Multi character tokens
+			\end{itemize}
+			The Single character tokens are directly matched in the input formula and are representing the token itself.
+			The multi character token is a sequence of characters which have some meaning when bundled together.
+			This tokenizer's grammar is unambiguous and each input formula is uniquely tokenized.
+
+			The tokens derivation is explaned in details in the following table with Flex syntax. The matched symbol represents the 
+			symbol from the input formula and the output token is the newly created token for the matched symbol.
+		\begin{flushleft}
+			\centering
+			\begin{tabular}{ | m{10em} | m{15em}| } 
+				\hline
+					\textbf{Matched sequence} & \textbf{Output token} \\ [0.7ex] 
+				\hline
+					[ \textbackslash t \textbackslash  n] & ; \\ 
+				\hline
+					[,TF01()C\&|~*+-] 	& yytext[0];  \\
+				\hline
+				    "<="            &   T\_LESS\_EQ; \\
+				\hline
+				    "<=m"           &   T\_MEASURED\_LESS\_EQ; \\
+				\hline
+				    "= 0"           &   T\_EQ\_ZERO; \\
+				\hline
+				    "->"            &   T\_FORMULA\_OP\_IMPLICATION; \\
+				\hline
+				    "<->"           &   T\_FORMULA\_OP\_EQUALITY; \\
+				\hline
+				    [a-zA-Z0-9]+    &   T\_STRING; \\
+				\hline
+				    .               &   yytext[0]; \\
+				\hline
+			\end{tabular}
+		\end{flushleft}
+		In the above table the `do nothing` token is marked as \textbf{ ; }, which means to ignore all whitespaces.
+		The yytext[0] is the matched character. All single character tokens are passed as their ASCII code for an easier use in Bison.
+		The last matched symbol in the table represents everything else, if nothing has been matched then just return the text itself. 
+		Later on the parser will use it to promt where the unrecongized symbol was found and the symbol itself can be printed out.
+% Returns T\_STRING literal type and the string  value is written to yylval which can be later accessed from the parser. Note that it uses our simple memory manager to allocate this string in order to be able to safely free all allocated strings even when some syntax error occures 
+
+		\paragraph{Parser literals}
+			The single character tokens are passed as their ASCII symbol to Bison. 
+			As discussed above the multi character tokens need more clearance in order to represent the literal from the input text symbols.
+			The followings are definition of literals for multi character tokens
+			\begin{itemize}
+				\item \%token <const char*> T\_STRING is the literal for "string"
+				\item \%token T\_LESS\_EQ is the literal for "<="
+				\item \%token T\_MEASURED\_LESS\_EQ is the literal for "<=m"
+				\item \%token T\_EQ\_ZERO is the literal for "=0"
+				\item \%token T\_FORMULA\_OP\_IMPLICATION is the literal for "->"
+				\item \%token T\_FORMULA\_OP\_EQUALITY is the literal for "<->"
+			\end{itemize}
+			The followings are definitions of priority and associativity of the operation tokens. 
+			The priority is from low to hight (w.r.t. the line order in which they are defined)
+			\begin{itemize}
+				\item \%left T\_FORMULA\_OP\_IMPLICATION T\_FORMULA\_OP\_EQUALITY
+				\item \%left '|' '+'
+				\item \%left '\&' '*'
+				\item \%right '\textasciitilde' '-'
+				\item \%nonassoc '(' ')'
+			\end{itemize}
+
+		\paragraph{Parser grammar}
+			With the usage of the Parser literals, the input formula can be parsed and an Abstract Syntax Tree(AST) can be built from it.
+			The AST contains all the data from the input string formula in a more structed way. 
+			On the AST additional optimizations can be done which will simplify the initial formula and will produce better performance when 
+			a model is seeked in the satisfiability algorithms. For example the following formula 
+			\begin{equation}
+				X\  \textit{->}\  Y 
+			\end{equation}
+			can be transformed to 
+			\begin{equation}
+				\sim X | Y
+			\end{equation}
+			after the AST is built, and the impliciation operation can even be removed from the all the calculations in the satisfiability algorithms, 
+			since all implications can be transformed when the AST is built.
+			\newline
+			The following construction methods will be used in the following parser algorithm:
+			\begin{itemize}
+				\item create\_term\_node 
+				\item create\_formula\_node 
+			\end{itemize}
+			Both methods construct AST nodes. The create\_term\_node method creates a term AST node from an operation and one or two other terms depending on the operation arity.
+			The create\_formula\_node analogious to the create\_term\_node method, creates a formula AST node from an operation and depending on the operation the followings can be arguments of create\_formula\_node 
+			\begin{itemize}
+				\item one or two terms
+				\item one or two formulas
+			\end{itemize}
+			Few special symbols to define beforehand:
+			\paragraph{Returned Value} \$\$ is the return value to the 'parent' who can use the matched subsequence
+			\paragraph{Matched Symbol at Position} \$i, where i is an integer value  represents the i-th matched symbol
+
+		\paragraph{Parser Algorithm} The following is the parser algorithm which produces an Abstract Sytax Tree. 
+
+	\begin{lstlisting}
+formula // 'formula' non-terminal
+    : 'T' { // matching token 'T'
+        
+        $$ = create_formula_node(constant_true);   
+    }
+    | 'F' {
+        $$ = create_formula_node(constant_false);
+    }
+    | 'C' '(' term ',' term ')' {
+        $$ = create_formula_node(contact, $3, $5); 
+    }
+    | "<=" '(' term ',' term ')' {
+        $$ = create_formula_node(less_eq, $3, $5);
+    }
+    | "<=m" '(' term ',' term ')' {
+        $$ = create_formula_node(measured_less_eq, $3, $5);
+    }
+    | term "=0" {
+        $$ = create_formula_node(eq_zero, $1);
+    }
+    | '(' formula '&' formula ')' {
+        $$ = create_formula_node(conjunction, $2, $4);
+    }
+    | formula '&' formula {
+        $$ = create_formula_node(conjunction, $1, $3);
+    }
+    | '(' formula '|' formula ')' {
+        $$ = create_formula_node(disjunction, $2, $4);
+    }
+    | formula '|' formula {
+        $$ = create_formula_node(disjunction, $1, $3);
+    }
+    | '~' formula {
+        $$ = create_formula_node(negation, $2);
+    }
+    | '(' formula "->" formula ')' {
+        $$ = create_formula_node(implication, $2, $4);
+    }
+    | formula "->" formula {
+        $$ = create_formula_node(implication, $1, $3);
+    }
+    | '(' formula "<->" formula ')' {
+        $$ = create_formula_node(equality, $2, $4);
+    }
+    | formula "<->" formula {
+        $$ = create_formula_node(equality, $1, $3);
+    }
+    | '(' formula ')' {
+        $$ = $2;
+    }
+  ;
+term
+    : '1' {
+        $$ = create_term_node(constant_true);
+    }
+    | '0' {
+        $$ = create_term_node(constant_false);
+    }
+    | "string" {
+        $$ = create_term_node(term_operation_t::variable);
+        $$->variable = std::move(*$1);
+        // the string is allocated from the
+        // tokenizer and we need to free it
+        free_lexer_string($1); 
+    }
+    | '(' term '*' term ')' {
+        $$ = create_term_node(intersection, $2, $4);
+    }
+    | term '*' term {
+        $$ = create_term_node(intersection, $1, $3);
+    }
+    | '(' term '+' term ')' {
+        $$ = create_term_node(union_, $2, $4);
+    }
+    | term '+' term {
+        $$ = create_term_node(union_, $1, $3);
+    }
+    | '-' term {
+        $$ = create_term_node(complement, $2);
+    }
+    | '(' term ')' {
+        $$ = $2;
+    }
+  ;
+	\end{lstlisting}
+
+
+
+
+
+
+
+
+
+
+	The AST can be easily modified. One of which is removing the implications and equivalences. They are replaced by conjunction, disjunction and negation. This is convenient because it simplifies the tableau method. It does not have to handle implication and equivalence. The following is a modified AST of $\phi$ without the implication:
+	
+\begin{tikzpicture}[
+  tlabel/.style={pos=0.6,right=-1pt,font=\footnotesize\color{red!70!black}},
+]
+\node{$|$}
+child {node {$\sim$}
+  child {node {$\&$}
+    child {node {C}
+      child {node {x1}}
+      child {node {x2}}
+    }
+    child[missing] {}
+    child {node {<=}
+      child {node {x2}}
+      child {node {x3}}
+    }
+  }
+}
+child[missing] {}
+child[missing] {}
+child {node {C}
+  child {node {x1}}
+  child {node {x3}}
+};
+\end{tikzpicture}
+
+
+	
+
+
+
+
 
 	THE FOLLOWING ARE NOTES WHICH WILL BE REMOVED \\
 Contents: (notes)
@@ -793,8 +1031,14 @@ Contents: (notes)
 
 	 Converstion from AST to more suitable formula representation:
 	- Variables - Oтъждествяваме я с поредния номер в списъка с променливи(i.e. instead of the variables their corresponding number) The variable names does not change durring the formula satisfiability checking, so their corresponding "idexes " could be used...
+	- Hashes..(for equality)
+	- The boolean variables are strings.(variables - ids), equality - hashes (they are details)
 	- Term representation.
 	- Formula representation.
+
+	- Tableau - the official doc is fairly good, use it
+
+
 
 
 	- variable evaluations - representation
@@ -814,7 +1058,7 @@ Contents: (notes)
 	 - Variable Set-Substituitons -> maybe variable evalualuation instead of substituion. Now it's too complicated with this substituioning
 	 - Term Set-Evaluation : $& |$ as cup and cap symbols maybe?
 	  -
-	  \fi
+	\fi
 
 	\newpage
 	\section{Tableaux Implementation}
