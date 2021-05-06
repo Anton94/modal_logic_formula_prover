@@ -237,9 +237,9 @@ In step 1 the input formula is signed as not valid and added to the tableau. Thi
 	\newpage
 	\section{Region-based Contact Logics}
 The region-based theory of space has the notion of region and relations between regions as one of the basic primitive notions of the theory.
-A region is simply defined as a set of elements in some space. Union and intersection are used as primary operations over regions.
-Two basic relations are introduced such as part-of and the contact relation. 
-The part-of relation constructs the structural dependencies between regions, namely the part-of relations defines the mereology of reagions.
+A region is defined as a set of elements in some space. Union and intersection are used as primary operations over regions.
+Two relations are introduced, part-of relation and contact relation. 
+The part-of relation constructs the structural dependencies between regions, namely the part-of relations defines the mereology of regions.
 The contact relation defines the topological relation of connection. We will abstract ourselfs from the inner relation between two connected regions, namely
 this relation might be defined as "region A and region B are neightbours". What we will use for this inner relation is its reflexivity and symmetry.
 %talk about terms
@@ -309,11 +309,11 @@ is defined by the following inductive definition:
 		$a \sqcap \neg b = \emptyset$ will be called zero term formula.
 		Since $a \sqcap \neg b$ is a new term, it can be assigned a variable $s = a \sqcap \neg b$, 
 		and now the zero term formula above can be written as $s  = 0$ which is with better readability and 
-		can be easirly grasped in proofs and definitions.
+		can be straightforwardly grasped in proofs and definitions.
 
 
 	\subsection{Semantics}
-Our goal is to define the semantics of a formula and to answer the question when a formula satisfiable.
+Our goal is to define the semantics of a formula and to answer the question when a given formula is satisfiable.
 When trying to define the satisfiability of a formula, couple of questions arise, such as:
 		\begin{itemize}
 			\item How is a region represented 
@@ -344,8 +344,8 @@ Having (W, R) as defined above, we conclude the followings:
 		 \end{equation*}
 A relation system is defined as $\mathcal{F} = (W, R)$, where $W \neq \emptyset$. $\mathcal{F}$ is usually called a frame.
 
-	\paragraph{Boolean variable Evaluation}
-By  an evaluation of the Boolean variables in $'\mathcal{F}$ we mean any function $\mathscr{v}$ assignig to each Boolean variable a a subset $v(a) \subseteq W$. The evaluation is then extended inductively to all Boolean terms as follows
+	\paragraph{Boolean variable evaluation}
+Let $\mathcal{F}$  be a frame, then a boolean variable evaluation is any function $\mathscr{v}$ assignig to each Boolean variable a subset $v(a) \subseteq W$. The evaluation is then extended inductively to all Boolean terms as follows
 		\begin{itemize}
 			\item $v(0) = \emptyset$
 			\item $v(1) = W$
@@ -363,7 +363,7 @@ The pair $\mathcal{M} = (\mathcal{F}, \mathscr{v})$ is called a model. The truth
 			\item $\mathcal{M} \models \neg \varphi \text{ iff } \mathcal{M} \not\models \varphi$
 			\item $\mathcal{M} \models a \; \sigma \; b \text{ iff } \mathcal{M} \models a \: \sigma \: \mathcal{M} \models b$, where $\sigma \in \{ \vee, \wedge \}$
 		\end{itemize}
-Let us note that in the above semantics we evaluate formulas not locally at points, as it is in the standard modal semantics, but globally in the whole model and this is one of the main differences of the present modal approach with the standard Kripke approach.
+In the previously defined semantics we evaluate formulas not locally at points, as it is in the standard modal semantics, but globally in the whole model and this is one of the main differences of the present modal approach with the standard Kripke approach.
 
 A model $\mathcal{M}$ is a model of a formula $\varphi$  if $\varphi$ is true in $\mathcal{M}$; $\mathcal{M}$ is a model of a set of formulas A if $\mathcal{M}$ is 
 a model of all formulas from A. A formula $\varphi$ is true in a frame $\mathcal{F}$, or that $\mathcal{F}$ is a frame for $\varphi$, in symbols $\mathcal{F} \models \varphi$,
