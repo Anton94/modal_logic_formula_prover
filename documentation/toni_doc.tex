@@ -710,7 +710,7 @@
 	\newpage
 	\section{Implementation Introduction}
 	The main programming language is C++. Flex \& Bison are used to parse the input formula. The formula proover is a C++ library. The unit and performance tests are C++ applications.
-	The user application is a Web page. For the Web server is implemented with the third party CppRestSDK library. The satisfiability checking runs on the server. There is a feature to interupt an ongoing process. Can be triggered by the user via a button. There is a user disconnecting detection which cancels the requested formula prooving.
+	The user application is a Web page. The Web server is implemented with the third party CppRestSDK library. The satisfiability checking runs on the server. There is a feature to interupt an ongoing process. Can be triggered by the user via a button. There is a user disconnecting detection which cancels the requested formula prooving.
 	TODO: something more? maybe some screenshots from the web application or in it's section is enough?
 		
 	\subsection{Syntax}
@@ -793,24 +793,21 @@ child {node {C}
 	For example, the whitespaces are not significant and a tokens are not created for them.
 	We shall use Flex as a tokenizer \cite{flex-tokenizer}.
 
-		\paragraph{Grammar} The tokenizer's grammar is composed from two types of symbols
-			\begin{itemize}
-				\item Single character tokens
-				\item Multi character tokens
-			\end{itemize}
-			The Single character tokens are directly matched in the input formula and are representing the token itself.
-			The multi character token is a sequence of characters which have some meaning when bundled together.
-			This tokenizer's grammar is unambiguous and each input formula is uniquely tokenized.
+	\paragraph{Grammar} The tokenizer's grammar is composed from two types of tokens. Single character and multi character.
 
-			The tokens derivation is explaned in details in the following table with Flex syntax. The matched symbol represents the 
-			symbol from the input formula and the output token is the newly created token for the matched symbol.
+	The Single character tokens are directly matched in the input formula and are representing the token itself.
+	The multi character token is a sequence of characters which have some meaning when bundled together.
+	This tokenizer's grammar is unambiguous and each input formula is uniquely tokenized.
+
+	The tokens derivation is explaned in details in the following table with Flex syntax. The matched symbol represents the symbol from the input formula and the output token is the newly created token for the matched symbol.
+
 		\begin{flushleft}
 			\centering
 			\begin{tabular}{ | m{10em} | m{15em}| } 
 				\hline
 					\textbf{Matched sequence} & \textbf{Output token} \\ [0.7ex] 
 				\hline
-					[ \textbackslash t \textbackslash  n] & ; \\ 
+					[ \textbackslash t\textbackslash  n] & ; \\
 				\hline
 					[,TF01()C\&|~*+-] 	& yytext[0];  \\
 				\hline
@@ -830,16 +827,21 @@ child {node {C}
 				\hline
 			\end{tabular}
 		\end{flushleft}
-		In the above table the `do nothing` token is marked as \textbf{ ; }, which means to ignore all whitespaces.
-		The yytext[0] is the matched character. All single character tokens are passed as their ASCII code for an easier use in Bison.
-		The last matched symbol in the table represents everything else, if nothing has been matched then just return the text itself. 
-		Later on the parser will use it to promt where the unrecongized symbol was found and the symbol itself can be printed out.
+	Let us review the table above. All white spaces, tabulations and newlines are ignored. The syntax for it is the \textbf{;} character.
+
+	All single character tokens are passed as their ASCII code. The syntax for it is \textbf{yytext[0]}. It gives the matched character. That way it will be easy to use them in the parser.
+
+	The multi character tokens are converted to unique identificators. For example, the "<=" sequence is converted to T\_LESS\_EQ. The sequence of letters and numbers is converted to T\_STRING. Later, it will be used as term's variables.
+
+	The last matched symbol in the table represents everything else, if nothing has been matched then just return the text itself.
+	The parser will use it to promt where the unrecongized symbol was found and the symbol itself can be printed out.
+
 % Returns T\_STRING literal type and the string  value is written to yylval which can be later accessed from the parser. Note that it uses our simple memory manager to allocate this string in order to be able to safely free all allocated strings even when some syntax error occures 
 
-		\paragraph{Parser literals}
+	\subsubsection{Parser}
 			The single character tokens are passed as their ASCII symbol to Bison. 
 			As discussed above the multi character tokens need more clearance in order to represent the literal from the input text symbols.
-			The followings are definition of literals for multi character tokens
+			The followings are definition of literals for multi character tokens:
 			\begin{itemize}
 				\item \%token <const char*> T\_STRING is the literal for "string"
 				\item \%token T\_LESS\_EQ is the literal for "<="
@@ -859,41 +861,27 @@ child {node {C}
 			\end{itemize}
 
 		\paragraph{Parser grammar}
-			With the usage of the Parser literals, the input formula can be parsed and an Abstract Syntax Tree(AST) can be built from it.
-			The AST contains all the data from the input string formula in a more structed way. 
-			On the AST additional optimizations can be done which will simplify the initial formula and will produce better performance when 
-			a model is seeked in the satisfiability algorithms. For example the following formula 
-			\begin{equation}
-				X\  \textit{->}\  Y 
-			\end{equation}
-			can be transformed to 
-			\begin{equation}
-				\sim X | Y
-			\end{equation}
-			after the AST is built, and the impliciation operation can even be removed from the all the calculations in the satisfiability algorithms, 
-			since all implications can be transformed when the AST is built.
-			\newline
-			The following construction methods will be used in the following parser algorithm:
-			\begin{itemize}
-				\item create\_term\_node 
-				\item create\_formula\_node 
-			\end{itemize}
-			Both methods construct AST nodes. The create\_term\_node method creates a term AST node from an operation and one or two other terms depending on the operation arity.
-			The create\_formula\_node analogious to the create\_term\_node method, creates a formula AST node from an operation and depending on the operation the followings can be arguments of create\_formula\_node 
-			\begin{itemize}
-				\item one or two terms
-				\item one or two formulas
-			\end{itemize}
+			With the usage of the Parser literals, the input formula can be parsed to an Abstract Syntax Tree(AST).
+			The AST contains all the data from the input string formula in a more structed way.
+			On the AST additional optimizations can be done which will simplify the initial formula. It will produce better performance when a model is seeked in the satisfiability algorithms.
+
+			For convenience, will define two helper methods. Namely, \textbf{create\_term\_node} and \textbf{create\_formula\_node}. Both method construct AST nodes.
+
+			The create\_term\_node method creates an AST term node. It's arguments are an operation and up to two child terms. Depending on the operation arity.
+
+			The create\_formula\_node is analogious to the create\_term\_node method. Creates an AST formula node.
+
 			Few special symbols to define beforehand:
-			\paragraph{Returned Value} \$\$ is the return value to the 'parent' who can use the matched subsequence
-			\paragraph{Matched Symbol at Position} \$i, where i is an integer value  represents the i-th matched symbol
+			\begin{itemize}
+				\item \textbf{\$\$} is the return value to the 'parent'. Later, he can use it, e.g. as a child.
+				\item \textbf{\$i} is the return value of the i-th matched element in the matcher sequence.
+			\end{itemize}
 
 		\paragraph{Parser Algorithm} The following is the parser algorithm which produces an Abstract Sytax Tree. 
 
 	\begin{lstlisting}
 formula // 'formula' non-terminal
     : 'T' { // matching token 'T'
-        
         $$ = create_formula_node(constant_true);   
     }
     | 'F' {
@@ -976,15 +964,6 @@ term
     }
   ;
 	\end{lstlisting}
-
-
-
-
-
-
-
-
-
 
 	The AST can be easily modified. One of which is removing the implications and equivalences. They are replaced by conjunction, disjunction and negation. This is convenient because it simplifies the tableau method. It does not have to handle implication and equivalence. The following is a modified AST of $\phi$ without the implication:
 	
@@ -1087,4 +1066,4 @@ Contents: (notes)
 			\href{https://en.wikipedia.org/wiki/Connected_space}{Connected Space}
 			or go to the next url: \url{https://en.wikipedia.org/wiki/Connected_space}
 	\end{thebibliography}
-\end{document}\grid
+\end{document}

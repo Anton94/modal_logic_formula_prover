@@ -27,7 +27,7 @@ auto tableau::is_satisfiable(const formula& f, imodel& out_model) -> bool
         return true;
     }
     model_ = nullptr;
-    out_model.clear(); // it's not a good practive to modify the output parameter if it returns false, but it's ok for our purposes
+    out_model.clear(); // it's not a good practise to modify the output parameter if it returns false, but it's ok for our purposes
     return false;
 }
 
