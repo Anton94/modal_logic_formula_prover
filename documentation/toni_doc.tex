@@ -760,13 +760,17 @@
 	\end{itemize}
 
 	\subsection{Formula parsing}
-	The formula is a sequence of characters. These characters does not give us any information for the formula's structure. It should be analyzed. Flex \cite{flex-tokenizer} and Bison \cite{bison-parser} are used to parse it into an AST (Abstract Syntax Tree). Flex is used as a tokenizer. Bison is used as the parser. The AST holds the formula's operations in the inner nodes. The terms are in the leaves.
+	The formula is a sequence of characters. These characters does not give us any information for the formula's structure. It should be analyzed. Flex \cite{flex-tokenizer} and Bison \cite{bison-parser} are used to parse it into an AST (Abstract Syntax Tree). Flex is used as a tokenizer. Bison is used as the parser.
+
+	\subsubsection{Abstract Syntax Tree}
+	The AST is a binary tree. Each node has an operation type and up to two children. The formula nodes are prior term nodes. A formula node could have term node as children. Term nodes could not have a formula node as a child. The leaves are variables or constants.
 	
 	Let $\phi = (C(x1,x2) \;\& <=(x2, x3)) => C(x1, x3)$. The following is an AST of $\phi$:
 
 \begin{tikzpicture}[
   tlabel/.style={pos=0.6,right=-1pt,font=\footnotesize\color{red!70!black}},
 ]
+\label{AST-phi}
 \node{=>}
 child {node {$\&$}
   child {node {C}
@@ -786,6 +790,71 @@ child {node {C}
   child {node {x3}}
 };
 \end{tikzpicture}
+
+	\newpage
+	\paragraph{Operation types} Enum structure is used to represent the type of formulas and terms in a memory efficient way.
+
+	\begin{lstlisting}[language=C++]
+enum class formula_operation_t
+{
+    constant_true,
+    constant_false,
+    conjunction,
+    disjunction,
+    negation,
+    implication,
+    equality,
+    contact,
+    less_eq,
+    measured_less_eq,
+    eq_zero
+};
+
+enum class term_operation_t
+{
+    constant_true,
+    constant_false,
+    union_, // union is a keyword
+    intersection,
+    complement,
+    variable
+};
+	\end{lstlisting}
+
+	\newpage
+	\paragraph{Node types} There are two types of nodes. Formula nodes and term nodes. They are defined with a separate classes.
+
+	\begin{lstlisting}
+class Node
+{
+    ...
+};
+
+class NFormula : public Node
+{
+public:
+    NFormula(formula_operation_t op,
+             Node* left = nullptr, Node* right = nullptr);
+    ...
+
+    formula_operation_t op;
+    Node* left;
+    Node* right;
+};
+
+class NTerm : public Node
+{
+public:
+    NTerm(term_operation_t op,
+          NTerm* left = nullptr, NTerm* right = nullptr);
+    ...
+
+    term_operation_t op;
+    NTerm* left;
+    NTerm* right;
+    std::string variable;
+};
+	\end{lstlisting}
 
 	\subsubsection{Tokenizer}
 	The tokenizer is responsible for demarcating the special sybmols in the input formula.
@@ -831,7 +900,7 @@ child {node {C}
 
 	All single character tokens are passed as their ASCII code. The syntax for it is \textbf{yytext[0]}. It gives the matched character. That way it will be easy to use them in the parser.
 
-	The multi character tokens are converted to unique identificators. For example, the "<=" sequence is converted to T\_LESS\_EQ. The sequence of letters and numbers is converted to T\_STRING. Later, it will be used as term's variables.
+	The multi character tokens are converted to unique identificators. For example, the "<=" sequence is converted to T\_LESS\_EQ. The sequence of letters and numbers is converted to T\_STRING. Later, it will be used as a term variable.
 
 	The last matched symbol in the table represents everything else, if nothing has been matched then just return the text itself.
 	The parser will use it to promt where the unrecongized symbol was found and the symbol itself can be printed out.
@@ -860,7 +929,7 @@ child {node {C}
 				\item \%nonassoc '(' ')'
 			\end{itemize}
 
-		\paragraph{Parser grammar}
+		\paragraph{Grammar}
 			With the usage of the Parser literals, the input formula can be parsed to an Abstract Syntax Tree(AST).
 			The AST contains all the data from the input string formula in a more structed way.
 			On the AST additional optimizations can be done which will simplify the initial formula. It will produce better performance when a model is seeked in the satisfiability algorithms.
@@ -877,7 +946,7 @@ child {node {C}
 				\item \textbf{\$i} is the return value of the i-th matched element in the matcher sequence.
 			\end{itemize}
 
-		\paragraph{Parser Algorithm} The following is the parser algorithm which produces an Abstract Sytax Tree. 
+		\paragraph{Algorithm} The following is the parser algorithm which produces an Abstract Sytax Tree.
 
 	\begin{lstlisting}
 formula // 'formula' non-terminal
@@ -965,7 +1034,8 @@ term
   ;
 	\end{lstlisting}
 
-	The AST can be easily modified. One of which is removing the implications and equivalences. They are replaced by conjunction, disjunction and negation. This is convenient because it simplifies the tableau method. It does not have to handle implication and equivalence. The following is a modified AST of $\phi$ without the implication:
+	\subsection{Formula refinement}
+	The AST can be easily modified and optimized. One of the modifications is removing the implications and equivalences. They are replaced by conjunction, disjunction and negation. This is convenient because it simplifies the tableau method. It does not have to handle implication and equivalence operations. The following is a modified AST of $\phi$ \ref{AST-phi} without the implication:
 	
 \begin{tikzpicture}[
   tlabel/.style={pos=0.6,right=-1pt,font=\footnotesize\color{red!70!black}},
@@ -992,13 +1062,224 @@ child {node {C}
 };
 \end{tikzpicture}
 
+	\subsubsection{Visitor Pattern} The AST modification is best achieved with the visitor pattern \cite{visitor-pattern}. Uses double virtual dispatching. Separates the algorithm from the object structure on which it operates. Allows new visitors to be added in a simple manner. Each AST modification will be implemented as a visitor. Will not explain the pattern in depth. In essence, the visitor pattern requires the AST nodes to impelement a virtual \textbf{accept} method. This method accepts a visitor as argument and calls the visitor's virtual \textbf{visit} method with the real node's type. This is the double virtual dispatching. One virtual call to find the node's real type. Another to find the visitor's real type. Now, adding a new visitor requires only adding it's class. Does not require changes in the AST node classes or other visitor classes.
 
-	
+\newpage
+\begin{lstlisting}
+...
+class Visitor
+{
+public:
+    virtual void visit(NFormula& f) = 0;
+    virtual void visit(NTerm& t) = 0;
+};
 
+// Example visitor(aglorithm) which will print the AST tree.
+class VPrinter : public Visitor
+{
+public:
+    void visit(NFormula& f) override
+    {
+        // Print the formula node's data.
+    }
+    void visit(NTerm& t) override
+    {
+        // Print the term node's data.
+    }
+};
 
+class Node
+{
+public:
+    virtual void accept(Visitor& v) = 0;
+};
 
+class NFormula : public Node
+{
+public:
+    void accept(Visitor& v) override { v.visit(*this); }
 
+    ...
+};
 
+class NTerm : public Node
+{
+public:
+    void accept(Visitor& v) override { v.visit(*this); }
+
+    ...
+};
+\end{lstlisting}
+
+	\newpage
+	It's worth showing the implemention of the VPrinter visit methods. They are simple and a good illustration of the pattern. Shows how the AST tree is traversed.
+\begin{lstlisting}
+void VPrinter::visit(NFormula& f)
+{
+    switch(f.op)
+    {
+        case formula_operation_t::constant_true:
+            out_ << "T"; // out_ is an output stream, e.g. std::cout.
+            break;
+        case formula_operation_t::constant_false:
+            out_ << "F";
+            break;
+        case formula_operation_t::conjunction:
+            out_ << "(";
+            f.left->accept(*this);
+            out_ << " & ";
+            f.right->accept(*this);
+            out_ << ")";
+            break;
+        case formula_operation_t::disjunction:
+            // Analogous to conjunction. The symbol is '|'.
+        case formula_operation_t::implication:
+            // Analogous to conjunction. The symbol is '->'.
+        case formula_operation_t::equality:
+            // Analogous to conjunction. The symbol is '<->'.
+        case formula_operation_t::negation:
+            out_ << "~";
+            f.left->accept(*this);
+            break;
+        case formula_operation_t::less_eq:
+            out_ << "<=(";
+            f.left->accept(*this);
+            out_ << ", ";
+            f.right->accept(*this);
+            out_ << ")";
+            break;
+        case formula_operation_t::measured_less_eq:
+            out_ << "<=m(";
+            f.left->accept(*this);
+            out_ << ", ";
+            f.right->accept(*this);
+            out_ << ")";
+            break;
+        case formula_operation_t::eq_zero:
+            out_ << "(";
+            f.left->accept(*this);
+            out_ << ")=0";
+            break;
+        case formula_operation_t::contact:
+            out_ << "C(";
+            f.left->accept(*this);
+            out_ << ", ";
+            f.right->accept(*this);
+            out_ << ")";
+            break;
+        default:
+            assert(false && "Unrecognized.");
+    }
+}
+
+void VPrinter::visit(NTerm& t)
+{
+    switch(t.op)
+    {
+        case term_operation_t::constant_true:
+            out_ << "1";
+            break;
+        case term_operation_t::constant_false:
+            out_ << "0";
+            break;
+        case term_operation_t::variable:
+            out_ << t.variable;
+            break;
+        case term_operation_t::union_:
+            out_ << "(";
+            t.left->accept(*this);
+            out_ << " + ";
+            t.right->accept(*this);
+            out_ << ")";
+            break;
+        case term_operation_t::intersection:
+            // Analogous to union_. The symbol is '*'.
+        case term_operation_t::complement:
+            out_ << "-";
+            t.left->accept(*this);
+            break;
+        default:
+            assert(false && "Unrecognized.");
+    }
+}
+\end{lstlisting}
+
+	\subsubsection{Visitors Overview}
+	The following are the supported visitors. Their implementation is close to a thousand lines of code and can be checked in the repository.
+	\subsubsection*{VReduceConstants}
+		Removes all unnecessary childs of And/Or/Negation operations of the following type:
+			\begin{table}[H]
+				  \centering
+				  \begin{tabular}{llll}
+				    \toprule
+				    \midrule
+				\tabitem \textasciitilde T $\equiv$ F & \tabitem C(0,0)  $\equiv$ F & \tabitem \textasciitilde F $\equiv$ T & \tabitem C(1,1) $\equiv$ T \\
+				\tabitem (T \& T) $\equiv$ T & \tabitem C(a,0)  $\equiv$ F & \tabitem (F | F) $\equiv$ F & \tabitem C(0,a) $\equiv$ F \\
+				\tabitem (g \& T) $\equiv$ g & \tabitem -1 $\equiv$ 0 & \tabitem (g | T) $\equiv$ T & \tabitem -0 $\equiv$ 1 \\
+				\tabitem (T \& g) $\equiv$ g & \tabitem (1 * 1) $\equiv$ 1 & \tabitem (T | g) $\equiv$ T & \tabitem (0 + 0) $\equiv$ 0 \\
+				\tabitem (g \& F) $\equiv$ F & \tabitem (t * 1) $\equiv$ t & \tabitem (g | F) $\equiv$ g & \tabitem (t + 1) $\equiv$ 1 \\
+				\tabitem (F \& g) $\equiv$ F & \tabitem (1 * t) $\equiv$ t & \tabitem (F | g) $\equiv$ g & \tabitem (1 + t) $\equiv$ 1 \\
+				\tabitem 0=0 $\equiv$ T & \tabitem (t * 0) $\equiv$ 0 & \tabitem 1=0 $\equiv$ F & \tabitem (t + 0) $\equiv$ t \\
+				\tabitem <=(0,a) $\equiv$ T & \tabitem (0 * t) $\equiv$ 0 & \tabitem <=(a,1) $\equiv$ T & \tabitem (0 + t) $\equiv$ t \\
+
+					    \bottomrule
+				  \end{tabular}
+				\end{table}
+
+	\subsubsection*{VConvertContactsWithConstantTerms}
+				Converts C with constant 1 terms in !=0 atomic formulas.
+				This visitor is best used after the contacts are reduced, via VReduceConstants
+				\begin{itemize}
+					\item C(a,1) $\equiv$ \textasciitilde(a=0)
+					\item C(1,a) $\equiv$ \textasciitilde(a=0)
+				\end{itemize}
+
+	\subsubsection*{VConvertLessEqContactWithEqualTerms}
+				Converts C and <= atomic formulas with identical terms:
+				\begin{itemize}
+					\item <=(a,a) $\equiv$ T, \\
+						since (a * -a = 0))
+					\item C(a,a) $\equiv$ \textasciitilde(a=0)
+				\end{itemize}
+
+	\subsubsection*{VReduceDoubleNegation}
+				Removes the double/tripple/etc negations.
+				This visitor is best used after all visitors which might add additional negations!
+				\begin{itemize}
+					\item -(-g) $\equiv$ g
+					\item -(-t) $\equiv$ t
+				\end{itemize}
+
+	\subsubsection*{VConvertImplicationEqualityToConjDisj}
+				Converts all formula nodes of type implication and equality to nodes
+				which are using just conjuction and disjunction. The main reason for this visitor is to simplify the formula operations.
+				This visitor simplifies the formula to contain only conjunctions, disjunctions and negation operations.
+				\begin{itemize}
+					\item (f -> g)  $\equiv$ (\textasciitilde f | g)
+					\item (f <-> g) $\equiv$ ((f \& g) | (\textasciitilde f \& \textasciitilde g))
+				\end{itemize}
+
+	\subsubsection*{VConvertLessEqToEqZero}
+				Converts a <= formula to an equals to zero atomic formula
+				\begin{itemize}
+					\item <=(a,b) $\equiv$ (a * -b) = 0
+				\end{itemize}
+
+	\subsubsection*{VSplitDisjInLessEqAndContacts}
+				Divides C and <= atomic formulas with a disjunction term into two simpler formulas
+				\begin{itemize}
+					\item C(a + b, c) $\equiv$ C(a, c) | C(b, c)
+					\item C(a, b + c) $\equiv$ C(a, b) | C(a, c)
+					\item <=(a + b, c) $\equiv$ <=(a,c) \& <=(b,c)
+				\end{itemize}
+
+			There are few visitors which only collect or print information from the formula
+				\begin{itemize}
+					\item VVariablesGetter - gets all variables from the formula (as string)
+					\item VPrinter - prints the formula to some provided output stream
+				\end{itemize}
+
+	\newpage
 	THE FOLLOWING ARE NOTES WHICH WILL BE REMOVED \\
 Contents: (notes)
 	Parsing:
@@ -1017,8 +1298,10 @@ Contents: (notes)
 
 	- Tableau - the official doc is fairly good, use it
 
+	-
 
 
+    - In the introduction - github repo, automatic test on each commit on various of machines
 
 	- variable evaluations - representation
 		- plus one operation (Next)
