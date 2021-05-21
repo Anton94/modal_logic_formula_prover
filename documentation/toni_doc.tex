@@ -1112,7 +1112,7 @@ public:
 \end{lstlisting}
 
 	\newpage
-	It's worth showing the implemention of the VPrinter visit methods. They are simple and a good illustration of the pattern. Shows how the AST tree is traversed.
+	It's worth showing the implemention of the VPrinter visit methods. They are simple and a good illustration of the pattern. Shows how the AST tree is traversed by calling the VPrinter instance with the AST's root node.
 \begin{lstlisting}
 void VPrinter::visit(NFormula& f)
 {
@@ -1206,8 +1206,8 @@ void VPrinter::visit(NTerm& t)
 
 	\subsubsection{Visitors Overview}
 	The following are the supported visitors. Their implementation is close to a thousand lines of code and can be checked in the repository.
-	\subsubsection*{VReduceConstants}
-		Removes all unnecessary childs of And/Or/Negation operations of the following type:
+	\paragraph{VReduceConstants}
+	Removes all unnecessary childs of And/Or/Negation operations of the following type:
 			\begin{table}[H]
 				  \centering
 				  \begin{tabular}{llll}
@@ -1226,7 +1226,7 @@ void VPrinter::visit(NTerm& t)
 				  \end{tabular}
 				\end{table}
 
-	\subsubsection*{VConvertContactsWithConstantTerms}
+	\paragraph{VConvertContactsWithConstantTerms}
 				Converts C with constant 1 terms in !=0 atomic formulas.
 				This visitor is best used after the contacts are reduced, via VReduceConstants
 				\begin{itemize}
@@ -1234,7 +1234,7 @@ void VPrinter::visit(NTerm& t)
 					\item C(1,a) $\equiv$ \textasciitilde(a=0)
 				\end{itemize}
 
-	\subsubsection*{VConvertLessEqContactWithEqualTerms}
+	\paragraph{VConvertLessEqContactWithEqualTerms}
 				Converts C and <= atomic formulas with identical terms:
 				\begin{itemize}
 					\item <=(a,a) $\equiv$ T, \\
@@ -1242,7 +1242,7 @@ void VPrinter::visit(NTerm& t)
 					\item C(a,a) $\equiv$ \textasciitilde(a=0)
 				\end{itemize}
 
-	\subsubsection*{VReduceDoubleNegation}
+	\paragraph{VReduceDoubleNegation}
 				Removes the double/tripple/etc negations.
 				This visitor is best used after all visitors which might add additional negations!
 				\begin{itemize}
@@ -1250,7 +1250,7 @@ void VPrinter::visit(NTerm& t)
 					\item -(-t) $\equiv$ t
 				\end{itemize}
 
-	\subsubsection*{VConvertImplicationEqualityToConjDisj}
+	\paragraph{VConvertImplicationEqualityToConjDisj}
 				Converts all formula nodes of type implication and equality to nodes
 				which are using just conjuction and disjunction. The main reason for this visitor is to simplify the formula operations.
 				This visitor simplifies the formula to contain only conjunctions, disjunctions and negation operations.
@@ -1259,13 +1259,13 @@ void VPrinter::visit(NTerm& t)
 					\item (f <-> g) $\equiv$ ((f \& g) | (\textasciitilde f \& \textasciitilde g))
 				\end{itemize}
 
-	\subsubsection*{VConvertLessEqToEqZero}
+	\paragraph{VConvertLessEqToEqZero}
 				Converts a <= formula to an equals to zero atomic formula
 				\begin{itemize}
 					\item <=(a,b) $\equiv$ (a * -b) = 0
 				\end{itemize}
 
-	\subsubsection*{VSplitDisjInLessEqAndContacts}
+	\paragraph{VSplitDisjInLessEqAndContacts}
 				Divides C and <= atomic formulas with a disjunction term into two simpler formulas
 				\begin{itemize}
 					\item C(a + b, c) $\equiv$ C(a, c) | C(b, c)
@@ -1273,11 +1273,143 @@ void VPrinter::visit(NTerm& t)
 					\item <=(a + b, c) $\equiv$ <=(a,c) \& <=(b,c)
 				\end{itemize}
 
-			There are few visitors which only collect or print information from the formula
+	There are few visitors which only collect or print information from the formula
 				\begin{itemize}
 					\item VVariablesGetter - gets all variables from the formula (as string)
 					\item VPrinter - prints the formula to some provided output stream
 				\end{itemize}
+
+	\subsection{Formula building}
+	The formula is a binary tree. A \textbf{subformula} is a subtree in the formula's tree. The process of building a satisfiable model is computational heavy. A part of it is lexical comparing and traversing subformulas. The AST is convenient to modify the formula. These modifications are a preprocessing step. After them the formula will not be modifed any more. Then a few optimizations could be done.
+
+	\subsubsection{Optimizations}
+	\paragraph{Reducing formula operations}
+	The formula operations could be reduced to not have \textit{implication}, \textit{equivalence} and \textit{less equal}. The \textit{VConvertImplicationEqualityToConjDisj} and \textit{VConvertLessEqToEqZero} visitor should be applied.
+
+	\paragraph{Variable substitution}
+	The variables are a sequence of characters, i.e. strings. It is slow to compare them. An integer ID could be assigned to each variable. One way to do it is via the \textit{VVariablesGetter} visitor. Retrieve all unique variables in a vector and use their positions as IDs.
+
+	\paragraph{Hasing subformulas}
+	Conducting a test whether two subformulas are equal in a lexical way is an important procedure for the sake of performance. Such equality checks are required in various situations, such as:
+	\begin{itemize}
+		\item testing if two subformulas are equal
+		\item checking if a subformula exists in a set of subformulas
+	\end{itemize}
+	Have in mind that the naive solution to do an equality check has complexity of O(n), where n is the size of the formula. By comparing the whole subformula. To reduce this complexity a precalcaulated hash value shall be used.
+	For each formula node an additional hash variable is stored. The hash is computed recursively through the formula's structure. The hash of a parent node depends on the hashes of its children nodes. 
+	The equality comparison first checks the hash codes. The full equality checking is done only for matching hash codes.
+
+	\newpage
+	\subsubsection{Layout}
+	The formula structure will be similar to the AST. A couple of changes reflecting the optimizations above. The following is the final formula node's layout.
+
+\begin{lstlisting}
+class formula {
+    ...
+    enum class operation_type : char {
+        constant_true,
+        constant_false,
+        conjunction,
+        disjunction,
+        negation,
+        measured_less_eq,
+        eq_zero,
+        c,
+        invalid,
+    };
+
+    operation_operation_type op_;
+    std::size_t hash_;
+
+    struct child_formulas {
+        formula* left;
+        formula* right;
+    };
+    struct child_terms {
+        term* left;
+        term* right;
+    };
+
+    union {
+        // Holds only one of the described objects.
+        // Depending on the operation type the
+        // child_f_ or child_t_ is "valid".
+        child_formulas child_f_;
+        child_terms child_t_;
+    };
+};
+
+class term {
+    ...
+    enum class operation_type : char
+    {
+        constant_true,
+        constant_false,
+
+        union_,
+        intersection,
+        complement,
+        variable,
+
+        invalid,
+    };
+
+    operation_type op_;
+    std::size_t hash_;
+
+    struct childs
+    {
+        term* left;
+        term* right;
+    };
+    union {
+        // Holds either children or variable id.
+        // Depending on the node's operation type.
+        childs childs_;
+        size_t variable_id_;
+    };
+};
+\end{lstlisting}
+
+	\subsubsection{Hashing}
+	Let $\tau_1$ and $\tau_2$ be two terms. Let $h_1$ be the precalculated hash of $\tau_1$ and $h_2$ be the precalculated hash of $\tau_2$.
+	The equality check procedure follows the following steps:
+	\begin{itemize}
+		\item if $h_1 \neq h_2$, then the terms are not equal
+		\item if $h_1 = h_2$, then the full structure of the terms is compared.
+	\end{itemize}
+	\noindent
+	The following is the implemented hash construction procedure for the term node. The formula node is analogous.
+\begin{lstlisting}
+void term_construct_hash()
+{
+  switch(op_)
+  {
+  case operation_t::constant_true:
+  case operation_t::constant_false:
+    break;
+  case operation_t::union_:
+  case operation_t::intersection:
+    hash_ = ((childs_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
+        childs_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
+    break;
+  case operation_t::complement:
+    hash_ = (childs_.left->get_hash() & 0xFFFFFFFF) * 2654435761;
+    break;
+  case operation_t::variable:
+    hash_ = (variable_id_ & 0xFFFFFFFF) * 2654435761;
+    break;
+  default:
+    assert(false && "Unrecognized.");
+  }
+
+  // Add also the operation to the hash
+  const auto op_code = static_cast<unsigned>(op_) + 1;
+  hash_ += (op_code & 0xFFFFFFFF) * 2654435723;
+}
+\end{lstlisting}
+
+	TODO: review the last section above!!\textbf{•}
 
 	\newpage
 	THE FOLLOWING ARE NOTES WHICH WILL BE REMOVED \\
