@@ -1207,7 +1207,7 @@ void VPrinter::visit(NTerm& t)
 	\subsubsection{Visitors Overview}
 	The following are the supported visitors. Their implementation is close to a thousand lines of code and can be checked in the repository.
 	\paragraph{VReduceConstants}
-	Removes all unnecessary childs of And/Or/Negation operations of the following type:
+	Removes all unnecessary children of And/Or/Negation operations of the following type:
 			\begin{table}[H]
 				  \centering
 				  \begin{tabular}{llll}
@@ -1280,7 +1280,7 @@ void VPrinter::visit(NTerm& t)
 				\end{itemize}
 
 	\subsection{Formula building}
-	The formula is a binary tree. A \textbf{subformula} is a subtree in the formula's tree. The process of building a satisfiable model is computational heavy. A part of it is lexical comparing and traversing subformulas. The AST is convenient to modify the formula. These modifications are a preprocessing step. After them the formula will not be modifed any more. Then a few optimizations could be done.
+	The formula is a binary tree. A \textbf{subformula} is a subtree in the formula's tree. The process of building a satisfiable model is computational heavy. A part of it is lexical comparing and traversing subformulas. The AST is convenient to modify the formula. These modifications are a preprocessing step. After them the formula will not be modifed. A few optimizations could be done.
 
 	\subsubsection{Optimizations}
 	\paragraph{Reducing formula operations}
@@ -1289,13 +1289,10 @@ void VPrinter::visit(NTerm& t)
 	\paragraph{Variable substitution}
 	The variables are a sequence of characters, i.e. strings. It is slow to compare them. An integer ID could be assigned to each variable. One way to do it is via the \textit{VVariablesGetter} visitor. Retrieve all unique variables in a vector and use their positions as IDs.
 
-	\paragraph{Hasing subformulas}
-	Conducting a test whether two subformulas are equal in a lexical way is an important procedure for the sake of performance. Such equality checks are required in various situations, such as:
-	\begin{itemize}
-		\item testing if two subformulas are equal
-		\item checking if a subformula exists in a set of subformulas
-	\end{itemize}
-	Have in mind that the naive solution to do an equality check has complexity of O(n), where n is the size of the formula. By comparing the whole subformula. To reduce this complexity a precalcaulated hash value shall be used.
+	\paragraph{Hashing subformulas}
+	Conducting a test whether two subformulas are equal in a lexical way is an important procedure for the sake of performance. Such equality checks are required in various situations. One of which is checking if a subformula exists in a set of subformulas.
+
+	Have in mind that the naive solution to do an equality check is to compare the whole subformula strcuture. The complexity is O(n), where n is the size of the subformula. To reduce this complexity a precalcaulated hash value shall be used.
 	For each formula node an additional hash variable is stored. The hash is computed recursively through the formula's structure. The hash of a parent node depends on the hashes of its children nodes. 
 	The equality comparison first checks the hash codes. The full equality checking is done only for matching hash codes.
 
@@ -1318,7 +1315,7 @@ class formula {
         invalid,
     };
 
-    operation_operation_type op_;
+    operation_type op_;
     std::size_t hash_;
 
     struct child_formulas {
@@ -1345,19 +1342,17 @@ class term {
     {
         constant_true,
         constant_false,
-
         union_,
         intersection,
         complement,
         variable,
-
         invalid,
     };
 
     operation_type op_;
     std::size_t hash_;
 
-    struct childs
+    struct children
     {
         term* left;
         term* right;
@@ -1365,23 +1360,16 @@ class term {
     union {
         // Holds either children or variable id.
         // Depending on the node's operation type.
-        childs childs_;
+        children children_;
         size_t variable_id_;
     };
 };
 \end{lstlisting}
 
 	\subsubsection{Hashing}
-	Let $\tau_1$ and $\tau_2$ be two terms. Let $h_1$ be the precalculated hash of $\tau_1$ and $h_2$ be the precalculated hash of $\tau_2$.
-	The equality check procedure follows the following steps:
-	\begin{itemize}
-		\item if $h_1 \neq h_2$, then the terms are not equal
-		\item if $h_1 = h_2$, then the full structure of the terms is compared.
-	\end{itemize}
-	\noindent
 	The following is the implemented hash construction procedure for the term node. The formula node is analogous.
 \begin{lstlisting}
-void term_construct_hash()
+void term::construct_hash()
 {
   switch(op_)
   {
@@ -1390,11 +1378,11 @@ void term_construct_hash()
     break;
   case operation_t::union_:
   case operation_t::intersection:
-    hash_ = ((childs_.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
-        childs_.right->get_hash() & 0xFFFFFFFF) * 2654435741);
+    hash_ = ((children.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
+        children.right->get_hash() & 0xFFFFFFFF) * 2654435741);
     break;
   case operation_t::complement:
-    hash_ = (childs_.left->get_hash() & 0xFFFFFFFF) * 2654435761;
+    hash_ = (children.left->get_hash() & 0xFFFFFFFF) * 2654435761;
     break;
   case operation_t::variable:
     hash_ = (variable_id_ & 0xFFFFFFFF) * 2654435761;
@@ -1403,13 +1391,19 @@ void term_construct_hash()
     assert(false && "Unrecognized.");
   }
 
-  // Add also the operation to the hash
+  // Add the operation type to the hash.
   const auto op_code = static_cast<unsigned>(op_) + 1;
   hash_ += (op_code & 0xFFFFFFFF) * 2654435723;
 }
 \end{lstlisting}
 
-	TODO: review the last section above!!\textbf{•}
+	Let $\tau_1$ and $\tau_2$ be two terms. Let $h_1$ be the precalculated hash of $\tau_1$ and $h_2$ be the precalculated hash of $\tau_2$.
+	The equality check procedure follows the following steps:
+	\begin{itemize}
+		\item if $h_1 \neq h_2$, then the terms are not equal
+		\item if $h_1 = h_2$, then recursively compare the children.
+	\end{itemize}
+	\noindent
 
 	\newpage
 	THE FOLLOWING ARE NOTES WHICH WILL BE REMOVED \\
