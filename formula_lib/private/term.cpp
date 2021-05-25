@@ -483,7 +483,7 @@ void term::construct_hash()
             assert(false && "Unrecognized.");
     }
 
-    // add also the operation to the hash
+    // Add the operation type to the hash.
     const auto op_code = static_cast<unsigned>(op_) + 1;
     hash_ += (op_code & 0xFFFFFFFF) * 2654435723;
 }

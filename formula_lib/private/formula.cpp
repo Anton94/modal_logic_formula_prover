@@ -121,13 +121,12 @@ auto formula::build(const NFormula& f) -> bool
             is_constructed = false;
     }
 
-    assert(is_constructed);
     if(!is_constructed)
     {
         return false;
     }
 
-    // add also the operation to the hash
+    // Add the operation type to the hash.
     const auto op_code = static_cast<unsigned>(op_) + 1;
     hash_ += (op_code & 0xFFFFFFFF) * 2654435723;
 
