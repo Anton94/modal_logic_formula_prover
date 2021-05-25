@@ -97,7 +97,6 @@ auto term::build(const NTerm& t) -> bool
             is_constructed = false;
     }
 
-    assert(is_constructed);
     if(!is_constructed)
     {
         return false;
@@ -415,7 +414,10 @@ auto term::construct_complement_operation(const NTerm& t) -> bool
     op_ = operation_t::complement;
 
     childs_.left = new(std::nothrow) term(formula_mgr_);
-    assert(childs_.left);
+    if(!childs_.left)
+    {
+        return false;
+    }
 
     assert(t.left);
     return childs_.left->build(*t.left);
@@ -443,8 +445,16 @@ auto term::construct_binary_operation(const NTerm& t, operation_t op) -> bool
 
     // allocate the new term childs
     childs_.left = new(std::nothrow) term(formula_mgr_);
+    if(!childs_.left)
+    {
+        return false;
+    }
     childs_.right = new(std::nothrow) term(formula_mgr_);
-    assert(childs_.left && childs_.right);
+    if(!childs_.right)
+    {
+        delete childs_.left;
+        return false;
+    }
 
     // recursive construction of the child terms
     assert(t.left && t.right);

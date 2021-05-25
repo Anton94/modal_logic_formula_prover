@@ -521,9 +521,8 @@ auto formula::construct_eq_zero_atomic_formula(const NFormula& f) -> bool
     op_ = operation_t::eq_zero;
 
     child_t_.left = new(std::nothrow) term(formula_mgr_);
-    assert(child_t_.left);
 
-    if(!child_t_.left->build(*static_cast<const NTerm*>(f.left)))
+    if(!child_t_.left || !child_t_.left->build(*static_cast<const NTerm*>(f.left)))
     {
         return false;
     }
@@ -539,8 +538,16 @@ auto formula::construct_contact_atomic_formula(const NFormula& f) -> bool
     op_ = operation_t::c;
 
     child_t_.left = new(std::nothrow) term(formula_mgr_);
+    if(!child_t_.left)
+    {
+        return false;
+    }
     child_t_.right = new(std::nothrow) term(formula_mgr_);
-    assert(child_t_.left && child_t_.right);
+    if(!child_t_.right)
+    {
+        delete child_t_.left;
+        return false;
+    }
 
     // recursive construction of the child terms
     if(!child_t_.left->build(*static_cast<const NTerm*>(f.left)) || !child_t_.right->build(*static_cast<const NTerm*>(f.right)))
@@ -559,8 +566,16 @@ auto formula::construct_measured_less_eq_atomic_formula(const NFormula& f) -> bo
     op_ = operation_t::measured_less_eq;
 
     child_t_.left = new(std::nothrow) term(formula_mgr_);
+    if(!child_t_.left)
+    {
+        return false;
+    }
     child_t_.right = new(std::nothrow) term(formula_mgr_);
-    assert(child_t_.left && child_t_.right);
+    if(!child_t_.right)
+    {
+        delete child_t_.left;
+        return false;
+    }
 
     // recursive construction of the child terms
     if(!child_t_.left->build(*static_cast<const NTerm*>(f.left)) || !child_t_.right->build(*static_cast<const NTerm*>(f.right)))
@@ -578,9 +593,8 @@ auto formula::construct_negation_formula(const NFormula& f) -> bool
     op_ = operation_t::negation;
 
     child_f_.left = new(std::nothrow) formula(formula_mgr_);
-    assert(child_f_.left);
 
-    if(!child_f_.left->build(*static_cast<const NFormula*>(f.left)))
+    if(!child_t_.left || !child_f_.left->build(*static_cast<const NFormula*>(f.left)))
     {
         return false;
     }
@@ -595,8 +609,16 @@ auto formula::construct_binary_formula(const NFormula& f, operation_t op) -> boo
     assert(op_ == operation_t::conjunction || op_ == operation_t::disjunction);
 
     child_f_.left = new(std::nothrow) formula(formula_mgr_);
+    if(!child_t_.left)
+    {
+        return false;
+    }
     child_f_.right = new(std::nothrow) formula(formula_mgr_);
-    assert(child_f_.left && child_f_.right);
+    if(!child_t_.right)
+    {
+        delete child_t_.left;
+        return false;
+    }
 
     // recursive construction of the child formulas
     if(!child_f_.left->build(*static_cast<const NFormula*>(f.left)) || !child_f_.right->build(*static_cast<const NFormula*>(f.right)))
