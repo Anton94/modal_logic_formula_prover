@@ -1544,173 +1544,168 @@ void term::construct_hash()
 		\item measured\_less\_eq\_F - contains only formulas of type $\varphi \le_m \psi$ signed as false
 	\end{itemize}
 
-	TODO: Refactore till this subsection. Will continue with the rest ASAP.
 	\subsubsection*{Definition: Formula Contradiction}
-	Let $\varphi$ be a signed formula, then $\varphi$ is causing a contradiction if any of the followings is true:
+	Let $\varphi$ be a signed formula, then $\varphi$ is causing a contradiction if any of the following is true:
 	\begin{itemize}
-		\item $\varphi$ is a non-atomic signed as true and $\varphi$ belongs to formulas\_F
-		\item $\varphi$ is a non-atomic signed as false and $\varphi$ belongs to formulas\_T
-		\item $\varphi$ is a contact formula signed as true and $\varphi$ belongs to contacts\_F
-		\item $\varphi$ is a contact formula signed as false and $\varphi$ belongs to contacts\_T
-		\item $\varphi$ is a zero terms formula signed as true and $\varphi$ belongs to zero\_terms\_F
-		\item $\varphi$ is a zero terms formula signed as false and $\varphi$ belongs to zero\_terms\_T
-		\item $\varphi$ is a measured less formula signed as true and $\varphi$ belongs to measured\_less\_eq\_F
-		\item $\varphi$ is a measured less formula signed as false and $\varphi$ belongs to measured\_less\_eq\_T
+		\item $\varphi$ is a non-atomic signed as true and $\varphi$ belongs to $formulas\_F$
+		\item $\varphi$ is a non-atomic signed as false and $\varphi$ belongs to $formulas\_T$
+		\item $\varphi$ is a contact formula signed as true and $\varphi$ belongs to $contacts\_F$
+		\item $\varphi$ is a contact formula signed as false and $\varphi$ belongs to $contacts\_T$
+		\item $\varphi$ is a zero terms formula signed as true and $\varphi$ belongs to $zero\_terms\_F$
+		\item $\varphi$ is a zero terms formula signed as false and $\varphi$ belongs to $zero\_terms\_T$
+		\item $\varphi$ is a measured less formula signed as true and $\varphi$ belongs to $measured\_less\_eq\_F$
+		\item $\varphi$ is a measured less formula signed as false and $\varphi$ belongs to $measured\_less\_eq\_T$
 	\end{itemize}
 
-		\subsubsection*{Invariant}
-			At any time, all formulas in all eight signed formula collections do not contradict.
+	\subsubsection*{Invariant}
+	At any time, all formulas in all eight signed formula collections do not contradict.
 
-			A contradiction may occure if a formula is split and some of the resulting components causes a contradiction.
+	A contradiction may occure if a formula is split and some of the resulting components causes a contradiction.
 
-		\subsubsection*{Example}
-			Let's assume that contacts\_T = \{ C(a, b)\} and let's have a look at the following formula $\mathbb{T}(T \wedge \neg C(a,b))$.
-			\newline
-			By the rules of decomposition, namely the ( $\wedge$ ) rule produces $\mathbb{T}T \text{ and } \mathbb{T}\neg C(a,b)$.
+	\subsubsection*{Example}
+	Let's assume that $contacts\_T = \{ C(a, b)\}$ and let's have a look at the following formula $\mathbb{T}(T \wedge \neg C(a,b))$.
+	\newline
+	By the rules of decomposition, namely the ( $\wedge$ ) rule produces $\mathbb{T}T \text{ and } \mathbb{T}\neg C(a,b)$.
 
-			Then the $\mathbb{T}\neg C(a,b)$ will be decomposed to $\mathbb{F} C(a,b)$ by the ( $\neg$ ) rule, which causes a contradiction
-			since C(a,b) is already present in contacts\_T formulas
+	Then the $\mathbb{T}\neg C(a,b)$ will be decomposed to $\mathbb{F} C(a,b)$ by the ( $\neg$ ) rule, which causes a contradiction since $C(a,b)$ is already present in $contacts\_T$ formulas.
 
-		\subsubsection*{Tableaux Algorithm}
-			Given a formula $\varphi$, the following algorithm determines the atomic formulas in all branches of the tableaux process.
+	\subsubsection*{Tableaux Algorithm}
+	Given a formula $\varphi$, the following algorithm determines the atomic formulas in all branches of the tableaux process.
 
-			As a first step if the formula $\varphi$ is the constant F, then false is returned directly, otherwise the whole formula $\varphi$ is inserted in formulas\_T.
-		\newline
-			\subsubsection*{Remarks}
-			\begin{itemize}
-				\item true boolean value is used to represent the formula constant T
-				\item false boolean value is used to represent the formula constant F
-				\item Contact atomic formula is commutative, meaning that: $C(a,b) \iff C(b,a)$
-			\end{itemize}
-			Few lemmas which will provide a much more efficient contradiction finding in the tableaux process.
-			\subsubsection*{Lemma: A}
-				Let x be a term. Suppose that the atomic formula x = 0 has already been signed as true.
-				Then marking the following formulas as true will lead to contradiction:
-				\begin{itemize}
-					\item C(x,y)
-					\item C(y,x)
-				\end{itemize}
-				for any term y.
+	As a first step if the formula $\varphi$ is the constant F, then false is returned directly, otherwise the whole formula $\varphi$ is inserted in $formulas\_T$.
+	\newline
+	\subsubsection*{Remarks}
+	\begin{itemize}
+		\item true boolean value is used to represent the formula constant T
+		\item false boolean value is used to represent the formula constant F
+		\item Contact atomic formula is commutative, meaning that: $C(a,b) \iff C(b,a)$
+	\end{itemize}
 
-			\subsubsection*{Lemma: A-inverse}
-				Let x, y and z be terms, suppose that the atomic formulas C(x,y) or C(z, x) has already been signed as true,
-				then marking the formula x = 0 as true will lead to contradiction.
-				\newline
-				TODO: addd short proof.
-			\subsubsection*{Time Complexity A and A-inverse}
-				The algorithmic complexity to check whether a new formula leads to contradiction by Lemma A and Lemma A-inverse is done effectively, namely in constant time with the usage of one new collection contact\_T\_terms\_ which keeps the terms of the true contacts, namely the contacts in the collection contacts\_T. This means that for each $\mathbb{T}(C(x, y))$, the terms x and y are in the mentioned collection of true terms. The contact\_T\_terms\_  is a multiset and keeps track of all added terms, meaning that if the term x is added twice and then removed only once there will still be an entry of that x in the contact\_T\_terms\_ collection.
+	Few lemmas which will provide a much more efficient contradiction finding in the tableaux process.
+	\subsubsection*{Lemma: A}
+	Let x be a term. Suppose that the atomic formula $x = 0$ has already been signed as true.
+	Then marking the following formulas as true will lead to contradiction:
+	\begin{itemize}
+		\item C(x,y)
+		\item C(y,x)
+	\end{itemize}
+	for any term y.
 
-				To check if a new formula leads to contradiction by Lemma A or Lemma A-inverse the following method is used:
-				\begin{lstlisting}
+	\subsubsection*{Lemma: A-inverse}
+	Let x, y and z be terms. Suppose that the atomic formulas C(x,y) or C(z, x) has already been signed as true, then marking the formula x = 0 as true will lead to contradiction.
+	\newline
+	TODO: addd short proof.
+	\subsubsection*{Time Complexity A and A-inverse}
+	The algorithmic complexity to check whether a new formula leads to contradiction by Lemma A and Lemma A-inverse is done effectively. Namely in constant time with the usage of one new collection $contact\_T\_terms\_$. It keeps the terms of the true contacts. Namely the contacts in the collection $contacts\_T$. This means that for each $\mathbb{T}(C(x, y))$, the terms x and y are in the mentioned collection of true terms. The $contact\_T\_terms\_$  is a multiset and keeps track of all added terms, meaning that if the term x is added twice and then removed only once there will still be an entry of that x in the $contact\_T\_terms\_$ collection. Removing a true contact appears when moving up the tableau tree, i.e. switching to another branch.
+
+	To check if a new formula leads to contradiction by Lemma A or Lemma A-inverse the following method is used:
+\begin{lstlisting}
 auto has_broken_contact_rule(const formula* f) const -> bool;
-				\end{lstlisting}
+\end{lstlisting}
 
-			\subsubsection{Handy methods}
-			\subsubsection*{Find formula}
-			\subsubsection*{Find formula signed as true}
-				\begin{lstlisting}
+	\subsubsection{Handy methods}
+	\subsubsection*{Searching}
+	\subsubsection*{Search for formula signed as true}
+\begin{lstlisting}
 auto find_in_T(const formula* f) const -> bool
-				\end{lstlisting}
-		Checks existance of formula $\varphi$ in any positive collection depending on the type of $\varphi$.
-	Namely if $\varphi$ is of type:
+\end{lstlisting}
+	Checks existance of formula $\varphi$ in any positive collection depending on the type of $\varphi$. Namely if $\varphi$ is of type:
 	\begin{itemize}
-		\item C(x, y), then return true $\iff \varphi$ belongs to contacts\_T
-		\item $x \le y$, then return true $\iff \varphi$ belongs to zero\_terms\_T
-		\item $x \le_m y$, then return true $\iff \varphi$ belongs to measured\_less\_eq\_T
-		\item $\neg \psi$, then return true $\iff \varphi$ belongs to formulas\_T
-		\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then return true $\iff \varphi$ belongs to formulas\_T
+		\item $C(x, y)$: returns whether $\varphi \in contacts\_T$
+		\item $x = 0$: returns whether $\varphi \in zero\_terms\_T$
+		\item $x \le_m y$: returns whether $\varphi \in measured\_less\_eq\_T$
+		\item non-atomic formula: returns whether $\varphi \in formulas\_T$
 	\end{itemize}
-	\subsubsection*{Find formula signed as false}
+
+	\subsubsection*{Search for formula signed as false}
 \begin{lstlisting}
 auto find_in_F(const formula* f) const -> bool
 \end{lstlisting}
-	Checks existance of formula $\varphi$ in any negative collection depending on the type of $\varphi$.
-	Namely if $\varphi$ is of type:
+	Checks existance of formula $\varphi$ in any negative collection depending on the type of $\varphi$. Namely if $\varphi$ is of type:
 	\begin{itemize}
-		\item C(x, y), then return true $\iff \varphi$ belongs to contacts\_F
-		\item $x \le y$, then return true $\iff \varphi$ belongs to zero\_terms\_F
-		\item $x \le_m y$, then return true $\iff \varphi$ belongs to measured\_less\_eq\_F
-		\item $\neg \psi$, then return true $\iff \varphi$ belongs to formulas\_F
-		\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then return true $\iff \varphi$ belongs to formulas\_F
+		\item $C(x, y)$: returns whether $\varphi \in contacts\_F$
+		\item $x = 0$: returns whether $\varphi \in zero\_terms\_F$
+		\item $x \le_m y$: returns whether $\varphi \in measured\_less\_eq\_F$
+		\item non-atomic formula: returns whether $\varphi \in formulas\_F$
 	\end{itemize}
-			\subsubsection*{Add formula}
-			\subsubsection*{Mark formula as true}
-				\begin{lstlisting}
+
+	\subsubsection*{Adding}
+	\subsubsection*{Mark formula as true}
+\begin{lstlisting}
 void add_formula_to_T(const formula* f)
-				\end{lstlisting}
-				Adds the formula $\varphi$ as true in in the respective positive collection.
-				Namely if $\varphi$ is of type:
-				\begin{itemize}
-					\item C(x, y), then $\varphi$ is added to contacts\_T, and the terms x and y are added to the contact\_T\_terms\_ collection.
-					\item $x = 0$, then x is added in zero\_terms\_T
-					\item $x \le_m y$, then $\varphi$ is added to measured\_less\_eq\_T
-					\item $\neg \psi$, then $\varphi$ is added to formulas\_T
-					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then $\varphi$ is added to formulas\_T
-				\end{itemize}
-			\subsubsection*{Mark formula as false}
-				\begin{lstlisting}
+\end{lstlisting}
+	Adds the formula $\varphi$ as true in in the respective positive collection. Namely if $\varphi$ is of type:
+	\begin{itemize}
+		\item C(x, y): $\varphi$ is added to $contacts\_T$, and the terms x and y are added to the $contact\_T\_terms\_$
+		\item $x = 0$: x is added in $zero\_terms\_T$
+		\item $x \le_m y$: $\varphi$ is added to $measured\_less\_eq\_T$
+		\item non-atomic formula: $\varphi$ is added to $formulas\_T$
+	\end{itemize}
+
+	\subsubsection*{Mark formula as false}
+\begin{lstlisting}
 void add_formula_to_F(const formula* f)
-				\end{lstlisting}
-				Adds the formula $\varphi$ as false in the respective negative collection.
-				Namely if $\varphi$ is of type:
-				\begin{itemize}
-					\item C(x, y), then $\varphi$ is added to contacts\_F.
-					\item $x = 0$, then x is added in zero\_terms\_F
-					\item $x \le_m y$, then $\varphi$ is added to measured\_less\_eq\_F
-					\item $\neg \psi$, then $\varphi$ is added to formulas\_F
-					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then $\varphi$ is added to formulas\_F
-				\end{itemize}
-			\subsubsection*{Remove formula}
-			\subsubsection*{Remove formula signed as true}
-				\begin{lstlisting}
+\end{lstlisting}
+	Adds the formula $\varphi$ as false in the respective negative collection. Namely if $\varphi$ is of type:
+	\begin{itemize}
+		\item C(x, y): $\varphi$ is added to $contacts\_F$
+		\item $x = 0$: x is added in $zero\_terms\_F$
+		\item $x \le_m y$: $\varphi$ is added to $measured\_less\_eq\_F$
+		\item non-atomic formula: $\varphi$ is added to $formulas\_F$
+	\end{itemize}
+
+	\subsubsection*{Removing}
+	\subsubsection*{Remove formula signed as true}
+\begin{lstlisting}
 void remove_formula_from_T(const formula* f)
-				\end{lstlisting}
-				Removes the formula $\varphi$ from the respective positive collection.
-				Namely if $\varphi$ is of type:
-				\begin{itemize}
-					\item C(x, y), then $\varphi$ is removed from contacts\_T, and the terms x and y are removed from the contact\_T\_terms\_ collection.
-					\item $x = 0$, then x is removed from zero\_terms\_T
-					\item $x \le_m y$, then $\varphi$ is removed from measured\_less\_eq\_T
-					\item $\neg \psi$, then $\varphi$ is removed from formulas\_T
-					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then $\varphi$ is removed from formulas\_T
-				\end{itemize}
-			\subsubsection*{Remove formula signed as true}
-				\begin{lstlisting}
+\end{lstlisting}
+	Removes the formula $\varphi$ from the respective positive collection. Namely if $\varphi$ is of type:
+	\begin{itemize}
+		\item C(x, y): $\varphi$ is removed from $contacts\_T$, and the terms x and y are removed from the $contact\_T\_terms\_$.
+		\item $x = 0$: x is removed from $zero\_terms\_T$
+		\item $x \le_m y$: $\varphi$ is removed from $measured\_less\_eq\_T$
+		\item non-atomic formula: $\varphi$ is removed from $formulas\_T$
+	\end{itemize}
+
+	\subsubsection*{Remove formula signed as false}
+\begin{lstlisting}
 void remove_formula_from_F(const formula* f)
-				\end{lstlisting}
-				Removes the formula $\varphi$ from the respective negative collection.
-				Namely if $\varphi$ is of type:
-				\begin{itemize}
-					\item C(x, y), then $\varphi$ is removed from contacts\_F
-					\item $x = 0$, then x is removed from zero\_terms\_F
-					\item $x \le_m y$, then $\varphi$ is removed from measured\_less\_eq\_F
-					\item $\neg \psi$, then $\varphi$ is removed from formulas\_F
-					\item $\psi_1 \sigma \psi_2$, where $\sigma \in \{\wedge, \vee\}$, then $\varphi$ is removed from formulas\_F
-				\end{itemize}
-			\subsubsection{Def: Tableaux branch output}
-			\label{tableaux:branch:output}
-				As stated above the ouput of a branch in the tableaux process is a set of atomic formulas.
-				These atomic formulas can be grouped in six groups:
-				\begin{itemize}
-					\item Contacts
-					\item Non Contacts
-					\item Equal to Zero Terms
-					\item Not Equal to Zero Terms
-					\item Meassured Equal to Zero Terms
-					\item Meassured Not Equal to Zero Terms
-				\end{itemize}
-				These groups can be represented with the following formula:
-				\begin{align*}
-					\bigwedge\nolimits_{i} \; C(a_i, b_i) \:\: \wedge \:\: &
-					\bigwedge\nolimits_{j} \; \neg C(e_j, f_j) \:\: \wedge \:\: \\
-					\bigwedge\nolimits_{k} \; d_k = 0 \:\: \wedge \:\: &
-					\bigwedge\nolimits_{l} \; g_l \neq 0 \:\: \wedge \:\: \\
-					\bigwedge\nolimits_{s} \; <=_m(H_s, O_s) \:\: \wedge \:\: &
-					\bigwedge\nolimits_{u} \; \neg (<=_m(Q_u, R_u) )
-				\end{align*}
-				% TODO explain which is what
-			\subsubsection*{Tableaux Satisfiable Step Implementation}
-				\begin{lstlisting}
+\end{lstlisting}
+	Removes the formula $\varphi$ from the respective negative collection. Namely if $\varphi$ is of type:
+	\begin{itemize}
+		\item C(x, y): $\varphi$ is removed from $contacts\_F$
+		\item $x = 0$: x is removed from $zero\_terms\_F$
+		\item $x \le_m y$: $\varphi$ is removed from $measured\_less\_eq\_F$
+		\item non-atomic formula: $\varphi$ is removed from $formulas\_F$
+	\end{itemize}
+
+	\subsubsection{Def: Tableaux branch output}
+	\label{tableaux:branch:output}
+	As stated above the ouput of a branch in the tableaux process is a set of atomic formulas. These atomic formulas are grouped in six groups:
+	\begin{itemize}
+		\item Contacts ($contacts\_T$)
+		\item Non Contacts ($contacts\_F$)
+		\item Equal to Zero Terms ($zero\_terms\_T$)
+		\item Not Equal to Zero Terms ($czero\_terms\_F$)
+		\item Meassured Equal to Zero Terms ($measured\_less\_eq\_T$)
+		\item Meassured Not Equal to Zero Terms ($measured\_less\_eq\_F$)
+	\end{itemize}
+
+	All atomic formulas in the branch should be satisfied. So, they are in a conjunction. Can be represented with the following formula:
+	\begin{align*}
+		\bigwedge\nolimits_{i} \; C(a_i, b_i) \:\: \wedge \:\: &
+		\bigwedge\nolimits_{j} \; \neg C(e_j, f_j) \:\: \wedge \:\: \\
+		\bigwedge\nolimits_{k} \; d_k = 0 \:\: \wedge \:\: &
+		\bigwedge\nolimits_{l} \; g_l \neq 0 \:\: \wedge \:\: \\
+		\bigwedge\nolimits_{s} \; <=_m(H_s, O_s) \:\: \wedge \:\: &
+		\bigwedge\nolimits_{u} \; \neg (<=_m(Q_u, R_u) )
+	\end{align*}
+	%TODO explain which is what
+
+	\newpage
+	\subsubsection*{Tableaux Satisfiable Step Implementation}
+	The Tableaux satisfiable step is the whole Tableaux algorithm.
+\begin{lstlisting}
 auto tableau::satisfiable_step() -> bool
 {
     // The bottom of the recursive algorithm is when we have
@@ -1718,6 +1713,8 @@ auto tableau::satisfiable_step() -> bool
     // Then we can run algorithms for model construction.
     if(formulas_T_.empty() && formulas_F_.empty())
     {
+        // This is the method which tries
+        // to construct satisfiable model.
         return has_satisfiable_model();
     }
 
@@ -1725,7 +1722,7 @@ auto tableau::satisfiable_step() -> bool
     {
         // Choosing some formula to handle in this step.
         // If this branch does not produce a valid satisfiable path,
-	 // then this formula will be returned to formulas_T_
+        // then this formula will be returned to formulas_T_.
         auto f = *formulas_T_.begin();
 
         const auto op = f->get_operation_type();
@@ -1740,28 +1737,31 @@ auto tableau::satisfiable_step() -> bool
                 {
                     return false;
                 }
-		// F(F) is satisfiable, continue with the rest
+                // F(F) is satisfiable, continue with the rest.
                 return satisfiable_step();
             }
 
             if(find_in_T(X))
             {
-		// contradiction, we want to satisfy F(X)
-		// but we already have to satisfy T(X)
+                // Contradiction, we want to satisfy F(X)
+                // but we already have to satisfy T(X).
                 return false;
             }
 
-            if(find_in_F(X)) // skip adding it multiple times
+            if(find_in_F(X)) // Skip adding F(X) multiple times.
             {
                 return satisfiable_step();
             }
 
             add_formula_to_F(X);
             auto res = satisfiable_step();
+            // Revert it on the way back.
             remove_formula_from_F(X);
             return res;
         }
-
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
         if(op == op_t::conjunction)
         {
             // T(X & Y) -> T(X) & T(Y)
@@ -1791,7 +1791,6 @@ auto tableau::satisfiable_step() -> bool
         }
 
         assert(op == op_t::disjunction);
-
         // T(X v Y) -> T(X) v T(Y)
         auto X = f->get_left_child_formula();
         auto Y = f->get_right_child_formula();
@@ -1804,7 +1803,9 @@ auto tableau::satisfiable_step() -> bool
             trace() << "One of the childs is constant true";
             return satisfiable_step();
         }
-
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
         auto process_T_disj_child = [&](const formula* child) {
             if(child->is_constant_false() || // T(F) is not satisfiable
                find_in_F(child) || has_broken_contact_rule(child))
@@ -1826,9 +1827,9 @@ auto tableau::satisfiable_step() -> bool
         trace() << "Start of the left subtree: " << *X << " of " << *f;
         if(process_T_disj_child(X))
         {
-            return true; // there was no contradiction in the left path,
-			 // so there is no need to continue with
-                         // the right path
+            // There was no contradiction in the left path,
+            // so there is no need to continue with the right path.
+            return true;
         }
 
         trace() << "Start of the right subtree: " << *Y << " of " << *f;
@@ -1854,17 +1855,20 @@ auto tableau::satisfiable_step() -> bool
             {
                 return false;
             }
-		// T(T) is satisfiable, continue with the rest
+            // T(T) is satisfiable, continue with the rest
             return satisfiable_step();
         }
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
         if(find_in_F(X))
         {
-		// contradiction, we want to satisfy T(X)
-		// but we already have to satisfy F(X)
+            // Contradiction, we want to satisfy T(X)
+            // but we already have to satisfy F(X).
             return false;
         }
-	  // We will add T(X) where X might be Contact or =0 term,
-        // so we need to verify that we will not break the contact rule
+        // We will add T(X) where X might be Contact or =0 term,
+        // so we need to verify that we will not break the contact rule.
         if(has_broken_contact_rule(X))
         {
             return false;
@@ -1887,7 +1891,7 @@ auto tableau::satisfiable_step() -> bool
         F_disjunction_child X(*this, f->get_left_child_formula());
         F_disjunction_child Y(*this, f->get_right_child_formula());
 
-	// Checks that X does not bring a contradiction
+        // Checks that X does not bring a contradiction
         if(!X.validate())
         {
             return false;
@@ -1909,8 +1913,10 @@ auto tableau::satisfiable_step() -> bool
         return res;
     }
 
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
     assert(op == op_t::conjunction);
-
     // F(X & Y) -> F(X) v F(Y)
     auto X = f->get_left_child_formula();
     auto Y = f->get_right_child_formula();
@@ -1944,15 +1950,15 @@ auto tableau::satisfiable_step() -> bool
     trace() << "Start of the left subtree: " << *X << " of " << *f;
     if(process_F_conj_child(X))
     {
-        return true; // there was no contradiction in left path,
-			// so there is no need to continue with the
-                     // right path
+        // There was no contradiction in left path,
+        // so there is no need to continue with the right path.
+        return true;
     }
 
     trace() << "Start of the right subtree: " << *Y << " of " << *f;
     return process_F_conj_child(Y);
 }
-				\end{lstlisting}
+\end{lstlisting}
 
 	\newpage
 	\section{Model Implementation}
