@@ -1,0 +1,31 @@
+\babel@toc {english}{}
+\contentsline {section}{\numberline {1}Tableaux Method}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Propositional logic tableau}{3}{subsection.1.1}%
+\contentsline {subsubsection}{\numberline {1.1.1}Rules}{4}{subsubsection.1.1.1}%
+\contentsline {paragraph}{Negation}{4}{section*.2}%
+\contentsline {paragraph}{Conjunction}{4}{section*.3}%
+\contentsline {paragraph}{Disjunction}{4}{section*.4}%
+\contentsline {paragraph}{Implication}{4}{section*.5}%
+\contentsline {paragraph}{Equivalence}{5}{section*.6}%
+\contentsline {paragraph}{Closed branch}{5}{section*.7}%
+\contentsline {paragraph}{Closed tableau}{5}{section*.8}%
+\contentsline {paragraph}{Tautology formula}{5}{section*.9}%
+\contentsline {section}{\numberline {2}Region-based Contact Logics}{7}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Syntax}{7}{subsection.2.1}%
+\contentsline {paragraph}{Variable}{7}{section*.10}%
+\contentsline {paragraph}{Boolean constants}{7}{section*.11}%
+\contentsline {paragraph}{Boolean operations}{7}{section*.12}%
+\contentsline {paragraph}{Term}{7}{section*.13}%
+\contentsline {paragraph}{Propositional constants}{7}{section*.14}%
+\contentsline {paragraph}{Propositional connectives}{8}{section*.15}%
+\contentsline {paragraph}{Atomic Formulas}{8}{section*.16}%
+\contentsline {paragraph}{Formula}{8}{section*.17}%
+\contentsline {subsection}{\numberline {2.2}Semantics}{8}{subsection.2.2}%
+\contentsline {paragraph}{Relational System}{9}{section*.18}%
+\contentsline {paragraph}{Boolean variable valuation}{9}{section*.19}%
+\contentsline {paragraph}{Model}{9}{section*.20}%
+\contentsline {section}{\numberline {3}Quantative Contact Logics}{12}{section.3}%
+\contentsline {section}{\numberline {4}Implementation Introduction}{13}{section.4}%
+\contentsline {section}{\numberline {5}Tableaux Implementation}{14}{section.5}%
+\contentsline {section}{\numberline {6}Model Implementation}{15}{section.6}%
+\contentsline {section}{\numberline {7}Quantative Contact Logics Implementation}{16}{section.7}%

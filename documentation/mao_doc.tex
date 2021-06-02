@@ -14,11 +14,18 @@
 \usepackage{hyperref}
 \usepackage{tikz}
 \usepackage{multicol}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
 
 \usetikzlibrary{arrows.meta}
 
 \restylefloat{table}
 \newcommand{\tabitem}{~~\llap{\textbullet}~~}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{axiom}[theorem]{Axiom}
 
 \lstset { %
     language=C++,
@@ -300,27 +307,15 @@ is defined by the following inductive definition:
 				where $\sigma \in \{\vee, \wedge, \rightarrow, \leftrightarrow\}$
 		\end{itemize}
 
-	\paragraph{Zero term formula}
-		Let a and b be two terms, then
-		\begin{equation}
-			a \le b \iff a \sqcap \neg b = \emptyset
-		\end{equation}
-
-		$a \sqcap \neg b = \emptyset$ will be called zero term formula.
-		Since $a \sqcap \neg b$ is a new term, it can be assigned a variable $s = a \sqcap \neg b$, 
-		and now the zero term formula above can be written as $s  = 0$ which is with better readability and 
-		can be straightforwardly grasped in proofs and definitions.
-
-
 	\subsection{Semantics}
-Our goal is to define the semantics of a formula and to answer the question when a given formula is satisfiable.
+The goal is to define the semantics of a formula and to answer the question when a given formula is satisfiable.
 When trying to define the satisfiability of a formula, couple of questions arise, such as:
 		\begin{itemize}
 			\item How is a region represented 
 			\item What does it mean for two regions to be in contact
 			\item In which scope is the formula satisfiable
 		\end{itemize}
-Let us first define the semantics of a formula which will lead us to its evaluation and satisfiability.
+Let us first define the semantics of a formula which will lead us to its valuation and satisfiability.
 \newline
 Let W be a countable set and $W \neq \emptyset$. This set will represent all elements in the world.
 A region will be a subset of W. Namely a set of elements represents a region.
@@ -342,10 +337,10 @@ Having (W, R) as defined above, we conclude the followings:
 		\begin{equation*}
 			R(\text{ Bulgaria } \sqcup \text{ Macedonia , Austria })
 		 \end{equation*}
-A relation system is defined as $\mathcal{F} = (W, R)$, where $W \neq \emptyset$. $\mathcal{F}$ is usually called a frame.
+	\paragraph{Relational System} A relational system is defined as $\mathcal{F} = (W, R)$, where $W \neq \emptyset$. $\mathcal{F}$ is usually called a frame.
 
-	\paragraph{Boolean variable evaluation}
-Let $\mathcal{F}$  be a frame, then a boolean variable evaluation is any function $\mathscr{v}$ assignig to each Boolean variable a subset $v(a) \subseteq W$. The evaluation is then extended inductively to all Boolean terms as follows
+	\paragraph{Boolean variable valuation}
+Let $\mathcal{F}$  be a frame, then a boolean variable valuation is any function $\mathscr{v}$ assignig to each Boolean variable a subset $v(a) \subseteq W$. The valuation is then extended inductively to all Boolean terms as follows
 		\begin{itemize}
 			\item $v(0) = \emptyset$
 			\item $v(1) = W$
@@ -354,7 +349,7 @@ Let $\mathcal{F}$  be a frame, then a boolean variable evaluation is any functio
 			\item $v(a*) = W \ v(a)$
 		\end{itemize}
 
-The pair $\mathcal{M} = (\mathcal{F}, \mathscr{v})$ is called a model. The truth of a formula $\varphi$ in $\mathcal{M}$ ( in symbols $\mathcal{M} \models \varphi$) is defined inductively as follows:
+	\paragraph{Model} The pair $\mathcal{M} = (\mathcal{F}, \mathscr{v})$ is called a model. The truth of a formula $\varphi$ in $\mathcal{M}$ ( in symbols $\mathcal{M} \models \varphi$) is defined inductively as follows:
 		\begin{itemize}
 			\item $\mathcal{M} \not\models \bot$ 
 			\item $\mathcal{M} \models \top$
@@ -365,12 +360,95 @@ The pair $\mathcal{M} = (\mathcal{F}, \mathscr{v})$ is called a model. The truth
 		\end{itemize}
 In the previously defined semantics we evaluate formulas not locally at points, as it is in the standard modal semantics, but globally in the whole model and this is one of the main differences of the present modal approach with the standard Kripke approach.
 
-A model $\mathcal{M}$ is a model of a formula $\varphi$  if $\varphi$ is true in $\mathcal{M}$; $\mathcal{M}$ is a model of a set of formulas A if $\mathcal{M}$ is 
-a model of all formulas from A. A formula $\varphi$ is true in a frame $\mathcal{F}$, or that $\mathcal{F}$ is a frame for $\varphi$, in symbols $\mathcal{F} \models \varphi$,
+A model $\mathcal{M}$ is a model of a formula $\varphi$ if $\varphi$ is true in $\mathcal{M}$, in such a case we say that $\mathcal{M}$ satisfies $\varphi$, in symbols $\mathcal{M} \models \varphi$;
+$\mathcal{M}$ is a model of a set of formulas A if $\mathcal{M}$ is a model of all formulas from A, in symbols $\mathcal{M} \models A$. A formula $\varphi$ is true in a frame $\mathcal{F}$, or that $\mathcal{F}$ is a frame for $\varphi$, in symbols $\mathcal{F} \models \varphi$,
 if $\mathcal{M} \models \varphi$ for all models $\mathcal{M}$ based on $\mathcal{F}$, i.e. for all evaluations $\mathscr{v}$ we have $\mathcal{F}, \mathscr{v} \models \varphi$.
 If $\Sigma$ is a class of frames, we say that $\varphi$ is true in $\Sigma$, in symbols $\Sigma \models \varphi$, if $\varphi$ is true in all frames in $\Sigma$. We say that a set of 
 formulas A is satisfiable in $\Sigma$, or A is $\Sigma$-consistent, if there is a model $\mathcal{M} = (\mathcal{F}, \mathscr{v})$ with $\mathcal{F} \in \Sigma$ such that $\mathcal{M}$
 is a model of A.
+
+\begin{axiom}[Contact reflexivity]
+	Let a be a term, then
+	\begin{equation*}
+		a \neq 0 \implies aCa
+	\end{equation*}
+\end{axiom}
+
+\begin{axiom}[Contact symmetry]
+	Let a and b be two terms, then
+	\begin{equation*}
+		aCb \iff bCa
+	\end{equation*}
+\end{axiom}
+
+\begin{lemma}[Term equality]
+	Let a and b be two terms and let $\mathscr{v}$ be a valuation, then
+	\begin{equation*}
+		a = b \implies \mathscr{v}(a) = \mathscr{v}(b)
+	\end{equation*}
+\end{lemma}
+
+\begin{lemma}[Formula equality]
+	Let $\varphi$ and $\psi$ be two formulas and let $\mathscr{v}$ be a valuation, then
+	\begin{equation*}
+		\varphi = \psi \implies \mathscr{v}(\varphi) = \mathscr{v}(\psi)
+	\end{equation*}
+\end{lemma}
+
+\begin{lemma}[Zero term formula]
+	Let a and b be two terms, then
+	\begin{equation*}
+		a \le b \iff a \sqcap \neg b = \emptyset
+	\end{equation*}
+	The formula $a \sqcap \neg b = \emptyset$ will be called zero term formula.
+	Since $a \sqcap \neg b$ is a new term, it can be assigned a variable $s = a \sqcap \neg b$, 
+	and now the zero term formula above can be written as $s  = 0$ which is with better readability and 
+	can be straightforwardly grasped in proofs and definitions.
+\end{lemma}
+
+\begin{lemma}[Non-zero term]
+	Let a and b be two terms, then
+	\begin{equation*}
+		\neg(a \le b) \iff a \sqcap \neg b \neq \emptyset
+	\end{equation*}
+\end{lemma}
+
+\begin{lemma}[Contact monotonicity]
+	Let a and b be two terms, then
+	\begin{equation*}
+		aCb \land a \leq a' \land b \le b' \implies a'Cb'
+	\end{equation*}
+\end{lemma}[Contact distributivity]
+	Let a and b be two terms, then
+	\begin{equation*}
+		aC(b \sqcup c) \iff aCb \lor aCc
+	\end{equation*}
+\begin{lemma}[Trivial formula implications]
+	Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
+	\begin{itemize}
+		\item $\varphi \land T \implies \varphi$,\;\; $T \land \varphi \implies \varphi$,\;\;
+		      $\varphi \land F \implies F$,\;\; $F \land \varphi \implies F$
+		\item $\varphi \lor T \implies T$,\;\; $T \lor \varphi \implies T$,\;\;
+		      $\varphi \lor F \implies \varphi$,\;\; $F \lor \varphi \implies \varphi$,
+		\item $a \sqcap 1 \implies a$,\;\; $1 \sqcap a \implies a$,\;\;
+		      $a \sqcap 0 \implies 0$,\;\; $0 \sqcap a \implies 0$,
+		\item $a \sqcup 1 \implies 1$,\;\; $1 \sqcup a \implies 1$,\;\;
+		      $a \sqcup 0 \implies a$,\;\; $0 \sqcup a \implies a$,
+		\item $(a \sqcup b)Cc \iff aCc \lor bCc$
+		\item $(a \sqcup b) \leq c \iff a \leq c \land b \leq c$
+		\item $aCb \implies a \neq 0 \land b \neq 0$
+		\item $a \sqcap b \neq 0 \implies aCb$
+		\item $a = 0 \lor b = 0 \implies \neg(aCb)$
+		\item $0 \leq a \implies T$
+		\item $a \leq 1 \implies T$
+		\item $0C0 \implies F$
+		\item $aC0 \implies F$
+		\item $1C1 \implies T$
+		\item $aC1 \implies a \neq 0$
+		\item $a \neq 0 \implies aCa$
+	\end{itemize}
+\end{lemma}
+
 	\newpage
 	\section{Quantative Contact Logics}
 
