@@ -1,7 +1,8 @@
 \documentclass{article}
 \usepackage{mathtools}
-\usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
 \usepackage{systeme}
 \usepackage{newtxtext}
 \usepackage{newtxmath}
@@ -293,7 +294,8 @@ $\neg, \vee, \wedge, \rightarrow, \leftrightarrow$
 		A formula $\varphi$ is called atomic, if it has one of the following forms:
 		\begin{itemize}
 			\item C(a, b), where a and b are terms
-			\item a <= b, where a and b are terms
+			\item $a \le b$, where a and b are terms
+			\item $a \le_\mu b$, where a and b are terms
 		\end{itemize}
 
 	\paragraph{Formula}
@@ -342,19 +344,25 @@ Having (W, R) as defined above, we conclude the followings:
 	\paragraph{Boolean variable valuation}
 Let $\mathcal{F}$  be a frame, then a boolean variable valuation is any function $\mathscr{v}$ assignig to each Boolean variable a subset $v(a) \subseteq W$. The valuation is then extended inductively to all Boolean terms as follows
 		\begin{itemize}
-			\item $v(0) = \emptyset$
-			\item $v(1) = W$
-			\item $v(a \sqcap b) = v(a) \cap v(b)$
-			\item $v(a \sqcup b) = v(a) \cup v(b)$
-			\item $v(a*) = W \ v(a)$
+			\item $\mathscr{v}(0) = \emptyset$
+			\item $\mathscr{v}(1) = W$
+			\item $\mathscr{v}(a \sqcap b) = \mathscr{v}(a) \cap \mathscr{v}(b)$
+			\item $\mathscr{v}(a \sqcup b) = \mathscr{v}(a) \cup \mathscr{v}(b)$
+			\item $\mathscr{v}(a*) = W \ \mathscr{v}(a)$
 		\end{itemize}
 
-	\paragraph{Model} The pair $\mathcal{M} = (\mathcal{F}, \mathscr{v})$ is called a model. The truth of a formula $\varphi$ in $\mathcal{M}$ ( in symbols $\mathcal{M} \models \varphi$) is defined inductively as follows:
+	\paragraph{Measure function} A measure function will denote a function which maps a region to a positive real number.
+		\begin{equation*}
+			\mu : W \longrightarrow \mathbb{R}^+
+		\end{equation*}
+
+	\paragraph{Measured Model} Let $\mu$ be a measure function. The pair $\mathcal{M} = (\mathcal{F}, \mathscr{v})$ is called a model. The truth of a formula $\varphi$ in $\mathcal{M}$ ( in symbols $\mathcal{M} \models \varphi$) is defined inductively as follows:
 		\begin{itemize}
 			\item $\mathcal{M} \not\models \bot$ 
 			\item $\mathcal{M} \models \top$
-			\item $\mathcal{M} \models a \leq b \text{ iff } v(a) \subseteq v(b)$
-			\item $\mathcal{M} \models aCb \text{ iff } v(a) \text{ iff } (\exists x \in v(a)), (\exists y \in v(b)) (xRy)$
+			\item $\mathcal{M} \models aCb \text{ iff } \mathscr{v}(a) \text{ iff } (\exists x \in \mathscr{v}(a)), (\exists y \in \mathscr{v}(b)) (xRy)$
+			\item $\mathcal{M} \models a \leq b \text{ iff } \mathscr{v}(a) \subseteq \mathscr{v}(b)$
+			\item $\mathcal{M} \models a \leq_\mu b \text{ iff } \mu(\mathscr{v}(a)) \le \mu(\mathscr{v}(b))$
 			\item $\mathcal{M} \models \neg \varphi \text{ iff } \mathcal{M} \not\models \varphi$
 			\item $\mathcal{M} \models a \; \sigma \; b \text{ iff } \mathcal{M} \models a \: \sigma \: \mathcal{M} \models b$, where $\sigma \in \{ \vee, \wedge \}$
 		\end{itemize}
@@ -418,11 +426,25 @@ is a model of A.
 	\begin{equation*}
 		aCb \land a \leq a' \land b \le b' \implies a'Cb'
 	\end{equation*}
-\end{lemma}[Contact distributivity]
+\end{lemma}
+
+\begin{lemma}[Contact distributivity]
 	Let a and b be two terms, then
 	\begin{equation*}
 		aC(b \sqcup c) \iff aCb \lor aCc
 	\end{equation*}
+\end{lemma}
+
+\begin{lemma}[Measure Formula Addition Property of Equality]
+	Let a, b and d be three terms, then
+	\begin{equation*}
+		(a \sqcap d = 0) \land (b \sqcap d = 0) \implies (a \le_\mu b \iff a \sqcup d \le_\mu b \sqcup d)
+	\end{equation*}
+\end{lemma}
+
+\begin{proof}
+TODO
+\end{proof}
 \begin{lemma}[Trivial formula implications]
 	Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	\begin{itemize}
@@ -446,6 +468,13 @@ is a model of A.
 		\item $1C1 \implies T$
 		\item $aC1 \implies a \neq 0$
 		\item $a \neq 0 \implies aCa$
+		\item $0 \le_\mu a$
+		\item $a \le_\mu 1$
+		\item $(a = 0) \iff (a \le_\mu 0)$
+		\item $(a = 1) \iff (1 \le_\mu a)$
+		\item $(a \le_\mu b) \lor (b \le_\mu a)$
+		\item $a_1 \le_\mu a_2 \land a_2 \le_\mu a_3 \implies a_1 \le_\mu a_3$
+
 	\end{itemize}
 \end{lemma}
 
