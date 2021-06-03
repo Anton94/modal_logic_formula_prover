@@ -356,7 +356,7 @@ Let $\mathcal{F}$  be a frame, then a boolean variable valuation is any function
 			\mu : W \longrightarrow \mathbb{R}^+
 		\end{equation*}
 
-	\paragraph{Measured Model} Let $\mu$ be a measure function. The pair $\mathcal{M} = (\mathcal{F}, \mathscr{v})$ is called a model. The truth of a formula $\varphi$ in $\mathcal{M}$ ( in symbols $\mathcal{M} \models \varphi$) is defined inductively as follows:
+	\paragraph{Measured Model} Let $\mu$ be a measure function. The tuple $\mathcal{M} = (\mathcal{F}, \mu, \mathscr{v})$ is called a model. The truth of a formula $\varphi$ in $\mathcal{M}$ ( in symbols $\mathcal{M} \models \varphi$) is defined inductively as follows:
 		\begin{itemize}
 			\item $\mathcal{M} \not\models \bot$ 
 			\item $\mathcal{M} \models \top$
@@ -443,7 +443,35 @@ is a model of A.
 \end{lemma}
 
 \begin{proof}
-TODO
+Let $\mathcal{M} = <B, \mu, \mathscr{v}>$ be an arbitrary model. From the implication we can assume the following:
+	\begin{align*}
+		\mathcal{M} \models (a \sqcap d = 0) &\land (b \sqcap d = 0) \\
+		\mathcal{M} \models a \sqcap d = 0 \text{ and }& \mathcal{M} \models (b \sqcap d = 0) \\
+		\mathscr{v}(a \sqcap d) = \mathscr{v}(0) \text{ and }& \mathscr{v}(b \sqcap d) = \mathscr{v}(0) \\ 
+		\mathscr{v}(a) \sqcap_B \mathscr{v}(d) = 0_B  \;\;\;\;\;\;\;& \mathscr{v}(b) \sqcap_B \mathscr{v}(d) = 0_B  \\
+		\mathscr{v}(a) \cap \mathscr{v}(d) = \emptyset  \;\;\;\;\;\;\;& \mathscr{v}(b) \cap \mathscr{v}(d) = \emptyset
+	\end{align*}
+
+$\Longrightarrow$
+	\begin{align*} 
+		\text{Let } \mathcal{M} &\models  a \le_\mu b \\
+		\mu(\mathscr{v}(a)) &\le \mu(\mathscr{v}(b)) \\
+		\text{We know that } & \mu(\mathscr{v}(d)) \in \mathbb{R}^+ \\
+		\Rightarrow \mu(\mathscr{v}(a)) +  \mu(\mathscr{v}(d)) &\le \mu(\mathscr{v}(b)) +  \mu(\mathscr{v}(d)) \\
+		\text{From } \mathscr{v}(a) \cap \mathscr{v}(d) = \emptyset \Rightarrow & \mu(\mathscr{v}(a)) +  \mu(\mathscr{v}(d)) = \mu(\mathscr{v}(a \sqcup d)) \\
+		\text{From } \mathscr{v}(b) \cap \mathscr{v}(d) = \emptyset \Rightarrow & \mu(\mathscr{v}(b)) +  \mu(\mathscr{v}(d)) = \mu(\mathscr{v}(b \sqcup d)) \\
+		\Rightarrow \mu(\mathscr{v}(a \sqcup d)) &\le \mu(\mathscr{v}(b \sqcup d)) \\
+		\Rightarrow \mathcal{M} \models  a \sqcup d &\le_\mu b \sqcup d
+	\end{align*}
+
+$\Longleftarrow$
+	\begin{align*} 
+		\text{Let } \mathcal{M} \models  a &\sqcup d \le_\mu b \sqcup d \\
+		\Rightarrow \mu(\mathscr{v}(a \sqcup d)) &\le \mu(\mathscr{v}(b \sqcup d)) \\
+		\Rightarrow \mu(\mathscr{v}(a)) +  \mu(\mathscr{v}(d)) &\le \mu(\mathscr{v}(b)) +  \mu(\mathscr{v}(d)) \\
+		\Rightarrow \mu(\mathscr{v}(a)) &\le \mu(\mathscr{v}(b)) \\
+		\Rightarrow \mathcal{M} &\models  a \le_\mu b \\
+	\end{align*}
 \end{proof}
 \begin{lemma}[Trivial formula implications]
 	Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
