@@ -46,7 +46,7 @@
         </style>
 
         <script>
-            var IP_ADDRESS = "http://localhost:34567/";
+            var serverOrigin = location.href.origin;
             var valid_op_id = null;
 
             // since now we are only posting tasks, these requests will be fast enough and
@@ -56,7 +56,7 @@
                 document.getElementById("is_satisfied_output").innerHTML = "";
                 document.getElementById("output").innerHTML = "";
 
-                $.post(IP_ADDRESS + "satisfy", {
+                $.post(serverOrigin + "/satisfy", {
                         formula: formula
                     })
                     .done(function (data) {
@@ -68,7 +68,7 @@
                 var params =
                     "?algorithm_type=" + algorithm_type +
                     "&formula_filters=" + formula_filters;
-                return $.post(IP_ADDRESS + "task" + params, formula)
+                return $.post(serverOrigin + "/task" + params, formula)
                 // on error change_computing_components_availability
             }
 
@@ -76,7 +76,7 @@
 
             function ping_task(op_id, timer_id) {
                 var params = "?op_id=" + valid_op_id;
-                $.get(IP_ADDRESS + "rest/ping" + params, null)
+                $.get(serverOrigin + "/rest/ping" + params, null)
                     .done(function (data) {
                         // depending on the data return RUNNING or CANCELED or FINISHED...
                         console.log(data);
@@ -123,7 +123,7 @@
                 var params = "?op_id=" + valid_op_id;
                 let cancel_btn = document.getElementById("cancel_calculation");
                 cancel_btn.disabled = true;
-                $.get(IP_ADDRESS + "rest/cancel" + params, null)
+                $.get(serverOrigin + "/rest/cancel" + params, null)
                     .done(function (data) {
                         // return true if success, return false if the task was already canceled
                         console.log('Cancel answer: ' + data);
