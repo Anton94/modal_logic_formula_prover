@@ -44,6 +44,7 @@ auto variables_evaluations_block_for_positive_term::generate_next_evaluation() -
      * The variables in @t are the once in evaluation's A set, and the rest are B set.
      * If the current evaluation is true, then we can try to generate next evaluation only on the vars in B (and that will keep the evaluation of @t to be true).
      * Otherwise, we need to generate evaluation on the variables in @t (i.e. in A) which evaluates @t to true and don't forget to reset the evaluation of B
+     * Note that the used variables in the tableau branch are a subset of the formula's variables. So, the variables in B are not simply the inverse of the variables in A.
      *
      */
     if(term_.get().evaluate(evaluation_block_).is_constant_true())

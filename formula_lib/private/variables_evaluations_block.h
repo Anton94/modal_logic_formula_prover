@@ -7,7 +7,7 @@ class variables_evaluations_block
     /*
      * The idea is to keep the information of which variables are participating in that evaluation in a
      * bitset, i.e. a mask.
-     * A set bit at index X means that the variable with id X participates in the evaluation block.
+     * A set(1) bit at index X means that the variable with id X participates in the evaluation block.
      * The evaluations are also kept in a bitset manner. If there is a set bit in the variables mask at
      * position X that means
      * that the corresponding bit(at position X) in evaluations_ is the evaluation for the variable with id X.
@@ -52,7 +52,10 @@ private:
     variables_mask_t variables_B_;
     variables_evaluations_t evaluations_;
 
-    set_variables_ids_t set_variables_ids_A_; // for generating the next evaluations in order to make it
-                                            // O(|set varaibles|) instead of O(|all variables in the mask|)
+    // Caching the set variables in A.
+    // For generating the next evaluations in order to make it O(|set varaibles|) instead of O(|all variables in the mask|)
+    set_variables_ids_t set_variables_ids_A_;
+    // TODO: this is needed only by the variables_evaluations_block_for_positive_term, so it should be moved out of variables_evaluations_block.
+    // Takes extra space which in some algorithms is not used.
     set_variables_ids_t set_variables_ids_B_;
 };

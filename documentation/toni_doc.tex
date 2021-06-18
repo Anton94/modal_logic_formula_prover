@@ -1,4 +1,4 @@
-\documentclass{article}
+ \documentclass{article}
 
 \usepackage{algorithm2e}
 \usepackage[noend]{algpseudocode}
@@ -1679,29 +1679,6 @@ void remove_formula_from_F(const formula* f)
 		\item non-atomic formula: $\varphi$ is removed from $formulas\_F$
 	\end{itemize}
 
-	\subsubsection{Def: Tableaux branch output}
-	\label{tableaux:branch:output}
-	As stated above the ouput of a branch in the tableaux process is a set of atomic formulas. These atomic formulas are grouped in six groups:
-	\begin{itemize}
-		\item Contacts ($contacts\_T$)
-		\item Non Contacts ($contacts\_F$)
-		\item Equal to Zero Terms ($zero\_terms\_T$)
-		\item Not Equal to Zero Terms ($czero\_terms\_F$)
-		\item Meassured Equal to Zero Terms ($measured\_less\_eq\_T$)
-		\item Meassured Not Equal to Zero Terms ($measured\_less\_eq\_F$)
-	\end{itemize}
-
-	All atomic formulas in the branch should be satisfied. So, they are in a conjunction. Can be represented with the following formula:
-	\begin{align*}
-		\bigwedge\nolimits_{i} \; C(a_i, b_i) \:\: \wedge \:\: &
-		\bigwedge\nolimits_{j} \; \neg C(e_j, f_j) \:\: \wedge \:\: \\
-		\bigwedge\nolimits_{k} \; d_k = 0 \:\: \wedge \:\: &
-		\bigwedge\nolimits_{l} \; g_l \neq 0 \:\: \wedge \:\: \\
-		\bigwedge\nolimits_{s} \; <=_m(H_s, O_s) \:\: \wedge \:\: &
-		\bigwedge\nolimits_{u} \; \neg (<=_m(Q_u, R_u) )
-	\end{align*}
-	%TODO explain which is what
-
 	\newpage
 	\subsubsection*{Tableaux Satisfiable Step Implementation}
 	The Tableaux satisfiable step is the whole Tableaux algorithm.
@@ -1963,13 +1940,152 @@ auto tableau::satisfiable_step() -> bool
 	\newpage
 	\section{Model Implementation}
 
+	\subsection{Modal point representation}
+	The modal points are variable evaluations. The variables are converted to  identificators from 0 to N - 1, where N is the number of different boolean variables. The variable evaluation is a sequence of N 1s and 0s. Thus, all different evaluations are $2^N$. It is implemented via the \textit{boost::dynamic\_bitset}. Which is an optimized vector of N booleans. The memory for N elements is roughfly N bits. The element at position X is the evaluation for the variable with identificator X. 
+
+	There might be variables in the formula which are not used in the branch conjunction. The evaluations for those variables are not needed. So, the variable evaluations will be only over the \textbf{used variables}. Let the used variables count is K. Then, all different modal points will be $2^K$.
+
+	It is crucial to have an iterative algorithm for generating all modal points. The modal point representation is similar to the binary numbers. Therefore, the plus one binary operation is simulated over the bitset. It allows a generation of the next modal point. It is convenient for the model construction.
+
+	The following is the implementation of the variable evaluation:
+\newpage
+\begin{lstlisting}
+using variables_mask_t = boost::dynamic_bitset<>;
+using variables_evaluations_t = boost::dynamic_bitset<>;
+using set_variables_ids_t = std::vector<size_t>;
+
+class variables_evaluations_block {
+public:
+    variables_evaluations_block(const variables_mask_t& variables);
+
+    auto get_variables() const -> variables_mask_t;
+    auto get_evaluations() -> variables_evaluations_t&;
+    auto get_evaluations() const -> const variables_evaluations_t&;
+
+    auto get_set_variables_ids() const -> const set_variables_ids_t&;
+    auto generate_next_evaluation() -> bool;
+    void reset_evaluations();
+
+private:
+    void init();
+
+    variables_mask_t variables_;
+    variables_evaluations_t evaluations_;
+
+    // Caching the set variables.
+    // For generating the next evaluations in order to make it
+    // O(|set varaibles|) instead of O(|all variables in the mask|)
+    set_variables_ids_t set_variables_ids_;
+};
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
+...
+auto variables_evaluations_block::generate_next_evaluation() -> bool
+{
+    if((variables_ & evaluations_) == variables_)
+    {
+        // If the evaluation for the variables is only 1s
+        // then we cannot generate a new one,
+        // i.e. we have already generated all of them.
+        return false;
+    }
+
+    /*
+     * Will generate the evaluations in the following order:
+     * 0...00, 0...01, 0...10, ... , 11...10, 11...11.
+     * This is very similar to the increment(+1) operation of integer
+     * numbers in their binary representation.
+     * For the binary number an algorithm could be the following:
+     * Iterate all bits starting from the least significant.
+     *     - bit(i) == 1 => bit(i) = 0
+     *     - bit(i) == 0 => bit(i) = 1 & stop
+     * In our case it is similar, we want to make the increment
+     * operation only on the set bits in the variables_ mask.
+     * set_variables_ids_ has the ids of the set bits
+     * in the variables mask in reverce order.
+     */
+    for(const auto id : set_variables_ids_)
+    {
+        if(!evaluations_[id])
+        {
+            evaluations_.set(id);
+            break;
+        }
+        else
+        {
+            evaluations_.set(id, false);
+        }
+    }
+
+    return true;
+}
+\end{lstlisting}
+
+	\subsection*{Tableaux branch output}
+	\label{tableaux:branch:output}
+	As stated above the ouput of a branch in the tableaux process is a set of atomic formulas. These atomic formulas are grouped in six sets:
+	\begin{itemize}
+		\item Contacts ($contacts\_T$)
+		\item Non Contacts ($contacts\_F$)
+		\item Equal to Zero Terms ($zero\_terms\_T$)
+		\item Not Equal to Zero Terms ($zero\_terms\_F$)
+		\item Meassured Equal to Zero Terms ($measured\_less\_eq\_T$)
+		\item Meassured Not Equal to Zero Terms ($measured\_less\_eq\_F$)
+	\end{itemize}
+
+	All atomic formulas in the branch should be satisfied. So, they are in a conjunction. Can be represented with the following formula:
+	\begin{align*}
+		\bigwedge\nolimits_{i} \; C(a_i, b_i) \:\: \wedge \:\: &
+		\bigwedge\nolimits_{j} \; \neg C(e_j, f_j) \:\: \wedge \:\: \\
+		\bigwedge\nolimits_{k} \; d_k = 0 \:\: \wedge \:\: &
+		\bigwedge\nolimits_{l} \; g_l \neq 0 \:\: \wedge \:\: \\
+		\bigwedge\nolimits_{s} \; <=_m(H_s, O_s) \:\: \wedge \:\: &
+		\bigwedge\nolimits_{u} \; \neg (<=_m(Q_u, R_u) )
+	\end{align*}
+
+	\subsection*{Model output}
+	\label{tableaux:branch:output}
+	The model bulding produces the following collections:
+
+	TODO: refactor, I do not like it that way...
+
+	\begin{itemize}
+		\item Vector of the modal points - $std::vector<variables_evaluations_block>$
+		\item Connectivity matrix of the contacts between the points - $std::vector<model_points_set_t>$
+		\item The evaluations for each boolean variable - $std::vector<model_points_set_t>$
+	\end{itemize}
+
 	\newpage
 	\section{Connected Contact Logics Implementation}
+
+	\iffalse
+	TODO:
+	Model:
+	1) modal point representation
+	2) connectivity matrix
+	3) calculate_the_model_evaluation_of_each_variable - which points participates in the variable evaluation collection
+	4) 1 and 2 and 3 are the output of the model.
+	5) construct_contact_model_points
+	6) construct_non_zero_model_points
+
+	Connected model:
+	7) construct_all_valid_unique_points
+	8) reuse calculate_the_model_evaluation_of_each_variable
+	9) is_zero_terms_F_rule_satisfied
+	10) is_contacts_T_existence_rule_satisfied
+	11) build_contact_relations_matrix
+    Now, we have in some sence the biggest model(w.r.t number of unique points and maximal contact relations between them)
+    12) get_connected_components
+    13) reduce_variable_evaluations_to_subset_of_points
+    14) reduce_model_to_subset_of_points
 
 	TODOs:
 	 - inductive def. for structures, e.g. terms
 	 - recursive for functions
 	 - R is reflexive and symetric - somewhere to mention it.
+
+	\fi
 
 	\newpage
 	TODO: separate line for the authors
