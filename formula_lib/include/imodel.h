@@ -27,9 +27,9 @@ public:
     friend std::ostream& operator<<(std::ostream& out, const imodel& m);
 
 protected:
-    // Useful for models which have their first 2*@number_of_contacts in contact(2k with 2k + 1)
-    // Inserts 1s in the contact relations matrix between 2k and 2k+1 points (where k is less than the number
-    // of contacts)
+    // Useful for models which have their first 2*@number_of_contacts points in contact (point 2k is in contact with point (2k+1))
+    // Inserts 1s in the contact relations matrix between points 2k and 2k+1 (for each k in range [0, @number_of_contacts))
+    // Inserts 1s in the contact relations matrix between each point and itself (reflexivity).
     void create_contact_relations_first_2k_in_contact(size_t number_of_points, size_t number_of_contacts);
 
     const formula_mgr* mgr_{};

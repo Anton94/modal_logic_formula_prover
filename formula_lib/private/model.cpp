@@ -67,7 +67,7 @@ auto model::construct_non_zero_model_points(const terms_t& zero_terms_F, const f
         TERMINATE_IF_NEEDED();
         // TODO: optimize by checking if there is already existing point with evaluation which evaluates the
         // term z to true
-        variables_evaluations_block eval(variables_mask_t(0)); // it will be overriten if succeed
+        variables_evaluations_block eval(variables_mask_t(0)); // it will be overridden if succeed
         if(!create_point_evaluation(z, eval, contacts_F, zero_terms_T))
         {
             return false;
@@ -110,7 +110,7 @@ auto model::construct_contact_points(const formula* c, const formulas_t& contact
     const auto left = c->get_left_child_term();
     const auto right = c->get_right_child_term();
 
-    variables_evaluations_block left_eval(variables_mask_t(0)); // it will be overriten if succeed
+    variables_evaluations_block left_eval(variables_mask_t(0)); // it will be overridden if succeed
     if(!create_point_evaluation(left, left_eval, contacts_F, zero_terms_T))
     {
         return false;
@@ -201,7 +201,7 @@ auto model::construct_point(const formulas_t& contacts_F, const terms_t& zero_te
     term t(mgr_);
     t.construct_constant(true);
 
-    variables_evaluations_block eval(variables_mask_t(0)); // it will be overriten if succeed
+    variables_evaluations_block eval(variables_mask_t(0)); // it will be overridden if succeed
     if(create_point_evaluation(&t, eval, contacts_F, zero_terms_T))
     {
         points_.push_back(std::move(eval));

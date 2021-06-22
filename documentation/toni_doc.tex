@@ -498,6 +498,7 @@
 		\end{defn}
 
 		\begin{defn}
+			\label{boolean-valuation}
 			Let $\V_n$ be a denumerable set of boolean variables. Let $\Tn$ be the set of all boolean terms with variables of $\V_n$. Let W $\subseteq$ $W_n$. By a \textbf{boolean valuation} of a boolean term in $\Tn$ we mean the function $\eta$. It assigns a boolean constant for each pair of term t $\in$ $\Tn$ and variable evaluation $\E_n \in W_n$.
 			\begin{equation}
 				\eta(t, \E_n) \in \{0, 1\}
@@ -1544,6 +1545,27 @@ void term::construct_hash()
 		\item measured\_less\_eq\_F - contains only formulas of type $\varphi \le_m \psi$ signed as false
 	\end{itemize}
 
+	These collctions are unordered sets of points to the formulas/terms.
+\noindent
+\textit{types.h}
+\begin{lstlisting}
+using formulas_t = std::unordered_set<const formula*, formula_ptr_hasher, formula_ptr_comparator>;
+using terms_t = std::unordered_set<const term*, term_ptr_hasher, term_ptr_comparator>;
+\end{lstlisting}
+
+\noindent
+\textit{tableau.h}
+\begin{lstlisting}
+    formulas_t formulas_T_;
+    formulas_t formulas_F_;
+    formulas_t contacts_T_;
+    formulas_t contacts_F_;
+    terms_t zero_terms_T_;
+    terms_t zero_terms_F_;
+    formulas_t measured_less_eq_T_;
+    formulas_t measured_less_eq_F_;
+\end{lstlisting}
+
 	\subsubsection*{Definition: Formula Contradiction}
 	Let $\varphi$ be a signed formula, then $\varphi$ is causing a contradiction if any of the following is true:
 	\begin{itemize}
@@ -1940,6 +1962,32 @@ auto tableau::satisfiable_step() -> bool
 	\newpage
 	\section{Model Implementation}
 
+	\subsection*{Tableaux branch output}
+	\label{tableaux:branch:output}
+	As stated above the ouput of a branch in the tableaux process is a set of atomic formulas. These atomic formulas are grouped in six sets:
+	\begin{itemize}
+		\item Contacts ($contacts\_T$)
+		\item Non Contacts ($contacts\_F$)
+		\item Equal to Zero Terms ($zero\_terms\_T$)
+		\item Not Equal to Zero Terms ($zero\_terms\_F$)
+		\item Meassured Equal to Zero Terms ($measured\_less\_eq\_T$)
+		\item Meassured Not Equal to Zero Terms ($measured\_less\_eq\_F$)
+	\end{itemize}
+
+	All atomic formulas in the branch should be satisfied. So, they are in a conjunction. Can be represented with the following formula:
+	\begin{align*}
+		\bigwedge\nolimits_{i} \; C(a_i, b_i) \:\: \wedge \:\: &
+		\bigwedge\nolimits_{j} \; \neg C(e_j, f_j) \:\: \wedge \:\: \\
+		\bigwedge\nolimits_{k} \; d_k = 0 \:\: \wedge \:\: &
+		\bigwedge\nolimits_{l} \; g_l \neq 0 \:\: \wedge \:\: \\
+		\bigwedge\nolimits_{s} \; <=_m(H_s, O_s) \:\: \wedge \:\: &
+		\bigwedge\nolimits_{u} \; \neg (<=_m(Q_u, R_u) )
+	\end{align*}
+
+	\subsection*{Model output}
+	\label{tableaux:branch:output}
+	The model bulding algorithm should produce a set of modal points. The contacts between them and to define the valuation for each boolean variable.
+
 	\subsection{Modal point representation}
 	The modal points are variable evaluations. The variables are converted to  identificators from 0 to N - 1, where N is the number of different boolean variables. The variable evaluation is a sequence of N 1s and 0s. Thus, all different evaluations are $2^N$. It is implemented via the \textit{boost::dynamic\_bitset}. Which is an optimized vector of N booleans. The memory for N elements is roughfly N bits. The element at position X is the evaluation for the variable with identificator X. 
 
@@ -1949,6 +1997,8 @@ auto tableau::satisfiable_step() -> bool
 
 	The following is the implementation of the variable evaluation:
 \newpage
+\noindent
+\textit{variables\_evaluations\_block.h/cpp}
 \begin{lstlisting}
 using variables_mask_t = boost::dynamic_bitset<>;
 using variables_evaluations_t = boost::dynamic_bitset<>;
@@ -2021,40 +2071,377 @@ auto variables_evaluations_block::generate_next_evaluation() -> bool
     return true;
 }
 \end{lstlisting}
+\noindent
+\textit{model.h}
+\begin{lstlisting}
+using points_t = std::vector<variables_evaluations_block>;
+points_t points_;
+\end{lstlisting}
 
-	\subsection*{Tableaux branch output}
-	\label{tableaux:branch:output}
-	As stated above the ouput of a branch in the tableaux process is a set of atomic formulas. These atomic formulas are grouped in six sets:
-	\begin{itemize}
-		\item Contacts ($contacts\_T$)
-		\item Non Contacts ($contacts\_F$)
-		\item Equal to Zero Terms ($zero\_terms\_T$)
-		\item Not Equal to Zero Terms ($zero\_terms\_F$)
-		\item Meassured Equal to Zero Terms ($measured\_less\_eq\_T$)
-		\item Meassured Not Equal to Zero Terms ($measured\_less\_eq\_F$)
-	\end{itemize}
+	\newpage
+	\subsection{Contacts representation}
+	The contact relations are impleneted via a standard adjacency matrix. The elements of the matrix indicate whether pairs of points are in contact or not. Their values are 0 or 1. Thus, the optimized \textit{boost::dynamic\_bitset} is used again.
 
-	All atomic formulas in the branch should be satisfied. So, they are in a conjunction. Can be represented with the following formula:
-	\begin{align*}
-		\bigwedge\nolimits_{i} \; C(a_i, b_i) \:\: \wedge \:\: &
-		\bigwedge\nolimits_{j} \; \neg C(e_j, f_j) \:\: \wedge \:\: \\
-		\bigwedge\nolimits_{k} \; d_k = 0 \:\: \wedge \:\: &
-		\bigwedge\nolimits_{l} \; g_l \neq 0 \:\: \wedge \:\: \\
-		\bigwedge\nolimits_{s} \; <=_m(H_s, O_s) \:\: \wedge \:\: &
-		\bigwedge\nolimits_{u} \; \neg (<=_m(Q_u, R_u) )
-	\end{align*}
+\begin{lstlisting}
+using model_points_set_t = boost::dynamic_bitset<>;
+using contacts_t = std::vector<model_points_set_t>;
+contacts_t contact_relations_;
+\end{lstlisting}
 
-	\subsection*{Model output}
-	\label{tableaux:branch:output}
-	The model bulding produces the following collections:
+	\subsection{Valuation representation}
+	The valuation $\upsilon_n$ requires to define it for each boolean variable. It's implemeted via a NxM bit matrix. N is the number of boolean variables and M is the number of modal points. The matrix element at position $(i, j)$ indicates whether the valuation for the variable with id $i$ contains the modal point $j$.
 
-	TODO: refactor, I do not like it that way...
+\begin{lstlisting}
+using model_points_set_t = boost::dynamic_bitset<>;
+using variable_id_to_points_t = std::vector<model_points_set_t>;
 
-	\begin{itemize}
-		\item Vector of the modal points - $std::vector<variables_evaluations_block>$
-		\item Connectivity matrix of the contacts between the points - $std::vector<model_points_set_t>$
-		\item The evaluations for each boolean variable - $std::vector<model_points_set_t>$
-	\end{itemize}
+// A vector of bitsets representing the value of v(variable_id).
+variable_id_to_points_t variable_evaluations_;
+\end{lstlisting}
+
+	\subsection{Handy methods}
+	\subsubsection*{Contact matrix filling}
+	The algorithm for building a model creates a pair of points for each contact in the branch conjunction. Therefore these points should be in contact. In addition to that each modal point is in contact with itself (reflexivity).
+
+\newpage
+\noindent
+\textit{imodel.h/cpp}
+\begin{lstlisting}
+// Useful for models which have their first 2*@number_of_contacts points
+// in contact (point 2k is in contact with point (2k+1))
+// Inserts 1s in the contact relations matrix between points 2k and 2k+1
+// (for each k in range [0, @number_of_contacts))
+// Inserts 1s in the contact relations matrix between
+// each point and itself (reflexivity).
+void imodel::create_contact_relations_first_2k_in_contact(
+	size_t number_of_points,
+	size_t number_of_contacts)
+{
+    contact_relations_.clear();
+    // Fill NxN matrix with 0s.
+    contact_relations_.resize(number_of_points,
+                              model_points_set_t(number_of_points));
+    for(size_t k = 0; k < number_of_contacts; ++k)
+    {
+        const auto a = 2 * k;
+        const auto b = a + 1;
+        contact_relations_[a].set(b); // Sets the b-th bit to 1.
+        contact_relations_[b].set(a);
+    }
+
+    // Add also the reflexivity.
+    for(size_t i = 0; i < number_of_points; ++i)
+    {
+        contact_relations_[i].set(i);
+    }
+}
+\end{lstlisting}
+
+	\newpage
+	\subsubsection*{Variable evaluation filling}
+	Fills the $variable\_evaluations\_$ matrix based on the current modal points.
+\\
+\\
+\noindent
+\textit{imodel.h/cpp}
+\begin{lstlisting}
+void model::calculate_the_model_evaluation_of_each_variable()
+{
+    const auto points_size = points_.size();
+    variable_evaluations_.clear();
+    // Initialize each variable evaluation as the empty set.
+    variable_evaluations_.resize(
+        mgr_->get_variables().size(),
+        model_points_set_t(points_size));
+
+    // Calculate the valuation of each variable,
+    // i.e. each variable_id
+    // v(Pi) = { point | point_evaluation[Pi] == 1 },
+    // i.e. the evaluation of variable with id Pi is 1
+    // (the bit at position Pi is 1)
+    for(size_t point = 0; point < points_size; ++point)
+    {
+        const auto& point_evaluation = points_[point].get_evaluations();
+
+        // Iterate only set bits(1s)
+        auto Pi = point_evaluation.find_first();
+        while(Pi != variables_evaluations_t::npos)
+        {
+            // Adds the point to the v(Pi) set.
+            variable_evaluations_[Pi].set(point);
+            Pi = point_evaluation.find_next(Pi);
+        }
+    }
+}
+\end{lstlisting}
+
+	\newpage
+	\subsubsection*{Evaluating a term}
+	The implementation of the boolean valuation \ref{boolean-valuation} is in the \textit{term} class. The details are in the \textit{term.cpp} file.
+\\
+\noindent
+\textit{term.h}
+\begin{lstlisting}
+...
+struct evaluation_result
+{
+    enum class result_type : char
+    {
+        none,
+        constant_true,
+        constant_false,
+        term,
+    };
+
+    evaluation_result(result_type res_type, term* t);
+    evaluation_result(const evaluation_result&) = delete;
+    evaluation_result& operator=(const evaluation_result&) = delete;
+    evaluation_result(evaluation_result&& rhs) noexcept;
+    evaluation_result& operator=(evaluation_result&& rhs) noexcept;
+    ~evaluation_result();
+
+    auto release() -> term*;
+    auto get() const -> const term*;
+    void free();
+    auto is_constant() const -> bool;
+    auto is_term() const -> bool;
+    auto is_constant_true() const -> bool;
+    auto is_constant_false() const -> bool;
+
+    result_type type{result_type::none};
+	....
+};
+
+auto term::evaluate(
+	const variables_evaluations_block& evaluation_block,
+	bool skip_subterm_creation = false) const -> evaluation_result;
+\end{lstlisting}
+
+	\newpage
+	\subsubsection*{Modal points constructors}
+	\subsubsection*{Construction modal points for non-zero terms}
+	Creates a modal point for each non-zero term in the branch conjunction.
+\\
+\\
+\noindent
+\textit{model.h/cpp}
+\begin{lstlisting}
+auto model::construct_non_zero_model_points(
+	const terms_t& zero_terms_F, const formulas_t& contacts_F,
+	const terms_t& zero_terms_T) -> bool
+{
+    for(const auto& z : zero_terms_F)
+    {
+        // It will be overriten if succeed.
+        variables_evaluations_block eval(variables_mask_t(0));
+        if(!create_point_evaluation(z, eval, contacts_F, zero_terms_T))
+        {
+            return false;
+        }
+        points_.push_back(std::move(eval));
+    }
+
+    return true;
+}
+
+auto model::create_point_evaluation(
+	const term* t, variables_evaluations_block& out_evaluation,
+	const formulas_t& contacts_F,
+	const terms_t& zero_terms_T) const -> bool
+{
+    out_evaluation = variables_evaluations_block(used_variables_);
+
+    return does_point_evaluation_satisfies_basic_rules(
+               t, out_evaluation, contacts_F, zero_terms_T) ||
+           generate_next_point_evaluation(
+               t, out_evaluation, contacts_F, zero_terms_T);
+}
+
+auto model::does_point_evaluation_satisfies_basic_rules(
+	const term* t,
+	const variables_evaluations_block& evaluation,
+	const formulas_t& contacts_F,
+	const terms_t& zero_terms_T) const -> bool
+{
+    return t->evaluate(evaluation).is_constant_true() &&
+           are_zero_terms_T_satisfied(zero_terms_T, evaluation) &&
+           is_contacts_F_reflexive_rule_satisfied(
+               contacts_F, evaluation);
+}
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
+auto model::are_zero_terms_T_satisfied(
+	const terms_t& zero_terms_T,
+	const variables_evaluations_block& evaluation) const -> bool
+{
+    for(const auto& z : zero_terms_T)
+    {
+        if(!z->evaluate(evaluation).is_constant_false())
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+auto model::is_contacts_F_reflexive_rule_satisfied(
+	const formulas_t& contacts_F,
+	const variables_evaluations_block& evaluation) const -> bool
+{
+    for(const auto& c : contacts_F)
+    {
+        const auto left_term = c->get_left_child_term();
+        const auto right_term = c->get_right_child_term();
+        if(left_term->evaluate(evaluation).is_constant_true() &&
+           right_term->evaluate(evaluation).is_constant_true())
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+auto model::generate_next_point_evaluation(
+	const term* t, variables_evaluations_block& out_evaluation,
+	const formulas_t& contacts_F,
+	const terms_t& zero_terms_T) const -> bool
+{
+
+    while(out_evaluation.generate_next_evaluation())
+    {
+        if(does_point_evaluation_satisfies_basic_rules(
+              t, out_evaluation, contacts_F, zero_terms_T))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+\end{lstlisting}
+
+	\newpage
+	\subsubsection*{Construction modal points for contacts}
+	Creates a pair of modal points for each contact in the branch conjunction.
+\\
+\\
+\noindent
+\textit{model.h/cpp}
+\begin{lstlisting}
+auto model::construct_contact_model_points(
+	const formulas_t& contacts_T, const formulas_t& contacts_F,
+	const terms_t& zero_terms_T) -> bool
+{
+    for(const auto& c : contacts_T)
+    {
+        if(!construct_contact_points(c, contacts_F, zero_terms_T))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+auto model::is_contacts_F_connectivity_rule_satisfied(
+	const formulas_t& contacts_F,
+	const variables_evaluations_block& eval_a,
+	const variables_evaluations_block& eval_b) const -> bool
+{
+    for(const auto& c : contacts_F)
+    {
+        const auto l = c->get_left_child_term();
+        const auto r = c->get_right_child_term();
+        if((l->evaluate(eval_a).is_constant_true() &&
+            r->evaluate(eval_b).is_constant_true()) ||
+           (l->evaluate(eval_b).is_constant_true() &&
+            r->evaluate(eval_a).is_constant_true()))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
+auto model::construct_contact_points(
+	const formula* c, const formulas_t& contacts_F,
+	const terms_t& zero_terms_T) -> bool
+{
+    const auto left = c->get_left_child_term();
+    const auto right = c->get_right_child_term();
+
+    // It will be overridden if succeed.
+    variables_evaluations_block left_eval(variables_mask_t(0));
+    if(!create_point_evaluation(
+            left, left_eval, contacts_F, zero_terms_T))
+    {
+        return false;
+    }
+
+    do
+    {
+        variables_evaluations_block right_eval(variables_mask_t(0));
+        if(!create_point_evaluation(
+               right, right_eval, contacts_F, zero_terms_T))
+        {
+            return false;
+        }
+
+        do
+        {
+            if(is_contacts_F_connectivity_rule_satisfied(
+                  contacts_F, left_eval, right_eval))
+            {
+                points_.push_back(std::move(left_eval));
+                points_.push_back(std::move(right_eval));
+                return true;
+            }
+        } while(generate_next_point_evaluation(
+                    right, right_eval, contacts_F, zero_terms_T));
+    } while(generate_next_point_evaluation(
+                left, left_eval, contacts_F, zero_terms_T));
+
+    return false;
+}
+\end{lstlisting}
+
+	\newpage
+	\subsection{Building algorithm}
+	The building algorithm is simple. Creates a pair of suitable modal points for each contact. Creates a suitable modal point for each non-zero term. Lastly, updates the boolean variable valuation and connectivity matrix.
+\\
+\noindent
+\textit{model.h/cpp}
+\begin{lstlisting}
+auto model::create(
+	const formulas_t& contacts_T, const formulas_t& contacts_F,
+	const terms_t& zero_terms_T, const terms_t& zero_terms_F,
+	const variables_mask_t& used_variables,
+	const formula_mgr* mgr) -> bool
+{
+    ...
+    if(!construct_contact_model_points(
+            contacts_T, contacts_F, zero_terms_T) ||
+       !construct_non_zero_model_points(
+           zero_terms_F, contacts_F, zero_terms_T))
+    {
+        return false;
+
+    }
+
+    if(points_.empty() &&
+       !construct_point(contacts_F, zero_terms_T))
+    {
+        return false;
+    }
+
+    calculate_the_model_evaluation_of_each_variable();
+    create_contact_relations_first_2k_in_contact(
+        points_.size(), contacts_T.size());
+    return true;
+}
+\end{lstlisting}
 
 	\newpage
 	\section{Connected Contact Logics Implementation}
@@ -2062,12 +2449,16 @@ auto variables_evaluations_block::generate_next_evaluation() -> bool
 	\iffalse
 	TODO:
 	Model:
-	1) modal point representation
-	2) connectivity matrix
-	3) calculate_the_model_evaluation_of_each_variable - which points participates in the variable evaluation collection
-	4) 1 and 2 and 3 are the output of the model.
+	1)# modal point representation
+	2)# connectivity matrix
+	2')# variable evaluation representation
+	3)# calculate_the_model_evaluation_of_each_variable - which points participates in the variable evaluation collection
+	4)# 1 and 2 and 3 are the output of the model.
 	5) construct_contact_model_points
 	6) construct_non_zero_model_points
+	6') The whole algorithm
+
+	6'') t->evaluate is not explained
 
 	Connected model:
 	7) construct_all_valid_unique_points
@@ -2084,7 +2475,7 @@ auto variables_evaluations_block::generate_next_evaluation() -> bool
 	 - inductive def. for structures, e.g. terms
 	 - recursive for functions
 	 - R is reflexive and symetric - somewhere to mention it.
-
+	 - Code location for each snippet(only filename)
 	\fi
 
 	\newpage

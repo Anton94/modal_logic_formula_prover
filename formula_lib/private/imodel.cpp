@@ -26,7 +26,7 @@ void imodel::create_contact_relations_first_2k_in_contact(size_t number_of_point
     {
         const auto a = 2 * k;
         const auto b = a + 1;
-        contact_relations_[a].set(b);
+        contact_relations_[a].set(b); // Sets the b-th bit to 1.
         contact_relations_[b].set(a);
     }
 
