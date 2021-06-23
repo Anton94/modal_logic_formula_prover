@@ -62,7 +62,7 @@ public:
     };
 
     auto evaluate(const variables_evaluations_block& evaluation_block,
-                  bool skip_subterm_creation = false) const -> evaluation_result;
+                  bool skip_subterm_creation = true) const -> evaluation_result;
 
     enum class operation_type : char
     {

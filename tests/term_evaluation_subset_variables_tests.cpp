@@ -50,9 +50,10 @@ void evaluate(const std::string& term_for_evaluation, const std::string& expecte
         }
     }
 
-    auto res = t->evaluate(block);
+    auto res = t->evaluate(block, false);
     term* evaluated_term{nullptr};
-    if(res.type == term::evaluation_result::result_type::term)
+    const auto is_res_term = res.is_term();
+    if(is_res_term)
     {
         evaluated_term = res.release();
         trace() << "Result: " << *evaluated_term;
@@ -72,10 +73,16 @@ void evaluate(const std::string& term_for_evaluation, const std::string& expecte
     }
     else
     {
-        auto expected = mgr.get_internal_formula()->get_right_child_term();
-        CHECK(*evaluated_term == *expected);
-
-        delete evaluated_term;
+        if(is_res_term)
+        {
+            auto expected = mgr.get_internal_formula()->get_right_child_term();
+            CHECK(*evaluated_term == *expected);
+            delete evaluated_term;
+        }
+        else
+        {
+            CHECK((false && "Expected the evaluation to be a term but got a constant."));
+        }
     }
 }
 }
