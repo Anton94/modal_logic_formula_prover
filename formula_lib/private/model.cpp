@@ -2,6 +2,7 @@
 #include "formula.h"
 #include "formula_mgr.h"
 #include "term.h"
+#include "utils.h"
 #include "../include/thread_termiator.h"
 
 #include <cassert>
@@ -147,53 +148,6 @@ auto model::does_point_evaluation_satisfies_basic_rules(const term* t,
     return t->evaluate(evaluation).is_constant_true() &&
            are_zero_terms_T_satisfied(zero_terms_T, evaluation) &&
            is_contacts_F_reflexive_rule_satisfied(contacts_F, evaluation);
-}
-
-auto model::is_contacts_F_connectivity_rule_satisfied(const formulas_t& contacts_F,
-                                                      const variables_evaluations_block& eval_a,
-                                                      const variables_evaluations_block& eval_b) const -> bool
-{
-    for(const auto& c : contacts_F)
-    {
-        const auto l = c->get_left_child_term();
-        const auto r = c->get_right_child_term();
-        if((l->evaluate(eval_a).is_constant_true() &&
-            r->evaluate(eval_b).is_constant_true()) ||
-           (l->evaluate(eval_b).is_constant_true() &&
-            r->evaluate(eval_a).is_constant_true()))
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-auto model::are_zero_terms_T_satisfied(const terms_t& zero_terms_T,
-                                       const variables_evaluations_block& evaluation) const -> bool
-{
-    for(const auto& z : zero_terms_T)
-    {
-        if(!z->evaluate(evaluation).is_constant_false())
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-auto model::is_contacts_F_reflexive_rule_satisfied(const formulas_t& contacts_F,
-                                                   const variables_evaluations_block& evaluation) const
-    -> bool
-{
-    for(const auto& c : contacts_F)
-    {
-        if(c->get_left_child_term()->evaluate(evaluation).is_constant_true() &&
-           c->get_right_child_term()->evaluate(evaluation).is_constant_true())
-        {
-            return false;
-        }
-    }
-    return true;
 }
 
 auto model::construct_point(const formulas_t& contacts_F, const terms_t& zero_terms_T) -> bool

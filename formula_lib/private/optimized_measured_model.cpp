@@ -3,6 +3,7 @@
 #include "formula_mgr.h"
 #include "term.h"
 #include "thread_termiator.h"
+#include "utils.h"
 
 #include <algorithm>
 #include <cassert>

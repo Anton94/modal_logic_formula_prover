@@ -159,28 +159,8 @@ private:
                                                      const variables_evaluations_block& evaluation,
                                                      const formulas_t& contacts_F,
                                                      const terms_t& zero_terms_T) const -> bool;
-    /*
-     * Returns true if for each ~C(a,b) the following is satisfied:
-     *  !(evaluation_left evaluates a to true && evaluation_right evaluates b to true)
-     */
-    auto is_contacts_F_connectivity_rule_satisfied(const formulas_t& contacts_F,
-                                                   const variables_evaluations_block& eval_a,
-                                                   const variables_evaluations_block& eval_b) const
-        -> bool;
-protected:
 
-    /*
-     * Returns true if evaluation evaluates all zero terms to false
-     */
-    auto are_zero_terms_T_satisfied(const terms_t& zero_terms_T,
-                                    const variables_evaluations_block& evaluation) const -> bool;
-    /*
-     * Returns true if for each ~C(a,b) the following is satisfied:
-     *  !(evaluation evaluates a to true && evaluation evaluates b to true), i.e. the reflexivity of
-     * the point and the ~C
-     */
-    auto is_contacts_F_reflexive_rule_satisfied(const formulas_t& contacts_F,
-                                                const variables_evaluations_block& evaluation) const -> bool;
+protected:
     /*
      * Creates a point evaluation which does not break the =0 and ~C reflexivity rules.
      */

@@ -87,17 +87,6 @@ private:
      * all terms 'a' to false and the following is true: !(Pi[a]=1 && Pi[b]=1) === Pi[a]=0 || Pi[b]=0
      */
     void construct_all_valid_unique_points(const formulas_t& contacts_F, const terms_t& zero_terms_T);
-    /*
-     * Returns true if evaluation evaluates all zero terms to false
-     */
-    auto are_zero_terms_T_satisfied(const terms_t& zero_terms_T,
-                                    const variables_evaluations_block& evaluation) const -> bool;
-    /*
-     * Returns true if for each ~C(a,b) the following is satisfied:
-     *  !(evaluation evaluates a to true && evaluation evaluates b to true)
-     */
-    auto is_contacts_F_rule_satisfied_only_reflexivity(const formulas_t& contacts_F,
-                                                       const variables_evaluations_block& evaluation) const -> bool;
 
     /*
      * Returns true if all non-zero term's model evaluations are not empty.

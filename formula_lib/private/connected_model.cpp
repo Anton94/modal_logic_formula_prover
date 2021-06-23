@@ -2,6 +2,7 @@
 #include "formula.h"
 #include "formula_mgr.h"
 #include "term.h"
+#include "utils.h"
 #include "../include/thread_termiator.h"
 
 #include <cassert>
@@ -98,7 +99,7 @@ void connected_model::construct_all_valid_unique_points(const formulas_t& contac
         TERMINATE_IF_NEEDED(); // TODO: not every point but maybe every 100 or something
 
         if(are_zero_terms_T_satisfied(zero_terms_T, evaluation) &&
-           is_contacts_F_rule_satisfied_only_reflexivity(contacts_F, evaluation))
+           is_contacts_F_reflexive_rule_satisfied(contacts_F, evaluation))
         {
             points_.push_back(evaluation);
         }
@@ -116,35 +117,6 @@ void connected_model::clear()
     points_.clear();
 
     imodel::clear();
-}
-
-auto connected_model::are_zero_terms_T_satisfied(const terms_t& zero_terms_T,
-                                                 const variables_evaluations_block& evaluation) const -> bool
-{
-    for(const auto& z : zero_terms_T)
-    {
-        if(!z->evaluate(evaluation).is_constant_false())
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-auto connected_model::is_contacts_F_rule_satisfied_only_reflexivity(
-    const formulas_t& contacts_F, const variables_evaluations_block& evaluation) const -> bool
-{
-    for(const auto& c : contacts_F)
-    {
-        const auto a = c->get_left_child_term();
-        const auto b = c->get_right_child_term();
-
-        if(a->evaluate(evaluation).is_constant_true() && b->evaluate(evaluation).is_constant_true())
-        {
-            return false;
-        }
-    }
-    return true;
 }
 
 auto connected_model::is_zero_terms_F_rule_satisfied(const terms_t& zero_terms_F) const -> bool
