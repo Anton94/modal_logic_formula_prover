@@ -164,8 +164,10 @@ auto connected_model::is_contact_satisfied(const formula* c) const -> bool
 {
     assert(c && c->get_operation_type() == formula::operation_t::c);
 
-    const auto v_a = c->get_left_child_term()->evaluate(variable_evaluations_, points_.size());
-    const auto v_b = c->get_right_child_term()->evaluate(variable_evaluations_, points_.size());
+    const auto left_t = c->get_left_child_term();
+    const auto right_t = c->get_right_child_term();
+    const auto v_a = left_t->evaluate(variable_evaluations_, points_.size());
+    const auto v_b = right_t->evaluate(variable_evaluations_, points_.size());
 
     auto point_from_v_a = v_a.find_first(); // TODO: maybe iterate over the set with less items
     while (point_from_v_a != model_points_set_t::npos)
@@ -258,7 +260,7 @@ auto connected_model::get_connected_component(size_t root_point_id, model_points
     {
         const auto point_id = q.front();
         q.pop();
-        if(!not_visited_points.test(point_id)) // while the point waits in the queue some other point could also push it and
+        if(!not_visited_points.test(point_id)) // while the point waits in the queue some other point could also push it.
         {
             continue;
         }
@@ -290,12 +292,14 @@ void connected_model::reduce_variable_evaluations_to_subset_of_points(const mode
 
 void connected_model::reduce_model_to_subset_of_points(const model_points_set_t& points_subset)
 {
+    // Construct the reduced points collection.
     points_t reduced_points;
     const auto reduced_points_size = points_subset.count();
     reduced_points.reserve(reduced_points_size);
+    // Let K is the number of points in @points_subset.
+    // All collections should have size K. That require a mapping between old points indexes and the reduced.
     std::unordered_map<size_t, size_t> point_id_old_to_new;
     point_id_old_to_new.reserve(reduced_points_size);
-
     auto point = points_subset.find_first();
     while (point != model_points_set_t::npos)
     {
@@ -305,7 +309,8 @@ void connected_model::reduce_model_to_subset_of_points(const model_points_set_t&
         point = points_subset.find_next(point);
     }
 
-    // TODO: example, explaining, etc.
+    // Converts the @points_subset of old points to a subset of reduced points.
+    // The old points have a (potential) bigger container size than the reduced points.
     auto map_subset_of_points_to_reduced_points = [&](const model_points_set_t& points_subset) -> model_points_set_t
     {
         model_points_set_t mapped_subset(reduced_points_size); // all 0s
@@ -319,7 +324,7 @@ void connected_model::reduce_model_to_subset_of_points(const model_points_set_t&
         return mapped_subset;
     };
 
-    contacts_t reduced_contact_relations(reduced_points_size, model_points_set_t(reduced_points_size)); // KxK matrix of 0s (K=@reduced_points_size)
+    contacts_t reduced_contact_relations(reduced_points_size, model_points_set_t(reduced_points_size)); // KxK matrix of 0s.
 
     point = points_subset.find_first();
     while (point != model_points_set_t::npos)
@@ -332,6 +337,7 @@ void connected_model::reduce_model_to_subset_of_points(const model_points_set_t&
         point = points_subset.find_next(point);
     }
 
+    // Update the models data.
     points_ = std::move(reduced_points);
     contact_relations_ = std::move(reduced_contact_relations);
     calculate_the_model_evaluation_of_each_variable();

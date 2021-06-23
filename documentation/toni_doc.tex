@@ -680,6 +680,7 @@
 	\end{defn}
 
 	\subsection{Connected model building}
+	\label{connected-model-building}
 
 		Let $\beta$ be a branch conjunction as in \ref{branch-conjunction} :
 		\nonumber\BranchConjunction
@@ -2178,10 +2179,12 @@ void model::calculate_the_model_evaluation_of_each_variable()
 	\newpage
 	\subsubsection*{Evaluating a term}
 	The implementation of the boolean valuation \ref{boolean-valuation} is in the \textit{term} class. The details are in the \textit{term.cpp} file.
+	The boolean valuation assings a constant true or false to the term for some variable evaluation. This variable evaluation assings a constant true or false to each boolean variable in the term.
 \\
 \noindent
 \textit{term.h}
 \begin{lstlisting}
+class term {
 ...
 struct evaluation_result
 {
@@ -2190,37 +2193,115 @@ struct evaluation_result
         none,
         constant_true,
         constant_false,
-        term,
     };
 
-    evaluation_result(result_type res_type, term* t);
-    evaluation_result(const evaluation_result&) = delete;
-    evaluation_result& operator=(const evaluation_result&) = delete;
-    evaluation_result(evaluation_result&& rhs) noexcept;
-    evaluation_result& operator=(evaluation_result&& rhs) noexcept;
-    ~evaluation_result();
-
-    auto release() -> term*;
-    auto get() const -> const term*;
-    void free();
-    auto is_constant() const -> bool;
-    auto is_term() const -> bool;
     auto is_constant_true() const -> bool;
     auto is_constant_false() const -> bool;
 
     result_type type{result_type::none};
 	....
 };
+...
+};
 
+// Ignore the second argument for subterm creation.
+// It is a support for a partial variable evaluation block
+// which does not evaluate all boolean variables in the term.
+// Then it will evaluate all known variables and reduces the constants.
+// Returns it as a subterm.
+// It is not used because it was needed
+// for an old model building algorithm.
 auto term::evaluate(
 	const variables_evaluations_block& evaluation_block,
-	bool skip_subterm_creation = false) const -> evaluation_result;
+	bool skip_subterm_creation = true) const -> evaluation_result;
+\end{lstlisting}
+
+	\newpage
+	\subsubsection*{Zero terms satisfaction}
+	Checks whether a modal point(variable evaluation) does not conflict with the zero terms. The point should not be part of any zero term evaluation. So, the point should evaluate all zero terms to constant false.
+\\
+\noindent
+\textit{utils.h/cpp}
+\begin{lstlisting}
+/// Returns true if the evaluation evaluates all zero terms to false.
+auto are_zero_terms_T_satisfied(
+	const terms_t& zero_terms_T,
+	const variables_evaluations_block& evaluation) -> bool
+{
+    // The evaluation should evaluate all zero terms to constant false.
+    // That way it will not participate in any of their evaluations.
+    for(const auto& z : zero_terms_T)
+    {
+        if(!z->evaluate(evaluation).is_constant_false())
+        {
+            return false;
+        }
+    }
+    return true;
+}
+\end{lstlisting}
+
+	\newpage
+	\subsubsection*{Non-contacts satisfaction}
+	Checks whether a modal point (or a pair of points) does not conflict with the non-contacts. It is splitted to two components. Based on the reflexivity and connectivity rules.
+
+	For the reflexivity it is sufficient to verify that the point is not part of the both non-contact terms evaluations. So, the point should not evaluate both terms to constant true.
+
+	For the connectivity it is sufficient to verify that the pair of points does not participate in the non-contact terms evaluations. So, the points should not evaluate the terms to constant true.
+\\
+\noindent
+\textit{utils.h/cpp}
+\begin{lstlisting}
+auto is_contacts_F_reflexive_rule_satisfied(
+	const formulas_t& contacts_F,
+	const variables_evaluations_block& evaluation) -> bool
+{
+    for(const auto& c : contacts_F)
+    {
+        // The evaluation should not be parth of both
+        // non-contact term's evaluations.
+        const auto left_t = c->get_left_child_term();
+        const auto right_t = c->get_right_child_term();
+        if(left_t->evaluate(evaluation).is_constant_true() &&
+           right_t->evaluate(evaluation).is_constant_true())
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+auto is_contacts_F_connectivity_rule_satisfied(
+	const formulas_t& contacts_F,
+	const variables_evaluations_block& eval_a,
+	const variables_evaluations_block& eval_b) -> bool
+{
+    for(const auto& c : contacts_F)
+    {
+        // In order the eval_a and eval_b to not conflict with a
+        // non-contact they should not participate in the non-contact
+        // term's evaluations. In other words, both evaluations
+        // should not evaluate both terms to true.
+        const auto l = c->get_left_child_term();
+        const auto r = c->get_right_child_term();
+        if((l->evaluate(eval_a).is_constant_true() &&
+            r->evaluate(eval_b).is_constant_true()) ||
+           (l->evaluate(eval_b).is_constant_true() &&
+            r->evaluate(eval_a).is_constant_true()))
+        {
+            // The reflexivity case is not taken into account here.
+            return false;
+        }
+    }
+    return true;
+}
+
 \end{lstlisting}
 
 	\newpage
 	\subsubsection*{Modal points constructors}
 	\subsubsection*{Construction modal points for non-zero terms}
-	Creates a modal point for each non-zero term in the branch conjunction.
+	Creates a modal point for each non-zero term in the branch conjunction. The point should not conflict with any zero term or non-contact.
 \\
 \\
 \noindent
@@ -2285,23 +2366,6 @@ auto model::are_zero_terms_T_satisfied(
     return true;
 }
 
-auto model::is_contacts_F_reflexive_rule_satisfied(
-	const formulas_t& contacts_F,
-	const variables_evaluations_block& evaluation) const -> bool
-{
-    for(const auto& c : contacts_F)
-    {
-        const auto left_term = c->get_left_child_term();
-        const auto right_term = c->get_right_child_term();
-        if(left_term->evaluate(evaluation).is_constant_true() &&
-           right_term->evaluate(evaluation).is_constant_true())
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
 auto model::generate_next_point_evaluation(
 	const term* t, variables_evaluations_block& out_evaluation,
 	const formulas_t& contacts_F,
@@ -2340,26 +2404,6 @@ auto model::construct_contact_model_points(
         }
     }
 
-    return true;
-}
-
-auto model::is_contacts_F_connectivity_rule_satisfied(
-	const formulas_t& contacts_F,
-	const variables_evaluations_block& eval_a,
-	const variables_evaluations_block& eval_b) const -> bool
-{
-    for(const auto& c : contacts_F)
-    {
-        const auto l = c->get_left_child_term();
-        const auto r = c->get_right_child_term();
-        if((l->evaluate(eval_a).is_constant_true() &&
-            r->evaluate(eval_b).is_constant_true()) ||
-           (l->evaluate(eval_b).is_constant_true() &&
-            r->evaluate(eval_a).is_constant_true()))
-        {
-            return false;
-        }
-    }
     return true;
 }
 \end{lstlisting}
@@ -2445,32 +2489,484 @@ auto model::create(
 
 	\newpage
 	\section{Connected Contact Logics Implementation}
+	The connected model reuses core part of the model. It have the same modal points contacts and valuation representation. The model output is also the same. Uses some of the described Handy methods in the Model implementation section.
+
+	\subsection{Handy methods}
+	\subsubsection*{Construction of all valid modal points}
+	The first step of the algorithm for building a connected model is to create all valid modal points. A valid modal point is a point which does not conflict with any zero term or non-contact.
+\\
+\noindent
+\textit{connected\_model.h/cpp}
+\begin{lstlisting}
+void connected_model::construct_all_valid_unique_points(
+	const formulas_t& contacts_F,
+	const terms_t& zero_terms_T)
+{
+    variables_evaluations_block evaluation(used_variables_);
+
+    do
+    {
+        if(are_zero_terms_T_satisfied(zero_terms_T, evaluation) &&
+           is_contacts_F_rule_satisfied_only_reflexivity(
+               contacts_F, evaluation))
+        {
+            points_.push_back(evaluation);
+        }
+    } while(evaluation.generate_next_evaluation());
+}
+\end{lstlisting}
+
+	\newpage
+	\subsubsection*{Evaluating a term with a valuation}
+	The term evaluation with the $variable\_evaluation\_block$ returns a constant true or false. It tells whether the variable evaluation participates in the term's evaluation.
+
+	Another way of evaluating a term is via the whole valuation. It returns a set of modal points which participate in it's evaluation. It is implemented in the \textit{term} class.
+\\
+\noindent
+\textit{term.h/cpp}
+\begin{lstlisting}
+auto term::evaluate(
+	const variable_id_to_points_t& variable_evaluations,
+	const size_t points_count) const -> model_points_set_t
+{
+    switch(op_)
+    {
+        case operation_t::constant_true:
+            return ~model_points_set_t(points_count);
+        case operation_t::constant_false:
+            return model_points_set_t(points_count);
+        case operation_t::union_:
+            return childs_.left->evaluate(variable_evaluations,
+                                          points_count) |
+                   childs_.right->evaluate(variable_evaluations,
+                                           points_count);
+        case operation_t::intersection:
+            return childs_.left->evaluate(variable_evaluations,
+                                          points_count) &
+                   childs_.right->evaluate(variable_evaluations,
+                                           points_count);
+        case operation_t::complement:
+            return ~childs_.left->evaluate(variable_evaluations,
+                                           points_count);
+        case operation_t::variable:
+            // Returns the evaluation for the variable.
+            return variable_evaluations[variable_id_];
+        default:
+            assert(false && "Unrecognized.");
+            return model_points_set_t(points_count);
+    }
+}
+\end{lstlisting}
+
+	\newpage
+	\subsubsection*{Contacts satisfcation}
+	Checks whether the contacts are satisfied. It is sufficient to verify that there is a pair of points in the contact terms evaluations which are in contact.
+\\
+\\
+\noindent
+\textit{connected\_model.h/cpp}
+\begin{lstlisting}
+auto connected_model::is_contacts_T_rule_satisfied(
+	const formulas_t& contacts_T) const -> bool
+{
+    // C(a,b)
+    for(const auto& c : contacts_T)
+    {
+        if(!is_contact_satisfied(c))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+auto connected_model::is_contact_satisfied(
+	const formula* c) const -> bool
+{
+    const auto left_t = c->get_left_child_term();
+    const auto right_t = c->get_right_child_term();
+    const auto v_a = left_t->evaluate(variable_evaluations_,
+                                      points_.size());
+    const auto v_b = right_t->evaluate(variable_evaluations_,
+                                       points_.size());
+
+    auto point_from_v_a = v_a.find_first();
+    while (point_from_v_a != model_points_set_t::npos)
+    {
+        const auto& contacts_of_point_from_v_a =
+            contact_relations_[point_from_v_a];
+        if ((contacts_of_point_from_v_a & v_b).any())
+        {
+            return true;
+        }
+
+        point_from_v_a = v_a.find_next(point_from_v_a);
+    }
+    return false;
+}
+\end{lstlisting}
+
+	\newpage
+	\subsubsection*{Contacts existance satisfcation}
+	Checks whether the contacts have at least one point in their term's evaluations. It's a faster verification than the whole contact satisfication.
+\\
+\\
+\noindent
+\textit{connected\_model.h/cpp}
+\begin{lstlisting}
+auto connected_model::is_contacts_T_existence_rule_satisfied(
+	const formulas_t& contacts_T) const -> bool
+{
+    for(const auto& c : contacts_T)
+    {
+        const auto a = c->get_left_child_term();
+        const auto b = c->get_right_child_term();
+
+        if(a->evaluate(variable_evaluations_, points_.size()).none() ||
+           b->evaluate(variable_evaluations_, points_.size()).none())
+        {
+            return false;
+        }
+    }
+    return true;
+}
+\end{lstlisting}
+
+	\newpage
+	\subsubsection*{Non-zero term satisfaction}
+	Checks whether the non-zero terms are satisfied. It is sufficient to verify that there is a at least one modal point in each non-zero term's evaluation.
+\\
+\\
+\noindent
+\textit{connected\_model.h/cpp}
+\begin{lstlisting}
+auto connected_model::is_zero_terms_F_rule_satisfied(
+	const terms_t& zero_terms_F) const -> bool
+{
+    for(const auto& z : zero_terms_F)
+    {
+        if(z->evaluate(variable_evaluations_, points_.size()).none())
+        {
+            return false;
+        }
+    }
+    return true;
+}
+\end{lstlisting}
+
+	\newpage
+	\subsubsection*{Contact matrix building}
+	The first step of the algorithm for building a connected model is to create all valid modal points. A valid modal point is a point which does not conflict with any zero term or non-contact.
+\\
+\noindent
+\textit{connected\_model.h/cpp}
+\begin{lstlisting}
+/*
+* Builds N x N bit matrix with contact relations between all points,
+* which later reduces in order to satisfy all ~C atomic formulas.
+* Returns true if the produced contact relations satisfy all
+* contact atomic formulas.
+*/
+auto connected_model::build_contact_relations_matrix(
+    const formulas_t& contacts_T, const formulas_t& contacts_F) -> bool
+{
+    const auto point_size = points_.size();
+    contact_relations_.clear();
+    // Fill NxN matrix with 1s.
+    contact_relations_.resize(point_size,
+                              ~model_points_set_t(point_size));
+
+    // Removes the connection between each point in v_l
+    // and all points from v_r.
+    auto connection_remover = [&](auto& v_l, auto& v_r)
+    {
+        const auto neg_v_r = ~v_r;
+
+        auto point_from_v_l = v_l.find_first();
+        while (point_from_v_l != model_points_set_t::npos)
+        {
+            auto& contacts_of_point_from_v_l =
+                contact_relations_[point_from_v_l];
+            // Remove all points in @contacts_of_point_from_v_l
+            // which are also in @v_r.
+            contacts_of_point_from_v_l &= neg_v_r;
+
+            point_from_v_l = v_l.find_next(point_from_v_l);
+        }
+    };
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
+    // ~C(a,b)
+    for(const auto& c : contacts_F)
+    {
+        const auto left_t = c->get_left_child_term();
+        const auto right_t = c->get_right_child_term();
+        const auto v_a = left_t->evaluate(variable_evaluations_,
+                                          points_.size());
+        const auto v_b = right_t()->evaluate(variable_evaluations_,
+                                             points_.size());
+		// There are no common points, because we built them that way.
+        assert((v_a & v_b).none());
+
+        connection_remover(v_a, v_b);
+        connection_remover(v_b, v_a);
+    }
+
+    return is_contacts_T_rule_satisfied(contacts_T);
+}
+\end{lstlisting}
+
+	\newpage
+	\subsubsection*{Connected components}
+	Let us look at the model as a graph. The modal points are the vertices. The contacts between them are the edges. This method returns a vector of connected components in the graph. Each connected component is described by the points in it. The algorithm is a standard BFS from each not visited node in the graph.
+\\
+\\
+\noindent
+\textit{connected\_model.h/cpp}
+\begin{lstlisting}
+auto connected_model::get_connected_components()
+	const -> std::vector<model_points_set_t>
+{
+    if(points_.empty())
+    {
+        return {};
+    }
+
+    std::vector<model_points_set_t> connected_components;
+    model_points_set_t not_visited_points(points_.size());
+    // Bitset of 1s for the not visited points, inverted
+    // because we have fast finding of 1s in the bitset.
+    not_visited_points.set();
+
+    size_t root_point_id = not_visited_points.find_first();
+    while(root_point_id != model_points_set_t::npos)
+    {
+        auto connected_component =
+            get_connected_component(root_point_id, not_visited_points);
+        connected_components.push_back(std::move(connected_component));
+
+        root_point_id = not_visited_points.find_next(root_point_id);
+    }
+    return connected_components;
+}
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
+auto connected_model::get_connected_component(
+	size_t root_point_id,
+	model_points_set_t& not_visited_points)
+	const -> model_points_set_t
+{
+    assert(not_visited_points.test(root_point_id));
+
+    model_points_set_t connected_component(points_.size());
+
+    // A simple traversing
+    std::queue<size_t> q;
+    q.push(root_point_id);
+
+    while(!q.empty())
+    {
+        const auto point_id = q.front();
+        q.pop();
+        // While the point waits in the queue some other point
+        // could also push it.
+        if(!not_visited_points.test(point_id))
+        {
+            continue;
+        }
+
+        const auto& point_connections = contact_relations_[point_id];
+        auto connected_point_id = point_connections.find_first();
+        while(connected_point_id != model_points_set_t::npos)
+        {
+            if(not_visited_points.test(connected_point_id))
+            {
+                connected_component.set(point_id);
+                not_visited_points.reset(point_id);
+                q.push(connected_point_id);
+            }
+            connected_point_id =
+                point_connections.find_next(connected_point_id);
+        }
+    }
+
+    return connected_component;
+}
+\end{lstlisting}
+
+	\subsubsection*{Reduce variable evaluations to subset of points}
+	Leaves only a selected subset of points in the variable evaluations.
+\\
+\\
+\noindent
+\textit{connected\_model.h/cpp}
+\begin{lstlisting}
+void connected_model::reduce_variable_evaluations_to_subset_of_points(
+	const model_points_set_t& points_subset)
+{
+    for(auto& evaluation : variable_evaluations_)
+    {
+        evaluation &= points_subset;
+    }
+}
+\end{lstlisting}
+
+	\newpage
+	\subsubsection*{Reduce model to subset of points}
+	Leaves only a selected subset of points in the model. Updates the variable evaluations and the contact relations between them.
+\\
+\\
+\noindent
+\textit{connected\_model.h/cpp}
+\begin{lstlisting}
+void connected_model::reduce_model_to_subset_of_points(
+	const model_points_set_t& points_subset)
+{
+    // Construct the reduced points collection.
+    points_t reduced_points;
+    const auto reduced_points_size = points_subset.count();
+    reduced_points.reserve(reduced_points_size);
+    // Let K is the number of points in @points_subset.
+    // All collections should have size K. That require a mapping
+    // between old points indexes and the reduced.
+    std::unordered_map<size_t, size_t> point_id_old_to_new;
+    point_id_old_to_new.reserve(reduced_points_size);
+    auto point = points_subset.find_first();
+    while (point != model_points_set_t::npos)
+    {
+        point_id_old_to_new[point] = reduced_points.size();
+
+        reduced_points.push_back(points_[point]);
+        point = points_subset.find_next(point);
+    }
+
+    // Converts the @points_subset of old points to a subset of
+    // reduced points. The old points have a (potential) bigger
+    // container size than the reduced points.
+    auto map_subset_of_points_to_reduced_points =
+        [&](const model_points_set_t& points_subset)->model_points_set_t
+    {
+        // All 0s.
+        model_points_set_t mapped_subset(reduced_points_size);
+
+        auto point = points_subset.find_first();
+        while (point != model_points_set_t::npos)
+        {
+            mapped_subset.set(point_id_old_to_new[point]);
+            point = points_subset.find_next(point);
+        }
+        return mapped_subset;
+    };
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
+    // KxK matrix of 0s.
+    contacts_t reduced_contact_relations(
+        reduced_points_size,
+        model_points_set_t(reduced_points_size));
+
+    point = points_subset.find_first();
+    while (point != model_points_set_t::npos)
+    {
+        auto& point_contacts = contact_relations_[point];
+        point_contacts &= points_subset; // Remove extra contacts.
+
+        const auto reduced_point_id = point_id_old_to_new[point];
+        reduced_contact_relations[reduced_point_id] =
+            map_subset_of_points_to_reduced_points(point_contacts);
+        point = points_subset.find_next(point);
+    }
+
+    // Update the models data.
+    points_ = std::move(reduced_points);
+    contact_relations_ = std::move(reduced_contact_relations);
+    calculate_the_model_evaluation_of_each_variable();
+}
+\end{lstlisting}
+
+	\newpage
+	\subsection{Building algorithm}
+	The building algorithm used the descibed methods. Follows the \ref{connected-model-building} connected model building algorithm.
+\\
+\\
+\noindent
+\textit{connected\_model.h/cpp}
+\begin{lstlisting}
+auto connected_model::create(
+	const formulas_t& contacts_T, const formulas_t& contacts_F,
+	const terms_t& zero_terms_T, const terms_t& zero_terms_F,
+	const formulas_t&, const formulas_t&,
+	const variables_mask_t& used_variables,
+	const formula_mgr* mgr) -> bool
+{
+    construct_all_valid_unique_points(contacts_F, zero_terms_T);
+
+    if(points_.empty())
+    {
+        trace() << "Unable to create even one model point which "
+        "does not break the =0 or the reflexivity of ~C atomics.";
+        return false;
+    }
+
+    calculate_the_model_evaluation_of_each_variable();
+
+    if(!is_zero_terms_F_rule_satisfied(zero_terms_F) ||
+       !is_contacts_T_existence_rule_satisfied(contacts_T))
+    {
+        trace() << "Unable to create model points even to satisfy "
+        "the existence of points in the model evaluation "
+        "of != 0 and contact terms.";
+        return false;
+    }
+
+    if(!build_contact_relations_matrix(contacts_T, contacts_F))
+    {
+        trace() << "Unable to create contact relations which "
+        "satisfies ~C and C atomic formulas.";
+        return false;
+    }
+
+    // Now, we have in some sence the biggest model (w.r.t number
+    // of unique points and maximal contact relations between them).
+    trace() << "Will try to find a connected component of points "
+    "(which itself is a satisfiable model) in the following "
+    "satisfiable model:\n" << *this;
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
+    const auto original_variable_evaluations = variable_evaluations_;
+    const auto connected_components = get_connected_components();
+    for(const auto& connected_component : connected_components)
+    {
+        // Restrict the variable evaluations to only those points
+        // which are in the @connected_component.
+        reduce_variable_evaluations_to_subset_of_points(
+            connected_component);
+
+        if(is_zero_terms_F_rule_satisfied(zero_terms_F) &&
+           is_contacts_T_rule_satisfied(contacts_T))
+        {
+            // Good. The connected component is also a valid model.
+            // Remove all other points(outside the connected component)
+            // because we do not need them.
+            reduce_model_to_subset_of_points(connected_component);
+            trace() << "Found a connected component which is also "
+            "a satisfiable model for the formula:\n" << *this;
+            return true;
+        }
+
+        // Rollback the variable_evaluations.
+        variable_evaluations_ = original_variable_evaluations;
+    }
+
+    trace() << "Unable to find such connected component of points.";
+    return false;
+}
+\end{lstlisting}
 
 	\iffalse
-	TODO:
-	Model:
-	1)# modal point representation
-	2)# connectivity matrix
-	2')# variable evaluation representation
-	3)# calculate_the_model_evaluation_of_each_variable - which points participates in the variable evaluation collection
-	4)# 1 and 2 and 3 are the output of the model.
-	5) construct_contact_model_points
-	6) construct_non_zero_model_points
-	6') The whole algorithm
-
-	6'') t->evaluate is not explained
-
-	Connected model:
-	7) construct_all_valid_unique_points
-	8) reuse calculate_the_model_evaluation_of_each_variable
-	9) is_zero_terms_F_rule_satisfied
-	10) is_contacts_T_existence_rule_satisfied
-	11) build_contact_relations_matrix
-    Now, we have in some sence the biggest model(w.r.t number of unique points and maximal contact relations between them)
-    12) get_connected_components
-    13) reduce_variable_evaluations_to_subset_of_points
-    14) reduce_model_to_subset_of_points
-
 	TODOs:
 	 - inductive def. for structures, e.g. terms
 	 - recursive for functions
