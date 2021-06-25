@@ -29,5 +29,3 @@ add_subdirectory (tests)
 #add_subdirectory (client)
 add_subdirectory (parser)
 
-file(COPY simple_client/ DESTINATION client/dist)
-

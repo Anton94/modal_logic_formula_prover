@@ -46,3 +46,8 @@ elseif(${ENABLE_ADDRESS_UB_LEAK_SANITIZERS})
 endif()
 
 include(ECMEnableSanitizers)
+
+add_custom_target(copy_client
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/simple_client ${CMAKE_BINARY_DIR}/client/dist
+)
+add_dependencies(${executable} copy_client)
