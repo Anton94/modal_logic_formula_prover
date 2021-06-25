@@ -25,8 +25,25 @@
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{defn}[theorem]{Deffinition}
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{axiom}[theorem]{Axiom}
+
+\newcommand{\vVar}{\mathscr{v}_{var}}
+\newcommand{\Var}{\mathbb{V}ar}
+\newcommand{\vE}{\mathscr{v}}
+\newcommand{\vBool}{\mathscr{v}_B}
+\newcommand{\Ts}{\mathcal{T}_s}
+\newcommand{\BranchConjunction}{%
+\begin{align*}
+			\bigwedge_{i=1}^{I} \; C(a_i, b_i) \:\: & \wedge \:\: 
+			\bigwedge_{k=1}^{K} \; \neg C(e_k, f_k) \:\: \wedge \:\: \\
+			\bigwedge_{j=1}^{J} \; d_j \neq 0 \:\: & \wedge \:\:
+			\bigwedge_{l=1}^{L} \; g_l = 0 \:\: \wedge \:\:\\
+			\bigwedge_{p=1}^{P} \; m_p \le_\mu n_p \:\: &\wedge \:\:
+			\bigwedge_{q=1}^{Q} \; u_q <_\mu v_q \:\:
+\end{align*}%
+}
 
 \lstset { %
     language=C++,
@@ -329,7 +346,7 @@ For example let us take:
 		\end{equation*}
 With the above W, we can define the relation R, for example let $x, y \in W$, then:
 		\begin{equation*}
-			R = \text{"x has similar population count with y"}
+			R(x,y) = \text{"x has similar population count with y"}
 		\end{equation*}
 
 Having (W, R) as defined above, we conclude the followings: 
@@ -507,7 +524,201 @@ $\Longleftarrow$
 \end{lemma}
 
 	\newpage
-	\section{Quantative Contact Logics}
+	\section{Quantitative Contact Logics}
+		The quantitative contact logics is basically the region based contact logics with the addition of quantitative measures. The quantitative measure are represented 
+		with two new atomic formulas:
+		\begin{itemize} 
+			\item $\le_\mu$
+			\item $<_\mu$
+		\end{itemize}
+		Where $\mu$ is a measure function. Detailed definition is given in <TODO Ref Measured Model>.
+	
+	\section{Formula Satisfiability} 
+The satisfiability verification for a given formula is done by constructing a model. The formula is satisfiable only if such model exists. The model construction is done in several steps. Foremost the tableau method is used to simplify the problem and to detect contradictions earlier in the process, even before the model construction. If all branches of the tableau method are closed, then a model in which the given formula is satisfiable does not exists. If there are open branches in the tableau result, then semantical reasoning shall be done in order to construct a model, if such model exists. Let us define few definitions before we define define the process of formula satisfiability. 
+
+	\paragraph{Tableau Branch Conjunction}
+		A branch from the tableau method consists of signed atomic formulas. For a formula to be satisfiable, it means that all atomic formulas in a tableau branch should be satisfied. This in terms can be represented as a conjunction of the atomic formulas. Let's call it a branch conjunction. For the quantitative contact logics the conjunction contains the signed contact, zero term and measure atomic formulas.
+	\begin{defn}
+		Let $\varphi$ be a formula and let $\mathcal{T}$ be a tableau from the $\varphi$ formula. Then a branch of the tableau method is defined with the following notation:
+		\begin{align*}
+				B = \{T C(a_i, b_i) \mid i \in \{1, \ldots, I\} \} &\cup 
+					\{F C(e_k, f_k) \mid k \in \{1, \ldots, K\} \} \cup \\
+					\{F d_j = 0 \mid j \in \{1, \ldots, J\} \} &\cup 
+					\{T g_l = 0 \mid l \in \{1, \ldots, L\} \} \cup \\
+					\{T m_p \le_\mu n_p \mid p \in \{1, \ldots, P\} \} &\cup 
+					\{F u_q \le_\mu v_q \mid q \in \{1, \ldots, Q\} \}
+		\end{align*}
+	\end{defn}
+	The branch conjunction of the tableau method branch is defined as:
+	\BranchConjunction
+
+	\begin{defn}
+		Let B be a branch conjunction, then the set of all variables used in all atomic formulas in B is defined as $\Var_B$.
+	\end{defn}
+
+	\begin{defn}
+		Let B be a branch conjunction and let $\Var_B$ be the set of all variables in B, then the variable valuation $\vVar$ defines a mapping from $\Var_B$ to a boolean value, namely:
+		\begin{align*}
+			\vVar : \Var_B \rightarrow \{ \textbf{false}, \textbf{true}\}
+		\end{align*}
+	\end{defn}
+
+	\paragraph{Boolean valuation} 
+		Let $\vVar$ be a variable valuation and let $\Ts$ be the set of all terms,
+		then the function $\vBool : \Ts \rightarrow \{ \textbf{false}, \textbf{true}\}$ is called a boolean valuation and is defined recursively as:
+		\begin{itemize}
+			\item $\vBool(0) = \textbf{false}$
+			\item $\vBool(1) = \textbf{true}$
+			\item $\vBool(p) = \vVar(p), where p \in \Var_B$
+			\item $\vBool(a \sqcap b) = \vBool(a) \land \vBool(b)$
+			\item $\vBool(a \sqcup b) = \vBool(a) \lor \vBool(b)$
+			\item $\vBool(a*) = \neg \vBool(a)$
+		\end{itemize}
+
+	\begin{defn} 
+		A model point is represented by a variable valuation.
+	\end{defn}
+
+	\begin{defn}
+		Let a be a term, let $\vVar$ be a variable valuation which is a representation of a model point p. Then the following holds:
+		\begin{align*}
+			\vBool(a) = true \rightarrow p \in \vE(a)
+		\end{align*}
+		Where $\vE$ is the model valuation function. In such a case when $\vBool(a) = \textbf{true}$ we will say that the point p is \textbf{valid}.
+	\end{defn}
+	
+	\paragraph{Model Point Creation}
+		Constructing a valid model for a given branch conjunction of a formula consists of finding W, R and the model valuation function $\vE$.
+		To construct W we are going to generate the infimum number of model points in such a way to keep the formula satisfied at all times.
+		If this is not possible, then a model does not exist in the given branch conjunction. Generating only the minimum 
+		required model points helps out to avoid unnecessary computations.
+
+	\begin{defn}
+		Let $\Var_B$ be the set of all variables in a branch conjunction B and let a be a term.
+		Then a model point p is constructed by generating a variable valuation, such that p is valid.
+		The generation of a valid point p is done by generation of a variable valuation for which $\vBool(a) = 1$. 
+		Let n be the number of variables in $\Var_B$, then all possible variants of a variable valuations are $2^n$.
+	\end{defn}
+
+	\begin{defn}
+		Let B be a branch conjunction as:
+		\BranchConjunction
+		The following atomic formulas require model point existence:
+		\begin{itemize}
+			\item $C(a_i, b_i), \textit{ for } i < I$
+			\item $d_j \neq 0, \textit{ for } j < J$
+			\item $m_p \le_\mu n_p, \textit{ for } p < P$
+			\item $u_q <_\mu v_q, \textit{ for } q < Q$
+		\end{itemize}
+	\end{defn}
+
+	\begin{defn}
+		Let B be a branch conjunction and $C(a, b) \in B$, where a and b are two terms. Then two model points are generated p1 and p2 with their corresponding variable valuations $\vVar^1$ and $\vVar^2$ such that:
+		\begin{itemize}
+			\item $\vBool(a) = \textbf{true}$
+			\item $\vBool(b) = \textbf{true}$
+		\end{itemize}
+		Along with the generation of a valid variable valuation, the R relations is extended as well, namely the following relations are added:
+		\begin{itemize}
+			\item $p_1Rp_1$ - reflexivity of the modal point $p_1$
+			\item $p_2Rp_2$ - reflexivity of the modal point $p_2$
+			\item $p_1Rp_2$ - symmetric relation between $p_1$ and $p_2$
+			\item $p_2Rp_1$ - symmetric relation between $p_2$ and $p_1$
+		\end{itemize}
+	\end{defn}
+	\leavevmode\newline
+	The constructed points and the relation between them is best seen on a diagram
+	\begin{center}
+	\begin{tikzpicture}[scale = 1]
+		\filldraw[color=black!60, fill=red!0, thick](-3,0) circle (0.5);
+		\node at (-3.5,0.7) {$\vVar^1$};
+		\node at (-3,0) {$p_1$};
+		\node at (-3.5,-0.7) {a};
+		\draw[thick, ->] (-3.5,0) arc [
+      	  		start angle=10,
+		       end angle=335,
+        		x radius=0.5cm,
+        		y radius =0.2cm
+    			] ;
+		\draw[thick, <->](-2.5,0) -- (2.5,0);
+		\filldraw[color=black!60, fill=red!0, thick](3,0) circle (0.5);
+		\node at (3.5,0.7) {$\vVar^2$};
+		\node at (3,0) {$p_2$};
+		\node at (3.5,-0.7) {b};
+		\draw[thick, ->] (3.5,0) arc [
+      	  		start angle=180,
+		      end angle=525,
+        		x radius=0.5cm,
+        		y radius =0.2cm
+    			] ;
+		\node[text width=10cm, anchor=west, right] at (-4.5,-2)
+    		{Generated model points and their relations for contact C(a, b)};
+      \end{tikzpicture}
+	\end{center}
+
+	\begin{defn}
+		Let B be a branch conjunction and $a \neq 0 \in B$, where a is a term. Then one model point p is generated and its variable valuations $\vVar$ such that:
+		\begin{itemize}
+			\item $\vBool(a) = \textbf{true}$
+		\end{itemize}
+		The R relations is extended as follows:
+		\begin{itemize}
+			\item $pRp$ - reflexivity of the modal point $p$
+		\end{itemize}
+	\end{defn}
+	\leavevmode\newline
+	The constructed point diagram:
+	\begin{center}
+	\begin{tikzpicture}[scale = 1]
+		\filldraw[color=black!60, fill=red!0, thick](-0,0) circle (0.5);
+		\draw[thick, ->] (-0.5,0) arc [
+      	  		start angle=10,
+		       end angle=345,
+        		x radius=0.5cm,
+        		y radius =0.2cm
+    			] ;
+		\node at (-0.5,0.7) {$\vVar$};
+		\node at (-0,0) {$p$};
+		\node at (-0.5,-0.7) {a};
+		\node[text width=10cm, anchor=west, right] at (-4.5,-2)
+    		{Generated model points and its relation for not equal term $a \neq 0$};
+      \end{tikzpicture}
+	\end{center}
+
+	\begin{defn}
+		Let B be a branch conjunction and $a \le_\mu b \in B$, where a and b are two terms.
+		Then one model point p is generated and its variable valuations $\vVar$ is the constant true, namely the constant term 1.
+	\end{defn}
+	% say that the meassure atmoic formulas produce one model point 
+
+	\begin{defn}
+		With definitions (1, 2, 3) we are able to construct a model where the contacts and non zero terms are satisfied. 
+		We will denote this model as \textbf{partially constructed model}. 
+		However to satisfy a branch conjunction B we need to verify that the non contacts and zero terms are satisfied as well.
+	\end{defn}
+
+	\begin{defn}
+		Let M = (W, R) be a partially constructed model. Then we say that the model M satisfies a equal to zero term $a = 0$, if the following holds:
+		\begin{align*}
+			\forall p \in W: \vBool(a) = \textit{true}
+		\end{align*}
+	\end{defn}
+
+	\begin{defn}
+		Let M = (W, R) be a partially constructed model. Then we say that the model M satisfies a non contact $\neg C(a, b)$, if the following holds:
+		\begin{align*}
+			\forall p \in W: \vBool(a) = \textit{false} \lor \vBool(b) = \textit{false} \\
+			\\
+			\forall (p, q) \in R: vBool(p, a) = \textit{false} \lor vBool(q, b) = \textit{false} \\ 
+				\land \; vBool(p, b) = \textit{false} \lor vBool(q, a) = \textit{false}
+		\end{align*}
+	\end{defn}
+
+	\subsection{Sistemi linejni neravenstva} 
+		Intro about such systems.
+
+	\subsection{Modeling of a quantitative contact logic formula}
+		opisvane na algoritama.
 
 	\newpage
 	\section{Implementation Introduction}
@@ -522,7 +733,7 @@ $\Longleftarrow$
 	\section{Quantative Contact Logics Implementation}
 	
 	
-
+% make the vBool with two parameters
 
 
 
