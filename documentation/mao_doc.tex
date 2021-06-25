@@ -569,7 +569,7 @@ The satisfiability verification for a given formula is done by constructing a mo
 		\begin{itemize}
 			\item $\vBool(0) = \textbf{false}$
 			\item $\vBool(1) = \textbf{true}$
-			\item $\vBool(p) = \vVar(p), where p \in \Var_B$
+			\item $\vBool(p) = \vVar(p), \textit{ where } p \in \Var_B$
 			\item $\vBool(a \sqcap b) = \vBool(a) \land \vBool(b)$
 			\item $\vBool(a \sqcup b) = \vBool(a) \lor \vBool(b)$
 			\item $\vBool(a*) = \neg \vBool(a)$
@@ -698,27 +698,106 @@ The satisfiability verification for a given formula is done by constructing a mo
 	\end{defn}
 
 	\begin{defn}
-		Let M = (W, R) be a partially constructed model. Then we say that the model M satisfies a equal to zero term $a = 0$, if the following holds:
+		Let M = (W, R) be a partially constructed model and let $\Ts$ be the set of all terms. Then the model valuation $\vE : \Ts \rightarrow \mathscr{P}(W)$ is defined recursively as:
+		\begin{itemize}
+			\item $\vBool(0) = W$
+			\item $\vBool(1) = \emptyset$
+			\item $\vBool(p) = \{ q \; | \; \vVar(q, p) = 1\}, \textit{ where } p \in \Var_B$
+			\item $\vBool(a \sqcap b) = \vBool(a) \cap \vBool(b)$
+			\item $\vBool(a \sqcup b) = \vBool(a) \cup \vBool(b)$
+			\item $\vBool(a*) = W \setminus \vBool(a)$
+		\end{itemize}
+	\end{defn}
+		The tuple $(W, R, \vE)$ is called a partially constructed frame.
+	\begin{defn}
+		Let $\mathscr{F} = (W, R, \vE)$ be a partially constructed frame. Then we say that the frame $\mathscr{F}$ satisfies an equal to zero term $a = 0$, if the following holds:
 		\begin{align*}
-			\forall p \in W: \vBool(a) = \textit{true}
+			\forall p \in W: \vE(a) \ne \emptyset
 		\end{align*}
 	\end{defn}
 
 	\begin{defn}
-		Let M = (W, R) be a partially constructed model. Then we say that the model M satisfies a non contact $\neg C(a, b)$, if the following holds:
+		Let $\mathscr{F} = (W, R, \vE)$ be a partially constructed frame. Then we say that the frame $\mathscr{F}$ satisfies a non contact $\neg C(a, b)$, if the following holds:
 		\begin{align*}
-			\forall p \in W: \vBool(a) = \textit{false} \lor \vBool(b) = \textit{false} \\
+			\forall p \in W: \vE(a) = \emptyset \lor \vE(b) = \emptyset \\
 			\\
-			\forall (p, q) \in R: vBool(p, a) = \textit{false} \lor vBool(q, b) = \textit{false} \\ 
-				\land \; vBool(p, b) = \textit{false} \lor vBool(q, a) = \textit{false}
+			\forall (p, q) \in R: (\vE(p, a) = \emptyset \lor \vE(q, b) = \emptyset) \\ 
+				\land \; (\vE(p, b) = \emptyset \lor \vE(q, a) = \emptyset)
 		\end{align*}
-	\end{defn}
+	\end{defn}													
 
-	\subsection{Sistemi linejni neravenstva} 
-		Intro about such systems.
+	\paragraph{Satisfied atomic formulas}
+		Let M be a partially constructed model from a branch conjunction B. M is said to be a potential model if: 
+		\begin{itemize}
+			\item $\forall \; \neg C(a, b) : M \textit{ satisfies } \neg C(a, b)$
+			\item $\forall \; a = 0 : M \textit{ satisfies } a = 0$
+		\end{itemize}
 
-	\subsection{Modeling of a quantitative contact logic formula}
-		opisvane na algoritama.
+	\leavevmode\newline
+	To validate that the potential model is correct, meaning that it satisfies the formula, we must take into account the measure atomic formulas.
+	Without loss of generality, we can transform each $<_\mu$ atomic formula, to an equivalent formula which uses only the $\le_\mu$ atomic formula and boolean operators.
+	In a branch conjunction B, there might be more than one atomic measure formula. Validating that the potential model satisfies the branch conjunction together with the 
+	measure atomic formulas, means that all atomic measure formulas to be satisfied. Satisfying a set of measure atomic formulas produces a system of inequalities.
+
+	\subsection{System of Inequalities} 
+		The system of inequality has the following structure:
+		\[
+			\syslineskipcoeff{1.50}
+			\systeme*{\sum_{i^1} X_{i^1} <= \sum_{j^1} X_{j^1},
+				\:\:.\:\:.\:\:.,
+				\sum_{i^n} X_{i^n} <= \sum_{j^n} X_{j^n}, 
+				\sum_{k^1} X_{k^1} > \sum_{l^1} X_{l^1},
+				\:\:.\:\:.\:\:.,
+				\sum_{k^m} X_{k^m} > \sum_{l^m} X_{l^m}
+				}
+		\]
+
+		\leavevmode\newline
+		\subsection{System Construction}
+		Let $\mathscr{F} = (W, R, \vE)$ be a potential frame. The system of inequalities is constructed from the potential frame by evaluating each
+		of the terms in the $\le_\mu$ and $<_\mu$ atomic formulas. The number of points in the model are $N = | \; W \; |$. Let us enumerate the points
+		$p_0, p_1, ..., p_N$. The system will have N different variables $X_0, X_1, ..., X_N$, 
+		where $\forall i < N: X_i \textit{ is mapped to point }p_i$.
+
+		\begin{defn}
+			Let x and y be two terms, then the formula $\le_\mu(x, y)$ is transformed to an inequality as follows:
+			\begin{align*}
+				\sum_{i \in \vE(x)} X_i <= \sum_{j \in \vE(y)} X_j
+			\end{align*}
+		\end{defn}
+
+		\begin{defn}
+			Let x and y be two terms, then the formula $<_\mu(x, y)$ is transformed to an inequality as follows:
+			\begin{align*}
+				\sum_{i \in \vE(x)} X_i < \sum_{j \in \vE(y)} X_j
+			\end{align*}
+		\end{defn}
+
+		\begin{defn}
+			Let x and y be two terms and let $\mathscr{I}_q$ be the inequality produced from $\le_\mu(x, y)$. Then the inequality $\mathscr{L}_q$ can be simplified 
+			by removing all variables present on both sides of the equation. This can be written as:
+			\begin{align*}
+				\sum_{i \in \vE(x) \setminus \vE(y)} X_i <= \sum_{j \in \vE(y) \setminus \vE(x)} X_j
+			\end{align*}
+		\end{defn}
+
+		\begin{defn}
+			Let x and y be two terms and let $\mathscr{I}_q$ be the inequality produced from $<_\mu(x, y)$. Then the inequality $\mathscr{L}_q$ can be simplified 
+			by removing all variables present on both sides of the equation. This can be written as:
+			\begin{align*}
+				\sum_{i \in \vE(x) \setminus \vE(y)} X_i < \sum_{j \in \vE(y) \setminus \vE(x)} X_j
+			\end{align*}
+		\end{defn}
+
+		\begin{defn}
+			Let $\mathscr{F} = (W, R, \vE)$ be a potential frame. Let $\mathscr{S}$ be the system of inequalities defined by
+			\begin{itemize}
+				\item inequalities for all $\le_\mu$ fromulas by def: 4.17 
+				\item inequalities for all $<_\mu$ fromulas by def: 4.18
+				\item inequality $0 < X_i$ for each $0 \le i < N$  
+			\end{itemize}
+			If the system of inequalities $\mathscr{S}$ has a solution, then the branch conjunction is satisfiable by the potential frame $\mathscr{F}$.
+		\end{defn}
 
 	\newpage
 	\section{Implementation Introduction}
