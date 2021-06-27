@@ -51,7 +51,7 @@
     basicstyle=\footnotesize,% basic font setting
 }
 
-\title{Satisfiability Of Qualitative Contact Logics}
+\title{Satisfiability of Qualitative Contact Logics}
 \date{2019-9-28}
 \author{Martin Stoev}
 
@@ -2658,7 +2658,7 @@ auto term::evaluate(
 		then this inequality is transformed into:
 		\[
 			\syslineskipcoeff{1.50}
-			\systeme*{0 <= \sum_{i^1} X_{i^1} - \sum_{j^1} X_{j^1}} + \epsilon
+			\systeme*{\sum_{j^1} X_{j^1} - \sum_{i^1} X_{i^1} + \epsilon <= 0}
 		\]
 		where $\epsilon$ is a small value.
 		\\
