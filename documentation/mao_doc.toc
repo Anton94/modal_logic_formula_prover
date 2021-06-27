@@ -74,4 +74,8 @@
 \contentsline {subsection}{\numberline {7.4}Handy methods}{50}{subsection.7.4}%
 \contentsline {subsection}{\numberline {7.5}Building algorithm}{60}{subsection.7.5}%
 \contentsline {section}{\numberline {8}Quantative Contact Logics Implementation}{61}{section.8}%
-\contentsline {subsection}{\numberline {8.1}Bulding Algorithm}{62}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.1}System of Inequalities Implementation}{62}{subsection.8.1}%
+\contentsline {paragraph}{Measured Less Operator Representation}{62}{section*.75}%
+\contentsline {paragraph}{Building the System of Inequalities}{63}{section*.76}%
+\contentsline {paragraph}{Model Points Valuations Generation}{64}{section*.77}%
+\contentsline {subsection}{\numberline {8.2}Bulding Algorithm}{64}{subsection.8.2}%

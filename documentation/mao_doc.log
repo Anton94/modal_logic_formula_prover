@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (MiKTeX 21.2) (preloaded format=pdflatex 2021.5.19)  27 JUN 2021 18:44
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (MiKTeX 21.2) (preloaded format=pdflatex 2021.5.19)  27 JUN 2021 21:28
 entering extended mode
 **./mao_doc.tex
 (mao_doc.tex
@@ -1362,7 +1362,126 @@ Underfull \hbox (badness 10000) in paragraph at lines 2485--2490
 LaTeX Warning: Reference `model-valuation' on page 62 undefined on input line 2
 591.
 
-[62] [63] (mao_doc.aux)
+
+Overfull \hbox (173.40527pt too wide) in paragraph at lines 2622--2623
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
+] 
+ []
+
+
+Overfull \hbox (178.20532pt too wide) in paragraph at lines 2624--2625
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (72.60425pt too wide) in paragraph at lines 2637--2638
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2645--2654
+
+ []
+
+[62]
+Underfull \hbox (badness 10000) in paragraph at lines 2662--2667
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2670--2685
+
+ []
+
+
+Overfull \hbox (39.85599pt too wide) in paragraph at lines 2687--2690
+\T1/ntxtlf/m/n/10 straints for all mea-sured atomic for-mu-las. This is done by
+ the \T1/ntxtlf/m/it/10 has_solvable_system_of_inequalities
+ []
+
+
+Overfull \hbox (115.80469pt too wide) in paragraph at lines 2695--2696
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
+][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (111.00464pt too wide) in paragraph at lines 2697--2698
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
+][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (187.80542pt too wide) in paragraph at lines 2698--2700
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
+][][][][][][][][] 
+ []
+
+
+Overfull \hbox (115.80469pt too wide) in paragraph at lines 2705--2706
+[][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (120.60474pt too wide) in paragraph at lines 2706--2707
+[][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (115.80469pt too wide) in paragraph at lines 2707--2708
+[][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (701.41064pt too wide) in paragraph at lines 2709--2710
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
+][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
+[][][][][][][][][][] 
+ []
+
+[63]
+Overfull \hbox (115.80469pt too wide) in paragraph at lines 2716--2717
+[][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (120.60474pt too wide) in paragraph at lines 2717--2718
+[][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (111.00464pt too wide) in paragraph at lines 2718--2719
+[][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (384.60742pt too wide) in paragraph at lines 2722--2723
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
+][][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (77.4043pt too wide) in paragraph at lines 2727--2728
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (168.60522pt too wide) in paragraph at lines 2739--2740
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
+][] 
+ []
+
+
+Overfull \hbox (67.8042pt too wide) in paragraph at lines 2744--2745
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2759--2764
+
+ []
+
+[64] [65] [66] (mao_doc.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -1370,13 +1489,13 @@ LaTeX Warning: There were undefined references.
 LaTeX Warning: There were multiply-defined labels.
 
 Package rerunfilecheck Info: File `mao_doc.out' has not changed.
-(rerunfilecheck)             Checksum: 9FE0B8E6A1F51A4AE907278B1B628D85;5423.
+(rerunfilecheck)             Checksum: C498883F86C3D2FE7E17935CA2ABCBD3;5675.
  ) 
 Here is how much of TeX's memory you used:
- 28803 strings out of 479334
- 493414 string characters out of 2856609
- 978263 words of memory out of 3000000
- 44424 multiletter control sequences out of 15000+200000
+ 28932 strings out of 479334
+ 495266 string characters out of 2856609
+ 979263 words of memory out of 3000000
+ 44464 multiletter control sequences out of 15000+200000
  494785 words of font info for 131 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  113i,15n,116p,1362b,1850s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -1399,9 +1518,9 @@ toevm/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/ztmb.pfb><C:/Users
 /stoevm/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/ztmbi.pfb><C:/Us
 ers/stoevm/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/ztmr.pfb><C:/
 Users/stoevm/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/ztmri.pfb>
-Output written on mao_doc.pdf (63 pages, 661680 bytes).
+Output written on mao_doc.pdf (66 pages, 685513 bytes).
 PDF statistics:
- 2013 PDF objects out of 2073 (max. 8388607)
- 1307 named destinations out of 1440 (max. 500000)
- 309 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 2132 PDF objects out of 2487 (max. 8388607)
+ 1396 named destinations out of 1440 (max. 500000)
+ 317 words of extra memory for PDF output out of 10000 (max. 10000000)
 
