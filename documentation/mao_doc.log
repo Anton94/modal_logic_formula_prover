@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (MiKTeX 21.2) (preloaded format=pdflatex 2021.5.19)  27 JUN 2021 15:30
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (MiKTeX 21.2) (preloaded format=pdflatex 2021.5.19)  27 JUN 2021 18:44
 entering extended mode
 **./mao_doc.tex
 (mao_doc.tex
@@ -1357,7 +1357,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 2485--2490
 
  []
 
-[58] [59] [60] [61] (mao_doc.aux)
+[58] [59] [60] [61]
+
+LaTeX Warning: Reference `model-valuation' on page 62 undefined on input line 2
+591.
+
+[62] [63] (mao_doc.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -1365,13 +1370,13 @@ LaTeX Warning: There were undefined references.
 LaTeX Warning: There were multiply-defined labels.
 
 Package rerunfilecheck Info: File `mao_doc.out' has not changed.
-(rerunfilecheck)             Checksum: 766CE786BD77894A7FD72E48D27B7F2B;5277.
+(rerunfilecheck)             Checksum: 9FE0B8E6A1F51A4AE907278B1B628D85;5423.
  ) 
 Here is how much of TeX's memory you used:
- 28677 strings out of 479334
- 491180 string characters out of 2856609
+ 28803 strings out of 479334
+ 493414 string characters out of 2856609
  978263 words of memory out of 3000000
- 44378 multiletter control sequences out of 15000+200000
+ 44424 multiletter control sequences out of 15000+200000
  494785 words of font info for 131 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  113i,15n,116p,1362b,1850s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -1394,9 +1399,9 @@ toevm/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/ztmb.pfb><C:/Users
 /stoevm/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/ztmbi.pfb><C:/Us
 ers/stoevm/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/ztmr.pfb><C:/
 Users/stoevm/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/ztmri.pfb>
-Output written on mao_doc.pdf (61 pages, 643610 bytes).
+Output written on mao_doc.pdf (63 pages, 661680 bytes).
 PDF statistics:
- 1905 PDF objects out of 2073 (max. 8388607)
- 1227 named destinations out of 1440 (max. 500000)
- 301 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 2013 PDF objects out of 2073 (max. 8388607)
+ 1307 named destinations out of 1440 (max. 500000)
+ 309 words of extra memory for PDF output out of 10000 (max. 10000000)
 

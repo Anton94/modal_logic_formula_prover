@@ -2585,11 +2585,25 @@ auto model::create(
 
 	\newpage
 	\section{Quantative Contact Logics Implementation}
-	
+
+\newpage
+	\subsubsection*{Model Valuation of a Term}
+	The implementation of the model valuation \ref{model-valuation} is in the \textit{term} class. The details are in the \textit{term.cpp} file.
+	The model valuation assigns a set of points to the term for some variable valuation.
+\\
+\noindent
+\textit{term.h}
+\begin{lstlisting}
+class term {
+...
+auto term::evaluate(
+	const variable_id_to_points_t& variable_evaluations,
+	const size_t points_count) const -> model_points_set_t;
+\end{lstlisting}	
 
 	\subsection{Bulding Algorithm}
 		The building algorithm using the described methods. Follows the TODO: Lemma 4.20.
-\\
+%\\
 \\
 \noindent
 \textit{measured\_model.h/cpp}
@@ -2643,9 +2657,6 @@ auto measured_model::create(
 		*constant_true_, used_variables_)
             });
     }
-\end{lstlisting}
-\newpage
-\begin{lstlisting}
     create_contact_relations_first_2k_in_contact(points_.size(),
 	 contacts_T.size());
     calculate_the_model_evaluation_of_each_variable();

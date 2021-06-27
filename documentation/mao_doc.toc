@@ -74,3 +74,4 @@
 \contentsline {subsection}{\numberline {7.4}Handy methods}{50}{subsection.7.4}%
 \contentsline {subsection}{\numberline {7.5}Building algorithm}{60}{subsection.7.5}%
 \contentsline {section}{\numberline {8}Quantative Contact Logics Implementation}{61}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Bulding Algorithm}{62}{subsection.8.1}%
