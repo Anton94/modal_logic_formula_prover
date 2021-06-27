@@ -2586,7 +2586,87 @@ auto model::create(
 	\newpage
 	\section{Quantative Contact Logics Implementation}
 	
-	
+
+	\subsection{Bulding Algorithm}
+		The building algorithm using the described methods. Follows the TODO: Lemma 4.20.
+\\
+\\
+\noindent
+\textit{measured\_model.h/cpp}
+\begin{lstlisting}
+auto measured_model::create(
+    const formulas_t& contacts_T,
+    const formulas_t& contacts_F,
+    const terms_t& zero_terms_T,
+    const terms_t& zero_terms_F,
+    const formulas_t& measured_less_eq_T,
+    const formulas_t& measured_less_eq_F,
+    const variables_mask_t& used_variables,
+    const formula_mgr* mgr)
+    -> bool
+{
+    clear();
+    mgr_ = mgr;
+    used_variables_ = used_variables;
+    number_of_contacts_ = contacts_T.size();
+
+    measured_less_eq_T_ = measured_less_eq_T;
+    measured_less_eq_F_ = measured_less_eq_F;
+
+    if (!construct_contact_model_points(contacts_T) ||
+        !construct_non_zero_model_points(zero_terms_F))
+    {
+        trace() << "Unable to construct the model points "
+	 "with binary variable evaluations which evaluates "
+	 "the contact & non-zero terms to 1";
+        return false;
+    }
+
+    auto additional_points = measured_less_eq_T.size() +
+		 measured_less_eq_F.size();
+    if(points_.empty() && additional_points == 0)
+    {
+        additional_points = 1;
+    }
+    if(additional_points > 0)
+    {
+        info() << "Adding additional " << additional_points <<
+            " points because of the <=m/~<=m atomics or empty model. "
+            "We need a potential one model point for each side "
+	 "of each inequality in the system.";
+        constant_true_ = std::make_unique<term>(mgr_);
+        constant_true_->construct_constant(true);
+        points_.insert(points_.end(), additional_points, 
+            {
+                constant_true_.get(),
+                variables_evaluations_block_for_positive_term(
+		*constant_true_, used_variables_)
+            });
+    }
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
+    create_contact_relations_first_2k_in_contact(points_.size(),
+	 contacts_T.size());
+    calculate_the_model_evaluation_of_each_variable();
+
+    system_ = system_of_inequalities(points_.size());
+    while (!is_zero_term_rule_satisfied(zero_terms_T) ||
+           !is_contact_F_rule_satisfied(contacts_F) ||
+           !has_solvable_system_of_inequalities())
+    {
+        TERMINATE_IF_NEEDED();
+        if (!generate_next())
+        {
+            trace() << "Unable to generate a new combination of " 
+                " binary variable evaluations for the model points.";
+            return false;
+        }
+    }
+
+    return true;
+}
+\end{lstlisting}
 % make the vBool with two parameters
 
 
