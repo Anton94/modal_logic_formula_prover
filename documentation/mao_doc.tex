@@ -796,17 +796,1792 @@ The satisfiability verification for a given formula is done by constructing a mo
 				\item inequalities for all $<_\mu$ fromulas by def: 4.18
 				\item inequality $0 < X_i$ for each $0 \le i < N$  
 			\end{itemize}
-			If the system of inequalities $\mathscr{S}$ has a solution, then the branch conjunction is satisfiable by the potential frame $\mathscr{F}$.
+			If the system of inequalities $\mathscr{S}$ has a solution, then we say that the system is valid.
 		\end{defn}
+		\begin{lemma}
+			Let $\varphi$ be a formula. If there exists branch conjunction B for the formula $\varphi$
+			and there exists a potential frame $\mathscr{F}$ for the branch conjunction B and 
+			there exists a valid system of inequalities defined from the potential frame $\mathscr{F}$,
+			then the formula $\varphi$ is satisfiable by the frame $\mathscr{F}$.
+		\end{lemma}
 
 	\newpage
 	\section{Implementation Introduction}
+	The main programming language is C++. Flex \& Bison are used to parse the input formula. The formula proover is a C++ library. The unit and performance tests are C++ applications.
+	The user application is a Web page. The Web server is implemented with the third party CppRestSDK library. The satisfiability checking runs on the server. There is a feature to interupt an ongoing process. Can be triggered by the user via a button. There is a user disconnecting detection which cancels the requested formula prooving.
+	TODO: something more? maybe some screenshots from the web application or in it's section is enough?
+		
+	\subsection{Syntax}
+	The formula should be easy and intuitive to write. Only the keyboard keys should be used. The legend bellow describes the formula's syntaxis:
+
+	\begin{center}
+	\begin{tabular}{ |c|c|c| }
+		\hline
+		\multicolumn{3}{|c|}{\textbf{Terms}} \\
+		\hline
+		0 				    & 0      & Boolean constant 0 \\
+		1 					& 1      & Boolean constant 1 \\
+		- 					& *      & Boolean complement \\
+		*				 	& $\cap$ & Boolean meat \\
+		+ 					& $\cup$ & Boolean join \\
+		()                  & ()     & Parentheses \\
+		\text{[a-zA-Z0-9]+} & $x_1$  & Boolean variable. Syntax $x1$, $Y42$, $Var101$ \\
+		\hline
+		\hline
+		\multicolumn{3}{|c|}{\textbf{Formulas}} \\
+		\hline
+		F      & $\bot$            & Propositional constant false \\
+		T      & $\top$            & Propositional constant true \\
+		$\sim$ & $\neg$            & Negation \\
+		$\&$   & $\land$           & Conjunction \\
+		$|$    & $\lor$            & Disjunction \\
+		->     & $\Rightarrow$     & Implication \\
+		<->    & $\Leftrightarrow$ & Equivalence \\
+		C      & C                 & Contact, syntax C($t_1$, $t_2$) \\
+		<=     & $\leq$            & Part of , syntax <=($t_1$, $t_2$) \\
+		<=m    & $\leq$$m$$$       & Measured Part of, syntax <=m($t_1$, $t_2$) \\
+		=0     & =0                & Zero term, syntax $t_1=0$ \\
+		()     & ()                & Parentheses \\
+		\hline
+	\end{tabular}
+	\end{center}
+
+	These are a few examples of formulas:
+	\begin{itemize}
+		\item $C(x1 * 1, x2 + y1)$
+		\item $C(x1 + 0, (-x2 + x3) * x1)$
+		\item $C(x1,x2) \;\&\; C(x2, x3) \;\& \sim C(x1,x3)$
+		\item $C(x1,x2) \;\& <=(x1,x3) \;\& \sim C(x2,x3)$
+		\item $C(x1,x2) \text{ -> } C(x2, x1)$
+		\item $C(x1,x2) \;\&\; C(x2, x3) => C(x1, x3)$
+		\item $F \text{ -> } C(x1,x2) \;\& \sim C(x1,x2)$
+	\end{itemize}
+
+	\subsection{Formula parsing}
+	The formula is a sequence of characters. These characters does not give us any information for the formula's structure. It should be analyzed. Flex \cite{flex-tokenizer} and Bison \cite{bison-parser} are used to parse it into an AST (Abstract Syntax Tree). Flex is used as a tokenizer. Bison is used as the parser.
+
+	\subsubsection{Abstract Syntax Tree}
+	The AST is a binary tree. Each node has an operation type and up to two children. The formula nodes are prior term nodes. A formula node could have term node as children. Term nodes could not have a formula node as a child. The leaves are variables or constants.
+	
+	Let $\phi = (C(x1,x2) \;\& <=(x2, x3)) => C(x1, x3)$. The following is an AST of $\phi$:
+
+\begin{tikzpicture}[
+  tlabel/.style={pos=0.6,right=-1pt,font=\footnotesize\color{red!70!black}},
+]
+\label{AST-phi}
+\node{=>}
+child {node {$\&$}
+  child {node {C}
+    child {node {x1}}
+    child {node {x2}}
+  }
+  child[missing] {}
+  child {node {<=}
+    child {node {x2}}
+    child {node {x3}}
+  }
+}
+child[missing] {}
+child[missing] {}
+child {node {C}
+  child {node {x1}}
+  child {node {x3}}
+};
+\end{tikzpicture}
+
+	\newpage
+	\paragraph{Operation types} Enum structure is used to represent the type of formulas and terms in a memory efficient way.
+
+	\begin{lstlisting}[language=C++]
+enum class formula_operation_t
+{
+    constant_true,
+    constant_false,
+    conjunction,
+    disjunction,
+    negation,
+    implication,
+    equality,
+    contact,
+    less_eq,
+    measured_less_eq,
+    eq_zero
+};
+
+enum class term_operation_t
+{
+    constant_true,
+    constant_false,
+    union_, // union is a keyword
+    intersection,
+    complement,
+    variable
+};
+	\end{lstlisting}
+
+	\newpage
+	\paragraph{Node types} There are two types of nodes. Formula nodes and term nodes. They are defined with a separate classes.
+
+	\begin{lstlisting}
+class Node
+{
+    ...
+};
+
+class NFormula : public Node
+{
+public:
+    NFormula(formula_operation_t op,
+             Node* left = nullptr, Node* right = nullptr);
+    ...
+
+    formula_operation_t op;
+    Node* left;
+    Node* right;
+};
+
+class NTerm : public Node
+{
+public:
+    NTerm(term_operation_t op,
+          NTerm* left = nullptr, NTerm* right = nullptr);
+    ...
+
+    term_operation_t op;
+    NTerm* left;
+    NTerm* right;
+    std::string variable;
+};
+	\end{lstlisting}
+
+	\subsubsection{Tokenizer}
+	The tokenizer is responsible for demarcating the special sybmols in the input formula.
+	After the symbols are identified a token is created for each of them or at least for those significant to the semantic of the input formula.
+	For example, the whitespaces are not significant and a tokens are not created for them.
+	We shall use Flex as a tokenizer \cite{flex-tokenizer}.
+
+	\paragraph{Grammar} The tokenizer's grammar is composed from two types of tokens. Single character and multi character.
+
+	The Single character tokens are directly matched in the input formula and are representing the token itself.
+	The multi character token is a sequence of characters which have some meaning when bundled together.
+	This tokenizer's grammar is unambiguous and each input formula is uniquely tokenized.
+
+	The tokens derivation is explaned in details in the following table with Flex syntax. The matched symbol represents the symbol from the input formula and the output token is the newly created token for the matched symbol.
+
+		\begin{flushleft}
+			\centering
+			\begin{tabular}{ | m{10em} | m{15em}| } 
+				\hline
+					\textbf{Matched sequence} & \textbf{Output token} \\ [0.7ex] 
+				\hline
+					[ \textbackslash t\textbackslash  n] & ; \\
+				\hline
+					[,TF01()C\&|~*+-] 	& yytext[0];  \\
+				\hline
+				    "<="            &   T\_LESS\_EQ; \\
+				\hline
+				    "<=m"           &   T\_MEASURED\_LESS\_EQ; \\
+				\hline
+				    "= 0"           &   T\_EQ\_ZERO; \\
+				\hline
+				    "->"            &   T\_FORMULA\_OP\_IMPLICATION; \\
+				\hline
+				    "<->"           &   T\_FORMULA\_OP\_EQUALITY; \\
+				\hline
+				    [a-zA-Z0-9]+    &   T\_STRING; \\
+				\hline
+				    .               &   yytext[0]; \\
+				\hline
+			\end{tabular}
+		\end{flushleft}
+	Let us review the table above. All white spaces, tabulations and newlines are ignored. The syntax for it is the \textbf{;} character.
+
+	All single character tokens are passed as their ASCII code. The syntax for it is \textbf{yytext[0]}. It gives the matched character. That way it will be easy to use them in the parser.
+
+	The multi character tokens are converted to unique identificators. For example, the "<=" sequence is converted to T\_LESS\_EQ. The sequence of letters and numbers is converted to T\_STRING. Later, it will be used as a term variable.
+
+	The last matched symbol in the table represents everything else, if nothing has been matched then just return the text itself.
+	The parser will use it to promt where the unrecongized symbol was found and the symbol itself can be printed out.
+
+% Returns T\_STRING literal type and the string  value is written to yylval which can be later accessed from the parser. Note that it uses our simple memory manager to allocate this string in order to be able to safely free all allocated strings even when some syntax error occures 
+
+	\subsubsection{Parser}
+			The single character tokens are passed as their ASCII symbol to Bison. 
+			As discussed above the multi character tokens need more clearance in order to represent the literal from the input text symbols.
+			The followings are definition of literals for multi character tokens:
+			\begin{itemize}
+				\item \%token <const char*> T\_STRING is the literal for "string"
+				\item \%token T\_LESS\_EQ is the literal for "<="
+				\item \%token T\_MEASURED\_LESS\_EQ is the literal for "<=m"
+				\item \%token T\_EQ\_ZERO is the literal for "=0"
+				\item \%token T\_FORMULA\_OP\_IMPLICATION is the literal for "->"
+				\item \%token T\_FORMULA\_OP\_EQUALITY is the literal for "<->"
+			\end{itemize}
+			The followings are definitions of priority and associativity of the operation tokens. 
+			The priority is from low to hight (w.r.t. the line order in which they are defined)
+			\begin{itemize}
+				\item \%left T\_FORMULA\_OP\_IMPLICATION T\_FORMULA\_OP\_EQUALITY
+				\item \%left '|' '+'
+				\item \%left '\&' '*'
+				\item \%right '\textasciitilde' '-'
+				\item \%nonassoc '(' ')'
+			\end{itemize}
+
+		\paragraph{Grammar}
+			With the usage of the Parser literals, the input formula can be parsed to an Abstract Syntax Tree(AST).
+			The AST contains all the data from the input string formula in a more structed way.
+			On the AST additional optimizations can be done which will simplify the initial formula. It will produce better performance when a model is seeked in the satisfiability algorithms.
+
+			For convenience, will define two helper methods. Namely, \textbf{create\_term\_node} and \textbf{create\_formula\_node}. Both method construct AST nodes.
+
+			The create\_term\_node method creates an AST term node. It's arguments are an operation and up to two child terms. Depending on the operation arity.
+
+			The create\_formula\_node is analogious to the create\_term\_node method. Creates an AST formula node.
+
+			Few special symbols to define beforehand:
+			\begin{itemize}
+				\item \textbf{\$\$} is the return value to the 'parent'. Later, he can use it, e.g. as a child.
+				\item \textbf{\$i} is the return value of the i-th matched element in the matcher sequence.
+			\end{itemize}
+
+		\paragraph{Algorithm} The following is the parser algorithm which produces an Abstract Sytax Tree.
+
+	\begin{lstlisting}
+formula // 'formula' non-terminal
+    : 'T' { // matching token 'T'
+        $$ = create_formula_node(constant_true);   
+    }
+    | 'F' {
+        $$ = create_formula_node(constant_false);
+    }
+    | 'C' '(' term ',' term ')' {
+        $$ = create_formula_node(contact, $3, $5); 
+    }
+    | "<=" '(' term ',' term ')' {
+        $$ = create_formula_node(less_eq, $3, $5);
+    }
+    | "<=m" '(' term ',' term ')' {
+        $$ = create_formula_node(measured_less_eq, $3, $5);
+    }
+    | term "=0" {
+        $$ = create_formula_node(eq_zero, $1);
+    }
+    | '(' formula '&' formula ')' {
+        $$ = create_formula_node(conjunction, $2, $4);
+    }
+    | formula '&' formula {
+        $$ = create_formula_node(conjunction, $1, $3);
+    }
+    | '(' formula '|' formula ')' {
+        $$ = create_formula_node(disjunction, $2, $4);
+    }
+    | formula '|' formula {
+        $$ = create_formula_node(disjunction, $1, $3);
+    }
+    | '~' formula {
+        $$ = create_formula_node(negation, $2);
+    }
+    | '(' formula "->" formula ')' {
+        $$ = create_formula_node(implication, $2, $4);
+    }
+    | formula "->" formula {
+        $$ = create_formula_node(implication, $1, $3);
+    }
+    | '(' formula "<->" formula ')' {
+        $$ = create_formula_node(equality, $2, $4);
+    }
+    | formula "<->" formula {
+        $$ = create_formula_node(equality, $1, $3);
+    }
+    | '(' formula ')' {
+        $$ = $2;
+    }
+  ;
+term
+    : '1' {
+        $$ = create_term_node(constant_true);
+    }
+    | '0' {
+        $$ = create_term_node(constant_false);
+    }
+    | "string" {
+        $$ = create_term_node(term_operation_t::variable);
+        $$->variable = std::move(*$1);
+        // the string is allocated from the
+        // tokenizer and we need to free it
+        free_lexer_string($1); 
+    }
+    | '(' term '*' term ')' {
+        $$ = create_term_node(intersection, $2, $4);
+    }
+    | term '*' term {
+        $$ = create_term_node(intersection, $1, $3);
+    }
+    | '(' term '+' term ')' {
+        $$ = create_term_node(union_, $2, $4);
+    }
+    | term '+' term {
+        $$ = create_term_node(union_, $1, $3);
+    }
+    | '-' term {
+        $$ = create_term_node(complement, $2);
+    }
+    | '(' term ')' {
+        $$ = $2;
+    }
+  ;
+	\end{lstlisting}
+
+	\subsection{Formula refinement}
+	The AST can be easily modified and optimized. One of the modifications is removing the implications and equivalences. They are replaced by conjunction, disjunction and negation. This is convenient because it simplifies the tableau method. It does not have to handle implication and equivalence operations. The following is a modified AST of $\phi$ \ref{AST-phi} without the implication:
+	
+\begin{tikzpicture}[
+  tlabel/.style={pos=0.6,right=-1pt,font=\footnotesize\color{red!70!black}},
+]
+\node{$|$}
+child {node {$\sim$}
+  child {node {$\&$}
+    child {node {C}
+      child {node {x1}}
+      child {node {x2}}
+    }
+    child[missing] {}
+    child {node {<=}
+      child {node {x2}}
+      child {node {x3}}
+    }
+  }
+}
+child[missing] {}
+child[missing] {}
+child {node {C}
+  child {node {x1}}
+  child {node {x3}}
+};
+\end{tikzpicture}
+
+	\subsubsection{Visitor Pattern} The AST modification is best achieved with the visitor pattern \cite{visitor-pattern}. Uses double virtual dispatching. Separates the algorithm from the object structure on which it operates. Allows new visitors to be added in a simple manner. Each AST modification will be implemented as a visitor. Will not explain the pattern in depth. In essence, the visitor pattern requires the AST nodes to impelement a virtual \textbf{accept} method. This method accepts a visitor as argument and calls the visitor's virtual \textbf{visit} method with the real node's type. This is the double virtual dispatching. One virtual call to find the node's real type. Another to find the visitor's real type. Now, adding a new visitor requires only adding it's class. Does not require changes in the AST node classes or other visitor classes.
+
+\newpage
+\begin{lstlisting}
+...
+class Visitor
+{
+public:
+    virtual void visit(NFormula& f) = 0;
+    virtual void visit(NTerm& t) = 0;
+};
+
+// Example visitor(aglorithm) which will print the AST tree.
+class VPrinter : public Visitor
+{
+public:
+    void visit(NFormula& f) override
+    {
+        // Print the formula node's data.
+    }
+    void visit(NTerm& t) override
+    {
+        // Print the term node's data.
+    }
+};
+
+class Node
+{
+public:
+    virtual void accept(Visitor& v) = 0;
+};
+
+class NFormula : public Node
+{
+public:
+    void accept(Visitor& v) override { v.visit(*this); }
+
+    ...
+};
+
+class NTerm : public Node
+{
+public:
+    void accept(Visitor& v) override { v.visit(*this); }
+
+    ...
+};
+\end{lstlisting}
+
+	\newpage
+	It's worth showing the implemention of the VPrinter visit methods. They are simple and a good illustration of the pattern. Shows how the AST tree is traversed by calling the VPrinter instance with the AST's root node.
+\begin{lstlisting}
+void VPrinter::visit(NFormula& f)
+{
+    switch(f.op)
+    {
+        case formula_operation_t::constant_true:
+            out_ << "T"; // out_ is an output stream, e.g. std::cout.
+            break;
+        case formula_operation_t::constant_false:
+            out_ << "F";
+            break;
+        case formula_operation_t::conjunction:
+            out_ << "(";
+            f.left->accept(*this);
+            out_ << " & ";
+            f.right->accept(*this);
+            out_ << ")";
+            break;
+        case formula_operation_t::disjunction:
+            // Analogous to conjunction. The symbol is '|'.
+        case formula_operation_t::implication:
+            // Analogous to conjunction. The symbol is '->'.
+        case formula_operation_t::equality:
+            // Analogous to conjunction. The symbol is '<->'.
+        case formula_operation_t::negation:
+            out_ << "~";
+            f.left->accept(*this);
+            break;
+        case formula_operation_t::less_eq:
+            out_ << "<=(";
+            f.left->accept(*this);
+            out_ << ", ";
+            f.right->accept(*this);
+            out_ << ")";
+            break;
+        case formula_operation_t::measured_less_eq:
+            out_ << "<=m(";
+            f.left->accept(*this);
+            out_ << ", ";
+            f.right->accept(*this);
+            out_ << ")";
+            break;
+        case formula_operation_t::eq_zero:
+            out_ << "(";
+            f.left->accept(*this);
+            out_ << ")=0";
+            break;
+        case formula_operation_t::contact:
+            out_ << "C(";
+            f.left->accept(*this);
+            out_ << ", ";
+            f.right->accept(*this);
+            out_ << ")";
+            break;
+        default:
+            assert(false && "Unrecognized.");
+    }
+}
+
+void VPrinter::visit(NTerm& t)
+{
+    switch(t.op)
+    {
+        case term_operation_t::constant_true:
+            out_ << "1";
+            break;
+        case term_operation_t::constant_false:
+            out_ << "0";
+            break;
+        case term_operation_t::variable:
+            out_ << t.variable;
+            break;
+        case term_operation_t::union_:
+            out_ << "(";
+            t.left->accept(*this);
+            out_ << " + ";
+            t.right->accept(*this);
+            out_ << ")";
+            break;
+        case term_operation_t::intersection:
+            // Analogous to union_. The symbol is '*'.
+        case term_operation_t::complement:
+            out_ << "-";
+            t.left->accept(*this);
+            break;
+        default:
+            assert(false && "Unrecognized.");
+    }
+}
+\end{lstlisting}
+
+	\subsubsection{Visitors Overview}
+	The following are the supported visitors. Their implementation is close to a thousand lines of code and can be checked in the repository.
+	\paragraph{VReduceConstants}
+	Removes all unnecessary children of And/Or/Negation operations of the following type:
+			\begin{table}[H]
+				  \centering
+				  \begin{tabular}{llll}
+				    \toprule
+				    \midrule
+				\tabitem \textasciitilde T $\equiv$ F & \tabitem C(0,0)  $\equiv$ F & \tabitem \textasciitilde F $\equiv$ T & \tabitem C(1,1) $\equiv$ T \\
+				\tabitem (T \& T) $\equiv$ T & \tabitem C(a,0)  $\equiv$ F & \tabitem (F | F) $\equiv$ F & \tabitem C(0,a) $\equiv$ F \\
+				\tabitem (g \& T) $\equiv$ g & \tabitem -1 $\equiv$ 0 & \tabitem (g | T) $\equiv$ T & \tabitem -0 $\equiv$ 1 \\
+				\tabitem (T \& g) $\equiv$ g & \tabitem (1 * 1) $\equiv$ 1 & \tabitem (T | g) $\equiv$ T & \tabitem (0 + 0) $\equiv$ 0 \\
+				\tabitem (g \& F) $\equiv$ F & \tabitem (t * 1) $\equiv$ t & \tabitem (g | F) $\equiv$ g & \tabitem (t + 1) $\equiv$ 1 \\
+				\tabitem (F \& g) $\equiv$ F & \tabitem (1 * t) $\equiv$ t & \tabitem (F | g) $\equiv$ g & \tabitem (1 + t) $\equiv$ 1 \\
+				\tabitem 0=0 $\equiv$ T & \tabitem (t * 0) $\equiv$ 0 & \tabitem 1=0 $\equiv$ F & \tabitem (t + 0) $\equiv$ t \\
+				\tabitem <=(0,a) $\equiv$ T & \tabitem (0 * t) $\equiv$ 0 & \tabitem <=(a,1) $\equiv$ T & \tabitem (0 + t) $\equiv$ t \\
+
+					    \bottomrule
+				  \end{tabular}
+				\end{table}
+
+	\paragraph{VConvertContactsWithConstantTerms}
+				Converts C with constant 1 terms in !=0 atomic formulas.
+				This visitor is best used after the contacts are reduced, via VReduceConstants
+				\begin{itemize}
+					\item C(a,1) $\equiv$ \textasciitilde(a=0)
+					\item C(1,a) $\equiv$ \textasciitilde(a=0)
+				\end{itemize}
+
+	\paragraph{VConvertLessEqContactWithEqualTerms}
+				Converts C and <= atomic formulas with identical terms:
+				\begin{itemize}
+					\item <=(a,a) $\equiv$ T, \\
+						since (a * -a = 0))
+					\item C(a,a) $\equiv$ \textasciitilde(a=0)
+				\end{itemize}
+
+	\paragraph{VReduceDoubleNegation}
+				Removes the double/tripple/etc negations.
+				This visitor is best used after all visitors which might add additional negations!
+				\begin{itemize}
+					\item -(-g) $\equiv$ g
+					\item -(-t) $\equiv$ t
+				\end{itemize}
+
+	\paragraph{VConvertImplicationEqualityToConjDisj}
+				Converts all formula nodes of type implication and equality to nodes
+				which are using just conjuction and disjunction. The main reason for this visitor is to simplify the formula operations.
+				This visitor simplifies the formula to contain only conjunctions, disjunctions and negation operations.
+				\begin{itemize}
+					\item (f -> g)  $\equiv$ (\textasciitilde f | g)
+					\item (f <-> g) $\equiv$ ((f \& g) | (\textasciitilde f \& \textasciitilde g))
+				\end{itemize}
+
+	\paragraph{VConvertLessEqToEqZero}
+				Converts a <= formula to an equals to zero atomic formula
+				\begin{itemize}
+					\item <=(a,b) $\equiv$ (a * -b) = 0
+				\end{itemize}
+
+	\paragraph{VSplitDisjInLessEqAndContacts}
+				Divides C and <= atomic formulas with a disjunction term into two simpler formulas
+				\begin{itemize}
+					\item C(a + b, c) $\equiv$ C(a, c) | C(b, c)
+					\item C(a, b + c) $\equiv$ C(a, b) | C(a, c)
+					\item <=(a + b, c) $\equiv$ <=(a,c) \& <=(b,c)
+				\end{itemize}
+
+	There are few visitors which only collect or print information from the formula
+				\begin{itemize}
+					\item VVariablesGetter - gets all variables from the formula (as string)
+					\item VPrinter - prints the formula to some provided output stream
+				\end{itemize}
+
+	\subsection{Formula building}
+	The formula is a binary tree. A \textbf{subformula} is a subtree in the formula's tree. The process of building a satisfiable model is computational heavy. A part of it is lexical comparing and traversing subformulas. The AST is convenient to modify the formula. These modifications are a preprocessing step. After them the formula will not be modifed. A few optimizations could be done.
+
+	\subsubsection{Optimizations}
+	\paragraph{Reducing formula operations}
+	The formula operations could be reduced to not have \textit{implication}, \textit{equivalence} and \textit{less equal}. The \textit{VConvertImplicationEqualityToConjDisj} and \textit{VConvertLessEqToEqZero} visitor should be applied.
+
+	\paragraph{Variable substitution}
+	The variables are a sequence of characters, i.e. strings. It is slow to compare them. An integer ID could be assigned to each variable. One way to do it is via the \textit{VVariablesGetter} visitor. Retrieve all unique variables in a vector and use their positions as IDs.
+
+	\paragraph{Hashing subformulas}
+	Conducting a test whether two subformulas are equal in a lexical way is an important procedure for the sake of performance. Such equality checks are required in various situations. One of which is checking if a subformula exists in a set of subformulas.
+
+	Have in mind that the naive solution to do an equality check is to compare the whole subformula strcuture. The complexity is O(n), where n is the size of the subformula. To reduce this complexity a precalcaulated hash value shall be used.
+	For each formula node an additional hash variable is stored. The hash is computed recursively through the formula's structure. The hash of a parent node depends on the hashes of its children nodes. 
+	The equality comparison first checks the hash codes. The full equality checking is done only for matching hash codes.
+
+	\newpage
+	\subsubsection{Layout}
+	The formula structure will be similar to the AST. A couple of changes reflecting the optimizations above. The following is the final formula node's layout.
+
+\begin{lstlisting}
+class formula {
+    ...
+    enum class operation_type : char {
+        constant_true,
+        constant_false,
+        conjunction,
+        disjunction,
+        negation,
+        measured_less_eq,
+        eq_zero,
+        c,
+        invalid,
+    };
+
+    operation_type op_;
+    std::size_t hash_;
+
+    struct child_formulas {
+        formula* left;
+        formula* right;
+    };
+    struct child_terms {
+        term* left;
+        term* right;
+    };
+
+    union {
+        // Holds only one of the described objects.
+        // Depending on the operation type the
+        // child_f_ or child_t_ is "valid".
+        child_formulas child_f_;
+        child_terms child_t_;
+    };
+};
+
+class term {
+    ...
+    enum class operation_type : char
+    {
+        constant_true,
+        constant_false,
+        union_,
+        intersection,
+        complement,
+        variable,
+        invalid,
+    };
+
+    operation_type op_;
+    std::size_t hash_;
+
+    struct children
+    {
+        term* left;
+        term* right;
+    };
+    union {
+        // Holds either children or variable id.
+        // Depending on the node's operation type.
+        children children_;
+        size_t variable_id_;
+    };
+};
+\end{lstlisting}
+
+	\subsubsection{Hashing}
+	The following is the implemented hash construction procedure for the term node. The formula node is analogous.
+\begin{lstlisting}
+void term::construct_hash()
+{
+  switch(op_)
+  {
+  case operation_t::constant_true:
+  case operation_t::constant_false:
+    break;
+  case operation_t::union_:
+  case operation_t::intersection:
+    hash_ = ((children.left->get_hash() & 0xFFFFFFFF) * 2654435761) +
+        children.right->get_hash() & 0xFFFFFFFF) * 2654435741);
+    break;
+  case operation_t::complement:
+    hash_ = (children.left->get_hash() & 0xFFFFFFFF) * 2654435761;
+    break;
+  case operation_t::variable:
+    hash_ = (variable_id_ & 0xFFFFFFFF) * 2654435761;
+    break;
+  default:
+    assert(false && "Unrecognized.");
+  }
+
+  // Add the operation type to the hash.
+  const auto op_code = static_cast<unsigned>(op_) + 1;
+  hash_ += (op_code & 0xFFFFFFFF) * 2654435723;
+}
+\end{lstlisting}
+
+	Let $\tau_1$ and $\tau_2$ be two terms. Let $h_1$ be the precalculated hash of $\tau_1$ and $h_2$ be the precalculated hash of $\tau_2$.
+	The equality check procedure follows the following steps:
+	\begin{itemize}
+		\item if $h_1 \neq h_2$, then the terms are not equal
+		\item if $h_1 = h_2$, then recursively compare the children.
+	\end{itemize}
+	\noindent
+
+	\newpage
+	\subsubsection{Conversion from AST}
+	The formula building from an AST is straightforward. Recursive depth first iteration over the AST. For each AST node a coresponding formula/term node is constructed. The implementation could be found in \textit{term.cpp} and \textit{formula.cpp} in the repository.
+
+	\newpage
+	THE FOLLOWING ARE NOTES WHICH WILL BE REMOVED \\
+
+	- Tableau - the official doc is fairly good, use it
+
+    - In the introduction - github repo, automatic test on each commit on various of machines
+
+	- variable evaluations - representation
+		- plus one operation (Next)
+		- marked bits only for the used variables
+		- plus one on marked bits
+	 - contact matrix representation
+
+
+	 \iffalse
+		Notes for the official documentation
+	 - bitset-Next instead of bitet-PlusOne on marked and explain the marked before defining the
+	 - variable bitset/boolean substitution does now explains anything and is confusing.
+	 - Variable boolean substitution - how the substitution is done? And why we need it? What it's going to be used for?
+	 - Term hash variable -> without 'variable', maybe 'member'.
+	 - Term Set-Evaluation -> Maybe boolean valuation should be the correct name
+	 - Variable Set-Substituitons -> maybe variable evalualuation instead of substituion. Now it's too complicated with this substituioning
+	 - Term Set-Evaluation : $& |$ as cup and cap symbols maybe?
+	  -
+	\fi
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	\newpage
 	\section{Tableaux Implementation}
+	The Tableaux process is a decision procedure. Recursively breaks down a given formula into basic components. Based on that a decision can be concluded. The recursive step breaks down a formula part into one or two subformulas. Continuously appling the recursive step produces a binary tree. The nodes are the formulas and the links represent the recursive step.
+
+	All formulas in a branch are considered to be in conjunction. Contradiction may arise in a same branch if there exists a formula and its negation.
+
+	The main principle of the tableaux is to break complex formula into smaller ones until complementary pairs of atomic formulas are produced.
+
+	\subsubsection*{Definition: Signed formulas set}
+	The signed formulas set consists only of signed formulas. The letter \textit{X} is usually used for its representation.
+
+	\subsection{Definition: Tableaux Step}
+	The \textit{Tableaux Step} takes as input a formula and a signed formulas set and produces as output one or two new formulas, depending on the operation.
+	The signed formulas set consists of the broken down formulas by previous tableaux steps.
+	The output of the tableaux step depends on the rule applied to the formula.
+
+	\subsubsection{Rules}
+	Only \textit{negation} \textit{conjunction} and \textit{disjunction} operations will be handled. The implication and equivalence are converted.
+
+		\subsubsection*{Negation}
+			$\begin{array}{rl}
+				& \mathbb{T}(\neg \varphi), X \\
+			      \cline{2-2}
+			      & \mathbb{F}(\varphi), X
+			\end{array}$
+			\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:
+			$\begin{array}{rl}
+				& \mathbb{F}(\neg \varphi), X \\
+			      \cline{2-2}
+			      & \mathbb{T}(\varphi), X
+			\end{array}$
+
+		\subsubsection*{Conjunction}
+			$\begin{array}{rl}
+				& \mathbb{T}(\varphi \: \wedge \: \psi), X \\
+			      \cline{2-2}
+			      & \mathbb{T}\varphi, \mathbb{T}\psi, X
+			\end{array}$
+			\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:
+			$\begin{array}{rl}
+				& \:\:\: \mathbb{F}(\varphi \: \wedge \: \psi), X \\
+			      \cline{2-2}
+			      & \mathbb{F}\varphi, X \:\:\:\:\:\:\:\: \mathbb{F}\psi, X
+			\end{array}$
+
+		\subsubsection*{Disjunction}
+			$\begin{array}{rl}
+				& \:\:\: \mathbb{T}(\varphi \: \vee \: \psi), X \\
+			      \cline{2-2}
+			      & \mathbb{T}\varphi, X \:\:\:\:\:\:\:\: \mathbb{T}\psi, X
+			\end{array}$
+			\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:\:
+			$\begin{array}{rl}
+				& \mathbb{F}(\varphi \: \vee \: \psi), X \\
+			      \cline{2-2}
+			      & \mathbb{F}\varphi, \mathbb{F}\psi, X
+			\end{array}$
+
+	\newpage
+	For our case the functionality of the tableaux process shall be extended. If the branch is not closed there are additional calculations needed in order to verify that there is no contradiction. Namely to verify that there is no contradiction on Term level. This means that there exists a satisfiable model.
+	This verification can be done in different manners. Depending on the algorithm type. The best way to think about it is that the tableaux process returns a not-closed branch and if there is a model for the set of atomic formuas in this branch, then the formula is satisfiable, otherwise the tableaux process proceeds with the next not-closed branch. If such branch does not exist then the formula is not satisfiable. 
+
+	\subsection{Implementation}
+	The program implementation of the tableaux method follows the standard tableaux process. First interesting design decision is to keep all true signed formulas in one data set, and all false signed formulas in another data set. This enables fast searches whether a formula has been signed as true or false.
+
+	\subsubsection*{Definition: Signed Formula Collection}
+	Let X be a set of formulas, then X is called signed formula collection if and only if all formulas in X are signed as true or all formulas are signed as false.
+
+	This collection is implemented with \textit{std::unordered\_set} (hashset), which stores the formulas by pointers to their root nodes. The hashing uses the node's precalculated hash. The comparing is via the node's \textit{operator==}. That way different pointers to subformulas with same structure will be threated as identic.
+
+	The average complexity for search, insert and erase in this collection is O(1). There is no formula coping. So, almost no memory overhead for keeping the formulas in the set.
+	\newline
+	\newline
+	There are 8 signed formula collections:
+%Note add definition for positive and negative collections !!!
+	\begin{itemize}
+		\item formulas\_T - contains only non-atomic formulas signed as true
+		\item formulas\_F - contains only non-atomic formulas signed as false, \\
+				For example, if $\neg\varphi$ is encountered as an output of the tableaux step, then only $\varphi$ is inserted into the formula\_F
+		\item contacts\_T - contains only atomic contact formulas signed as true
+		\item contacts\_F - contains only atomic contact formulas signed as false
+		\item zero\_terms\_T - contains only formulas of type $\varphi \le \psi$ signed as true
+		\item zero\_terms\_F - contains only formulas of type $\varphi \le \psi$ signed as false
+		\item measured\_less\_eq\_T - contains only formulas of type $\varphi \le_m \psi$ signed as true
+		\item measured\_less\_eq\_F - contains only formulas of type $\varphi \le_m \psi$ signed as false
+	\end{itemize}
+
+	These collctions are unordered sets of points to the formulas/terms.
+\noindent
+\textit{types.h}
+\begin{lstlisting}
+using formulas_t = std::unordered_set<const formula*, formula_ptr_hasher, formula_ptr_comparator>;
+using terms_t = std::unordered_set<const term*, term_ptr_hasher, term_ptr_comparator>;
+\end{lstlisting}
+
+\noindent
+\textit{tableau.h}
+\begin{lstlisting}
+    formulas_t formulas_T_;
+    formulas_t formulas_F_;
+    formulas_t contacts_T_;
+    formulas_t contacts_F_;
+    terms_t zero_terms_T_;
+    terms_t zero_terms_F_;
+    formulas_t measured_less_eq_T_;
+    formulas_t measured_less_eq_F_;
+\end{lstlisting}
+
+	\subsubsection*{Definition: Formula Contradiction}
+	Let $\varphi$ be a signed formula, then $\varphi$ is causing a contradiction if any of the following is true:
+	\begin{itemize}
+		\item $\varphi$ is a non-atomic signed as true and $\varphi$ belongs to $formulas\_F$
+		\item $\varphi$ is a non-atomic signed as false and $\varphi$ belongs to $formulas\_T$
+		\item $\varphi$ is a contact formula signed as true and $\varphi$ belongs to $contacts\_F$
+		\item $\varphi$ is a contact formula signed as false and $\varphi$ belongs to $contacts\_T$
+		\item $\varphi$ is a zero terms formula signed as true and $\varphi$ belongs to $zero\_terms\_F$
+		\item $\varphi$ is a zero terms formula signed as false and $\varphi$ belongs to $zero\_terms\_T$
+		\item $\varphi$ is a measured less formula signed as true and $\varphi$ belongs to $measured\_less\_eq\_F$
+		\item $\varphi$ is a measured less formula signed as false and $\varphi$ belongs to $measured\_less\_eq\_T$
+	\end{itemize}
+
+	\subsubsection*{Invariant}
+	At any time, all formulas in all eight signed formula collections do not contradict.
+
+	A contradiction may occure if a formula is split and some of the resulting components causes a contradiction.
+
+	\subsubsection*{Example}
+	Let's assume that $contacts\_T = \{ C(a, b)\}$ and let's have a look at the following formula $\mathbb{T}(T \wedge \neg C(a,b))$.
+	\newline
+	By the rules of decomposition, namely the ( $\wedge$ ) rule produces $\mathbb{T}T \text{ and } \mathbb{T}\neg C(a,b)$.
+
+	Then the $\mathbb{T}\neg C(a,b)$ will be decomposed to $\mathbb{F} C(a,b)$ by the ( $\neg$ ) rule, which causes a contradiction since $C(a,b)$ is already present in $contacts\_T$ formulas.
+
+	\subsubsection*{Tableaux Algorithm}
+	Given a formula $\varphi$, the following algorithm determines the atomic formulas in all branches of the tableaux process.
+
+	As a first step if the formula $\varphi$ is the constant F, then false is returned directly, otherwise the whole formula $\varphi$ is inserted in $formulas\_T$.
+	\newline
+	\subsubsection*{Remarks}
+	\begin{itemize}
+		\item true boolean value is used to represent the formula constant T
+		\item false boolean value is used to represent the formula constant F
+		\item Contact atomic formula is commutative, meaning that: $C(a,b) \iff C(b,a)$
+	\end{itemize}
+
+	Few lemmas which will provide a much more efficient contradiction finding in the tableaux process.
+	\subsubsection*{Lemma: A}
+	Let x be a term. Suppose that the atomic formula $x = 0$ has already been signed as true.
+	Then marking the following formulas as true will lead to contradiction:
+	\begin{itemize}
+		\item C(x,y)
+		\item C(y,x)
+	\end{itemize}
+	for any term y.
+
+	\subsubsection*{Lemma: A-inverse}
+	Let x, y and z be terms. Suppose that the atomic formulas C(x,y) or C(z, x) has already been signed as true, then marking the formula x = 0 as true will lead to contradiction.
+	\newline
+	TODO: addd short proof.
+	\subsubsection*{Time Complexity A and A-inverse}
+	The algorithmic complexity to check whether a new formula leads to contradiction by Lemma A and Lemma A-inverse is done effectively. Namely in constant time with the usage of one new collection $contact\_T\_terms\_$. It keeps the terms of the true contacts. Namely the contacts in the collection $contacts\_T$. This means that for each $\mathbb{T}(C(x, y))$, the terms x and y are in the mentioned collection of true terms. The $contact\_T\_terms\_$  is a multiset and keeps track of all added terms, meaning that if the term x is added twice and then removed only once there will still be an entry of that x in the $contact\_T\_terms\_$ collection. Removing a true contact appears when moving up the tableau tree, i.e. switching to another branch.
+
+	To check if a new formula leads to contradiction by Lemma A or Lemma A-inverse the following method is used:
+\begin{lstlisting}
+auto has_broken_contact_rule(const formula* f) const -> bool;
+\end{lstlisting}
+
+	\subsubsection{Handy methods}
+	\subsubsection*{Searching}
+	\subsubsection*{Search for formula signed as true}
+\begin{lstlisting}
+auto find_in_T(const formula* f) const -> bool
+\end{lstlisting}
+	Checks existance of formula $\varphi$ in any positive collection depending on the type of $\varphi$. Namely if $\varphi$ is of type:
+	\begin{itemize}
+		\item $C(x, y)$: returns whether $\varphi \in contacts\_T$
+		\item $x = 0$: returns whether $\varphi \in zero\_terms\_T$
+		\item $x \le_m y$: returns whether $\varphi \in measured\_less\_eq\_T$
+		\item non-atomic formula: returns whether $\varphi \in formulas\_T$
+	\end{itemize}
+
+	\subsubsection*{Search for formula signed as false}
+\begin{lstlisting}
+auto find_in_F(const formula* f) const -> bool
+\end{lstlisting}
+	Checks existance of formula $\varphi$ in any negative collection depending on the type of $\varphi$. Namely if $\varphi$ is of type:
+	\begin{itemize}
+		\item $C(x, y)$: returns whether $\varphi \in contacts\_F$
+		\item $x = 0$: returns whether $\varphi \in zero\_terms\_F$
+		\item $x \le_m y$: returns whether $\varphi \in measured\_less\_eq\_F$
+		\item non-atomic formula: returns whether $\varphi \in formulas\_F$
+	\end{itemize}
+
+	\subsubsection*{Adding}
+	\subsubsection*{Mark formula as true}
+\begin{lstlisting}
+void add_formula_to_T(const formula* f)
+\end{lstlisting}
+	Adds the formula $\varphi$ as true in in the respective positive collection. Namely if $\varphi$ is of type:
+	\begin{itemize}
+		\item C(x, y): $\varphi$ is added to $contacts\_T$, and the terms x and y are added to the $contact\_T\_terms\_$
+		\item $x = 0$: x is added in $zero\_terms\_T$
+		\item $x \le_m y$: $\varphi$ is added to $measured\_less\_eq\_T$
+		\item non-atomic formula: $\varphi$ is added to $formulas\_T$
+	\end{itemize}
+
+	\subsubsection*{Mark formula as false}
+\begin{lstlisting}
+void add_formula_to_F(const formula* f)
+\end{lstlisting}
+	Adds the formula $\varphi$ as false in the respective negative collection. Namely if $\varphi$ is of type:
+	\begin{itemize}
+		\item C(x, y): $\varphi$ is added to $contacts\_F$
+		\item $x = 0$: x is added in $zero\_terms\_F$
+		\item $x \le_m y$: $\varphi$ is added to $measured\_less\_eq\_F$
+		\item non-atomic formula: $\varphi$ is added to $formulas\_F$
+	\end{itemize}
+
+	\subsubsection*{Removing}
+	\subsubsection*{Remove formula signed as true}
+\begin{lstlisting}
+void remove_formula_from_T(const formula* f)
+\end{lstlisting}
+	Removes the formula $\varphi$ from the respective positive collection. Namely if $\varphi$ is of type:
+	\begin{itemize}
+		\item C(x, y): $\varphi$ is removed from $contacts\_T$, and the terms x and y are removed from the $contact\_T\_terms\_$.
+		\item $x = 0$: x is removed from $zero\_terms\_T$
+		\item $x \le_m y$: $\varphi$ is removed from $measured\_less\_eq\_T$
+		\item non-atomic formula: $\varphi$ is removed from $formulas\_T$
+	\end{itemize}
+
+	\subsubsection*{Remove formula signed as false}
+\begin{lstlisting}
+void remove_formula_from_F(const formula* f)
+\end{lstlisting}
+	Removes the formula $\varphi$ from the respective negative collection. Namely if $\varphi$ is of type:
+	\begin{itemize}
+		\item C(x, y): $\varphi$ is removed from $contacts\_F$
+		\item $x = 0$: x is removed from $zero\_terms\_F$
+		\item $x \le_m y$: $\varphi$ is removed from $measured\_less\_eq\_F$
+		\item non-atomic formula: $\varphi$ is removed from $formulas\_F$
+	\end{itemize}
+
+	\newpage
+	\subsubsection*{Tableaux Satisfiable Step Implementation}
+	The Tableaux satisfiable step is the whole Tableaux algorithm.
+\begin{lstlisting}
+auto tableau::satisfiable_step() -> bool
+{
+    // The bottom of the recursive algorithm is when we have
+    // only atomic formulas(which does not contradicts).
+    // Then we can run algorithms for model construction.
+    if(formulas_T_.empty() && formulas_F_.empty())
+    {
+        // This is the method which tries
+        // to construct satisfiable model.
+        return has_satisfiable_model();
+    }
+
+    if(!formulas_T_.empty())
+    {
+        // Choosing some formula to handle in this step.
+        // If this branch does not produce a valid satisfiable path,
+        // then this formula will be returned to formulas_T_.
+        auto f = *formulas_T_.begin();
+
+        const auto op = f->get_operation_type();
+        if(op == op_t::negation)
+        {
+            // T(~X) -> F(X)
+            auto X = f->get_left_child_formula();
+            if(X->is_constant())
+            {
+                // F(T) is not satisfiable
+                if(X->is_constant_true())
+                {
+                    return false;
+                }
+                // F(F) is satisfiable, continue with the rest.
+                return satisfiable_step();
+            }
+
+            if(find_in_T(X))
+            {
+                // Contradiction, we want to satisfy F(X)
+                // but we already have to satisfy T(X).
+                return false;
+            }
+
+            if(find_in_F(X)) // Skip adding F(X) multiple times.
+            {
+                return satisfiable_step();
+            }
+
+            add_formula_to_F(X);
+            auto res = satisfiable_step();
+            // Revert it on the way back.
+            remove_formula_from_F(X);
+            return res;
+        }
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
+        if(op == op_t::conjunction)
+        {
+            // T(X & Y) -> T(X) & T(Y)
+            T_conjuction_child X(*this, f->get_left_child_formula());
+            T_conjuction_child Y(*this, f->get_right_child_formula());
+
+            // Checks if X breaks the contact rule
+            // or brings a contradiction
+            if(!X.validate())
+            {
+                return false;
+            }
+            X.add_to_T(); // Adds X to T collection
+
+            if(!Y.validate())
+            {
+                X.remove_from_T();
+                return false;
+            }
+            Y.add_to_T();
+
+            auto res = satisfiable_step();
+            X.remove_from_T();
+            Y.remove_from_T();
+
+            return res;
+        }
+
+        assert(op == op_t::disjunction);
+        // T(X v Y) -> T(X) v T(Y)
+        auto X = f->get_left_child_formula();
+        auto Y = f->get_right_child_formula();
+        trace() << "Will split to two subtrees: "
+		<< *X << " and " << *Y;
+
+        // T(T) is satisfiable and we can skip the other branch
+        if(X->is_constant_true() || Y->is_constant_true())
+        {
+            trace() << "One of the childs is constant true";
+            return satisfiable_step();
+        }
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
+        auto process_T_disj_child = [&](const formula* child) {
+            if(child->is_constant_false() || // T(F) is not satisfiable
+               find_in_F(child) || has_broken_contact_rule(child))
+            {
+                return false;
+            }
+
+            if(find_in_T(child)) // skip adding it multiple times
+            {
+                return satisfiable_step();
+            }
+
+            add_formula_to_T(child);
+            const auto res = satisfiable_step();
+            remove_formula_from_T(child);
+            return res;
+        };
+
+        trace() << "Start of the left subtree: " << *X << " of " << *f;
+        if(process_T_disj_child(X))
+        {
+            // There was no contradiction in the left path,
+            // so there is no need to continue with the right path.
+            return true;
+        }
+
+        trace() << "Start of the right subtree: " << *Y << " of " << *f;
+        return process_T_disj_child(Y);
+    }
+
+    // Almost analogous but taking a formula from Fs
+
+    // Choosing some formula to handle in this step.
+    // If this branch does not produce a valid satisfiable path,
+    // then this formula will be returned to formulas_F_
+    auto f = *formulas_F_.begin();
+
+    const auto op = f->get_operation_type();
+    if(op == op_t::negation)
+    {
+        // F(~X) -> T(X)
+        auto X = f->get_left_child_formula();
+        if(X->is_constant())
+        {
+            // T(F) is not satisfiable
+            if(X->is_constant_false())
+            {
+                return false;
+            }
+            // T(T) is satisfiable, continue with the rest
+            return satisfiable_step();
+        }
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
+        if(find_in_F(X))
+        {
+            // Contradiction, we want to satisfy T(X)
+            // but we already have to satisfy F(X).
+            return false;
+        }
+        // We will add T(X) where X might be Contact or =0 term,
+        // so we need to verify that we will not break the contact rule.
+        if(has_broken_contact_rule(X))
+        {
+            return false;
+        }
+
+        if(find_in_T(X)) // skip adding it multiple times
+        {
+            return satisfiable_step();
+        }
+
+        add_formula_to_T(X);
+        auto res = satisfiable_step();
+        remove_formula_from_T(X);
+        return res;
+    }
+
+    if(op == op_t::disjunction)
+    {
+        // F(X v Y) -> F(X) & F(Y)
+        F_disjunction_child X(*this, f->get_left_child_formula());
+        F_disjunction_child Y(*this, f->get_right_child_formula());
+
+        // Checks that X does not bring a contradiction
+        if(!X.validate())
+        {
+            return false;
+        }
+        X.add_to_F();
+
+        if(!Y.validate())
+        {
+            X.remove_from_F();
+            return false;
+        }
+        Y.add_to_F();
+
+        auto res = satisfiable_step();
+
+        X.remove_from_F();
+        Y.remove_from_F();
+
+        return res;
+    }
+
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
+    assert(op == op_t::conjunction);
+    // F(X & Y) -> F(X) v F(Y)
+    auto X = f->get_left_child_formula();
+    auto Y = f->get_right_child_formula();
+
+    trace() << "Will split to two subtrees: " << *X << " and " << *Y;
+
+    // F(F) is satisfiable and we can skip the other branch
+    if(X->is_constant_false() || Y->is_constant_false())
+    {
+        trace() << "One of the childs is constant false";
+        return satisfiable_step();
+    }
+
+    auto process_F_conj_child = [&](const formula* child) {
+        if(child->is_constant_true() || // F(T) is not satisfiable
+           find_in_T(child))
+        {
+            return false;
+        }
+        if(find_in_F(child)) // skip adding it multiple times
+        {
+            return satisfiable_step();
+        }
+
+        add_formula_to_F(child);
+        const auto res = satisfiable_step();
+        remove_formula_from_F(child);
+        return res;
+    };
+
+    trace() << "Start of the left subtree: " << *X << " of " << *f;
+    if(process_F_conj_child(X))
+    {
+        // There was no contradiction in left path,
+        // so there is no need to continue with the right path.
+        return true;
+    }
+
+    trace() << "Start of the right subtree: " << *Y << " of " << *f;
+    return process_F_conj_child(Y);
+}
+\end{lstlisting}
 
 	\newpage
 	\section{Model Implementation}
+
+	\subsection*{Tableaux branch output}
+	\label{tableaux:branch:output}
+	As stated above the ouput of a branch in the tableaux process is a set of atomic formulas. These atomic formulas are grouped in six sets:
+	\begin{itemize}
+		\item Contacts ($contacts\_T$)
+		\item Non Contacts ($contacts\_F$)
+		\item Equal to Zero Terms ($zero\_terms\_T$)
+		\item Not Equal to Zero Terms ($zero\_terms\_F$)
+		\item Meassured Equal to Zero Terms ($measured\_less\_eq\_T$)
+		\item Meassured Not Equal to Zero Terms ($measured\_less\_eq\_F$)
+	\end{itemize}
+
+	All atomic formulas in the branch should be satisfied. So, they are in a conjunction. Can be represented with the following formula:
+	\begin{align*}
+		\bigwedge\nolimits_{i} \; C(a_i, b_i) \:\: \wedge \:\: &
+		\bigwedge\nolimits_{j} \; \neg C(e_j, f_j) \:\: \wedge \:\: \\
+		\bigwedge\nolimits_{k} \; d_k = 0 \:\: \wedge \:\: &
+		\bigwedge\nolimits_{l} \; g_l \neq 0 \:\: \wedge \:\: \\
+		\bigwedge\nolimits_{s} \; <=_m(H_s, O_s) \:\: \wedge \:\: &
+		\bigwedge\nolimits_{u} \; \neg (<=_m(Q_u, R_u) )
+	\end{align*}
+
+	\subsection*{Model output}
+	\label{tableaux:branch:output}
+	The model bulding algorithm should produce a set of modal points. The contacts between them and to define the valuation for each boolean variable.
+
+	\subsection{Modal point representation}
+	The modal points are variable evaluations. The variables are converted to  identificators from 0 to N - 1, where N is the number of different boolean variables. The variable evaluation is a sequence of N 1s and 0s. Thus, all different evaluations are $2^N$. It is implemented via the \textit{boost::dynamic\_bitset}. Which is an optimized vector of N booleans. The memory for N elements is roughfly N bits. The element at position X is the evaluation for the variable with identificator X. 
+
+	There might be variables in the formula which are not used in the branch conjunction. The evaluations for those variables are not needed. So, the variable evaluations will be only over the \textbf{used variables}. Let the used variables count is K. Then, all different modal points will be $2^K$.
+
+	It is crucial to have an iterative algorithm for generating all modal points. The modal point representation is similar to the binary numbers. Therefore, the plus one binary operation is simulated over the bitset. It allows a generation of the next modal point. It is convenient for the model construction.
+
+	The following is the implementation of the variable evaluation:
+\newpage
+\noindent
+\textit{variables\_evaluations\_block.h/cpp}
+\begin{lstlisting}
+using variables_mask_t = boost::dynamic_bitset<>;
+using variables_evaluations_t = boost::dynamic_bitset<>;
+using set_variables_ids_t = std::vector<size_t>;
+
+class variables_evaluations_block {
+public:
+    variables_evaluations_block(const variables_mask_t& variables);
+
+    auto get_variables() const -> variables_mask_t;
+    auto get_evaluations() -> variables_evaluations_t&;
+    auto get_evaluations() const -> const variables_evaluations_t&;
+
+    auto get_set_variables_ids() const -> const set_variables_ids_t&;
+    auto generate_next_evaluation() -> bool;
+    void reset_evaluations();
+
+private:
+    void init();
+
+    variables_mask_t variables_;
+    variables_evaluations_t evaluations_;
+
+    // Caching the set variables.
+    // For generating the next evaluations in order to make it
+    // O(|set varaibles|) instead of O(|all variables in the mask|)
+    set_variables_ids_t set_variables_ids_;
+};
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
+...
+auto variables_evaluations_block::generate_next_evaluation() -> bool
+{
+    if((variables_ & evaluations_) == variables_)
+    {
+        // If the evaluation for the variables is only 1s
+        // then we cannot generate a new one,
+        // i.e. we have already generated all of them.
+        return false;
+    }
+
+    /*
+     * Will generate the evaluations in the following order:
+     * 0...00, 0...01, 0...10, ... , 11...10, 11...11.
+     * This is very similar to the increment(+1) operation of integer
+     * numbers in their binary representation.
+     * For the binary number an algorithm could be the following:
+     * Iterate all bits starting from the least significant.
+     *     - bit(i) == 1 => bit(i) = 0
+     *     - bit(i) == 0 => bit(i) = 1 & stop
+     * In our case it is similar, we want to make the increment
+     * operation only on the set bits in the variables_ mask.
+     * set_variables_ids_ has the ids of the set bits
+     * in the variables mask in reverce order.
+     */
+    for(const auto id : set_variables_ids_)
+    {
+        if(!evaluations_[id])
+        {
+            evaluations_.set(id);
+            break;
+        }
+        else
+        {
+            evaluations_.set(id, false);
+        }
+    }
+
+    return true;
+}
+\end{lstlisting}
+\noindent
+\textit{model.h}
+\begin{lstlisting}
+using points_t = std::vector<variables_evaluations_block>;
+points_t points_;
+\end{lstlisting}
+
+	\newpage
+	\subsection{Contacts representation}
+	The contact relations are impleneted via a standard adjacency matrix. The elements of the matrix indicate whether pairs of points are in contact or not. Their values are 0 or 1. Thus, the optimized \textit{boost::dynamic\_bitset} is used again.
+
+\begin{lstlisting}
+using model_points_set_t = boost::dynamic_bitset<>;
+using contacts_t = std::vector<model_points_set_t>;
+contacts_t contact_relations_;
+\end{lstlisting}
+
+	\subsection{Valuation representation}
+	The valuation $\upsilon_n$ requires to define it for each boolean variable. It's implemeted via a NxM bit matrix. N is the number of boolean variables and M is the number of modal points. The matrix element at position $(i, j)$ indicates whether the valuation for the variable with id $i$ contains the modal point $j$.
+
+\begin{lstlisting}
+using model_points_set_t = boost::dynamic_bitset<>;
+using variable_id_to_points_t = std::vector<model_points_set_t>;
+
+// A vector of bitsets representing the value of v(variable_id).
+variable_id_to_points_t variable_evaluations_;
+\end{lstlisting}
+
+	\subsection{Handy methods}
+	\subsubsection*{Contact matrix filling}
+	The algorithm for building a model creates a pair of points for each contact in the branch conjunction. Therefore these points should be in contact. In addition to that each modal point is in contact with itself (reflexivity).
+
+\newpage
+\noindent
+\textit{imodel.h/cpp}
+\begin{lstlisting}
+// Useful for models which have their first 2*@number_of_contacts points
+// in contact (point 2k is in contact with point (2k+1))
+// Inserts 1s in the contact relations matrix between points 2k and 2k+1
+// (for each k in range [0, @number_of_contacts))
+// Inserts 1s in the contact relations matrix between
+// each point and itself (reflexivity).
+void imodel::create_contact_relations_first_2k_in_contact(
+	size_t number_of_points,
+	size_t number_of_contacts)
+{
+    contact_relations_.clear();
+    // Fill NxN matrix with 0s.
+    contact_relations_.resize(number_of_points,
+                              model_points_set_t(number_of_points));
+    for(size_t k = 0; k < number_of_contacts; ++k)
+    {
+        const auto a = 2 * k;
+        const auto b = a + 1;
+        contact_relations_[a].set(b); // Sets the b-th bit to 1.
+        contact_relations_[b].set(a);
+    }
+
+    // Add also the reflexivity.
+    for(size_t i = 0; i < number_of_points; ++i)
+    {
+        contact_relations_[i].set(i);
+    }
+}
+\end{lstlisting}
+
+	\newpage
+	\subsubsection*{Variable evaluation filling}
+	Fills the $variable\_evaluations\_$ matrix based on the current modal points.
+\\
+\\
+\noindent
+\textit{imodel.h/cpp}
+\begin{lstlisting}
+void model::calculate_the_model_evaluation_of_each_variable()
+{
+    const auto points_size = points_.size();
+    variable_evaluations_.clear();
+    // Initialize each variable evaluation as the empty set.
+    variable_evaluations_.resize(
+        mgr_->get_variables().size(),
+        model_points_set_t(points_size));
+
+    // Calculate the valuation of each variable,
+    // i.e. each variable_id
+    // v(Pi) = { point | point_evaluation[Pi] == 1 },
+    // i.e. the evaluation of variable with id Pi is 1
+    // (the bit at position Pi is 1)
+    for(size_t point = 0; point < points_size; ++point)
+    {
+        const auto& point_evaluation = points_[point].get_evaluations();
+
+        // Iterate only set bits(1s)
+        auto Pi = point_evaluation.find_first();
+        while(Pi != variables_evaluations_t::npos)
+        {
+            // Adds the point to the v(Pi) set.
+            variable_evaluations_[Pi].set(point);
+            Pi = point_evaluation.find_next(Pi);
+        }
+    }
+}
+\end{lstlisting}
+
+	\newpage
+	\subsubsection*{Evaluating a term}
+	The implementation of the boolean valuation \ref{boolean-valuation} is in the \textit{term} class. The details are in the \textit{term.cpp} file.
+	The boolean valuation assings a constant true or false to the term for some variable evaluation. This variable evaluation assings a constant true or false to each boolean variable in the term.
+\\
+\noindent
+\textit{term.h}
+\begin{lstlisting}
+class term {
+...
+struct evaluation_result
+{
+    enum class result_type : char
+    {
+        none,
+        constant_true,
+        constant_false,
+    };
+
+    auto is_constant_true() const -> bool;
+    auto is_constant_false() const -> bool;
+
+    result_type type{result_type::none};
+	....
+};
+...
+};
+
+// Ignore the second argument for subterm creation.
+// It is a support for a partial variable evaluation block
+// which does not evaluate all boolean variables in the term.
+// Then it will evaluate all known variables and reduces the constants.
+// Returns it as a subterm.
+// It is not used because it was needed
+// for an old model building algorithm.
+auto term::evaluate(
+	const variables_evaluations_block& evaluation_block,
+	bool skip_subterm_creation = true) const -> evaluation_result;
+\end{lstlisting}
+
+	\newpage
+	\subsubsection*{Zero terms satisfaction}
+	Checks whether a modal point(variable evaluation) does not conflict with the zero terms. The point should not be part of any zero term evaluation. So, the point should evaluate all zero terms to constant false.
+\\
+\noindent
+\textit{utils.h/cpp}
+\begin{lstlisting}
+/// Returns true if the evaluation evaluates all zero terms to false.
+auto are_zero_terms_T_satisfied(
+	const terms_t& zero_terms_T,
+	const variables_evaluations_block& evaluation) -> bool
+{
+    // The evaluation should evaluate all zero terms to constant false.
+    // That way it will not participate in any of their evaluations.
+    for(const auto& z : zero_terms_T)
+    {
+        if(!z->evaluate(evaluation).is_constant_false())
+        {
+            return false;
+        }
+    }
+    return true;
+}
+\end{lstlisting}
+
+	\newpage
+	\subsubsection*{Non-contacts satisfaction}
+	Checks whether a modal point (or a pair of points) does not conflict with the non-contacts. It is splitted to two components. Based on the reflexivity and connectivity rules.
+
+	For the reflexivity it is sufficient to verify that the point is not part of the both non-contact terms evaluations. So, the point should not evaluate both terms to constant true.
+
+	For the connectivity it is sufficient to verify that the pair of points does not participate in the non-contact terms evaluations. So, the points should not evaluate the terms to constant true.
+\\
+\noindent
+\textit{utils.h/cpp}
+\begin{lstlisting}
+auto is_contacts_F_reflexive_rule_satisfied(
+	const formulas_t& contacts_F,
+	const variables_evaluations_block& evaluation) -> bool
+{
+    for(const auto& c : contacts_F)
+    {
+        // The evaluation should not be parth of both
+        // non-contact term's evaluations.
+        const auto left_t = c->get_left_child_term();
+        const auto right_t = c->get_right_child_term();
+        if(left_t->evaluate(evaluation).is_constant_true() &&
+           right_t->evaluate(evaluation).is_constant_true())
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+auto is_contacts_F_connectivity_rule_satisfied(
+	const formulas_t& contacts_F,
+	const variables_evaluations_block& eval_a,
+	const variables_evaluations_block& eval_b) -> bool
+{
+    for(const auto& c : contacts_F)
+    {
+        // In order the eval_a and eval_b to not conflict with a
+        // non-contact they should not participate in the non-contact
+        // term's evaluations. In other words, both evaluations
+        // should not evaluate both terms to true.
+        const auto l = c->get_left_child_term();
+        const auto r = c->get_right_child_term();
+        if((l->evaluate(eval_a).is_constant_true() &&
+            r->evaluate(eval_b).is_constant_true()) ||
+           (l->evaluate(eval_b).is_constant_true() &&
+            r->evaluate(eval_a).is_constant_true()))
+        {
+            // The reflexivity case is not taken into account here.
+            return false;
+        }
+    }
+    return true;
+}
+
+\end{lstlisting}
+
+	\newpage
+	\subsubsection*{Modal points constructors}
+	\subsubsection*{Construction modal points for non-zero terms}
+	Creates a modal point for each non-zero term in the branch conjunction. The point should not conflict with any zero term or non-contact.
+\\
+\\
+\noindent
+\textit{model.h/cpp}
+\begin{lstlisting}
+auto model::construct_non_zero_model_points(
+	const terms_t& zero_terms_F, const formulas_t& contacts_F,
+	const terms_t& zero_terms_T) -> bool
+{
+    for(const auto& z : zero_terms_F)
+    {
+        // It will be overriten if succeed.
+        variables_evaluations_block eval(variables_mask_t(0));
+        if(!create_point_evaluation(z, eval, contacts_F, zero_terms_T))
+        {
+            return false;
+        }
+        points_.push_back(std::move(eval));
+    }
+
+    return true;
+}
+
+auto model::create_point_evaluation(
+	const term* t, variables_evaluations_block& out_evaluation,
+	const formulas_t& contacts_F,
+	const terms_t& zero_terms_T) const -> bool
+{
+    out_evaluation = variables_evaluations_block(used_variables_);
+
+    return does_point_evaluation_satisfies_basic_rules(
+               t, out_evaluation, contacts_F, zero_terms_T) ||
+           generate_next_point_evaluation(
+               t, out_evaluation, contacts_F, zero_terms_T);
+}
+
+auto model::does_point_evaluation_satisfies_basic_rules(
+	const term* t,
+	const variables_evaluations_block& evaluation,
+	const formulas_t& contacts_F,
+	const terms_t& zero_terms_T) const -> bool
+{
+    return t->evaluate(evaluation).is_constant_true() &&
+           are_zero_terms_T_satisfied(zero_terms_T, evaluation) &&
+           is_contacts_F_reflexive_rule_satisfied(
+               contacts_F, evaluation);
+}
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
+auto model::are_zero_terms_T_satisfied(
+	const terms_t& zero_terms_T,
+	const variables_evaluations_block& evaluation) const -> bool
+{
+    for(const auto& z : zero_terms_T)
+    {
+        if(!z->evaluate(evaluation).is_constant_false())
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+auto model::generate_next_point_evaluation(
+	const term* t, variables_evaluations_block& out_evaluation,
+	const formulas_t& contacts_F,
+	const terms_t& zero_terms_T) const -> bool
+{
+
+    while(out_evaluation.generate_next_evaluation())
+    {
+        if(does_point_evaluation_satisfies_basic_rules(
+              t, out_evaluation, contacts_F, zero_terms_T))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+\end{lstlisting}
+
+	\newpage
+	\subsubsection*{Construction modal points for contacts}
+	Creates a pair of modal points for each contact in the branch conjunction.
+\\
+\\
+\noindent
+\textit{model.h/cpp}
+\begin{lstlisting}
+auto model::construct_contact_model_points(
+	const formulas_t& contacts_T, const formulas_t& contacts_F,
+	const terms_t& zero_terms_T) -> bool
+{
+    for(const auto& c : contacts_T)
+    {
+        if(!construct_contact_points(c, contacts_F, zero_terms_T))
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+\end{lstlisting}
+\newpage
+\begin{lstlisting}
+auto model::construct_contact_points(
+	const formula* c, const formulas_t& contacts_F,
+	const terms_t& zero_terms_T) -> bool
+{
+    const auto left = c->get_left_child_term();
+    const auto right = c->get_right_child_term();
+
+    // It will be overridden if succeed.
+    variables_evaluations_block left_eval(variables_mask_t(0));
+    if(!create_point_evaluation(
+            left, left_eval, contacts_F, zero_terms_T))
+    {
+        return false;
+    }
+
+    do
+    {
+        variables_evaluations_block right_eval(variables_mask_t(0));
+        if(!create_point_evaluation(
+               right, right_eval, contacts_F, zero_terms_T))
+        {
+            return false;
+        }
+
+        do
+        {
+            if(is_contacts_F_connectivity_rule_satisfied(
+                  contacts_F, left_eval, right_eval))
+            {
+                points_.push_back(std::move(left_eval));
+                points_.push_back(std::move(right_eval));
+                return true;
+            }
+        } while(generate_next_point_evaluation(
+                    right, right_eval, contacts_F, zero_terms_T));
+    } while(generate_next_point_evaluation(
+                left, left_eval, contacts_F, zero_terms_T));
+
+    return false;
+}
+\end{lstlisting}
+
+	\newpage
+	\subsection{Building algorithm}
+	The building algorithm is simple. Creates a pair of suitable modal points for each contact. Creates a suitable modal point for each non-zero term. Lastly, updates the boolean variable valuation and connectivity matrix.
+\\
+\noindent
+\textit{model.h/cpp}
+\begin{lstlisting}
+auto model::create(
+	const formulas_t& contacts_T, const formulas_t& contacts_F,
+	const terms_t& zero_terms_T, const terms_t& zero_terms_F,
+	const variables_mask_t& used_variables,
+	const formula_mgr* mgr) -> bool
+{
+    ...
+    if(!construct_contact_model_points(
+            contacts_T, contacts_F, zero_terms_T) ||
+       !construct_non_zero_model_points(
+           zero_terms_F, contacts_F, zero_terms_T))
+    {
+        return false;
+
+    }
+
+    if(points_.empty() &&
+       !construct_point(contacts_F, zero_terms_T))
+    {
+        return false;
+    }
+
+    calculate_the_model_evaluation_of_each_variable();
+    create_contact_relations_first_2k_in_contact(
+        points_.size(), contacts_T.size());
+    return true;
+}
+\end{lstlisting}
 
 	\newpage
 	\section{Quantative Contact Logics Implementation}

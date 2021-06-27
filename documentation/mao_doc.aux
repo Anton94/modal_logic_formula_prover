@@ -45,10 +45,62 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Semantics}{8}{subsection.2.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Relational System}{9}{section*.18}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{Boolean variable valuation}{9}{section*.19}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{Model}{9}{section*.20}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {3}Quantative Contact Logics}{12}{section.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4}Implementation Introduction}{13}{section.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5}Tableaux Implementation}{14}{section.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6}Model Implementation}{15}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7}Quantative Contact Logics Implementation}{16}{section.7}\protected@file@percent }
-\gdef \@abspage@last{16}
+\@writefile{toc}{\contentsline {paragraph}{Measure function}{9}{section*.20}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Measured Model}{9}{section*.21}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Quantitative Contact Logics}{13}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Formula Satisfiability}{13}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Tableau Branch Conjunction}{13}{section*.22}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Boolean valuation}{14}{section*.23}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Model Point Creation}{14}{section*.24}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Satisfied atomic formulas}{17}{section*.25}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}System of Inequalities}{17}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}System Construction}{17}{subsection.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Implementation Introduction}{19}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Syntax}{19}{subsection.5.1}\protected@file@percent }
+\citation{flex-tokenizer}
+\citation{bison-parser}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Formula parsing}{20}{subsection.5.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.1}Abstract Syntax Tree}{20}{subsubsection.5.2.1}\protected@file@percent }
+\newlabel{AST-phi}{{5.2.1}{20}{Abstract Syntax Tree}{subsubsection.5.2.1}{}}
+\@writefile{toc}{\contentsline {paragraph}{Operation types}{21}{section*.26}\protected@file@percent }
+\citation{flex-tokenizer}
+\@writefile{toc}{\contentsline {paragraph}{Node types}{22}{section*.27}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.2}Tokenizer}{22}{subsubsection.5.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Grammar}{22}{section*.28}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.3}Parser}{23}{subsubsection.5.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Grammar}{24}{section*.29}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Algorithm}{24}{section*.30}\protected@file@percent }
+\citation{visitor-pattern}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Formula refinement}{26}{subsection.5.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.1}Visitor Pattern}{26}{subsubsection.5.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.3.2}Visitors Overview}{29}{subsubsection.5.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{VReduceConstants}{29}{section*.31}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{VConvertContactsWithConstantTerms}{30}{section*.32}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{VConvertLessEqContactWithEqualTerms}{30}{section*.33}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{VReduceDoubleNegation}{30}{section*.34}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{VConvertImplicationEqualityToConjDisj}{30}{section*.35}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{VConvertLessEqToEqZero}{30}{section*.36}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{VSplitDisjInLessEqAndContacts}{31}{section*.37}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Formula building}{31}{subsection.5.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.1}Optimizations}{31}{subsubsection.5.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Reducing formula operations}{31}{section*.38}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Variable substitution}{31}{section*.39}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Hashing subformulas}{31}{section*.40}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.2}Layout}{32}{subsubsection.5.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.3}Hashing}{33}{subsubsection.5.4.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.4}Conversion from AST}{34}{subsubsection.5.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Tableaux Implementation}{36}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Definition: Tableaux Step}{36}{subsection.6.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.1.1}Rules}{36}{subsubsection.6.1.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Implementation}{37}{subsection.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.2.1}Handy methods}{40}{subsubsection.6.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Model Implementation}{47}{section.7}\protected@file@percent }
+\newlabel{tableaux:branch:output}{{7}{47}{Tableaux branch output}{section*.64}{}}
+\newlabel{tableaux:branch:output}{{7}{47}{Model output}{section*.65}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Modal point representation}{47}{subsection.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Contacts representation}{50}{subsection.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Valuation representation}{50}{subsection.7.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}Handy methods}{50}{subsection.7.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.5}Building algorithm}{60}{subsection.7.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8}Quantative Contact Logics Implementation}{61}{section.8}\protected@file@percent }
+\gdef \@abspage@last{61}
