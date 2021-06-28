@@ -261,7 +261,7 @@
 		\end{itemize}
 	\end{defn}
 	\par
-	Let us note that in the above semantics we evaluate formulas not locally at points[ TODO ??], as it is in the standard modal semantics, but globally in the whole model and this is one of the main differences of the present modal approach with the standard Kripke approach.
+	Let us note that in the above semantics we evaluate formulas not locally at points, as it is in the standard modal semantics, but globally in the whole model and this is one of the main differences of the present modal approach with the standard Kripke approach.
 
 	\begin{defn}
 		A model $\M$ is a \textit{\textbf{model of a formula}} $\phi$ if $\phi$ is \textit{true} in $\M$.
@@ -292,7 +292,6 @@
 	\begin{lemma} (Non-zero term) Let a and b are terms. Then \par $\neg(a \leq b) \implies a \sqcap b^* \neq 0$
 	\end{lemma}
 
-	TODO: axiom or lemma or neither??
 	\begin{axiom}
 		(Reflexivity) Let a be a term. Then \par $ a \neq 0 \implies aCa$.
 	\end{axiom}
@@ -306,7 +305,7 @@
 	\end{lemma}
 
 	\begin{lemma}
-		(Distributivity) Let a and b are terms. Then \par $aC(b \sqcup c) \iff aCb \lor aCc$, \; TODO what is the other one? $aC(b \sqcup c) \iff aCb \lor aCc$.
+		(Distributivity) Let a and b are terms. Then \par $aC(b \sqcup c) \iff aCb \lor aCc$, \; $(a \sqcup b)Cc \iff aCc \lor bCc$.
 	\end{lemma}
 
 	\begin{lemma}
@@ -713,7 +712,7 @@
 	The main programming language is C++. Flex \& Bison are used to parse the input formula. The formula proover is a C++ library. The unit and performance tests are C++ applications.
 	The user application is a Web page. The Web server is implemented with the third-party CppRestSDK library. The satisfiability checking runs on the server. There is a feature to interrupt an ongoing process. Can be triggered by the user via a button. There is a user disconnecting detection which cancels the requested formula prooving.
 
-	TODO: something more? Maybe some screenshots from the web application or in its section are enough?
+	The project repository is at \url{https://github.com/Anton94/modal_logic_formula_prover}. Each commit is build and tested on a various compilers (Windows and Linux OS).
 		
 	\subsection{Syntax}
 	The formula should be easy and intuitive to write. Only the keyboard keys should be used. The legend bellow describes the formula's syntax:
@@ -796,7 +795,9 @@ child {node {C}
 	\newpage
 	\paragraph{Operation types} Enum structure is used to represent the type of formulas and terms in a memory efficient way.
 
-	\begin{lstlisting}[language=C++]
+\begin{lstlisting}[language=C++]
+ast.h
+
 enum class formula_operation_t
 {
     constant_true,
@@ -821,12 +822,14 @@ enum class term_operation_t
     complement,
     variable
 };
-	\end{lstlisting}
+\end{lstlisting}
 
 	\newpage
 	\paragraph{Node types} There are two types of nodes. Formula nodes and term nodes. They are defined with a separate classes.
 
-	\begin{lstlisting}
+\begin{lstlisting}
+ast.h
+
 class Node
 {
     ...
@@ -856,7 +859,7 @@ public:
     NTerm* right;
     std::string variable;
 };
-	\end{lstlisting}
+\end{lstlisting}
 
 	\subsubsection{Tokenizer}
 	The tokenizer is responsible for demarcating the special sybmols in the input formula.
@@ -950,7 +953,9 @@ public:
 
 		\paragraph{Algorithm} The following is the parser algorithm which produces an Abstract Sytax Tree.
 
-	\begin{lstlisting}
+\begin{lstlisting}
+parser.y
+
 formula // 'formula' non-terminal
     : 'T' { // matching token 'T'
         $$ = create_formula_node(constant_true);   
@@ -1034,7 +1039,7 @@ term
         $$ = $2;
     }
   ;
-	\end{lstlisting}
+\end{lstlisting}
 
 	\subsection{Formula refinement}
 	The AST can be easily modified and optimized. One of the modifications is removing the implications and equivalences. They are replaced by conjunction, disjunction, and negation. This is convenient because it simplifies the tableau method. It does not have to handle implication and equivalence operations. The following is a modified AST of $\phi$ \ref{AST-phi} without the implication:
@@ -1068,6 +1073,8 @@ child {node {C}
 
 \newpage
 \begin{lstlisting}
+visitor.h/ast.h
+
 ...
 class Visitor
 {
@@ -1115,7 +1122,10 @@ public:
 
 	\newpage
 	It's worth showing the implemention of the VPrinter visit methods. They are simple and a good illustration of the pattern. Shows how the AST tree is traversed by calling the VPrinter instance with the AST's root node.
+
 \begin{lstlisting}
+visitor.cpp
+
 void VPrinter::visit(NFormula& f)
 {
     switch(f.op)
@@ -1303,6 +1313,8 @@ void VPrinter::visit(NTerm& t)
 	The formula structure will be similar to the AST. A couple of changes reflecting the optimizations above. The following is the final formula node's layout.
 
 \begin{lstlisting}
+formula.h/term.h
+
 class formula {
     ...
     enum class operation_type : char {
@@ -1370,7 +1382,10 @@ class term {
 
 	\subsubsection{Hashing}
 	The following is the implemented hash construction procedure for the term node. The formula node is analogous.
+
 \begin{lstlisting}
+term.cpp
+
 void term::construct_hash()
 {
   switch(op_)
@@ -1410,54 +1425,6 @@ void term::construct_hash()
 	\newpage
 	\subsubsection{Conversion from AST}
 	The formula building from an AST is straightforward. Recursive depth first iteration over the AST. For each AST node a coresponding formula/term node is constructed. The implementation could be found in \textit{term.cpp} and \textit{formula.cpp} in the repository.
-
-	\newpage
-	THE FOLLOWING ARE NOTES WHICH WILL BE REMOVED \\
-
-	- Tableau - the official doc is fairly good, use it
-
-    - In the introduction - github repo, automatic test on each commit on various of machines
-
-	- variable evaluations - representation
-		- plus one operation (Next)
-		- marked bits only for the used variables
-		- plus one on marked bits
-	 - contact matrix representation
-
-
-	 \iffalse
-		Notes for the official documentation
-	 - bitset-Next instead of bitet-PlusOne on marked and explain the marked before defining the
-	 - variable bitset/boolean substitution does now explains anything and is confusing.
-	 - Variable boolean substitution - how the substitution is done? And why we need it? What it's going to be used for?
-	 - Term hash variable -> without 'variable', maybe 'member'.
-	 - Term Set-Evaluation -> Maybe boolean valuation should be the correct name
-	 - Variable Set-Substituitons -> maybe variable evalualuation instead of substituion. Now it's too complicated with this substituioning
-	 - Term Set-Evaluation : $& |$ as cup and cap symbols maybe?
-	  -
-	\fi
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	\newpage
 	\section{Tableaux Implementation}
@@ -1547,16 +1514,16 @@ void term::construct_hash()
 	\end{itemize}
 
 	These collctions are unordered sets of points to the formulas/terms.
-\noindent
-\textit{types.h}
+
 \begin{lstlisting}
+types.h
 using formulas_t = std::unordered_set<const formula*, formula_ptr_hasher, formula_ptr_comparator>;
 using terms_t = std::unordered_set<const term*, term_ptr_hasher, term_ptr_comparator>;
 \end{lstlisting}
 
-\noindent
-\textit{tableau.h}
 \begin{lstlisting}
+tableau.h
+
     formulas_t formulas_T_;
     formulas_t formulas_F_;
     formulas_t contacts_T_;
@@ -1617,11 +1584,11 @@ using terms_t = std::unordered_set<const term*, term_ptr_hasher, term_ptr_compar
 	\subsubsection*{Lemma: A-inverse}
 	Let x, y and z be terms. Suppose that the atomic formulas C(x,y) or C(z, x) has already been signed as true, then marking the formula x = 0 as true will lead to contradiction.
 	\newline
-	TODO: addd short proof.
 	\subsubsection*{Time Complexity A and A-inverse}
 	The algorithmic complexity to check whether a new formula leads to contradiction by Lemma A and Lemma A-inverse is done effectively. Namely in constant time with the usage of one new collection $contact\_T\_terms\_$. It keeps the terms of the true contacts. Namely the contacts in the collection $contacts\_T$. This means that for each $\mathbb{T}(C(x, y))$, the terms x and y are in the mentioned collection of true terms. The $contact\_T\_terms\_$  is a multiset and keeps track of all added terms, meaning that if the term x is added twice and then removed only once there will still be an entry of that x in the $contact\_T\_terms\_$ collection. Removing a true contact appears when moving up the tableau tree, i.e. switching to another branch.
 
 	To check if a new formula leads to contradiction by Lemma A or Lemma A-inverse the following method is used:
+
 \begin{lstlisting}
 auto has_broken_contact_rule(const formula* f) const -> bool;
 \end{lstlisting}
@@ -1998,9 +1965,9 @@ auto tableau::satisfiable_step() -> bool
 
 	The following is the implementation of the variable evaluation:
 \newpage
-\noindent
-\textit{variables\_evaluations\_block.h/cpp}
 \begin{lstlisting}
+variables_evaluations_block.h/cpp
+
 using variables_mask_t = boost::dynamic_bitset<>;
 using variables_evaluations_t = boost::dynamic_bitset<>;
 using set_variables_ids_t = std::vector<size_t>;
@@ -2072,9 +2039,8 @@ auto variables_evaluations_block::generate_next_evaluation() -> bool
     return true;
 }
 \end{lstlisting}
-\noindent
-\textit{model.h}
 \begin{lstlisting}
+model.h
 using points_t = std::vector<variables_evaluations_block>;
 points_t points_;
 \end{lstlisting}
@@ -2105,9 +2071,9 @@ variable_id_to_points_t variable_evaluations_;
 	The algorithm for building a model creates a pair of points for each contact in the branch conjunction. Therefore these points should be in contact. In addition to that each modal point is in contact with itself (reflexivity).
 
 \newpage
-\noindent
-\textit{imodel.h/cpp}
 \begin{lstlisting}
+imodel.h/cpp
+
 // Useful for models which have their first 2*@number_of_contacts points
 // in contact (point 2k is in contact with point (2k+1))
 // Inserts 1s in the contact relations matrix between points 2k and 2k+1
@@ -2142,10 +2108,9 @@ void imodel::create_contact_relations_first_2k_in_contact(
 	\subsubsection*{Variable evaluation filling}
 	Fills the $variable\_evaluations\_$ matrix based on the current modal points.
 \\
-\\
-\noindent
-\textit{imodel.h/cpp}
 \begin{lstlisting}
+imodel.h/cpp
+
 void model::calculate_the_model_evaluation_of_each_variable()
 {
     const auto points_size = points_.size();
@@ -2179,11 +2144,11 @@ void model::calculate_the_model_evaluation_of_each_variable()
 	\newpage
 	\subsubsection*{Evaluating a term}
 	The implementation of the boolean valuation \ref{boolean-valuation} is in the \textit{term} class. The details are in the \textit{term.cpp} file.
-	The boolean valuation assigns a constant true or false to the term for some variable evaluation. This variable evaluation assigns a constant true or false to each boolean variable in the term.
+	The boolean valuation assings a constant true or false to the term for some variable evaluation. This variable evaluation assings a constant true or false to each boolean variable in the term.
 \\
-\noindent
-\textit{term.h}
 \begin{lstlisting}
+term.h
+
 class term {
 ...
 struct evaluation_result
@@ -2220,9 +2185,9 @@ auto term::evaluate(
 	\subsubsection*{Zero terms satisfaction}
 	Checks whether a modal point(variable evaluation) does not conflict with the zero terms. The point should not be part of any zero term evaluation. So, the point should evaluate all zero terms to constant false.
 \\
-\noindent
-\textit{utils.h/cpp}
 \begin{lstlisting}
+utils.h/cpp
+
 /// Returns true if the evaluation evaluates all zero terms to false.
 auto are_zero_terms_T_satisfied(
 	const terms_t& zero_terms_T,
@@ -2248,10 +2213,8 @@ auto are_zero_terms_T_satisfied(
 	For the reflexivity it is sufficient to verify that the point is not part of the both non-contact terms evaluations. So, the point should not evaluate both terms to constant true.
 
 	For the connectivity it is sufficient to verify that the pair of points does not participate in the non-contact terms evaluations. So, the points should not evaluate the terms to constant true.
-\\
-\noindent
-\textit{utils.h/cpp}
 \begin{lstlisting}
+utils.h/cpp
 auto is_contacts_F_reflexive_rule_satisfied(
 	const formulas_t& contacts_F,
 	const variables_evaluations_block& evaluation) -> bool
@@ -2303,10 +2266,9 @@ auto is_contacts_F_connectivity_rule_satisfied(
 	\subsubsection*{Construction modal points for non-zero terms}
 	Creates a modal point for each non-zero term in the branch conjunction. The point should not conflict with any zero term or non-contact.
 \\
-\\
-\noindent
-\textit{model.h/cpp}
 \begin{lstlisting}
+model.h/cpp
+
 auto model::construct_non_zero_model_points(
 	const terms_t& zero_terms_F, const formulas_t& contacts_F,
 	const terms_t& zero_terms_T) -> bool
@@ -2388,10 +2350,9 @@ auto model::generate_next_point_evaluation(
 	\subsubsection*{Construction modal points for contacts}
 	Creates a pair of modal points for each contact in the branch conjunction.
 \\
-\\
-\noindent
-\textit{model.h/cpp}
 \begin{lstlisting}
+model.h/cpp
+
 auto model::construct_contact_model_points(
 	const formulas_t& contacts_T, const formulas_t& contacts_F,
 	const terms_t& zero_terms_T) -> bool
@@ -2455,9 +2416,9 @@ auto model::construct_contact_points(
 	\subsection{Building algorithm}
 	The building algorithm is simple. Creates a pair of suitable modal points for each contact. Creates a suitable modal point for each non-zero term. Lastly, updates the boolean variable valuation and connectivity matrix.
 \\
-\noindent
-\textit{model.h/cpp}
 \begin{lstlisting}
+model.h/cpp
+
 auto model::create(
 	const formulas_t& contacts_T, const formulas_t& contacts_F,
 	const terms_t& zero_terms_T, const terms_t& zero_terms_F,
@@ -2495,9 +2456,9 @@ auto model::create(
 	\subsubsection*{Construction of all valid modal points}
 	The first step of the algorithm for building a connected model is to create all valid modal points. A valid modal point is a point that does not conflict with any zero term or non-contact.
 \\
-\noindent
-\textit{connected\_model.h/cpp}
 \begin{lstlisting}
+connected_model.h/cpp
+
 void connected_model::construct_all_valid_unique_points(
 	const formulas_t& contacts_F,
 	const terms_t& zero_terms_T)
@@ -2522,9 +2483,9 @@ void connected_model::construct_all_valid_unique_points(
 
 	Another way of evaluating a term is via the whole valuation. It returns a set of modal points which participate in its evaluation. It is implemented in the \textit{term} class.
 \\
-\noindent
-\textit{term.h/cpp}
 \begin{lstlisting}
+term.h/cpp
+
 auto term::evaluate(
 	const variable_id_to_points_t& variable_evaluations,
 	const size_t points_count) const -> model_points_set_t
@@ -2562,10 +2523,9 @@ auto term::evaluate(
 	\subsubsection*{Contacts satisfcation}
 	Checks whether the contacts are satisfied. It is sufficient to verify that there is a pair of points in the contact terms evaluations which are in contact.
 \\
-\\
-\noindent
-\textit{connected\_model.h/cpp}
 \begin{lstlisting}
+connected_model.h/cpp
+
 auto connected_model::is_contacts_T_rule_satisfied(
 	const formulas_t& contacts_T) const -> bool
 {
@@ -2610,10 +2570,9 @@ auto connected_model::is_contact_satisfied(
 	\subsubsection*{Contacts existence satisfaction}
 	Checks whether the contacts have at least one point in their term's evaluations. It's a faster verification than the whole contact satisfication.
 \\
-\\
-\noindent
-\textit{connected\_model.h/cpp}
 \begin{lstlisting}
+connected_model.h/cpp
+
 auto connected_model::is_contacts_T_existence_rule_satisfied(
 	const formulas_t& contacts_T) const -> bool
 {
@@ -2636,10 +2595,9 @@ auto connected_model::is_contacts_T_existence_rule_satisfied(
 	\subsubsection*{Non-zero term satisfaction}
 	Checks whether the non-zero terms are satisfied. It is sufficient to verify that there is a at least one modal point in each non-zero term's evaluation.
 \\
-\\
-\noindent
-\textit{connected\_model.h/cpp}
 \begin{lstlisting}
+connected_model.h/cpp
+
 auto connected_model::is_zero_terms_F_rule_satisfied(
 	const terms_t& zero_terms_F) const -> bool
 {
@@ -2658,9 +2616,9 @@ auto connected_model::is_zero_terms_F_rule_satisfied(
 	\subsubsection*{Contact matrix building}
 	The first step of the algorithm for building a connected model is to create all valid modal points. A valid modal point is a point which does not conflict with any zero term or non-contact.
 \\
-\noindent
-\textit{connected\_model.h/cpp}
 \begin{lstlisting}
+connected_model.h/cpp
+
 /*
 * Builds N x N bit matrix with contact relations between all points,
 * which later reduces in order to satisfy all ~C atomic formulas.
@@ -2721,10 +2679,9 @@ auto connected_model::build_contact_relations_matrix(
 	\subsubsection*{Connected components}
 	Let us look at the model as a graph. The modal points are the vertices. The contacts between them are the edges. This method returns a vector of connected components in the graph. Each connected component is described by the points in it. The algorithm is a standard BFS from each not visited node in the graph.
 \\
-\\
-\noindent
-\textit{connected\_model.h/cpp}
 \begin{lstlisting}
+connected_model.h/cpp
+
 auto connected_model::get_connected_components()
 	const -> std::vector<model_points_set_t>
 {
@@ -2799,10 +2756,8 @@ auto connected_model::get_connected_component(
 	\subsubsection*{Reduce variable evaluations to a subset of points}
 	Leaves only a selected subset of points in the variable evaluations.
 \\
-\\
-\noindent
-\textit{connected\_model.h/cpp}
 \begin{lstlisting}
+connected_model.h/cpp
 void connected_model::reduce_variable_evaluations_to_subset_of_points(
 	const model_points_set_t& points_subset)
 {
@@ -2817,10 +2772,9 @@ void connected_model::reduce_variable_evaluations_to_subset_of_points(
 	\subsubsection*{Reduce model to a subset of points}
 	Leaves only a selected subset of points in the model. Updates the variable evaluations and the contact relations between them.
 \\
-\\
-\noindent
-\textit{connected\_model.h/cpp}
 \begin{lstlisting}
+connected_model.h/cpp
+
 void connected_model::reduce_model_to_subset_of_points(
 	const model_points_set_t& points_subset)
 {
@@ -2890,10 +2844,9 @@ void connected_model::reduce_model_to_subset_of_points(
 	\subsection{Building algorithm}
 	The building algorithm used the described methods. Follows the \ref{connected-model-building} connected model building algorithm.
 \\
-\\
-\noindent
-\textit{connected\_model.h/cpp}
 \begin{lstlisting}
+connected_model.h/cpp
+
 auto connected_model::create(
 	const formulas_t& contacts_T, const formulas_t& contacts_F,
 	const terms_t& zero_terms_T, const terms_t& zero_terms_F,
@@ -2971,7 +2924,6 @@ auto connected_model::create(
 	 - inductive def. For structures, e.g. terms
 	 - recursive for functions
 	 - R is reflexive and symmetric - somewhere to mention it.
-	 - Code location for each snippet(only filename)
 	\fi
 
 	\newpage
