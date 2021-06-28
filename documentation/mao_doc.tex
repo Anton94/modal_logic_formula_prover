@@ -51,18 +51,19 @@
     basicstyle=\footnotesize,% basic font setting
 }
 
-\title{Satisfiability of Qualitative Contact Logics}
+\title{Satisfiability of Quantitative Contact Logics}
 \date{2019-9-28}
 \author{Martin Stoev}
 
 \begin{document}
 	\maketitle
+ 	\thispagestyle{empty}
 	\newpage
 
 	\tableofcontents
+	\pagenumbering{arabic}
 
 	\newpage
-
 	\section{Tableaux Method}
 Properties for a logical formula are best proven when the formula is decomposed into subformulas. Namely, the formula is defined in such a way that it can be described with a a structural recursive approach. The idea is to test a property only for some subformula and then to derive that property for the given formula.
 Being able from a subformula to conclude properties for the formula itself leads to well structured and performant algorithms.
@@ -2584,9 +2585,7 @@ auto model::create(
 \end{lstlisting}
 
 	\newpage
-	\section{Quantative Contact Logics Implementation}
-
-\newpage
+	\section{Quantitative Contact Logics Implementation}
 	\subsubsection*{Model Valuation of a Term}
 	The implementation of the model valuation \ref{model-valuation} is in the \textit{term} class. The details are in the \textit{term.cpp} file.
 	The model valuation assigns a set of points to the term for some variable valuation.
@@ -2619,9 +2618,12 @@ auto term::evaluate(
 	An inequality is added to the system with the method:
 \begin{lstlisting}
      /*
-     * Returns true if the system is solvable and the added inequality does not makes the system unsolvable.
+     * Returns true if the system is solvable and the added inequality
+     *     does not makes the system unsolvable.
      */
-    auto add_constraint(const variables_set& lhs, const variables_set& rhs, inequality_operation op) -> bool;
+    auto add_constraint(const variables_set& lhs,
+	const variables_set& rhs, 
+	inequality_operation op) -> bool;
 \end{lstlisting}
 	The check whether the system has a solution is done with:
 \begin{lstlisting}
@@ -2634,7 +2636,8 @@ auto term::evaluate(
 	taken with the following method:
 \begin{lstlisting}
     /*
-     * If the system is solvable, returns a vector of values, which satisfy the system.
+     * If the system is solvable, returns a vector of values,
+     *      which satisfy the system.
      * Element at position 'i' is the value of the i-th variable.
      * If the system is not solvable, returns an empty vector.
      */
@@ -2692,39 +2695,53 @@ auto term::evaluate(
 auto measured_model::has_solvable_system_of_inequalities() -> bool
 {
     // For each <=m(a,b) calculate v(a) and v(b), then we will create
-    // an inequality of the following type: SUM_I Xi <= SUM_J Xj, where I is v(a) and J is v(b).
+    // an inequality of the following type: 
+    //     SUM_I Xi <= SUM_J Xj, where I is v(a) and J is v(b).
     // For each ~<=m(a,b) calculate v(a) and v(b), then we will create
-    // an inequality of the following type: SUM_I Xi > SUM_J Xj, where I is v(a) and J is v(b).
-    // Each inequality is a row in the system of inequalities. If this system has a solution, then we are good.
+    // an inequality of the following type: 
+    //     SUM_I Xi > SUM_J Xj, where I is v(a) and J is v(b).
+    // Each inequality is a row in the system of inequalities. 
+    // If this system has a solution, then we are good.
 
     const auto points_size = points_.size();
     system_.clear();
 
     for(const auto& m : measured_less_eq_T_)
     {
-        const auto v_a = m->get_left_child_term()->evaluate(variable_evaluations_, points_size);
-        const auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
-        if (!system_.add_constraint(v_a, v_b, system_of_inequalities::inequality_operation::LE))
+        const auto v_a = m->get_left_child_term()->evaluate(
+		variable_evaluations_, points_size);
+        const auto v_b = m->get_right_child_term()->evaluate(
+		variable_evaluations_, points_size);
+        if (!system_.add_constraint(v_a, v_b,
+		system_of_inequalities::inequality_operation::LE))
         {
-            verbose() << "Unable to find a solution for the system when adding the constraint for " << *m << "\n" << *static_cast<imodel* const>(this); // TODO: why not able to call directly *this??? why unresolved ???
+            verbose() << "Unable to find a solution for the system"
+		"when adding the constraint for " << *m << "\n" << 
+		*static_cast<imodel* const>(this);
             return false;
         }
     }
 
     for(const auto& m : measured_less_eq_F_)
     {
-        const auto v_a = m->get_left_child_term()->evaluate(variable_evaluations_, points_size);
-        const auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
-        if (!system_.add_constraint(v_a, v_b, system_of_inequalities::inequality_operation::G))
+        const auto v_a = m->get_left_child_term()->evaluate(
+		variable_evaluations_, points_size);
+        const auto v_b = m->get_right_child_term()->evaluate(
+		variable_evaluations_, points_size);
+        if (!system_.add_constraint(v_a, v_b,
+		system_of_inequalities::inequality_operation::G))
         {
             std::stringstream out;
             print_system(out);
-            verbose() << "Unable to find a solution for the system when adding the constraint for ~" << *m << "\n" << *static_cast<imodel* const>(this);
+            verbose() << "Unable to find a solution for the system"
+		"when adding the constraint for ~" << *m << "\n" <<
+		*static_cast<imodel* const>(this);
             return false;
         }
     }
 
-    info() << "Found a solution for the system:\n" << *static_cast<imodel* const>(this);
+    info() << "Found a solution for the system:\n" <<
+		*static_cast<imodel* const>(this);
     return true;
 }
 \end{lstlisting}
@@ -2735,13 +2752,10 @@ auto measured_model::has_solvable_system_of_inequalities() -> bool
 \begin{lstlisting}
 auto measured_model::generate_next() -> bool
 {
-    // TODO: maybe cache the valid evaluations per term
-    // simulation of +1 operation from left to right but not just 0/1 bits but all combinations per element
     for (auto& point : points_)
     {
         if (point.evaluation.generate_next_evaluation())
         {
-            // TODO: this maybe can be done smarter and not just whole new calculation
             calculate_the_model_evaluation_of_each_variable();
             return true;
         }
