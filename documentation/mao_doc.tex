@@ -85,7 +85,7 @@ The decomposition process is a set of tableau steps, which decompose the initial
 
 A tableau rule which decomposes the formula in two subformulas may require the assertion of only one of the subformulas to be satisfied. In this case, we will say that the branch is split into two branches. However, in some terminologies this is noted as a new branch spawned from the original branch, or that two new branches are created. For the sake of simplicity, we will use the terminology of branch splitting. In a scenario where the branch is split, all asserted formulas in the branch are copied in the split branch together with the newly asserted subformula from the tableau rule. The newly asserted subformulas depend on the tableau rule.
 
-	\subsubsection{Rules}
+	\subsection{Rules}
 		\paragraph{Negation}
 The rules for negations are straightforward. When a negation operation is encountered, the sign of the captured formula changes.
 		\newline
@@ -268,8 +268,8 @@ Two relations are introduced, part-of relation and contact relation.
 The part-of relation constructs the structural dependencies between regions, namely the part-of relations defines the mereology of regions.
 The contact relation defines the topological relation of connection. We will abstract ourselves from the inner relation between two connected regions, namely
 this relation might be defined as "region A and region B are neighbors". What we will use for this inner relation is its reflexivity and symmetry.
+	
 	\subsection{Syntax}
-
 	\paragraph{Variable} 
 represents a region. Two predefined variables shall be used in order to simplify the notation. 
 		\begin{itemize}
@@ -367,6 +367,8 @@ Let $\mathcal{F}$  be a frame, then a boolean variable valuation is any function
 			\item $\mathscr{v}(a*) = W \ \mathscr{v}(a)$
 		\end{itemize}
 
+	\subsection{Measured Model}
+
 	\paragraph{Measure function} A measure function will denote a function which maps a region to a positive real number.
 		\begin{equation*}
 			\mu : W \longrightarrow \mathbb{R}^+
@@ -393,6 +395,7 @@ If $\Sigma$ is a class of frames, we say that $\varphi$ is true in $\Sigma$, in 
 formulas A is satisfiable in $\Sigma$, or A is $\Sigma$-consistent, if there is a model $\mathcal{M} = (\mathcal{F}, \mathscr{v})$ with $\mathcal{F} \in \Sigma$ such that $\mathcal{M}$
 is a model of A.
 
+	\subsection{Formula Properties}
 \begin{axiom}[Contact reflexivity]
 	Let a be a term, then
 	\begin{equation*}
@@ -534,7 +537,7 @@ $\Longleftarrow$
 		\end{itemize}
 		Where $\mu$ is a measure function. Detailed definition is given in \ref{measured-model}.
 	
-	\section{Formula Satisfiability} 
+	\subsection{Formula Satisfiability} 
 The satisfiability verification for a given formula is done by constructing a model. The formula is satisfiable only if such a model exists. The model construction is done in several steps. Foremost, the tableau method is used to simplify the problem and to detect contradictions earlier in the process, even before the model construction. If all branches of the tableau method are closed, then a model in which the given formula is satisfiable does not exist. If there are open branches in the tableau result, then semantical reasoning shall be done in order to construct a model, if such a model exists. Let us define few definitions before we define the process of formula satisfiability.
 
 	\paragraph{Tableau Branch Conjunction}
@@ -809,9 +812,11 @@ The satisfiability verification for a given formula is done by constructing a mo
 	\newpage
 	\section{Implementation Introduction}
 	The main programming language is C++. Flex \& Bison are used to parse the input formula. The formula prover is a C++ library. The unit and performance tests are C++ applications.
-	The user application is a Web page. The Web server is implemented with the third party CppRestSDK library. The satisfiability checking runs on the server. There is a feature to interrupt an ongoing process. Can be triggered by the user via a button. There is a user disconnecting detection which cancels the requested formula proving.
+	The user application is a Web page. The Web server is implemented with the third party CppRestSDK library. The satisfiability checking runs on the server. There is a feature to interrupt an ongoing process. Can be triggered by the user via a button. There is a user disconnecting detection which cancels the requested formula proving. \\
+	The project repository is at:
 
-	The project repository is at \url{https://github.com/Anton94/modal_logic_formula_prover}. Each commit is build and tested on a various compilers (Windows and Linux OS).
+	\url{https://github.com/Anton94/modal_logic_formula_prover}. \\
+	Each commit is build and tested on a various compilers (Windows and Linux OS).
 		
 	\subsection{Syntax}
 	The formula should be easy and intuitive to write. Only the keyboard keys should be used. The legend below describes the formula's syntax:
@@ -893,7 +898,10 @@ child {node {C}
 
 	\newpage
 	\paragraph{Operation types} Enum structure is used to represent the type of formulas and terms in a memory efficient way.
-
+	\\
+	\\
+\noindent
+\textit{ast.h}
 	\begin{lstlisting}[language=C++]
 enum class formula_operation_t
 {
@@ -923,7 +931,10 @@ enum class term_operation_t
 
 	\newpage
 	\paragraph{Node types} There are two types of nodes. Formula nodes and term nodes. They are defined with a separate classes.
-
+	\\
+	\\
+\noindent
+\textit{ast.h}
 	\begin{lstlisting}
 class Node
 {
@@ -1047,7 +1058,10 @@ public:
 			\end{itemize}
 
 		\paragraph{Algorithm} The following is the parser algorithm, which produces an Abstract Syntax Tree.
-
+	\\
+	\\
+\noindent
+\textit{parser.y}
 	\begin{lstlisting}
 formula // 'formula' non-terminal
     : 'T' { // matching token 'T'
@@ -1165,6 +1179,8 @@ child {node {C}
 	\subsubsection{Visitor Pattern} The AST modification is best achieved with the visitor pattern \cite{visitor-pattern}. Uses double virtual dispatching. Separates the algorithm from the object structure on which it operates. Allows new visitors to be added in a simple manner. Each AST modification will be implemented as a visitor. Will not explain the pattern in depth. In essence, the visitor pattern requires the AST nodes to implement a virtual \textbf{accept} method. This method accepts a visitor as argument and calls the visitor's virtual \textbf{visit} method with the real node's type. This is the double virtual dispatching. One virtual call to find the node's real type. Another to find the visitor's real type. Now, adding a new visitor requires only adding its class. Does not require changes in the AST node classes or other visitor classes.
 
 \newpage
+\noindent
+\textit{visitor.h}
 \begin{lstlisting}
 ...
 class Visitor
@@ -1212,7 +1228,11 @@ public:
 \end{lstlisting}
 
 	\newpage
-	It's worth showing the implementation of the VPrinter visit methods. They are simple and a good illustration of the pattern. Shows how the AST tree is traversed by calling the VPrinter instance with the AST's root node.
+	It's worth showing the implementation of the VPrinter visit methods. They are simple and a good illustration of the pattern. Shows how the AST tree is traversed by calling the VPrinter instance with the AST's root node.	
+	\\
+	\\
+\noindent
+\textit{visitor.cpp}
 \begin{lstlisting}
 void VPrinter::visit(NFormula& f)
 {
@@ -1399,7 +1419,10 @@ void VPrinter::visit(NTerm& t)
 	\newpage
 	\subsubsection{Layout}
 	The formula structure will be similar to the AST. A couple of changes reflecting the optimizations above. The following is the final formula node's layout.
-
+	\\
+	\\
+\noindent
+\textit{formula.h} / \textit{term.h}
 \begin{lstlisting}
 class formula {
     ...
@@ -1468,6 +1491,10 @@ class term {
 
 	\subsubsection{Hashing}
 	The following is the implemented hash construction procedure for the term node. The formula node is analogous.
+	\\
+	\\
+\noindent
+\textit{term.h}
 \begin{lstlisting}
 void term::construct_hash()
 {
@@ -1517,15 +1544,16 @@ void term::construct_hash()
 
 	The main principle of the tableaux is to break a complex formula into smaller ones until complementary pairs of atomic formulas are produced.
 
-	\subsubsection*{Definition: Signed formulas set}
-	The signed formulas set consists only of signed formulas. The letter \textit{X} is usually used for its representation.
+	\begin{defn}
+		A set of only signed formulas represents a signed formula set. The letter \textit{X} is usually used for its representation.
+	\end{defn}
 
-	\subsection{Definition: Tableaux Step}
+	\subsection{Tableaux Step}
 	The \textit{Tableaux Step} takes as input a formula and a signed formulas set and produces as output one or two new formulas, depending on the operation.
 	The signed formulas set consists of the broken down formulas by previous tableaux steps.
 	The output of the tableaux step depends on the rule applied to the formula.
 
-	\subsubsection{Rules}
+	\subsection{Rules}
 	Only \textit{negation} \textit{conjunction} and \textit{disjunction} operations will be handled. The implication and equivalence are converted.
 
 		\subsubsection*{Negation}
@@ -1574,8 +1602,9 @@ void term::construct_hash()
 	\subsection{Implementation}
 	The program implementation of the tableaux method follows the standard tableaux process. The first interesting design decision is to keep all true signed formulas in one data set, and all false signed formulas in another data set. This enables fast searches whether a formula has been signed as true or false.
 
-	\subsubsection*{Definition: Signed Formula Collection}
-	Let X be a set of formulas, then X is called signed formula collection if and only if all formulas in X are signed as true or all formulas are signed as false.
+	\begin{defn}
+	Let X be a set of formulas, then X is called \textbf{signed formula collection} if and only if all formulas in X are signed as true or all formulas are signed as false.
+	\end{defn}
 
 	This collection is implemented with \textit{std::unordered\_set} (hashset), which stores the formulas by pointers to their root nodes. The hashing uses the node's precalculated hash. The comparing is via the node's \textit{operator==}. That way, different pointers to subformulas with the same structure will be treated as identical.
 
@@ -1596,12 +1625,20 @@ void term::construct_hash()
 		\item measured\_less\_eq\_F - contains only formulas of type $\varphi \le_m \psi$ signed as false
 	\end{itemize}
 
-	These collctions are unordered sets of points to the formulas/terms.
+	These collections are unordered sets of points to the formulas/terms.
+	\\
+	\\
 \noindent
 \textit{types.h}
 \begin{lstlisting}
-using formulas_t = std::unordered_set<const formula*, formula_ptr_hasher, formula_ptr_comparator>;
-using terms_t = std::unordered_set<const term*, term_ptr_hasher, term_ptr_comparator>;
+using formulas_t = std::unordered_set<
+	const formula*, 
+	formula_ptr_hasher, 
+	formula_ptr_comparator>;
+using terms_t = std::unordered_set<
+	const term*, 
+	term_ptr_hasher, 
+	term_ptr_comparator>;
 \end{lstlisting}
 
 \noindent
@@ -1617,7 +1654,7 @@ using terms_t = std::unordered_set<const term*, term_ptr_hasher, term_ptr_compar
     formulas_t measured_less_eq_F_;
 \end{lstlisting}
 
-	\subsubsection*{Definition: Formula Contradiction}
+	\begin{defn}
 	Let $\varphi$ be a signed formula, then $\varphi$ is causing a contradiction if any of the following is true:
 	\begin{itemize}
 		\item $\varphi$ is a non-atomic signed as true and $\varphi$ belongs to $formulas\_F$
@@ -1629,8 +1666,8 @@ using terms_t = std::unordered_set<const term*, term_ptr_hasher, term_ptr_compar
 		\item $\varphi$ is a measured less formula signed as true and $\varphi$ belongs to $measured\_less\_eq\_F$
 		\item $\varphi$ is a measured less formula signed as false and $\varphi$ belongs to $measured\_less\_eq\_T$
 	\end{itemize}
-
-	\subsubsection*{Invariant}
+	\end{defn}
+	\subsection*{Invariant}
 	At any time, all formulas in all eight signed formula collections do not contradict.
 
 	A contradiction may occur if a formula is split and some resulting components causes a contradiction.
@@ -1675,8 +1712,7 @@ using terms_t = std::unordered_set<const term*, term_ptr_hasher, term_ptr_compar
 auto has_broken_contact_rule(const formula* f) const -> bool;
 \end{lstlisting}
 
-	\subsubsection{Handy methods}
-	\subsubsection*{Searching}
+	\subsection{Handy methods}
 	\subsubsection*{Search for formula signed as true}
 \begin{lstlisting}
 auto find_in_T(const formula* f) const -> bool
@@ -1752,8 +1788,12 @@ void remove_formula_from_F(const formula* f)
 	\end{itemize}
 
 	\newpage
-	\subsubsection*{Tableaux Satisfiable Step Implementation}
+	\subsection{Tableaux Satisfiable Step Implementation}
 	The Tableaux satisfiable step is the whole Tableaux algorithm.
+	\\
+	\\
+\noindent
+\textit{tableau.cpp}
 \begin{lstlisting}
 auto tableau::satisfiable_step() -> bool
 {
@@ -2229,7 +2269,8 @@ void model::calculate_the_model_evaluation_of_each_variable()
 	\subsubsection*{Evaluating a term}
 	The implementation of the boolean valuation \ref{boolean-valuation} is in the \textit{term} class. The details are in the \textit{term.cpp} file.
 	The boolean valuation assigns a constant true or false to the term for some variable evaluation. This variable evaluation assigns a constant true or false to each boolean variable in the term.
-\\
+	\\
+	\\
 \noindent
 \textit{term.h}
 \begin{lstlisting}
@@ -2268,7 +2309,8 @@ auto term::evaluate(
 	\newpage
 	\subsubsection*{Zero terms satisfaction}
 	Checks whether a modal point(variable evaluation) does not conflict with the zero terms. The point should not be part of any zero term evaluation. So, the point should evaluate all zero terms to constant false.
-\\
+	\\
+	\\
 \noindent
 \textit{utils.h/cpp}
 \begin{lstlisting}
@@ -2297,7 +2339,8 @@ auto are_zero_terms_T_satisfied(
 	For the reflexivity, it is sufficient to verify that the point is not part of the both non-contact terms evaluations. So, the point should not evaluate both terms to constant true.
 
 	For the connectivity, it is sufficient to verify that the pair of points does not participate in the non-contact terms evaluations. So, the points should not evaluate the terms to constant true.
-\\
+	\\
+	\\
 \noindent
 \textit{utils.h/cpp}
 \begin{lstlisting}
@@ -2348,7 +2391,7 @@ auto is_contacts_F_connectivity_rule_satisfied(
 \end{lstlisting}
 
 	\newpage
-	\subsubsection*{Modal points constructors}
+	\subsection{Modal points constructors}
 	\subsubsection*{Construction modal points for non-zero terms}
 	Creates a modal point for each non-zero term in the branch conjunction. The point should not conflict with any zero term or non-contact.
 \\
@@ -2503,7 +2546,8 @@ auto model::construct_contact_points(
 	\newpage
 	\subsection{Building algorithm}
 	The building algorithm is simple. Creates a pair of suitable modal points for each contact. Creates a suitable modal point for each non-zero term. Lastly, updates the boolean variable valuation and connectivity matrix.
-\\
+	\\
+	\\
 \noindent
 \textit{model.h/cpp}
 \begin{lstlisting}
@@ -2541,7 +2585,8 @@ auto model::create(
 	\subsubsection*{Model Valuation of a Term}
 	The implementation of the model valuation \ref{model-valuation} is in the \textit{term} class. The details are in the \textit{term.cpp} file.
 	The model valuation assigns a set of points to the term for some variable valuation.
-\\
+	\\
+	\\
 \noindent
 \textit{term.h}
 \begin{lstlisting}
@@ -2560,6 +2605,10 @@ auto term::evaluate(
 		inequalities. The library's name is Kiwi.
 		Since the system of inequalities are of a special type
 		only two operations are introduced:
+	\\
+	\\
+\noindent
+\textit{system\_of\_inequalities.h}
 \begin{lstlisting}
     enum class inequality_operation
     {
@@ -2568,6 +2617,10 @@ auto term::evaluate(
     };
 \end{lstlisting}
 	An inequality is added to the system with the method:
+	\\
+	\\
+\noindent
+\textit{system\_of\_inequalities.h}
 \begin{lstlisting}
      /*
      * Returns true if the system is solvable and the added inequality
@@ -2578,6 +2631,10 @@ auto term::evaluate(
 	inequality_operation op) -> bool;
 \end{lstlisting}
 	The check whether the system has a solution is done with:
+	\\
+	\\
+\noindent
+\textit{system\_of\_inequalities.h}
 \begin{lstlisting}
     /*
      * Returns true if the system is still solvable.
@@ -2586,6 +2643,10 @@ auto term::evaluate(
 \end{lstlisting}
 	The final result when the system of inequalities is solvable can be 
 	taken with the following method:
+	\\
+	\\
+\noindent
+\textit{system\_of\_inequalities.h}
 \begin{lstlisting}
     /*
      * If the system is solvable, returns a vector of values,
@@ -2596,8 +2657,8 @@ auto term::evaluate(
     auto get_variables_values() const -> std::vector<double>;
 \end{lstlisting}
 
-	\paragraph{Measured Less Operator Representation}
-	All of the researched third party libraries for solving systems of inequalities work only with less or equal than inequalities.
+	\subsection{Measured Less Operator Representation}
+	All t	he researched third party libraries for solving systems of inequalities work only with less or equal than inequalities.
 		This means that the greater than inequalities must be simulated with the usage of less or equal than inequalities.
 		\newline
 		This absence is solved with the addition of a really
@@ -2640,9 +2701,12 @@ auto term::evaluate(
 
 	\paragraph{Building the System of Inequalities}
 	The system construction is done by adding constraints for all 	
-	measured atomic formulas. This is done by the
+	measured atomic formulas. This is done by the \\
 	\textit{has\_solvable\_system\_of\_inequalities} method:
-		
+	\\
+	\\
+\noindent
+\textit{measured\_model.h}
 \begin{lstlisting}
 auto measured_model::has_solvable_system_of_inequalities() -> bool
 {
@@ -2700,7 +2764,10 @@ auto measured_model::has_solvable_system_of_inequalities() -> bool
 
 	\paragraph{Model Points Valuations Generation}
 	The generation of new model point valuations is done as follows:
-
+	\\
+	\\
+\noindent
+\textit{measured\_model.h}
 \begin{lstlisting}
 auto measured_model::generate_next() -> bool
 {
@@ -2798,7 +2865,60 @@ auto measured_model::create(
     return true;
 }
 \end{lstlisting}
-% make the vBool with two parameters
+
+\newpage
+	\section{Rest Server}
+		The Web Server is used to serve:
+		\begin{itemize}
+			\item Rest APIs
+			\item Resources
+		\end{itemize}
+		The Rest APIs are used to chek for satisfiability, to find connected models or meassured models.
+		\newline
+		The resources are:
+		\begin{itemize}
+			\item Html pages
+			\item Images 
+			\item Javascript code
+			\item Styles
+		\end{itemize}
+		The Web Interface is easy to use, contains only the needed information and from there 
+		can be executed all of the described satisfiability algorithms.
+
+		One client can execute only one algorithmic program at a time. 
+		This way it is ensured that there are not a lot of simultaneous executing programs by the server.
+		
+		If the program execution time gets too long the client has the possibility to terminate the execution 
+		of the current program by server. This will re-enable the client to execute another program and will remove 
+		the execution load from the server.
+
+		If the client posts a couple formula for calculation and terminetes the session (for example closes the browser),
+		then the task in the backend will be terminated as well.
+
+		\subsection*{Output}
+		The output of the program is separated in three modules:
+		\begin{itemize}
+			\item Resulting output - indicates what was the final result of the execution. \\
+				For example: The formula is satisfiable.
+			\item Verbose output - This is the output which contains the full proof of the formula execution. \\
+				This output is printed though the whole execution.
+			\item Visualized graph - This is the end result of the model, if such model exists \\
+				The visualization is done with a JavaScript third party library for drawing graphs.
+		\end{itemize}
+	\newpage
+	\begin{thebibliography}{9}
+	\bibitem{flex-tokenizer} 
+		Flex Tokenizer,
+		\\\texttt{http://web.mit.edu/gnu/doc/html/flex\_1.html}
+
+	\bibitem{bison-parser} 
+		Bison Parser,
+		\\\texttt{https://www.gnu.org/software/bison/}
+
+	\bibitem{visitor-pattern} 
+		Visitor Pattern,
+		\\\texttt{https://en.wikipedia.org/wiki/Visitor\_pattern}
+	\end{thebibliography}
 
 
 
