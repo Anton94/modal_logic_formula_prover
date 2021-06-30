@@ -29,10 +29,11 @@
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{axiom}[theorem]{Axiom}
 
+\newcommand{\curvedE}{\mathscr{e}}
 \newcommand{\vVar}{\mathscr{v}_{var}}
 \newcommand{\Var}{\mathbb{V}ar}
 \newcommand{\vE}{\mathscr{v}}
-\newcommand{\vBool}{\mathscr{v}_B}
+\newcommand{\vBool}{\mathscr{vb}}
 \newcommand{\Ts}{\mathcal{T}_s}
 \newcommand{\BranchConjunction}{%
 \begin{align*}
@@ -567,16 +568,16 @@ The satisfiability verification for a given formula is done by constructing a mo
 		\end{align*}
 	\end{defn}
 
-	\paragraph{Boolean valuation} 
-		Let $\vVar$ be a variable valuation and let $\Ts$ be the set of all terms,
-		then the function $\vBool : \Ts \rightarrow \{ \textbf{false}, \textbf{true}\}$ is called a boolean valuation and is defined recursively as:
+	\paragraph{Boolean valuation}
+		Let $\curvedE$ be a variable valuation and let $\Ts$ be the set of all terms,
+		then the function $\vBool_{\curvedE} : \Ts \rightarrow \{ \textbf{false}, \textbf{true}\}$ is called a boolean valuation and is defined recursively as:
 		\begin{itemize}
-			\item $\vBool(0) = \textbf{false}$
-			\item $\vBool(1) = \textbf{true}$
-			\item $\vBool(p) = \vVar(p), \textit{ where } p \in \Var_B$
-			\item $\vBool(a \sqcap b) = \vBool(a) \land \vBool(b)$
-			\item $\vBool(a \sqcup b) = \vBool(a) \lor \vBool(b)$
-			\item $\vBool(a*) = \neg \vBool(a)$
+			\item $\vBool_{\curvedE}(0) = \textbf{false}$
+			\item $\vBool_{\curvedE}(1) = \textbf{true}$
+			\item $\vBool_{\curvedE}(p) = \curvedE(p), \textit{ where } p \in \Var_B$
+			\item $\vBool_{\curvedE}(a \sqcap b) = \vBool_{\curvedE}(a) \land \vBool_{\curvedE}(b)$
+			\item $\vBool_{\curvedE}(a \sqcup b) = \vBool_{\curvedE}(a) \lor \vBool_{\curvedE}(b)$
+			\item $\vBool_{\curvedE}(a*) = \neg \vBool_{\curvedE}(a)$
 		\end{itemize}
 
 	\begin{defn} 
@@ -584,11 +585,11 @@ The satisfiability verification for a given formula is done by constructing a mo
 	\end{defn}
 
 	\begin{defn}
-		Let a be a term, let $\vVar$ be a variable valuation which is a representation of a model point p. Then the following holds:
+		Let a be a term, let $\curvedE$ be a variable valuation which is a representation of a model point p. Then the following holds:
 		\begin{align*}
-			\vBool(a) = true \rightarrow p \in \vE(a)
+			\vBool_{\curvedE}(a) = true \rightarrow p \in \vE(a)
 		\end{align*}
-		Where $\vE$ is the model valuation function. In such a case when $\vBool(a) = \textbf{true}$ we will say that the point p is \textbf{valid}.
+		Where $\vE$ is the model valuation function. In such a case when $\vBool_{\curvedE}(a) = \textbf{true}$ we will say that the point p is \textbf{valid}.
 	\end{defn}
 	
 	\paragraph{Model Point Creation}
@@ -599,8 +600,10 @@ The satisfiability verification for a given formula is done by constructing a mo
 
 	\begin{defn}
 		Let $\Var_B$ be the set of all variables in a branch conjunction B and let a be a term.
-		Then a model point p is constructed by generating a variable valuation, such that p is valid.
-		The generation of a valid point p is done by generation of a variable valuation for which $\vBool(a) = 1$. 
+		Then a model point p is constructed by generating a variable valuation $\curvedE$, such that p is valid:
+		\begin{align*}
+			\vBool_{\curvedE}(a) = 1
+		\end{align*}
 		Let n be the number of variables in $\Var_B$, then all possible variants of a variable valuations are $2^n$.
 	\end{defn}
 
@@ -617,10 +620,10 @@ The satisfiability verification for a given formula is done by constructing a mo
 	\end{defn}
 
 	\begin{defn}
-		Let B be a branch conjunction and $C(a, b) \in B$, where a and b are two terms. Then two model points are generated p1 and p2 with their corresponding variable valuations $\vVar^1$ and $\vVar^2$ such that:
+		Let B be a branch conjunction and $C(a, b) \in B$, where a and b are two terms. Then two model points are generated p1 and p2 with their corresponding variable valuations $\curvedE^1$ and $\curvedE^2$ such that:
 		\begin{itemize}
-			\item $\vBool(a) = \textbf{true}$
-			\item $\vBool(b) = \textbf{true}$
+			\item $\vBool_{\curvedE^1}(a) = \textbf{true}$
+			\item $\vBool_{\curvedE^2}(b) = \textbf{true}$
 		\end{itemize}
 		Along with the generation of a valid variable valuation, the R relations is extended as well, namely the following relations are added:
 		\begin{itemize}
@@ -635,7 +638,7 @@ The satisfiability verification for a given formula is done by constructing a mo
 	\begin{center}
 	\begin{tikzpicture}[scale = 1]
 		\filldraw[color=black!60, fill=red!0, thick](-3,0) circle (0.5);
-		\node at (-3.5,0.7) {$\vVar^1$};
+		\node at (-3.5,0.7) {$\curvedE^1$};
 		\node at (-3,0) {$p_1$};
 		\node at (-3.5,-0.7) {a};
 		\draw[thick, ->] (-3.5,0) arc [
@@ -646,7 +649,7 @@ The satisfiability verification for a given formula is done by constructing a mo
     			] ;
 		\draw[thick, <->](-2.5,0) -- (2.5,0);
 		\filldraw[color=black!60, fill=red!0, thick](3,0) circle (0.5);
-		\node at (3.5,0.7) {$\vVar^2$};
+		\node at (3.5,0.7) {$\curvedE^2$};
 		\node at (3,0) {$p_2$};
 		\node at (3.5,-0.7) {b};
 		\draw[thick, ->] (3.5,0) arc [
@@ -661,9 +664,9 @@ The satisfiability verification for a given formula is done by constructing a mo
 	\end{center}
 
 	\begin{defn}
-		Let B be a branch conjunction and $a \neq 0 \in B$, where a is a term. Then one model point p is generated and its variable valuations $\vVar$ such that:
+		Let B be a branch conjunction and $a \neq 0 \in B$, where a is a term. Then one model point p is generated and its variable valuations $\curvedE$ such that:
 		\begin{itemize}
-			\item $\vBool(a) = \textbf{true}$
+			\item $\vBool_{\curvedE}(a) = \textbf{true}$
 		\end{itemize}
 		The R relations is extended as follows:
 		\begin{itemize}
@@ -681,7 +684,7 @@ The satisfiability verification for a given formula is done by constructing a mo
         		x radius=0.5cm,
         		y radius =0.2cm
     			] ;
-		\node at (-0.5,0.7) {$\vVar$};
+		\node at (-0.5,0.7) {$\curvedE$};
 		\node at (-0,0) {$p$};
 		\node at (-0.5,-0.7) {a};
 		\node[text width=10cm, anchor=west, right] at (-4.5,-2)
@@ -691,7 +694,7 @@ The satisfiability verification for a given formula is done by constructing a mo
 
 	\begin{defn}
 		Let B be a branch conjunction and $a \le_\mu b \in B$, where a and b are two terms.
-		Then one model point p is generated and its variable valuations $\vVar$ is the constant true, namely the constant term 1.
+		Then one model point p is generated and its variable valuations $\curvedE$ is the constant true, namely the constant term 1.
 	\end{defn}
 
 	\begin{defn}
@@ -703,12 +706,12 @@ The satisfiability verification for a given formula is done by constructing a mo
 	\begin{defn}
 		Let M = (W, R) be a partially constructed model and let $\Ts$ be the set of all terms. Then the model valuation $\vE : \Ts \rightarrow \mathscr{P}(W)$ is defined recursively as:
 		\begin{itemize}
-			\item $\vBool(0) = W$
-			\item $\vBool(1) = \emptyset$
-			\item $\vBool(p) = \{ q \; | \; \vVar(q, p) = 1\}, \textit{ where } p \in \Var_B$
-			\item $\vBool(a \sqcap b) = \vBool(a) \cap \vBool(b)$
-			\item $\vBool(a \sqcup b) = \vBool(a) \cup \vBool(b)$
-			\item $\vBool(a*) = W \setminus \vBool(a)$
+			\item $\vE(0) = W$
+			\item $\vE(1) = \emptyset$
+			\item $\vE(p) = \{ q \; | \; \curvedE(q, p) = 1\}, \textit{ where } p \in \Var_B$
+			\item $\vE(a \sqcap b) = \vE(a) \cap \vE(b)$
+			\item $\vE(a \sqcup b) = \vE(a) \cup \vE(b)$
+			\item $\vE(a*) = W \setminus \vE(a)$
 		\end{itemize}
 	\end{defn}
 		The tuple $(W, R, \vE)$ is called a partially constructed frame.
