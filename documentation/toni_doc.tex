@@ -222,7 +222,7 @@
 	\label{relational-system}
 
 	\par
-	Let $\F$ = (W, R) be a relational system with W $\neq$ $\emptyset$ and R $\subseteq$ $W^2$. We call such systems \textit{frames}. Following Galton[TODO] we may give a spatial meaning of frames naming the elements of W, \textit{cells} and the relation R, \textit{adjacency relation}. Then $\F$ is called \textit{adjacency space}. An example of adjacency space is the chessboard table, the cells are the squares, and two squares are adjacent if they have a common point.
+	Let $\F$ = (W, R) be a relational system with W $\neq$ $\emptyset$ and R $\subseteq$ $W^2$. We call such systems \textit{frames}. Following Galton we may give a spatial meaning of frames naming the elements of W, \textit{cells} and the relation R, \textit{adjacency relation}. Then $\F$ is called \textit{adjacency space}. An example of adjacency space is the chessboard table, the cells are the squares, and two squares are adjacent if they have a common point.
 
 	\par
 	Originally Galton assumed R to be a reflexive and symmetric relation but it is more natural for R to be an arbitrary relation. \textit{Regions} in an adjacency space are arbitrary subsets of W and two sets $a$ and $b$ are in \textit{contact} ($aC_Rb$) if for some $x \in a$ and $y \in b$ we have $xRy$. Another way to define this relation is the following. For a subset $a \subseteq W$ define as in modal logic $\langle R \rangle a = \{ x \in W : (\exists y \in W)(xRy$ and $y \in a)\}$. Then $aC_Rb$ iff $a \cap \langle R \rangle b \neq \emptyset$ iff $\langle R^{-1} \rangle a \cap b \neq \emptyset$, where $R^{-1}$ is the converse relation of R. Note that if R is a symmetric relation then $aCb$ iff $a \cap \langle R \rangle b \neq \emptyset$ iff $\langle R \rangle a \cap b \neq \emptyset$.
@@ -2923,7 +2923,6 @@ auto connected_model::create(
 	TODOs:
 	 - inductive def. For structures, e.g. terms
 	 - recursive for functions
-	 - R is reflexive and symmetric - somewhere to mention it.
 	\fi
 
 	\newpage
