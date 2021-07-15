@@ -1,0 +1,57 @@
+\contentsline {section}{\numberline {1}Tableau Method For Classic Propositional Logic}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}What Is A Tableau?}{3}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Classical Propositional Tableaus}{3}{subsection.1.2}%
+\contentsline {section}{\numberline {2}Contact Logic}{7}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Syntax}{7}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Relational semantics}{8}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Formula satisfiability}{10}{subsection.2.3}%
+\contentsline {paragraph}{}{10}{section*.2}%
+\contentsline {subsection}{\numberline {2.4}Branch conjunction model building}{11}{subsection.2.4}%
+\contentsline {section}{\numberline {3}Connected Contact Logic}{17}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Connectivity}{17}{subsection.3.1}%
+\contentsline {paragraph}{}{17}{section*.3}%
+\contentsline {paragraph}{}{17}{section*.4}%
+\contentsline {subsection}{\numberline {3.2}Connected model building}{18}{subsection.3.2}%
+\contentsline {section}{\numberline {4}Implementation Introduction}{19}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Syntax}{19}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Formula parsing}{20}{subsection.4.2}%
+\contentsline {subsubsection}{\numberline {4.2.1}Abstract Syntax Tree}{20}{subsubsection.4.2.1}%
+\contentsline {paragraph}{Operation types}{21}{section*.5}%
+\contentsline {paragraph}{Node types}{22}{section*.6}%
+\contentsline {subsubsection}{\numberline {4.2.2}Tokenizer}{22}{subsubsection.4.2.2}%
+\contentsline {paragraph}{Grammar}{22}{section*.7}%
+\contentsline {subsubsection}{\numberline {4.2.3}Parser}{23}{subsubsection.4.2.3}%
+\contentsline {paragraph}{Grammar}{24}{section*.8}%
+\contentsline {paragraph}{Algorithm}{24}{section*.9}%
+\contentsline {subsection}{\numberline {4.3}Formula refinement}{26}{subsection.4.3}%
+\contentsline {subsubsection}{\numberline {4.3.1}Visitor Pattern}{26}{subsubsection.4.3.1}%
+\contentsline {subsubsection}{\numberline {4.3.2}Visitors Overview}{29}{subsubsection.4.3.2}%
+\contentsline {paragraph}{VReduceConstants}{29}{section*.10}%
+\contentsline {paragraph}{VConvertContactsWithConstantTerms}{30}{section*.11}%
+\contentsline {paragraph}{VConvertLessEqContactWithEqualTerms}{30}{section*.12}%
+\contentsline {paragraph}{VReduceDoubleNegation}{30}{section*.13}%
+\contentsline {paragraph}{VConvertImplicationEqualityToConjDisj}{30}{section*.14}%
+\contentsline {paragraph}{VConvertLessEqToEqZero}{30}{section*.15}%
+\contentsline {paragraph}{VSplitDisjInLessEqAndContacts}{31}{section*.16}%
+\contentsline {subsection}{\numberline {4.4}Formula building}{31}{subsection.4.4}%
+\contentsline {subsubsection}{\numberline {4.4.1}Optimizations}{31}{subsubsection.4.4.1}%
+\contentsline {paragraph}{Reducing formula operations}{31}{section*.17}%
+\contentsline {paragraph}{Variable substitution}{31}{section*.18}%
+\contentsline {paragraph}{Hashing subformulas}{31}{section*.19}%
+\contentsline {subsubsection}{\numberline {4.4.2}Layout}{32}{subsubsection.4.4.2}%
+\contentsline {subsubsection}{\numberline {4.4.3}Hashing}{33}{subsubsection.4.4.3}%
+\contentsline {subsubsection}{\numberline {4.4.4}Conversion from AST}{34}{subsubsection.4.4.4}%
+\contentsline {section}{\numberline {5}Tableaux Implementation}{35}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Definition: Tableaux Step}{35}{subsection.5.1}%
+\contentsline {subsubsection}{\numberline {5.1.1}Rules}{35}{subsubsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.2}Implementation}{36}{subsection.5.2}%
+\contentsline {subsubsection}{\numberline {5.2.1}Handy methods}{39}{subsubsection.5.2.1}%
+\contentsline {section}{\numberline {6}Model Implementation}{46}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Modal point representation}{46}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Contacts representation}{49}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Valuation representation}{49}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4}Handy methods}{49}{subsection.6.4}%
+\contentsline {subsection}{\numberline {6.5}Building algorithm}{59}{subsection.6.5}%
+\contentsline {section}{\numberline {7}Connected Contact Logic Implementation}{60}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Handy methods}{60}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}Building algorithm}{71}{subsection.7.2}%

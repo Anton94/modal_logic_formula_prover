@@ -204,7 +204,8 @@
 	\end{itemize}
 
 	\noindent\textbf{\textit{Atomic formulas}} are of the form $a \leq b$ and $aCb$, where $a$ and $b$ are terms.
-
+\\
+\\
 	\noindent\textbf{\textit{Formulas}} are defined in the following inductive process:
 	\begin{itemize}
 		\item Each propositional constant is a formula
@@ -2664,7 +2665,8 @@ auto connected_model::build_contact_relations_matrix(
                                           points_.size());
         const auto v_b = right_t()->evaluate(variable_evaluations_,
                                              points_.size());
-		// There are no common points, because we built them that way.
+		// There are no common points,
+		// because we built them that way.
         assert((v_a & v_b).none());
 
         connection_remover(v_a, v_b);

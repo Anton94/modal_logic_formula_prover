@@ -1,7 +1,7 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (MiKTeX 21.2) (preloaded format=pdflatex 2021.5.19)  15 JUL 2021 21:13
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (MiKTeX 21.2) (preloaded format=pdflatex 2021.5.19)  15 JUL 2021 21:08
 entering extended mode
-**./mao_doc.tex
-(mao_doc.tex
+**./toni_doc.tex
+(toni_doc.tex
 LaTeX2e <2020-10-01> patch level 4
 L3 programming layer <2021-02-18> xparse <2020-03-03>
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
@@ -21,6 +21,83 @@ File: size10.clo 2020/04/10 v1.4m Standard LaTeX file (size option)
 \belowcaptionskip=\skip48
 \bibindent=\dimen138
 )
+(C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/algorithm2e\algorithm2
+e.sty
+Package: algorithm2e 2017/07/18 v5.2 algorithms environments
+\c@AlgoLine=\count187
+ (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/base\ifthen.sty
+Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
+)
+\algocf@hangindent=\skip49
+
+(C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/ifoddpage\ifoddpage.st
+y
+Package: ifoddpage 2016/04/23 v1.1 Conditionals for odd/even page detection
+\c@checkoddpage=\count188
+)
+(C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/latex-tools\xspace.sty
+Package: xspace 2014/10/28 v1.13 Space after command names (DPC,MH)
+) (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/relsize\relsize.sty
+Package: relsize 2013/03/29 ver 4.1
+)
+\skiptotal=\skip50
+\skiplinenumber=\skip51
+\skiprule=\skip52
+\skiphlne=\skip53
+\skiptext=\skip54
+\skiplength=\skip55
+\algomargin=\skip56
+\skipalgocfslide=\skip57
+\algowidth=\dimen139
+\inoutsize=\dimen140
+\inoutindent=\dimen141
+\interspacetitleruled=\dimen142
+\interspacealgoruled=\dimen143
+\interspacetitleboxruled=\dimen144
+\algocf@ruledwidth=\skip58
+\algocf@inoutbox=\box47
+\algocf@inputbox=\box48
+\AlCapSkip=\skip59
+\AlCapHSkip=\skip60
+\algoskipindent=\skip61
+\algocf@nlbox=\box49
+\algocf@hangingbox=\box50
+\algocf@untilbox=\box51
+\algocf@skipuntil=\skip62
+\algocf@capbox=\box52
+\algocf@lcaptionbox=\skip63
+\algoheightruledefault=\skip64
+\algoheightrule=\skip65
+\algotitleheightruledefault=\skip66
+\algotitleheightrule=\skip67
+\c@algocfline=\count189
+\c@algocfproc=\count190
+\c@algocf=\count191
+\algocf@algoframe=\box53
+\algocf@algobox=\box54
+)
+(C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/algorithmicx\algpseudo
+code.sty
+Package: algpseudocode 
+
+(C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/algorithmicx\algorithm
+icx.sty
+Package: algorithmicx 2005/04/27 v1.2 Algorithmicx
+
+Document Style algorithmicx 1.2 - a greatly improved `algorithmic' style
+\c@ALG@line=\count192
+\c@ALG@rem=\count193
+\c@ALG@nested=\count194
+\ALG@tlm=\skip68
+\ALG@thistlm=\skip69
+\c@ALG@Lnr=\count195
+\c@ALG@blocknr=\count196
+\c@ALG@storecount=\count197
+\c@ALG@tmpcounter=\count198
+\ALG@tmplength=\skip70
+)
+Document Style - pseudocode environments for use with the `algorithmicx' style
+)
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/mathtools\mathtools.st
 y
 Package: mathtools 2021/04/12 v1.27 mathematical typesetting tools
@@ -29,22 +106,22 @@ Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
 \KV@toks@=\toks15
 ) (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/latex-tools\calc.sty
 Package: calc 2017/05/25 v4.3 Infix arithmetic (KKT,FJ)
-\calc@Acount=\count187
-\calc@Bcount=\count188
-\calc@Adimen=\dimen139
-\calc@Bdimen=\dimen140
-\calc@Askip=\skip49
-\calc@Bskip=\skip50
+\calc@Acount=\count199
+\calc@Bcount=\count266
+\calc@Adimen=\dimen145
+\calc@Bdimen=\dimen146
+\calc@Askip=\skip71
+\calc@Bskip=\skip72
 LaTeX Info: Redefining \setlength on input line 80.
 LaTeX Info: Redefining \addtolength on input line 81.
-\calc@Ccount=\count189
-\calc@Cskip=\skip51
+\calc@Ccount=\count267
+\calc@Cskip=\skip73
 ) (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/mathtools\mhsetup.st
 y
 Package: mhsetup 2021/03/18 v1.4 programming setup (MH)
 ) (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsmath.sty
 Package: amsmath 2020/09/23 v2.17i AMS math features
-\@mathmargin=\skip52
+\@mathmargin=\skip74
 
 For additional information on amsmath, use the `?' option.
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amstext.sty
@@ -53,49 +130,49 @@ Package: amstext 2000/06/29 v2.01 AMS text
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0 generic functions
 \@emptytoks=\toks16
-\ex@=\dimen141
+\ex@=\dimen147
 ))
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d Bold Symbols
-\pmbraise@=\dimen142
+\pmbraise@=\dimen148
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/amsmath\amsopn.sty
 Package: amsopn 2016/03/08 v2.02 operator names
 )
-\inf@bad=\count190
+\inf@bad=\count268
 LaTeX Info: Redefining \frac on input line 234.
-\uproot@=\count191
-\leftroot@=\count192
+\uproot@=\count269
+\leftroot@=\count270
 LaTeX Info: Redefining \overline on input line 399.
-\classnum@=\count193
-\DOTSCASE@=\count194
+\classnum@=\count271
+\DOTSCASE@=\count272
 LaTeX Info: Redefining \ldots on input line 496.
 LaTeX Info: Redefining \dots on input line 499.
 LaTeX Info: Redefining \cdots on input line 620.
-\Mathstrutbox@=\box47
-\strutbox@=\box48
-\big@size=\dimen143
+\Mathstrutbox@=\box55
+\strutbox@=\box56
+\big@size=\dimen149
 LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
 LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
-\macc@depth=\count195
-\c@MaxMatrixCols=\count196
+\macc@depth=\count273
+\c@MaxMatrixCols=\count274
 \dotsspace@=\muskip16
-\c@parentequation=\count197
-\dspbrk@lvl=\count198
+\c@parentequation=\count275
+\dspbrk@lvl=\count276
 \tag@help=\toks17
-\row@=\count199
-\column@=\count266
-\maxfields@=\count267
+\row@=\count277
+\column@=\count278
+\maxfields@=\count279
 \andhelp@=\toks18
-\eqnshift@=\dimen144
-\alignsep@=\dimen145
-\tagshift@=\dimen146
-\tagwidth@=\dimen147
-\totwidth@=\dimen148
-\lineht@=\dimen149
+\eqnshift@=\dimen150
+\alignsep@=\dimen151
+\tagshift@=\dimen152
+\tagwidth@=\dimen153
+\totwidth@=\dimen154
+\lineht@=\dimen155
 \@envbody=\toks19
-\multlinegap=\skip53
-\multlinetaggap=\skip54
+\multlinegap=\skip75
+\multlinetaggap=\skip76
 \mathdisplay@stack=\toks20
 LaTeX Info: Redefining \[ on input line 2923.
 LaTeX Info: Redefining \] on input line 2924.
@@ -104,17 +181,17 @@ LaTeX Info: Thecontrolsequence`\('isalreadyrobust on input line 130.
 LaTeX Info: Thecontrolsequence`\)'isalreadyrobust on input line 130.
 LaTeX Info: Thecontrolsequence`\['isalreadyrobust on input line 130.
 LaTeX Info: Thecontrolsequence`\]'isalreadyrobust on input line 130.
-\g_MT_multlinerow_int=\count268
-\l_MT_multwidth_dim=\dimen150
-\origjot=\skip55
-\l_MT_shortvdotswithinadjustabove_dim=\dimen151
-\l_MT_shortvdotswithinadjustbelow_dim=\dimen152
-\l_MT_above_intertext_sep=\dimen153
-\l_MT_below_intertext_sep=\dimen154
-\l_MT_above_shortintertext_sep=\dimen155
-\l_MT_below_shortintertext_sep=\dimen156
-\xmathstrut@box=\box49
-\xmathstrut@dim=\dimen157
+\g_MT_multlinerow_int=\count280
+\l_MT_multwidth_dim=\dimen156
+\origjot=\skip77
+\l_MT_shortvdotswithinadjustabove_dim=\dimen157
+\l_MT_shortvdotswithinadjustbelow_dim=\dimen158
+\l_MT_above_intertext_sep=\dimen159
+\l_MT_below_intertext_sep=\dimen160
+\l_MT_above_shortintertext_sep=\dimen161
+\l_MT_below_shortintertext_sep=\dimen162
+\xmathstrut@box=\box57
+\xmathstrut@dim=\dimen163
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\amssymb.sty
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
@@ -133,23 +210,23 @@ Package: amsthm 2020/05/29 v2.20.6
 \thm@headfont=\toks23
 \thm@notefont=\toks24
 \thm@headpunct=\toks25
-\thm@preskip=\skip56
-\thm@postskip=\skip57
-\thm@headsep=\skip58
+\thm@preskip=\skip78
+\thm@postskip=\skip79
+\thm@headsep=\skip80
 \dth@everypar=\toks26
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/systeme\systeme.sty
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/xstring\xstring.sty
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/xstring\xstring.tex
-\integerpart=\count269
-\decimalpart=\count270
+\integerpart=\count281
+\decimalpart=\count282
 )
 Package: xstring 2019/02/06 v1.83 String manipulations (CT)
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/systeme\systeme.tex
 \SYS_systemecode=\toks27
 \SYS_systempreamble=\toks28
-\SYSeqnum=\count271
+\SYSeqnum=\count283
 )
 Package: systeme 2020/05/03 v0.34 Mise en forme de systemes d'equations (CT)
 ) (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/newtx\newtxtext.sty
@@ -170,7 +247,7 @@ LaTeX Info: Redefining \textsw on input line 47.
 LaTeX Info: Redefining \textssc on input line 48.
 LaTeX Info: Redefining \textulc on input line 49.
 )
-\ntx@fs=\dimen158
+\ntx@fs=\dimen164
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/xkeyval\xkeyval.sty
 Package: xkeyval 2020/11/20 v2.8 package option processing (HA)
 
@@ -179,17 +256,14 @@ Package: xkeyval 2020/11/20 v2.8 package option processing (HA)
 \XKV@toks=\toks29
 \XKV@tempa@toks=\toks30
 )
-\XKV@depth=\count272
+\XKV@depth=\count284
 File: xkeyval.tex 2014/12/03 v2.7a key=value parser (HA)
 ))
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/etoolbox\etoolbox.sty
 Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
-\etb@tempcnta=\count273
-) (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/base\ifthen.sty
-Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
-)
-(C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/carlisle\scalefnt.sty)
-(C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/base\fontenc.sty
+\etb@tempcnta=\count285
+) (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/carlisle\scalefnt.st
+y) (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/base\fontenc.sty
 Package: fontenc 2020/08/10 v2.0s Standard LaTeX package
 LaTeX Font Info:    Trying to load font information for T1+ntxtlf on input line
  112.
@@ -204,7 +278,7 @@ LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
 Package: textcomp 2020/02/02 v2.0n Standard LaTeX package
 LaTeX Font Info:    Changing ? sub-encoding to TS1/0 on input line 75.
 )
-\ntxt@cntz=\count274
+\ntxt@cntz=\count286
 LaTeX Font Info:    Redeclaring math symbol \mathsterling on input line 320.
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/newtx\newtxmath.sty
@@ -223,10 +297,10 @@ Package: ifluatex 2019/10/25 v1.5 ifluatex legacy package. Use iftex instead.
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/oberdiek\centernot.sty
 Package: centernot 2016/05/16 v1.4 Centers the not symbol horizontally (HO)
 )
-\tx@cntz=\count275
+\tx@cntz=\count287
  (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/binhex\binhex.tex)
-\tx@Isdigit=\count276
-\tx@IsAlNum=\count277
+\tx@Isdigit=\count288
+\tx@IsAlNum=\count289
 \tx@tA=\toks31
 \tx@tB=\toks32
 \tx@su=\read2
@@ -332,24 +406,24 @@ LaTeX Info: Redefining \textsquare on input line 2965.
 LaTeX Info: Redefining \openbox on input line 2967.
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.sty
-\lst@mode=\count278
-\lst@gtempboxa=\box50
+\lst@mode=\count290
+\lst@gtempboxa=\box58
 \lst@token=\toks34
-\lst@length=\count279
-\lst@currlwidth=\dimen159
-\lst@column=\count280
-\lst@pos=\count281
-\lst@lostspace=\dimen160
-\lst@width=\dimen161
-\lst@newlines=\count282
-\lst@lineno=\count283
-\lst@maxwidth=\dimen162
+\lst@length=\count291
+\lst@currlwidth=\dimen165
+\lst@column=\count292
+\lst@pos=\count293
+\lst@lostspace=\dimen166
+\lst@width=\dimen167
+\lst@newlines=\count294
+\lst@lineno=\count295
+\lst@maxwidth=\dimen168
 
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstmisc.sty
 File: lstmisc.sty 2020/03/24 1.8d (Carsten Heinz)
-\c@lstnumber=\count284
-\lst@skipnumbers=\count285
-\lst@framebox=\box51
+\c@lstnumber=\count296
+\lst@skipnumbers=\count297
+\lst@framebox=\box59
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/listings\listings.cfg
 File: listings.cfg 2020/03/24 1.8d listings configuration
@@ -379,46 +453,46 @@ Package xcolor Info: Model `wave' substituted by `hsb' on input line 1371.
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/latex-tools\array.sty
 Package: array 2020/10/01 v2.5c Tabular extension package (FMi)
-\col@sep=\dimen163
-\ar@mcellbox=\box52
-\extrarowheight=\dimen164
+\col@sep=\dimen169
+\ar@mcellbox=\box60
+\extrarowheight=\dimen170
 \NC@list=\toks35
-\extratabsurround=\skip59
-\backup@length=\skip60
-\ar@cellbox=\box53
+\extratabsurround=\skip81
+\backup@length=\skip82
+\ar@cellbox=\box61
 ) (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/makecell\makecell.st
 y
 Package: makecell 2009/08/03 V0.1e Managing of Tab Column Heads and Cells
-\rotheadsize=\dimen165
-\c@nlinenum=\count286
+\rotheadsize=\dimen171
+\c@nlinenum=\count298
 \TeXr@lab=\toks36
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/booktabs\booktabs.sty
 Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
-\heavyrulewidth=\dimen166
-\lightrulewidth=\dimen167
-\cmidrulewidth=\dimen168
-\belowrulesep=\dimen169
-\belowbottomsep=\dimen170
-\aboverulesep=\dimen171
-\abovetopsep=\dimen172
-\cmidrulesep=\dimen173
-\cmidrulekern=\dimen174
-\defaultaddspace=\dimen175
-\@cmidla=\count287
-\@cmidlb=\count288
-\@aboverulesep=\dimen176
-\@belowrulesep=\dimen177
-\@thisruleclass=\count289
-\@lastruleclass=\count290
-\@thisrulewidth=\dimen178
+\heavyrulewidth=\dimen172
+\lightrulewidth=\dimen173
+\cmidrulewidth=\dimen174
+\belowrulesep=\dimen175
+\belowbottomsep=\dimen176
+\aboverulesep=\dimen177
+\abovetopsep=\dimen178
+\cmidrulesep=\dimen179
+\cmidrulekern=\dimen180
+\defaultaddspace=\dimen181
+\@cmidla=\count299
+\@cmidlb=\count300
+\@aboverulesep=\dimen182
+\@belowrulesep=\dimen183
+\@thisruleclass=\count301
+\@lastruleclass=\count302
+\@thisrulewidth=\dimen184
 ) (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/float\float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count291
+\c@float@type=\count303
 \float@exts=\toks37
-\float@box=\box54
+\float@box=\box62
 \@float@everytoks=\toks38
-\@floatcapt=\box55
+\@floatcapt=\box63
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hyperref.sty
 Package: hyperref 2021-02-10 v7.00j Hypertext links for LaTeX
@@ -465,9 +539,9 @@ Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
 y
 Package: kvoptions 2020-10-07 v3.14 Key value format for package options (HO)
 )
-\@linkdim=\dimen179
-\Hy@linkcounter=\count292
-\Hy@pagecounter=\count293
+\@linkdim=\dimen185
+\Hy@linkcounter=\count304
+\Hy@pagecounter=\count305
  (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\pd1enc.def
 File: pd1enc.def 2021-02-10 v7.00j Hyperref: PDFDocEncoding definition (HO)
 Now handling font encoding PD1 ...
@@ -485,7 +559,7 @@ Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 y
 Package: etexcmds 2019/12/15 v1.7 Avoid name clashes with e-TeX commands (HO)
 )
-\Hy@SavedSpaceFactor=\count294
+\Hy@SavedSpaceFactor=\count306
  (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\puenc.def
 File: puenc.def 2021-02-10 v7.00j Hyperref: PDF Unicode definition (HO)
 Now handling font encoding PU ...
@@ -498,13 +572,13 @@ Package hyperref Info: Plain pages OFF on input line 4207.
 Package hyperref Info: Backreferencing OFF on input line 4212.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4445.
-\c@Hy@tempcnt=\count295
+\c@Hy@tempcnt=\count307
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/url\url.sty
 \Urlmuskip=\muskip17
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 4804.
-\XeTeXLinkMargin=\dimen180
+\XeTeXLinkMargin=\dimen186
 
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/bitset\bitset.sty
 Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
@@ -514,9 +588,9 @@ c.sty
 Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
 )
 ))
-\Fld@menulength=\count296
-\Field@Width=\dimen181
-\Fld@charsize=\dimen182
+\Fld@menulength=\count308
+\Field@Width=\dimen187
+\Fld@charsize=\dimen188
 Package hyperref Info: Hyper figures OFF on input line 6075.
 Package hyperref Info: Link nesting OFF on input line 6080.
 Package hyperref Info: Hyper index ON on input line 6083.
@@ -532,9 +606,9 @@ Package: atbegshi-ltx 2020/08/17 v1.0a Emulation of the original atbegshi packa
 ge
 with kernel methods
 )
-\Hy@abspage=\count297
-\c@Item=\count298
-\c@Hfootnote=\count299
+\Hy@abspage=\count309
+\c@Item=\count310
+\c@Hfootnote=\count311
 )
 Package hyperref Info: Driver (autodetected): hpdftex.
  (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\hpdftex.def
@@ -545,8 +619,8 @@ Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atvery packag
 e
 with kernel methods
 )
-\Fld@listcount=\count300
-\c@bookmark@seq@number=\count301
+\Fld@listcount=\count312
+\c@bookmark@seq@number=\count313
 
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/rerunfilecheck\rerunfi
 lecheck.sty
@@ -559,7 +633,7 @@ Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 86.
 )
-\Hy@SectionHShift=\skip61
+\Hy@SectionHShift=\skip83
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/pgf/frontendlayer\tikz
 .sty
@@ -570,14 +644,14 @@ ty
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfuti
 l-common.tex
 \pgfutil@everybye=\toks39
-\pgfutil@tempdima=\dimen183
-\pgfutil@tempdimb=\dimen184
+\pgfutil@tempdima=\dimen189
+\pgfutil@tempdimb=\dimen190
 
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfuti
 l-common-lists.tex))
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfuti
 l-latex.def
-\pgfutil@abb=\box56
+\pgfutil@abb=\box64
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/utilities\pgfrcs
 .code.tex
@@ -604,8 +678,8 @@ File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
 Package graphics Info: Driver file: pdftex.def on input line 105.
 )
-\Gin@req@height=\dimen185
-\Gin@req@width=\dimen186
+\Gin@req@height=\dimen191
+\Gin@req@width=\dimen192
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/pgf/systemlayer\pgfsys
 .sty
@@ -622,26 +696,26 @@ s.code.tex
 sfiltered.code.tex
 \pgfkeys@tmptoks=\toks42
 ))
-\pgf@x=\dimen187
-\pgf@y=\dimen188
-\pgf@xa=\dimen189
-\pgf@ya=\dimen190
-\pgf@xb=\dimen191
-\pgf@yb=\dimen192
-\pgf@xc=\dimen193
-\pgf@yc=\dimen194
-\pgf@xd=\dimen195
-\pgf@yd=\dimen196
+\pgf@x=\dimen193
+\pgf@y=\dimen194
+\pgf@xa=\dimen195
+\pgf@ya=\dimen196
+\pgf@xb=\dimen197
+\pgf@yb=\dimen198
+\pgf@xc=\dimen199
+\pgf@yc=\dimen256
+\pgf@xd=\dimen257
+\pgf@yd=\dimen258
 \w@pgf@writea=\write3
 \r@pgf@reada=\read3
-\c@pgf@counta=\count302
-\c@pgf@countb=\count303
-\c@pgf@countc=\count304
-\c@pgf@countd=\count305
+\c@pgf@counta=\count314
+\c@pgf@countb=\count315
+\c@pgf@countc=\count316
+\c@pgf@countd=\count317
 \t@pgf@toka=\toks43
 \t@pgf@tokb=\toks44
 \t@pgf@tokc=\toks45
-\pgf@sys@id@count=\count306
+\pgf@sys@id@count=\count318
 
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgf.
 cfg
@@ -660,8 +734,8 @@ File: pgfsys-common-pdf.def 2020/12/27 v3.1.8b (3.1.8b)
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfs
 yssoftpath.code.tex
 File: pgfsyssoftpath.code.tex 2020/12/27 v3.1.8b (3.1.8b)
-\pgfsyssoftpath@smallbuffer@items=\count307
-\pgfsyssoftpath@bigbuffer@items=\count308
+\pgfsyssoftpath@smallbuffer@items=\count319
+\pgfsyssoftpath@bigbuffer@items=\count320
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/systemlayer\pgfs
 ysprotocol.code.tex
@@ -679,9 +753,9 @@ e.tex
 .code.tex)
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathpars
 er.code.tex
-\pgfmath@dimen=\dimen197
-\pgfmath@count=\count309
-\pgfmath@box=\box57
+\pgfmath@dimen=\dimen259
+\pgfmath@count=\count321
+\pgfmath@box=\box65
 \pgfmath@toks=\toks46
 \pgfmath@stack@operand=\toks47
 \pgfmath@stack@operation=\toks48
@@ -706,59 +780,59 @@ tions.misc.code.tex)
 tions.integerarithmetics.code.tex)))
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmathfloa
 t.code.tex
-\c@pgfmathroundto@lastzeros=\count310
+\c@pgfmathroundto@lastzeros=\count322
 ))
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfint.code
 .tex)
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfco
 repoints.code.tex
 File: pgfcorepoints.code.tex 2020/12/27 v3.1.8b (3.1.8b)
-\pgf@picminx=\dimen198
-\pgf@picmaxx=\dimen199
-\pgf@picminy=\dimen256
-\pgf@picmaxy=\dimen257
-\pgf@pathminx=\dimen258
-\pgf@pathmaxx=\dimen259
-\pgf@pathminy=\dimen260
-\pgf@pathmaxy=\dimen261
-\pgf@xx=\dimen262
-\pgf@xy=\dimen263
-\pgf@yx=\dimen264
-\pgf@yy=\dimen265
-\pgf@zx=\dimen266
-\pgf@zy=\dimen267
+\pgf@picminx=\dimen260
+\pgf@picmaxx=\dimen261
+\pgf@picminy=\dimen262
+\pgf@picmaxy=\dimen263
+\pgf@pathminx=\dimen264
+\pgf@pathmaxx=\dimen265
+\pgf@pathminy=\dimen266
+\pgf@pathmaxy=\dimen267
+\pgf@xx=\dimen268
+\pgf@xy=\dimen269
+\pgf@yx=\dimen270
+\pgf@yy=\dimen271
+\pgf@zx=\dimen272
+\pgf@zy=\dimen273
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfco
 repathconstruct.code.tex
 File: pgfcorepathconstruct.code.tex 2020/12/27 v3.1.8b (3.1.8b)
-\pgf@path@lastx=\dimen268
-\pgf@path@lasty=\dimen269
+\pgf@path@lastx=\dimen274
+\pgf@path@lasty=\dimen275
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfco
 repathusage.code.tex
 File: pgfcorepathusage.code.tex 2020/12/27 v3.1.8b (3.1.8b)
-\pgf@shorten@end@additional=\dimen270
-\pgf@shorten@start@additional=\dimen271
+\pgf@shorten@end@additional=\dimen276
+\pgf@shorten@start@additional=\dimen277
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfco
 rescopes.code.tex
 File: pgfcorescopes.code.tex 2020/12/27 v3.1.8b (3.1.8b)
-\pgfpic=\box58
-\pgf@hbox=\box59
-\pgf@layerbox@main=\box60
-\pgf@picture@serial@count=\count311
+\pgfpic=\box66
+\pgf@hbox=\box67
+\pgf@layerbox@main=\box68
+\pgf@picture@serial@count=\count323
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfco
 regraphicstate.code.tex
 File: pgfcoregraphicstate.code.tex 2020/12/27 v3.1.8b (3.1.8b)
-\pgflinewidth=\dimen272
+\pgflinewidth=\dimen278
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfco
 retransformations.code.tex
 File: pgfcoretransformations.code.tex 2020/12/27 v3.1.8b (3.1.8b)
-\pgf@pt@x=\dimen273
-\pgf@pt@y=\dimen274
-\pgf@pt@temp=\dimen275
+\pgf@pt@x=\dimen279
+\pgf@pt@y=\dimen280
+\pgf@pt@temp=\dimen281
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfco
 requick.code.tex
@@ -775,14 +849,14 @@ File: pgfcorepathprocessing.code.tex 2020/12/27 v3.1.8b (3.1.8b)
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfco
 rearrows.code.tex
 File: pgfcorearrows.code.tex 2020/12/27 v3.1.8b (3.1.8b)
-\pgfarrowsep=\dimen276
+\pgfarrowsep=\dimen282
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfco
 reshade.code.tex
 File: pgfcoreshade.code.tex 2020/12/27 v3.1.8b (3.1.8b)
-\pgf@max=\dimen277
-\pgf@sys@shading@range@num=\count312
-\pgf@shadingcount=\count313
+\pgf@max=\dimen283
+\pgf@sys@shading@range@num=\count324
+\pgf@shadingcount=\count325
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfco
 reimage.code.tex
@@ -791,7 +865,7 @@ File: pgfcoreimage.code.tex 2020/12/27 v3.1.8b (3.1.8b)
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfco
 reexternal.code.tex
 File: pgfcoreexternal.code.tex 2020/12/27 v3.1.8b (3.1.8b)
-\pgfexternal@startupbox=\box61
+\pgfexternal@startupbox=\box69
 ))
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/basiclayer\pgfco
 relayers.code.tex
@@ -812,7 +886,7 @@ File: pgfcorerdf.code.tex 2020/12/27 v3.1.8b (3.1.8b)
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodul
 eshapes.code.tex
 File: pgfmoduleshapes.code.tex 2020/12/27 v3.1.8b (3.1.8b)
-\pgfnodeparttextbox=\box62
+\pgfnodeparttextbox=\box70
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodul
 eplot.code.tex
@@ -821,8 +895,8 @@ File: pgfmoduleplot.code.tex 2020/12/27 v3.1.8b (3.1.8b)
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibility\pgfc
 omp-version-0-65.sty
 Package: pgfcomp-version-0-65 2020/12/27 v3.1.8b (3.1.8b)
-\pgf@nodesepstart=\dimen278
-\pgf@nodesepend=\dimen279
+\pgf@nodesepstart=\dimen284
+\pgf@nodesepend=\dimen285
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/pgf/compatibility\pgfc
 omp-version-1-18.sty
@@ -843,8 +917,8 @@ Package: pgffor 2020/12/27 v3.1.8b (3.1.8b)
 
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/math\pgfmath.cod
 e.tex)
-\pgffor@iter=\dimen280
-\pgffor@skip=\dimen281
+\pgffor@iter=\dimen286
+\pgffor@skip=\dimen287
 \pgffor@stack=\toks49
 \pgffor@toks=\toks50
 ))
@@ -855,154 +929,60 @@ Package: tikz 2020/12/27 v3.1.8b (3.1.8b)
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflib
 raryplothandlers.code.tex
 File: pgflibraryplothandlers.code.tex 2020/12/27 v3.1.8b (3.1.8b)
-\pgf@plot@mark@count=\count314
-\pgfplotmarksize=\dimen282
+\pgf@plot@mark@count=\count326
+\pgfplotmarksize=\dimen288
 )
-\tikz@lastx=\dimen283
-\tikz@lasty=\dimen284
-\tikz@lastxsaved=\dimen285
-\tikz@lastysaved=\dimen286
-\tikz@lastmovetox=\dimen287
-\tikz@lastmovetoy=\dimen288
-\tikzleveldistance=\dimen289
-\tikzsiblingdistance=\dimen290
-\tikz@figbox=\box63
-\tikz@figbox@bg=\box64
-\tikz@tempbox=\box65
-\tikz@tempbox@bg=\box66
-\tikztreelevel=\count315
-\tikznumberofchildren=\count316
-\tikznumberofcurrentchild=\count317
-\tikz@fig@count=\count318
+\tikz@lastx=\dimen289
+\tikz@lasty=\dimen290
+\tikz@lastxsaved=\dimen291
+\tikz@lastysaved=\dimen292
+\tikz@lastmovetox=\dimen293
+\tikz@lastmovetoy=\dimen294
+\tikzleveldistance=\dimen295
+\tikzsiblingdistance=\dimen296
+\tikz@figbox=\box71
+\tikz@figbox@bg=\box72
+\tikz@tempbox=\box73
+\tikz@tempbox@bg=\box74
+\tikztreelevel=\count327
+\tikznumberofchildren=\count328
+\tikznumberofcurrentchild=\count329
+\tikz@fig@count=\count330
 
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/modules\pgfmodul
 ematrix.code.tex
 File: pgfmodulematrix.code.tex 2020/12/27 v3.1.8b (3.1.8b)
-\pgfmatrixcurrentrow=\count319
-\pgfmatrixcurrentcolumn=\count320
-\pgf@matrix@numberofcolumns=\count321
+\pgfmatrixcurrentrow=\count331
+\pgfmatrixcurrentcolumn=\count332
+\pgf@matrix@numberofcolumns=\count333
 )
-\tikz@expandcount=\count322
+\tikz@expandcount=\count334
 
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/ti
 kz/libraries\tikzlibrarytopaths.code.tex
 File: tikzlibrarytopaths.code.tex 2020/12/27 v3.1.8b (3.1.8b)
 )))
-(C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/latex-tools\multicol.s
-ty
-Package: multicol 2019/12/09 v1.8y multicolumn formatting (FMi)
-\c@tracingmulticols=\count323
-\mult@box=\box67
-\multicol@leftmargin=\dimen291
-\c@unbalance=\count324
-\c@collectmore=\count325
-\doublecol@number=\count326
-\multicoltolerance=\count327
-\multicolpretolerance=\count328
-\full@width=\dimen292
-\page@free=\dimen293
-\premulticols=\dimen294
-\postmulticols=\dimen295
-\multicolsep=\skip62
-\multicolbaselineskip=\skip63
-\partial@page=\box68
-\last@line=\box69
-\maxbalancingoverflow=\dimen296
-\mult@rightbox=\box70
-\mult@grightbox=\box71
-\mult@gfirstbox=\box72
-\mult@firstbox=\box73
-\@tempa=\box74
-\@tempa=\box75
-\@tempa=\box76
-\@tempa=\box77
-\@tempa=\box78
-\@tempa=\box79
-\@tempa=\box80
-\@tempa=\box81
-\@tempa=\box82
-\@tempa=\box83
-\@tempa=\box84
-\@tempa=\box85
-\@tempa=\box86
-\@tempa=\box87
-\@tempa=\box88
-\@tempa=\box89
-\@tempa=\box90
-\@tempa=\box91
-\@tempa=\box92
-\@tempa=\box93
-\@tempa=\box94
-\@tempa=\box95
-\@tempa=\box96
-\@tempa=\box97
-\@tempa=\box98
-\@tempa=\box99
-\@tempa=\box100
-\@tempa=\box101
-\@tempa=\box102
-\@tempa=\box103
-\@tempa=\box104
-\@tempa=\box105
-\@tempa=\box106
-\@tempa=\box107
-\@tempa=\box108
-\@tempa=\box109
-\@tempa=\box110
-\c@minrows=\count329
-\c@columnbadness=\count330
-\c@finalcolumnbadness=\count331
-\last@try=\dimen297
-\multicolovershoot=\dimen298
-\multicolundershoot=\dimen299
-\mult@nat@firstbox=\box111
-\colbreak@box=\box112
-\mc@col@check@num=\count332
-) (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/base\inputenc.sty
-Package: inputenc 2020/08/01 v1.3d Input encoding file
-\inpenc@prehook=\toks51
-\inpenc@posthook=\toks52
-) (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/babel\babel.sty
-Package: babel 2021/01/26 3.53 The Babel package
-
-(C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/babel\babel.def
-File: babel.def 2021/01/26 3.53 Babel common definitions
-\babel@savecnt=\count333
-\U@D=\dimen300
-\l@babelnohyphens=\language79
-
-(C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/babel\txtbabel.def)
-\bbl@readstream=\read4
+(C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/multirow\multirow.sty
+Package: multirow 2021/03/15 v2.8 Span multiple rows of a table
+\multirow@colwidth=\skip84
+\multirow@cntb=\count335
+\multirow@dima=\skip85
+\bigstrutjot=\dimen297
 )
-\bbl@dirlevel=\count334
-*************************************
-* Local config file bblopts.cfg used
-*
-(C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/arabi\bblopts.cfg
-File: bblopts.cfg 2005/09/08 v0.1 add Arabic and Farsi to "declared" options of
- babel
+(C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/frontendlayer/ti
+kz/libraries\tikzlibrarytrees.code.tex
+File: tikzlibrarytrees.code.tex 2020/12/27 v3.1.8b (3.1.8b)
 )
-(C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/babel-english\english.
-ldf
-Language: english 2017/06/06 v3.3r English support from the babel system
-Package babel Info: \l@canadian = using hyphenrules for english
-(babel)             (\language0) on input line 102.
-Package babel Info: \l@australian = using hyphenrules for ukenglish
-(babel)             (\language73) on input line 105.
-Package babel Info: \l@newzealand = using hyphenrules for ukenglish
-(babel)             (\language73) on input line 108.
-))
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/generic/pgf/libraries\pgflib
 raryarrows.meta.code.tex
 File: pgflibraryarrows.meta.code.tex 2020/12/27 v3.1.8b (3.1.8b)
-\pgfarrowinset=\dimen301
-\pgfarrowlength=\dimen302
-\pgfarrowwidth=\dimen303
-\pgfarrowlinewidth=\dimen304
+\pgfarrowinset=\dimen298
+\pgfarrowlength=\dimen299
+\pgfarrowwidth=\dimen300
+\pgfarrowlinewidth=\dimen301
 )
-\@float@every@table=\toks53
-\c@theorem=\count335
-\c@corollary=\count336
+\@float@every@table=\toks51
+\c@theorem=\count336
 
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/listings\lstlang1.sty
 File: lstlang1.sty 2020/03/24 1.8d listings language file
@@ -1016,59 +996,59 @@ File: lstmisc.sty 2020/03/24 1.8d (Carsten Heinz)
 ftex.def
 File: l3backend-pdftex.def 2021-02-18 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count337
-\l__pdf_internal_box=\box113
-) (mao_doc.aux
+\l__pdf_internal_box=\box75
+) (toni_doc.aux
 
 LaTeX Warning: Label `tableaux:branch:output' multiply defined.
 
 )
-\openout1 = `mao_doc.aux'.
+\openout1 = `toni_doc.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/ntxmi/m/it on input line 59.
+LaTeX Font Info:    Checking defaults for OML/ntxmi/m/it on input line 68.
 LaTeX Font Info:    Trying to load font information for OML+ntxmi on input line
- 59.
+ 68.
  (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/newtx\omlntxmi.fd
 File: omlntxmi.fd 2015/08/25 Fontinst v1.933 font definitions for OML/ntxmi.
 )
-LaTeX Font Info:    ... okay on input line 59.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 59.
-LaTeX Font Info:    ... okay on input line 59.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 59.
-LaTeX Font Info:    ... okay on input line 59.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 59.
-LaTeX Font Info:    ... okay on input line 59.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 59.
-LaTeX Font Info:    ... okay on input line 59.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 59.
-LaTeX Font Info:    ... okay on input line 59.
-LaTeX Font Info:    Checking defaults for U/ntxexa/m/n on input line 59.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for U/ntxexa/m/n on input line 68.
 LaTeX Font Info:    Trying to load font information for U+ntxexa on input line 
-59.
+68.
 
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/newtx\untxexa.fd
 File: untxexa.fd 2012/04/16 Fontinst v1.933 font definitions for U/ntxexa.
 )
-LaTeX Font Info:    ... okay on input line 59.
-LaTeX Font Info:    Checking defaults for LMS/ntxsy/m/n on input line 59.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for LMS/ntxsy/m/n on input line 68.
 LaTeX Font Info:    Trying to load font information for LMS+ntxsy on input line
- 59.
+ 68.
 
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/newtx\lmsntxsy.fd
 File: lmsntxsy.fd 2016/07/02 Fontinst v1.933 font definitions for LMS/ntxsy.
 )
-LaTeX Font Info:    ... okay on input line 59.
-LaTeX Font Info:    Checking defaults for LMX/ntxexx/m/n on input line 59.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for LMX/ntxexx/m/n on input line 68.
 LaTeX Font Info:    Trying to load font information for LMX+ntxexx on input lin
-e 59.
+e 68.
 
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/newtx\lmxntxexx.fd
 File: lmxntxexx.fd 2016/07/03 Fontinst v1.933 font definitions for LMX/ntxexx.
 )
-LaTeX Font Info:    ... okay on input line 59.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 59.
-LaTeX Font Info:    ... okay on input line 59.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 59.
-LaTeX Font Info:    ... okay on input line 59.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 68.
+LaTeX Font Info:    ... okay on input line 68.
 \c@mv@tabular=\count338
 \c@mv@boldtabular=\count339
 \c@lstlisting=\count340
@@ -1077,32 +1057,24 @@ LaTeX Font Info:    ... okay on input line 59.
 kii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count341
-\scratchdimen=\dimen305
-\scratchbox=\box114
+\scratchdimen=\dimen302
+\scratchbox=\box76
 \nofMPsegments=\count342
 \nofMParguments=\count343
-\everyMPshowfont=\toks54
+\everyMPshowfont=\toks52
 \MPscratchCnt=\count344
-\MPscratchDim=\dimen306
+\MPscratchDim=\dimen303
 \MPnumerator=\count345
 \makeMPintoPDFobject=\count346
-\everyMPtoPDFconversion=\toks55
+\everyMPtoPDFconversion=\toks53
 )
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-
 base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
-
-(C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/grfext\grfext.sty
-Package: grfext 2019/12/03 v1.3 Manage graphics extensions (HO)
-)
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 85.
-Package grfext Info: Graphics extension search list:
-(grfext)             [.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPE
-G,.JBIG2,.JB2,.eps]
-(grfext)             \AppendGraphicsExtensions on input line 504.
 )
-Package hyperref Info: Link coloring OFF on input line 59.
+Package hyperref Info: Link coloring OFF on input line 68.
 
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/hyperref\nameref.sty
 Package: nameref 2021-04-02 v2.47 Cross-referencing by name of section
@@ -1116,55 +1088,55 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
 \c@section@level=\count347
 )
-LaTeX Info: Redefining \ref on input line 59.
-LaTeX Info: Redefining \pageref on input line 59.
-LaTeX Info: Redefining \nameref on input line 59.
- (mao_doc.out) (mao_doc.out)
+LaTeX Info: Redefining \ref on input line 68.
+LaTeX Info: Redefining \pageref on input line 68.
+LaTeX Info: Redefining \nameref on input line 68.
+ (toni_doc.out) (toni_doc.out)
 \@outlinefile=\write4
-\openout4 = `mao_doc.out'.
+\openout4 = `toni_doc.out'.
 
 LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
-(Font)              scaled to size 17.28pt on input line 61.
+(Font)              scaled to size 17.28pt on input line 70.
 LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
-(Font)              scaled to size 12.0pt on input line 61.
+(Font)              scaled to size 12.0pt on input line 70.
 LaTeX Font Info:    Trying to load font information for OT1+ntxtlf on input lin
-e 61.
+e 70.
 
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/newtx\ot1ntxtlf.fd
 File: ot1ntxtlf.fd 2021/05/08 v1.0 font definition file for OT1/ntx/tlf
 )
 LaTeX Font Info:    Font shape `OT1/ntxtlf/m/n' will be
-(Font)              scaled to size 12.0pt on input line 61.
+(Font)              scaled to size 12.0pt on input line 70.
 LaTeX Font Info:    Font shape `OT1/ntxtlf/m/n' will be
-(Font)              scaled to size 8.8pt on input line 61.
+(Font)              scaled to size 8.8pt on input line 70.
 LaTeX Font Info:    Font shape `OT1/ntxtlf/m/n' will be
-(Font)              scaled to size 6.6pt on input line 61.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 61.
+(Font)              scaled to size 6.6pt on input line 70.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 70.
 
 
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 61.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 70.
 
 
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Trying to load font information for U+ntxmia on input line 
-61.
+70.
 
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/newtx\untxmia.fd
 File: untxmia.fd 2018/04/14 Fontinst v1.933 font definitions for U/ntxmia.
 )
 LaTeX Font Info:    Trying to load font information for U+ntxsym on input line 
-61.
+70.
 
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/newtx\untxsym.fd
 File: untxsym.fd 2015/03/20 Fontinst v1.933 font definitions for U/ntxsym.
 )
 LaTeX Font Info:    Trying to load font information for U+ntxsyc on input line 
-61.
+70.
 
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/newtx\untxsyc.fd
 File: untxsyc.fd 2012/04/12 Fontinst v1.933 font definitions for U/ntxsyc.
@@ -1173,341 +1145,329 @@ File: untxsyc.fd 2012/04/12 Fontinst v1.933 font definitions for U/ntxsyc.
 
 {C:/Users/stoevm/AppData/Local/MiKTeX/pdftex/config/pdftex.map}]
 LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
-(Font)              scaled to size 14.4pt on input line 64.
+(Font)              scaled to size 14.4pt on input line 72.
 LaTeX Font Info:    Font shape `T1/ntxtlf/b/n' will be
-(Font)              scaled to size 14.4pt on input line 64.
- (mao_doc.toc
+(Font)              scaled to size 14.4pt on input line 72.
+
+(toni_doc.toc
 LaTeX Font Info:    Font shape `T1/ntxtlf/b/n' will be
+(Font)              scaled to size 10.0pt on input line 1.
+LaTeX Font Info:    Font shape `OT1/ntxtlf/m/n' will be
 (Font)              scaled to size 10.0pt on input line 2.
 LaTeX Font Info:    Font shape `OT1/ntxtlf/m/n' will be
-(Font)              scaled to size 10.0pt on input line 3.
+(Font)              scaled to size 7.3pt on input line 2.
 LaTeX Font Info:    Font shape `OT1/ntxtlf/m/n' will be
-(Font)              scaled to size 7.3pt on input line 3.
-LaTeX Font Info:    Font shape `OT1/ntxtlf/m/n' will be
-(Font)              scaled to size 5.5pt on input line 3.
-[2])
+(Font)              scaled to size 5.5pt on input line 2.
+)
 \tf@toc=\write5
-\openout5 = `mao_doc.toc'.
+\openout5 = `toni_doc.toc'.
 
-pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has 
-been already used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.67 	\newpage
-               [1]
+ [2]
 LaTeX Font Info:    Font shape `T1/ntxtlf/b/n' will be
-(Font)              scaled to size 12.0pt on input line 76.
+(Font)              scaled to size 12.0pt on input line 78.
+LaTeX Font Info:    Font shape `T1/ntxtlf/m/it' will be
+(Font)              scaled to size 10.0pt on input line 87.
+
+
+Package amsmath Warning: Foreign command \atop;
+(amsmath)                \frac or \genfrac should be used instead
+(amsmath)                 on input line 103.
+
+[3] [4] [5] [6]
 LaTeX Font Info:    Trying to load font information for TS1+ntxtlf on input lin
-e 79.
+e 183.
 
 (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/newtx\ts1ntxtlf.fd
 File: ts1ntxtlf.fd 2015/01/18 v1.0 fd file for TS1/ntxtlf
 )
 LaTeX Font Info:    Font shape `TS1/ntxtlf/m/n' will be
-(Font)              scaled to size 10.0pt on input line 79.
-pdfTeX warning (ext4): destination with the same identifier (name{page.2}) has 
-been already used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.87 A
-       tableau rule which decomposes the formula in two subformulas may requ...
-[2]
-Underfull \hbox (badness 10000) in paragraph at lines 183--204
-
- []
-
-[3]
-Underfull \hbox (badness 10000) in paragraph at lines 221--234
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 237--240
-
- []
-
-[4]
-Underfull \hbox (badness 10000) in paragraph at lines 241--260
-
- []
-
-[5] [6]
-LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
-(Font)              scaled to size 7.3pt on input line 345.
-LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
-(Font)              scaled to size 5.5pt on input line 345.
- [7]
-LaTeX Font Info:    Font shape `T1/ntxtlf/m/it' will be
-(Font)              scaled to size 10.0pt on input line 400.
- [8] [9] [10] [11] [12]
+(Font)              scaled to size 10.0pt on input line 183.
 LaTeX Font Info:    Font shape `T1/ntxtlf/b/it' will be
-(Font)              scaled to size 10.0pt on input line 568.
-LaTeX Font Info:    Font shape `T1/ntxtlf/m/it' will be
-(Font)              scaled to size 7.3pt on input line 568.
-LaTeX Font Info:    Font shape `T1/ntxtlf/m/it' will be
-(Font)              scaled to size 5.5pt on input line 568.
- [13] [14] [15]
-Underfull \hbox (badness 10000) in paragraph at lines 761--762
+(Font)              scaled to size 10.0pt on input line 198.
+
+Underfull \hbox (badness 10000) in paragraph at lines 206--210
 
  []
 
-[16] [17]
-LaTeX Font Info:    Trying to load font information for T1+ntxtt on input line 
-821.
+LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
+(Font)              scaled to size 7.0pt on input line 218.
+LaTeX Font Info:    Trying to load font information for T1+qhv on input line 21
+8.
+(C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/tex-gyre\t1qhv.fd
+File: t1qhv.fd 2009/09/25 v1.2 font definition file for T1/qhv
+)
+LaTeX Font Info:    Font shape `T1/qhv/m/n' will be
+(Font)              scaled to size 6.29996pt on input line 218.
 
-(C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/newtx\t1ntxtt.fd
+[7] [8] [9] [10] [11] [12] [13]
+LaTeX Font Info:    Font shape `OT1/ntxtlf/b/n' will be
+(Font)              scaled to size 10.0pt on input line 524.
+LaTeX Font Info:    Font shape `OT1/ntxtlf/b/n' will be
+(Font)              scaled to size 7.3pt on input line 524.
+LaTeX Font Info:    Font shape `OT1/ntxtlf/b/n' will be
+(Font)              scaled to size 5.5pt on input line 524.
+
+Overfull \hbox (1.7808pt too wide) detected at line 574
+[][]\OML/ntxmi/m/it/10 R[] \U/ntxmia/m/it/10 = \LMS/ntxsy/m/n/10 f\OML/ntxmi/m/
+it/10 < x; y  \LMS/ntxsy/m/n/10 j \OML/ntxmi/m/it/10 x; y \LMS/ntxsy/m/n/10 2 \
+OML/ntxmi/m/it/10 W[]\LMS/ntxsy/m/n/10 ^ \OML/ntxmi/m/it/10 < x; y >  is a vali
+d connected pair of  modal points\LMS/ntxsy/m/n/10 g
+ []
+
+[14]
+LaTeX Font Info:    Font shape `T1/ntxtlf/b/n' will be
+(Font)              scaled to size 7.0pt on input line 596.
+LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
+(Font)              scaled to size 8.0pt on input line 600.
+LaTeX Font Info:    Trying to load font information for T1+ntxtt on input line 
+600.
+ (C:\Users\stoevm\AppData\Local\Programs\MiKTeX\tex/latex/newtx\t1ntxtt.fd
 File: t1ntxtt.fd 2012/04/20 v3.1
 )
 LaTeX Font Info:    Font shape `T1/ntxtt/m/n' will be
-(Font)              scaled to size 10.0pt on input line 821.
+(Font)              scaled to size 8.0pt on input line 600.
+LaTeX Font Info:    Font shape `OT1/ntxtlf/m/n' will be
+(Font)              scaled to size 8.0pt on input line 600.
+LaTeX Font Info:    Font shape `OT1/ntxtlf/m/n' will be
+(Font)              scaled to size 6.2pt on input line 600.
+LaTeX Font Info:    Font shape `OT1/ntxtlf/b/n' will be
+(Font)              scaled to size 8.0pt on input line 600.
+LaTeX Font Info:    Font shape `OT1/ntxtlf/b/n' will be
+(Font)              scaled to size 6.2pt on input line 600.
+[15] [16] [17] [18]
+LaTeX Font Info:    Font shape `T1/ntxtt/m/n' will be
+(Font)              scaled to size 10.0pt on input line 716.
 
-[18] [19]
-Underfull \hbox (badness 10000) in paragraph at lines 903--908
-
+Overfull \hbox (22.20898pt too wide) in paragraph at lines 716--717
+[]\T1/ntxtlf/m/n/10 The project repos-i-tory is at []$\T1/ntxtt/m/n/10 https : 
+/ / github . com / Anton94 / modal _ logic _ formula _
  []
 
 LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
-(Font)              scaled to size 8.0pt on input line 908.
-LaTeX Font Info:    Font shape `T1/ntxtlf/b/n' will be
-(Font)              scaled to size 8.0pt on input line 909.
-LaTeX Font Info:    Font shape `T1/ntxtlf/m/it' will be
-(Font)              scaled to size 8.0pt on input line 928.
+(Font)              scaled to size 7.3pt on input line 759.
+LaTeX Font Info:    Font shape `T1/ntxtlf/m/n' will be
+(Font)              scaled to size 5.5pt on input line 759.
+[19]
+
+LaTeX Warning: Citation `flex-tokenizer' on page 20 undefined on input line 765
+.
+
+
+LaTeX Warning: Citation `bison-parser' on page 20 undefined on input line 765.
+
 [20]
-Underfull \hbox (badness 10000) in paragraph at lines 936--941
-
- []
-
+LaTeX Font Info:    Font shape `T1/ntxtlf/b/n' will be
+(Font)              scaled to size 8.0pt on input line 802.
+LaTeX Font Info:    Font shape `T1/ntxtlf/m/it' will be
+(Font)              scaled to size 8.0pt on input line 821.
+ [21]
 LaTeX Font Info:    Font shape `TS1/ntxtlf/m/n' will be
-(Font)              scaled to size 8.0pt on input line 951.
-[21] [22]
-Underfull \hbox (badness 10000) in paragraph at lines 1063--1068
+(Font)              scaled to size 8.0pt on input line 843.
 
- []
 
+LaTeX Warning: Citation `flex-tokenizer' on page 22 undefined on input line 869
+.
+
+[22] [23]
 LaTeX Font Info:    Font shape `TS1/ntxtlf/m/it' will be
-(Font)              scaled to size 8.0pt on input line 1069.
-[23] [24] [25] [26]
-Underfull \hbox (badness 10000) in paragraph at lines 1234--1239
+(Font)              scaled to size 8.0pt on input line 960.
+ [24] [25]
 
- []
+LaTeX Warning: Citation `visitor-pattern' on page 26 undefined on input line 10
+73.
 
-[27] [28] [29] [30]
-Underfull \hbox (badness 10000) in paragraph at lines 1424--1429
-
- []
-
-[31]
-Underfull \hbox (badness 10000) in paragraph at lines 1496--1501
-
- []
-
-[32] [33] [34]
-Underfull \hbox (badness 10000) in paragraph at lines 1614--1619
+[26] [27] [28] [29] [30] [31] [32] [33] [34] [35]
+Underfull \hbox (badness 10000) in paragraph at lines 1500--1505
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1631--1636
-
- []
-
-[35]
-Overfull \hbox (6.329pt too wide) in paragraph at lines 1669--1670
-[]$\OML/ntxmi/m/it/10 '$ \T1/ntxtlf/m/it/10 is a mea-sured less for-mula signed
- as true and $\OML/ntxmi/m/it/10 '$ \T1/ntxtlf/m/it/10 be-longs to $\OML/ntxmi/
-m/it/10 measured[]less[]eq[]F$ 
- []
-
-
-Overfull \hbox (7.879pt too wide) in paragraph at lines 1670--1671
-[]$\OML/ntxmi/m/it/10 '$ \T1/ntxtlf/m/it/10 is a mea-sured less for-mula signed
- as false and $\OML/ntxmi/m/it/10 '$ \T1/ntxtlf/m/it/10 be-longs to $\OML/ntxmi
-/m/it/10 measured[]less[]eq[]T$ 
+Overfull \hbox (125.40479pt too wide) in paragraph at lines 1521--1522
+[][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 [36]
-Underfull \hbox (badness 10000) in paragraph at lines 1688--1690
+Overfull \hbox (67.8042pt too wide) in paragraph at lines 1522--1523
+[][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (3.96902pt too wide) in paragraph at lines 1547--1548
+[]$\OML/ntxmi/m/it/10 '$ \T1/ntxtlf/m/n/10 is a mea-sured less for-mula signed 
+as true and $\OML/ntxmi/m/it/10 '$ \T1/ntxtlf/m/n/10 be-longs to $\OML/ntxmi/m/
+it/10 measured[]less[]eq[]F$ 
+ []
+
+
+Overfull \hbox (5.96902pt too wide) in paragraph at lines 1548--1549
+[]$\OML/ntxmi/m/it/10 '$ \T1/ntxtlf/m/n/10 is a mea-sured less for-mula signed 
+as false and $\OML/ntxmi/m/it/10 '$ \T1/ntxtlf/m/n/10 be-longs to $\OML/ntxmi/m
+/it/10 measured[]less[]eq[]T$ 
+ []
+
+[37]
+Underfull \hbox (badness 10000) in paragraph at lines 1566--1568
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1708--1710
+Underfull \hbox (badness 10000) in paragraph at lines 1586--1588
 
  []
 
-[37] [38] [39]
-Underfull \hbox (badness 10000) in paragraph at lines 1795--1800
-
- []
-
-[40] [41] [42]
-Overfull \hbox (0.60352pt too wide) in paragraph at lines 1927--1928
+[38] [39] [40] [41] [42]
+Overfull \hbox (0.60352pt too wide) in paragraph at lines 1803--1804
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][] 
  []
 
 [43]
-Overfull \hbox (0.60352pt too wide) in paragraph at lines 1963--1964
+Overfull \hbox (0.60352pt too wide) in paragraph at lines 1839--1840
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 [44] [45] [46] [47] [48] [49]
-Overfull \hbox (0.60352pt too wide) in paragraph at lines 2203--2204
+Overfull \hbox (0.60352pt too wide) in paragraph at lines 2078--2079
 [][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 
-Overfull \hbox (0.60352pt too wide) in paragraph at lines 2205--2206
+Overfull \hbox (0.60352pt too wide) in paragraph at lines 2080--2081
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 [50]
-Underfull \hbox (badness 10000) in paragraph at lines 2235--2240
+Underfull \hbox (badness 10000) in paragraph at lines 2110--2112
 
  []
 
 
-Overfull \hbox (0.60352pt too wide) in paragraph at lines 2257--2259
+Overfull \hbox (0.60352pt too wide) in paragraph at lines 2131--2133
 [][][][][][][][][][][][][][][][][][][] 
  []
 
 [51]
-
-LaTeX Warning: Reference `boolean-valuation' on page 52 undefined on input line
- 2273.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2273--2279
+Underfull \hbox (badness 10000) in paragraph at lines 2147--2150
 
  []
 
 [52]
-Underfull \hbox (badness 10000) in paragraph at lines 2314--2319
+Underfull \hbox (badness 10000) in paragraph at lines 2187--2189
 
  []
 
-[53]
-Underfull \hbox (badness 10000) in paragraph at lines 2344--2349
+[53] [54]
+Underfull \hbox (badness 10000) in paragraph at lines 2268--2270
 
  []
 
-[54] [55]
-Underfull \hbox (badness 10000) in paragraph at lines 2399--2404
+[55] [56]
+Underfull \hbox (badness 10000) in paragraph at lines 2352--2354
 
  []
 
-[56] [57]
-Underfull \hbox (badness 10000) in paragraph at lines 2484--2489
+[57] [58]
+Underfull \hbox (badness 10000) in paragraph at lines 2418--2420
 
  []
 
-[58] [59]
-Underfull \hbox (badness 10000) in paragraph at lines 2551--2556
+[59]
+Underfull \hbox (badness 10000) in paragraph at lines 2458--2460
 
  []
 
 [60]
-
-LaTeX Warning: Reference `model-valuation' on page 61 undefined on input line 2
-589.
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2589--2595
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2604--2615
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2622--2627
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2636--2641
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2647--2653
+Underfull \hbox (badness 10000) in paragraph at lines 2485--2487
 
  []
 
 [61]
-Underfull \hbox (badness 10000) in paragraph at lines 2664--2673
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2681--2686
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2689--2704
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 2706--2713
+Underfull \hbox (badness 10000) in paragraph at lines 2525--2527
 
  []
 
 [62]
-Underfull \hbox (badness 10000) in paragraph at lines 2769--2774
+Underfull \hbox (badness 10000) in paragraph at lines 2572--2574
 
  []
 
 [63]
-Underfull \hbox (badness 10000) in paragraph at lines 2795--2800
+Underfull \hbox (badness 10000) in paragraph at lines 2597--2599
 
  []
 
-[64] [65] [66] [67] (mao_doc.aux)
+[64]
+Underfull \hbox (badness 10000) in paragraph at lines 2618--2620
+
+ []
+
+[65] [66]
+Underfull \hbox (badness 10000) in paragraph at lines 2682--2684
+
+ []
+
+[67]
+Underfull \hbox (badness 10000) in paragraph at lines 2759--2761
+
+ []
+
+[68]
+Underfull \hbox (badness 10000) in paragraph at lines 2775--2777
+
+ []
+
+
+Overfull \hbox (0.60352pt too wide) in paragraph at lines 2805--2806
+[][][][][][][][][][][][][] 
+ []
+
+[69] [70]
+Underfull \hbox (badness 10000) in paragraph at lines 2847--2849
+
+ []
+
+[71] [72] [73] (toni_doc.aux)
 
 LaTeX Warning: There were undefined references.
 
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package rerunfilecheck Info: File `mao_doc.out' has not changed.
-(rerunfilecheck)             Checksum: C6F3BA1465040FC0ACF141B714271F8E;6703.
+Package rerunfilecheck Info: File `toni_doc.out' has not changed.
+(rerunfilecheck)             Checksum: F07649B9F21F91FC2E004A89551F97F2;5983.
  ) 
 Here is how much of TeX's memory you used:
- 29011 strings out of 479334
- 496556 string characters out of 2856609
- 987264 words of memory out of 3000000
- 44509 multiletter control sequences out of 15000+200000
- 495107 words of font info for 132 fonts, out of 3000000 for 9000
+ 29937 strings out of 479334
+ 512702 string characters out of 2856609
+ 980887 words of memory out of 3000000
+ 45128 multiletter control sequences out of 15000+200000
+ 501215 words of font info for 159 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 113i,15n,116p,1366b,1850s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 113i,18n,116p,1378b,1837s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Users/stoevm/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/tex-gyre/q-ts1
-.enc}{C:/Users/stoevm/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/newtx/ntx-e
-c-tlf.enc}{C:/Users/stoevm/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/newtx/
-ntx-ot1-tlf.enc}<C:/Users/stoevm/AppData/Local/Programs/MiKTeX/fonts/type1/publ
-ic/newtx/NewTXMI.pfb><C:/Users/stoevm/AppData/Local/Programs/MiKTeX/fonts/type1
-/public/newtx/NewTXMI5.pfb><C:/Users/stoevm/AppData/Local/Programs/MiKTeX/fonts
-/type1/public/newtx/NewTXMI7.pfb><C:/Users/stoevm/AppData/Local/Programs/MiKTeX
-/fonts/type1/public/tex-gyre/qtmr.pfb><C:/Users/stoevm/AppData/Local/Programs/M
-iKTeX/fonts/type1/public/tex-gyre/qtmri.pfb><C:/Users/stoevm/AppData/Local/Prog
-rams/MiKTeX/fonts/type1/public/newtx/stxscr.pfb><C:/Users/stoevm/AppData/Local/
-Programs/MiKTeX/fonts/type1/public/txfonts/t1xtt.pfb><C:/Users/stoevm/AppData/L
-ocal/Programs/MiKTeX/fonts/type1/public/newtx/txexs.pfb><C:/Users/stoevm/AppDat
-a/Local/Programs/MiKTeX/fonts/type1/public/newtx/txmiaX.pfb><C:/Users/stoevm/Ap
-pData/Local/Programs/MiKTeX/fonts/type1/public/txfonts/txsya.pfb><C:/Users/stoe
-vm/AppData/Local/Programs/MiKTeX/fonts/type1/public/txfonts/txsyb.pfb><C:/Users
-/stoevm/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/txsys.pfb><C:/Us
-ers/stoevm/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/ztmb.pfb><C:/
-Users/stoevm/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/ztmbi.pfb><
-C:/Users/stoevm/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/ztmr.pfb
-><C:/Users/stoevm/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/ztmri.
-pfb>
-Output written on mao_doc.pdf (69 pages, 703295 bytes).
+.enc}{C:/Users/stoevm/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/newtx/ntx-o
+t1-tlf.enc}{C:/Users/stoevm/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/tex-g
+yre/q-ec.enc}{C:/Users/stoevm/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/new
+tx/ntx-ec-tlf.enc}<C:/Users/stoevm/AppData/Local/Programs/MiKTeX/fonts/type1/pu
+blic/newtx/NewTXMI.pfb><C:/Users/stoevm/AppData/Local/Programs/MiKTeX/fonts/typ
+e1/public/newtx/NewTXMI5.pfb><C:/Users/stoevm/AppData/Local/Programs/MiKTeX/fon
+ts/type1/public/newtx/NewTXMI7.pfb><C:/Users/stoevm/AppData/Local/Programs/MiKT
+eX/fonts/type1/public/tex-gyre/qhvr.pfb><C:/Users/stoevm/AppData/Local/Programs
+/MiKTeX/fonts/type1/public/tex-gyre/qtmr.pfb><C:/Users/stoevm/AppData/Local/Pro
+grams/MiKTeX/fonts/type1/public/tex-gyre/qtmri.pfb><C:/Users/stoevm/AppData/Loc
+al/Programs/MiKTeX/fonts/type1/public/txfonts/t1xtt.pfb><C:/Users/stoevm/AppDat
+a/Local/Programs/MiKTeX/fonts/type1/public/newtx/txexs.pfb><C:/Users/stoevm/App
+Data/Local/Programs/MiKTeX/fonts/type1/public/newtx/txmiaX.pfb><C:/Users/stoevm
+/AppData/Local/Programs/MiKTeX/fonts/type1/public/txfonts/txsyb.pfb><C:/Users/s
+toevm/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/txsys.pfb><C:/User
+s/stoevm/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/ztmb.pfb><C:/Us
+ers/stoevm/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/ztmbi.pfb><C:
+/Users/stoevm/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/ztmr.pfb><
+C:/Users/stoevm/AppData/Local/Programs/MiKTeX/fonts/type1/public/newtx/ztmri.pf
+b>
+Output written on toni_doc.pdf (73 pages, 770825 bytes).
 PDF statistics:
- 2214 PDF objects out of 2487 (max. 8388607)
- 1426 named destinations out of 1440 (max. 500000)
- 365 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 2572 PDF objects out of 2984 (max. 8388607)
+ 1723 named destinations out of 1728 (max. 500000)
+ 325 words of extra memory for PDF output out of 10000 (max. 10000000)
 
