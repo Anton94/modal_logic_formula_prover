@@ -562,10 +562,16 @@ The satisfiability verification for a given formula is done by constructing a mo
 	\end{defn}
 
 	\begin{defn}
-		Let B be a branch conjunction and let $\Var_B$ be the set of all variables in B, then the variable valuation $\vVar$ defines a mapping from $\Var_B$ to a boolean value, namely:
+		Let B be a branch conjunction and let $\Var_B$ be the set of all variables in B, then the variable valuation $\curvedE$ defines a mapping from $\Var_B$ to a boolean value, namely:
 		\begin{align*}
-			\vVar : \Var_B \rightarrow \{ \textbf{false}, \textbf{true}\}
+			\curvedE : \Var_B \rightarrow \{ \textbf{false}, \textbf{true}\}
 		\end{align*}
+	\end{defn}
+
+	% The idea of a modal points is to be represented by a separate $\curvedE$ variable valuation, which will be used to satisfy the term representing that modal point.
+
+	\begin{defn} 
+		Let $\curvedE$ be a variable valuation and let a be a term, then we say that the tuple <$\curvedE$, a> represents a model point.
 	\end{defn}
 
 	\paragraph{Boolean valuation}
@@ -580,14 +586,11 @@ The satisfiability verification for a given formula is done by constructing a mo
 			\item $\vBool_{\curvedE}(a*) = \neg \vBool_{\curvedE}(a)$
 		\end{itemize}
 
-	\begin{defn} 
-		A model point is represented by a variable valuation.
-	\end{defn}
 
 	\begin{defn}
-		Let a be a term, let $\curvedE$ be a variable valuation which is a representation of a model point p. Then the following holds:
+		Let <$\curvedE$, a> be a representation of a modal point p. Then the following holds:
 		\begin{align*}
-			\vBool_{\curvedE}(a) = true \rightarrow p \in \vE(a)
+			\vBool_{\curvedE}(a) = true \leftrightarrow p \in \vE(a)
 		\end{align*}
 		Where $\vE$ is the model valuation function. In such a case when $\vBool_{\curvedE}(a) = \textbf{true}$ we will say that the point p is \textbf{valid}.
 	\end{defn}
@@ -692,19 +695,26 @@ The satisfiability verification for a given formula is done by constructing a mo
       \end{tikzpicture}
 	\end{center}
 
+	With definitions (3.8, 3.9) we are able to construct a model where the contacts and non zero terms from the branch conjunction are satisfied.
+	We will denote this model as a \textbf{partial model}. The points in the partial model are represented with a tuple <$\curvedE$, a>.
+           Furthermore, it must be verified that the modeled <$\curvedE$, a> for each model point satisfy the equal to zero terms and the non contacts from the branch conjunction.
+
 	\begin{defn}
-		Let B be a branch conjunction and $a \le_\mu b \in B$, where a and b are two terms.
-		Then one model point p is generated and its variable valuations $\curvedE$ is the constant true, namely the constant term 1.
+		Let M be a partial model. Then we say that the partial model M satisfies an equal to zero term $a = 0$, if the following holds:
+		\begin{align*}
+			\forall \textit{<$\curvedE$, a>} \in M: \vBool_{\curvedE}(a) \ne \emptyset
+		\end{align*}
 	\end{defn}
 
 	\begin{defn}
-		With definitions (1, 2, 3) we are able to construct a model where the contacts and non zero terms are satisfied. 
-		We will denote this model as \textbf{partially constructed model}. 
-		However to satisfy a branch conjunction B we need to verify that the non contacts and zero terms are satisfied as well.
-	\end{defn}
+		Let M be a partial model. Then we say that the partial model M satisfies a non contact $\neg C(a, b)$, if the following holds:
+		\begin{align*}
+			\forall \textit{<$\curvedE$, a>} \in M: \vBool_{\curvedE}(a) = \emptyset \lor \vBool_{\curvedE}(b) = \emptyset
+		\end{align*}
+	\end{defn}		
 
 	\begin{defn}
-		Let M = (W, R) be a partially constructed model and let $\Ts$ be the set of all terms. Then the model valuation $\vE : \Ts \rightarrow \mathscr{P}(W)$ is defined recursively as:
+		Let M be a partial model and let $\Ts$ be the set of all terms. Then the model valuation $\vE : \Ts \rightarrow \mathscr{P}(W)$ is defined inductively as:
 		\begin{itemize}
 			\item $\vE(0) = W$
 			\item $\vE(1) = \emptyset$
@@ -714,36 +724,19 @@ The satisfiability verification for a given formula is done by constructing a mo
 			\item $\vE(a*) = W \setminus \vE(a)$
 		\end{itemize}
 	\end{defn}
-		The tuple $(W, R, \vE)$ is called a partially constructed frame.
-	\begin{defn}
-		Let $\mathscr{F} = (W, R, \vE)$ be a partially constructed frame. Then we say that the frame $\mathscr{F}$ satisfies an equal to zero term $a = 0$, if the following holds:
-		\begin{align*}
-			\forall p \in W: \vE(a) \ne \emptyset
-		\end{align*}
-	\end{defn}
-
-	\begin{defn}
-		Let $\mathscr{F} = (W, R, \vE)$ be a partially constructed frame. Then we say that the frame $\mathscr{F}$ satisfies a non contact $\neg C(a, b)$, if the following holds:
-		\begin{align*}
-			\forall p \in W: \vE(a) = \emptyset \lor \vE(b) = \emptyset \\
-			\\
-			\forall (p, q) \in R: (\vE(p, a) = \emptyset \lor \vE(q, b) = \emptyset) \\ 
-				\land \; (\vE(p, b) = \emptyset \lor \vE(q, a) = \emptyset)
-		\end{align*}
-	\end{defn}													
-
-	\paragraph{Satisfied atomic formulas}
-		Let M be a partially constructed model from a branch conjunction B. M is said to be a potential model if: 
-		\begin{itemize}
-			\item $\forall \; \neg C(a, b) : M \textit{ satisfies } \neg C(a, b)$
-			\item $\forall \; a = 0 : M \textit{ satisfies } a = 0$
-		\end{itemize}
+		The tuple $(W, R, \vE)$ is called a potential model.
 
 	\leavevmode\newline
-	To validate that the potential model is correct, meaning that it satisfies the formula, we must take into account the measure atomic formulas.
-	Without loss of generality, we can transform each $<_\mu$ atomic formula, to an equivalent formula which uses only the $\le_\mu$ atomic formula and boolean operators.
-	In a branch conjunction B, there might be more than one atomic measure formula. Validating that the potential model satisfies the branch conjunction together with the 
-	measure atomic formulas, means that all atomic measure formulas to be satisfied. Satisfying a set of measure atomic formulas produces a system of inequalities.
+	To validate that the potential model is correct, meaning that it satisfies the formula, we must take into account the measure atomic formulas. 
+	In order to satisfy the measure atomic formulas, additional points are generated and have the following structure <$\curvedE$, 1>. This means that 
+	for each model point the constant term 1 is taken together with a variable evaluation function. The variable evaluation functions of these model points 
+	is chosen such that the model satisfies all measure atomic formulas.
+
+	\begin{defn}
+		Let B be a branch conjunction and let N be the number of all measure atomic formulas ( $\le_\mu$ and $\leq_\mu$).
+		Then N additional modal points are generated in the potential model \{<$\curvedE_i$, 1> : $0 < i \leq N$ \}. The variable evaluation of the generated points must satisfy the measure atomic formulas.
+		Satisfying a set of measure atomic formulas produces a system of inequalities.
+	\end{defn}
 
 	\subsection{System of Inequalities} 
 		The system of inequality has the following structure:
@@ -760,7 +753,7 @@ The satisfiability verification for a given formula is done by constructing a mo
 
 		\leavevmode\newline
 		\subsection{System Construction}
-		Let $\mathscr{F} = (W, R, \vE)$ be a potential frame. The system of inequalities is constructed from the potential frame by evaluating each
+		Let $M = (W, R, \vE)$ be a potential model. The system of inequalities is constructed from the potential model by evaluating each
 		of the terms in the $\le_\mu$ and $<_\mu$ atomic formulas. The number of points in the model are $N = | \; W \; |$. Let us enumerate the points
 		$p_0, p_1, ..., p_N$. The system will have N different variables $X_0, X_1, ..., X_N$, 
 		where $\forall i < N: X_i \textit{ is mapped to point }p_i$.
@@ -796,10 +789,10 @@ The satisfiability verification for a given formula is done by constructing a mo
 		\end{defn}
 
 		\begin{defn}
-			Let $\mathscr{F} = (W, R, \vE)$ be a potential frame. Let $\mathscr{S}$ be the system of inequalities defined by
+			Let $M = (W, R, \vE)$ be a potential model. Let $\mathscr{S}$ be the system of inequalities defined by
 			\begin{itemize}
-				\item inequalities for all $\le_\mu$ fromulas by def: 4.17 
-				\item inequalities for all $<_\mu$ fromulas by def: 4.18
+				\item inequalities for all $\le_\mu$ fromulas by def: 3.16 
+				\item inequalities for all $<_\mu$ fromulas by def: 3.17
 				\item inequality $0 < X_i$ for each $0 \le i < N$  
 			\end{itemize}
 			If the system of inequalities $\mathscr{S}$ has a solution, then we say that the system is valid.
@@ -807,9 +800,9 @@ The satisfiability verification for a given formula is done by constructing a mo
 		\begin{lemma}
 			\label{building-lemma}
 			Let $\varphi$ be a formula. If there exists branch conjunction B for the formula $\varphi$
-			and there exists a potential frame $\mathscr{F}$ for the branch conjunction B and 
-			there exists a valid system of inequalities defined from the potential frame $\mathscr{F}$,
-			then the formula $\varphi$ is satisfiable by the frame $\mathscr{F}$.
+			and there exists a potential model M for the branch conjunction B and 
+			there exists a valid system of inequalities defined from the potential model M,
+			then the formula $\varphi$ is satisfiable by the model M.
 		\end{lemma}
 
 	\newpage
