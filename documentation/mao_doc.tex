@@ -588,7 +588,7 @@ The satisfiability verification for a given formula is done by constructing a mo
 
 
 	\begin{defn}
-		Let <$\curvedE$, a> be a representation of a modal point p. Then the following holds:
+		Let p = <$\curvedE$, a> be a representation of a modal point. Then the following holds:
 		\begin{align*}
 			\vBool_{\curvedE}(a) = true \leftrightarrow p \in \vE(a)
 		\end{align*}
@@ -597,9 +597,13 @@ The satisfiability verification for a given formula is done by constructing a mo
 	
 	\paragraph{Model Point Creation}
 		Constructing a valid model for a given branch conjunction of a formula consists of finding W, R and the model valuation function $\vE$.
-		To construct W we are going to generate the infimum number of model points in such a way to keep the formula satisfied at all times.
-		If this is not possible, then a model does not exist in the given branch conjunction. Generating only the minimum 
-		required model points helps out to avoid unnecessary computations.
+		The model construction depends on the atomic formulas in a branch conjunction. 
+		The algorithm to validate that a branch conjunction produces a model where the given formula is satisfiable iterates over the atomic formulas and extends the model in such a way that the model does not have contradictions.
+		If on some step a contradiction occurs, then the $\vE$ is modified in order to remove the contradiction.
+		When there are no possibilities for further modifications, then the branch conjunction is closed and a model does not exist in that branch conjunction.
+		The number of model points generated in the model depend on the contacts, non zero terms and the atomic measure formulas.
+		The goal is to search for a model with enough model points in order to make sure that all possible models which are not duplicated are considered.
+		Duplicated model points lead to additional unnecessary computation. 
 
 	\begin{defn}
 		Let $\Var_B$ be the set of all variables in a branch conjunction B and let a be a term.
@@ -628,6 +632,12 @@ The satisfiability verification for a given formula is done by constructing a mo
 			\item $\vBool_{\curvedE^1}(a) = \textbf{true}$
 			\item $\vBool_{\curvedE^2}(b) = \textbf{true}$
 		\end{itemize}
+		To validate that the newly generated model points for this contact do not break the non contacts, the following must be true.
+		\begin{align*}
+			\forall \neg C(e_k, f_k) : (\vBool_{\curvedE^1}(e_k) = \textbf{false} & \lor \vBool_{\curvedE^2}(f_k) = \textbf{false}) \; \land \\
+				(\vBool_{\curvedE^1}(f_k) = \textbf{false} & \lor \vBool_{\curvedE^2}(e_k) = \textbf{false})
+		\end{align*}
+		
 		Along with the generation of a valid variable valuation, the R relations is extended as well, namely the following relations are added:
 		\begin{itemize}
 			\item $p_1Rp_1$ - reflexivity of the modal point $p_1$
@@ -702,14 +712,14 @@ The satisfiability verification for a given formula is done by constructing a mo
 	\begin{defn}
 		Let M be a partial model. Then we say that the partial model M satisfies an equal to zero term $a = 0$, if the following holds:
 		\begin{align*}
-			\forall \textit{<$\curvedE$, a>} \in M: \vBool_{\curvedE}(a) \ne \emptyset
+			\forall \textit{<$\curvedE$, a>} \in M: \vBool_{\curvedE}(a) = \textit{false}
 		\end{align*}
 	\end{defn}
 
 	\begin{defn}
-		Let M be a partial model. Then we say that the partial model M satisfies a non contact $\neg C(a, b)$, if the following holds:
+		Let M be a partial model. Then we say that the partial model M satisfies the reflexivity of a non contact $\neg C(a, b)$, if the following holds:
 		\begin{align*}
-			\forall \textit{<$\curvedE$, a>} \in M: \vBool_{\curvedE}(a) = \emptyset \lor \vBool_{\curvedE}(b) = \emptyset
+			\forall \textit{<$\curvedE$, a>} \in M: \vBool_{\curvedE}(a) = false \lor \vBool_{\curvedE}(b) = false
 		\end{align*}
 	\end{defn}		
 
