@@ -704,10 +704,10 @@ The satisfiability verification for a given formula is done by constructing a mo
     		{Generated model points and its relation for not equal term $a \neq 0$};
       \end{tikzpicture}
 	\end{center}
-
-	With definitions (3.8, 3.9) we are able to construct a model where the contacts and non zero terms from the branch conjunction are satisfied.
-	We will denote this model as a \textbf{partial model}. The points in the partial model are represented with a tuple <$\curvedE$, a>.
-           Furthermore, it must be verified that the modeled <$\curvedE$, a> for each model point satisfy the equal to zero terms and the non contacts from the branch conjunction.
+	With definition 3.8 the constructed model satisfies the non zero terms from the branch conjunction.
+	With definition 3.9 the constructed model satisfies the contacts and the symmetric property of the non contacts from the branch conjunction.
+	The model constructed with definitions 3.8 and 3.9 will be denoted as a \textbf{partial model}. The points in the partial model are represented with a tuple <$\curvedE$, a>.
+           Furthermore, it must be verified that the modeled <$\curvedE$, a> for each model point satisfy the equal to zero terms and the reflexivity of the non contacts from the branch conjunction.
 
 	\begin{defn}
 		Let M be a partial model. Then we say that the partial model M satisfies an equal to zero term $a = 0$, if the following holds:
