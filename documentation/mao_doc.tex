@@ -219,6 +219,7 @@ A branch is said to be closed if and only if it contains the same formula signed
 		\end{defn}
 
 		\begin{defn}[Closed tableau]
+		\label{closed-tableau} 
 A tableau is said to be closed if, after the decomposition process, all branches are closed.
 		\end{defn}
 
@@ -542,12 +543,12 @@ $\Longleftarrow$
 		Where $\mu$ is a measure function. Detailed definition is given in \ref{measured-model}.
 	
 	\subsection{Formula Satisfiability} 
-The satisfiability verification for a given formula is done by constructing a model. The formula is satisfiable only if such a model exists. The model construction is done in several steps. Foremost, the tableau method is used to simplify the problem and to detect contradictions earlier in the process, even before the model construction. If all branches of the tableau method are closed, then a model in which the given formula is satisfiable does not exist. If there are open branches in the tableau result, then semantical reasoning shall be done in order to construct a model, if such a model exists. Let us define few definitions before we define the process of formula satisfiability.
+The satisfiability verification or sometimes called a satisfiability proof for a given formula is done by constructing a model. The formula is satisfiable only if such a model exists. The model construction is done in several steps. Foremost, the tableau method is used to simplify the problem and to detect contradictions earlier in the process, even before the model construction begins. If the produced tableau is closed as per definition \ref{closed-tableau}, then a model in which the given formula is satisfiable does not exist. If there are open branches in the tableau result, then semantical reasoning shall be done in order to construct a model, if such a model exists. Let us define few definitions before we define the procedure the satisfiability proof of a formula.
 
 	\paragraph{Tableau Branch Conjunction}
 		A branch from the tableau method consists of signed atomic formulas. For a formula to be satisfiable, it means that all atomic formulas in a tableau branch should be satisfied. This in terms can be represented as a conjunction of the atomic formulas. Let's call it a branch conjunction. For the quantitative contact logics, the conjunction contains the signed contact, zero term and measure atomic formulas.
 	\begin{defn}
-		Let $\varphi$ be a formula and let $\mathcal{T}$ be a tableau from the $\varphi$ formula. Then a branch of the tableau method is defined with the following notation:
+		Let $\varphi$ be a formula and let $\mathcal{T}$ be a tableau applied over the $\varphi$ formula. Then a branch of the tableau method is defined with the following notation:
 		\begin{align*}
 				B = \{T C(a_i, b_i) \mid i \in \{1, \ldots, I\} \} &\cup 
 					\{F C(e_k, f_k) \mid k \in \{1, \ldots, K\} \} \cup \\
@@ -557,11 +558,11 @@ The satisfiability verification for a given formula is done by constructing a mo
 					\{F u_q \le_\mu v_q \mid q \in \{1, \ldots, Q\} \}
 		\end{align*}
 	\end{defn}
-	The branch conjunction of the tableau method branch is defined as:
+	For the sake of simplicity we can remove the signed symbols $\signT \textit{ and } \signF$, in which case the branch conjunction of the tableau method branch is defined as:
 	\BranchConjunction
 
 	\begin{defn}
-		Let B be a branch conjunction, then the set of all variables used in all atomic formulas in B is defined as $\Var_B$.
+		Let B be a branch conjunction, then the set of all variables used in all atomic formulas in B is defined as $\Var_B$ and it has a normal ordering of the variable, meaning that we can represent them in a sequence $x_1, x_2, ..., x_n$.
 	\end{defn}
 
 	\begin{defn}
@@ -570,16 +571,16 @@ The satisfiability verification for a given formula is done by constructing a mo
 			\curvedE : \Var_B \rightarrow \{ \textbf{false}, \textbf{true}\}
 		\end{align*}
 	\end{defn}
-
+	The variable valuation can be thought as an array of 1's and 0's where the indexes of this array are the variables from $\Var_B$. Having in mind that the size of $\Var_B$ is n, we know that there are $2^n$ possible valuations. Later on we are going to map one variable valuation function per modal point, this will imply that there will be $2^n$ possible values for one modal point.
 	% The idea of a modal points is to be represented by a separate $\curvedE$ variable valuation, which will be used to satisfy the term representing that modal point.
 
 	\begin{defn} 
-		Let $\curvedE$ be a variable valuation and let a be a term, then we say that the tuple $\langle \curvedE, a \rangle$ represents a model point.
+		Let $\curvedE$ be a variable valuation and let a be a term, then we say that the tuple $\langle \curvedE, a \rangle$ represents a modal point.
 	\end{defn}
 
 	\paragraph{Boolean valuation}
 		Let $\curvedE$ be a variable valuation and let $\Ts$ be the set of all terms,
-		then the function $\vBool_{\curvedE} : \Ts \rightarrow \{ \textbf{false}, \textbf{true}\}$ is called a boolean valuation and is defined recursively as:
+		then the function $\vBool_{\curvedE} : \Ts \rightarrow \{ \textbf{false}, \textbf{true}\}$ is called a boolean valuation and is defined inductively as:
 		\begin{itemize}
 			\item $\vBool_{\curvedE}(0) = \textbf{false}$
 			\item $\vBool_{\curvedE}(1) = \textbf{true}$
@@ -598,19 +599,19 @@ The satisfiability verification for a given formula is done by constructing a mo
 		Where $\vE$ is the model valuation function. In such a case when $\vBool_{\curvedE}(a) = \textbf{true}$ we will say that the point p is \textbf{valid}.
 	\end{defn}
 	
-	\paragraph{Model Point Creation}
+	\paragraph{Modal Point Construction}
 		Constructing a valid model for a given branch conjunction of a formula consists of finding W, R and the model valuation function $\vE$.
 		The model construction depends on the atomic formulas in a branch conjunction. 
-		The algorithm to validate that a branch conjunction produces a model where the given formula is satisfiable iterates over the atomic formulas and extends the model in such a way that the model does not have contradictions.
+		The algorithm to validate that a branch conjunction produces a model where the given formula is satisfiable iterates over the atomic formulas and extends the model in such a way that at any point in time the model does not contain contradictions.
 		If on some step a contradiction occurs, then the $\vE$ is modified in order to remove the contradiction.
-		When there are no possibilities for further modifications, then the branch conjunction is closed and a model does not exist in that branch conjunction.
-		The number of model points generated in the model depend on the contacts, non zero terms and the atomic measure formulas.
-		The goal is to search for a model with enough model points in order to make sure that all possible models which are not duplicated are considered.
-		Duplicated model points lead to additional unnecessary computation. 
+		When there are no possibilities for further modifications, then the branch conjunction is closed and a model does not exist for that branch conjunction.
+		The number of modal points generated in the model depend on the contacts, non zero terms and the atomic measure formulas.
+		The goal is to search for a model with enough modal points in order to make sure that all possible models which are not duplicated are considered.
+		Duplicated modal points lead to additional unnecessary computation. 
 
 	\begin{defn}
 		Let $\Var_B$ be the set of all variables in a branch conjunction B and let a be a term.
-		Then a model point p is constructed by generating a variable valuation $\curvedE$, such that p is valid:
+		Then a modal point p is constructed by generating a variable valuation $\curvedE$, such that p is valid:
 		\begin{align*}
 			\vBool_{\curvedE}(a) = 1
 		\end{align*}
@@ -620,7 +621,7 @@ The satisfiability verification for a given formula is done by constructing a mo
 	\begin{defn}
 		Let B be a branch conjunction as:
 		\BranchConjunction
-		The following atomic formulas require model point existence:
+		The following atomic formulas require modal point existence:
 		\begin{itemize}
 			\item $C(a_i, b_i), \textit{ for } i < I$
 			\item $d_j \neq 0, \textit{ for } j < J$
@@ -629,13 +630,13 @@ The satisfiability verification for a given formula is done by constructing a mo
 		\end{itemize}
 	\end{defn}
 
-	\begin{defn}
-		Let B be a branch conjunction and $C(a, b) \in B$, where a and b are two terms. Then two model points are generated p1 and p2 with their corresponding variable valuations $\curvedE^1$ and $\curvedE^2$ such that:
+	\begin{defn}\label{def-contacts-construction}
+		Let B be a branch conjunction and $C(a, b) \in B$, where a and b are two terms. Then two modal points are generated p1 and p2 with their corresponding variable valuations $\curvedE^1$ and $\curvedE^2$ such that:
 		\begin{itemize}
 			\item $\vBool_{\curvedE^1}(a) = \textbf{true}$
 			\item $\vBool_{\curvedE^2}(b) = \textbf{true}$
 		\end{itemize}
-		To validate that the newly generated model points for this contact do not break the non contacts, the following must be true.
+		To validate that the newly generated modal points for this contact do not break the non contacts, the following must be true.
 		\begin{align*}
 			\forall \neg C(e_k, f_k) : (\vBool_{\curvedE^1}(e_k) = \textbf{false} & \lor \vBool_{\curvedE^2}(f_k) = \textbf{false}) \; \land \\
 				(\vBool_{\curvedE^1}(f_k) = \textbf{false} & \lor \vBool_{\curvedE^2}(e_k) = \textbf{false})
@@ -675,16 +676,16 @@ The satisfiability verification for a given formula is done by constructing a mo
         		y radius =0.2cm
     			] ;
 		\node[text width=10cm, anchor=west, right] at (-4.5,-2)
-    		{Generated model points and their relations for contact C(a, b)};
+    		{Generated modal points and their relations for contact C(a, b)};
       \end{tikzpicture}
 	\end{center}
 
-	\begin{defn}
-		Let B be a branch conjunction and $a \neq 0 \in B$, where a is a term. Then one model point p is generated and its variable valuations $\curvedE$ such that:
+	\begin{defn}\label{def-non-zero-construction}
+		Let B be a branch conjunction and $a \neq 0 \in B$, where a is a term. Then one modal point p is generated and its variable valuations $\curvedE$ such that:
 		\begin{itemize}
 			\item $\vBool_{\curvedE}(a) = \textbf{true}$
 		\end{itemize}
-		The R relations is extended as follows:
+		The R relation is extended as follows:
 		\begin{itemize}
 			\item $pRp$ - reflexivity of the modal point $p$
 		\end{itemize}
@@ -704,25 +705,25 @@ The satisfiability verification for a given formula is done by constructing a mo
 		\node at (-0,0) {$p$};
 		\node at (-0.5,-0.7) {a};
 		\node[text width=10cm, anchor=west, right] at (-4.5,-2)
-    		{Generated model points and its relation for not equal term $a \neq 0$};
+    		{Generated modal point and its relation for not equal term $a \neq 0$};
       \end{tikzpicture}
 	\end{center}
-	With definition 3.8 the constructed model satisfies the non zero terms from the branch conjunction.
-	With definition 3.9 the constructed model satisfies the contacts and the symmetric property of the non contacts from the branch conjunction.
-	The model constructed with definitions 3.8 and 3.9 will be denoted as a \textbf{partial model}. The points in the partial model are represented with a tuple $\langle \curvedE, a \rangle$.
-           Furthermore, it must be verified that the modeled <$\curvedE$, a> for each model point satisfy the equal to zero terms and the reflexivity of the non contacts from the branch conjunction.
+	With definition \ref{def-non-zero-construction} the constructed model satisfies the non zero terms from the branch conjunction. \\
+	With definition \ref{def-contacts-construction} the constructed model satisfies the contacts and the symmetric property of the non contacts from the branch conjunction. \\
+	A model constructed with definitions \ref{def-non-zero-construction} and \ref{def-contacts-construction} will be denoted as a \textbf{partial model}. The points in the partial model are represented with a tuple $\langle \curvedE, a \rangle$.
+           Furthermore, it must be verified that each of the modeled <$\curvedE$, a> modal point satisfies the equal to zero terms and the reflexivity of the non contacts from the branch conjunction.
 
 	\begin{defn}
 		Let M be a partial model. Then we say that the partial model M satisfies an equal to zero term $a = 0$, if the following holds:
 		\begin{align*}
-			\forall \textit{$\langle \curvedE, a \rangle$} \in M: \vBool_{\curvedE}(a) = \textit{false}
+			\forall \langle \curvedE, a \rangle \in M: \vBool_{\curvedE}(a) = \textit{false}
 		\end{align*}
 	\end{defn}
 
 	\begin{defn}
 		Let M be a partial model. Then we say that the partial model M satisfies the reflexivity of a non contact $\neg C(a, b)$, if the following holds:
 		\begin{align*}
-			\forall \textit{$\langle \curvedE, a\rangle$} \in M: \vBool_{\curvedE}(a) = false \lor \vBool_{\curvedE}(b) = false
+			\forall \langle \curvedE, a\rangle \in M: \vBool_{\curvedE}(a) = false \lor \vBool_{\curvedE}(b) = false
 		\end{align*}
 	\end{defn}		
 
@@ -731,7 +732,7 @@ The satisfiability verification for a given formula is done by constructing a mo
 		\begin{itemize}
 			\item $\vE(0) = W$
 			\item $\vE(1) = \emptyset$
-			\item $\vE(p) = \{ q \; | \; \curvedE(q, p) = 1\}, \textit{ where } p \in \Var_B$
+			\item $\vE(p) = \{ \langle \curvedE, a \rangle \; | \; \langle \curvedE, a \rangle \in W \:\:\textit{and}\:\: \curvedE(p) = \textit{true}$
 			\item $\vE(a \sqcap b) = \vE(a) \cap \vE(b)$
 			\item $\vE(a \sqcup b) = \vE(a) \cup \vE(b)$
 			\item $\vE(a*) = W \setminus \vE(a)$
@@ -742,7 +743,7 @@ The satisfiability verification for a given formula is done by constructing a mo
 	\leavevmode\newline
 	To validate that the potential model is correct, meaning that it satisfies the formula, we must take into account the measure atomic formulas. 
 	In order to satisfy the measure atomic formulas, additional points are generated and have the following structure $\langle \curvedE, 1 \rangle$. This means that 
-	for each model point the constant term 1 is taken together with a variable evaluation function. The variable evaluation functions of these model points 
+	for each modal point the constant term 1 is taken together with a variable evaluation function. The variable evaluation functions of these modal points 
 	is chosen such that the model satisfies all measure atomic formulas.
 
 	\begin{defn}
@@ -2771,8 +2772,8 @@ auto measured_model::has_solvable_system_of_inequalities() -> bool
 }
 \end{lstlisting}
 
-	\paragraph{Model Points Valuations Generation}
-	The generation of new model point valuations is done as follows:
+	\paragraph{Modal Points Valuations Generation}
+	The generation of new modal point valuations is done as follows:
 	\\
 	\\
 \noindent
