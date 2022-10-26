@@ -298,10 +298,10 @@ A region is defined as a set of elements in some space. Union and intersection a
 Two relations are introduced, part-of relation and contact relation. 
 The part-of relation constructs the structural dependencies between regions, namely the part-of relations defines the mereology of regions.
 The contact relation defines the topological relation of connection. We will abstract ourselves from the inner relation between two connected regions, namely
-this relation might be defined as "region A and region B are neighbors". What we will use for this inner relation is its reflexivity and symmetry.
+this relation might be defined as "region A and region B are neighbors". What is of importance to us for the inner relation its reflexivity and symmetry.
 	
 	\subsection{Syntax}
-	\paragraph{Variable} 
+	\paragraph{Boolean variable} 
 represents a region. Two predefined variables shall be used in order to simplify the notation. 
 		\begin{itemize}
 			\item W represents the whole world, namely the biggest region which contains all elements.
@@ -310,7 +310,7 @@ represents a region. Two predefined variables shall be used in order to simplify
 Let $\mathbb{V}ar$ be a countable set of all variables.
 
 	\paragraph{Boolean constants}
-Boolean constants are defined for W and $\emptyset$, namely 1 represents the world, while 0 represents the empty region.
+are defined for W and $\emptyset$, namely 1 represents the world, while 0 represents the empty region.
 
 	\paragraph{Boolean operations}
 are operations over regions. The followings are boolean operations:
@@ -337,12 +337,12 @@ $\top$ and $\bot$
 	\paragraph{Propositional connectives} 
 $\neg, \vee, \wedge, \rightarrow, \leftrightarrow$
 
-	\paragraph{Atomic Formulas}
-		A formula $\varphi$ is called atomic, if it has one of the following forms:
+	\paragraph{Atomic formula}
+is defined by the following forms, where a and b are two terms:
 		\begin{itemize}
-			\item C(a, b), where a and b are terms
-			\item $a \le b$, where a and b are terms
-			\item $a \le_\mu b$, where a and b are terms
+			\item C(a, b)
+			\item $a \le b$
+			\item $a \le_\mu b$
 		\end{itemize}
 
 	\paragraph{Formula}
@@ -356,37 +356,16 @@ is defined by the following inductive definition:
 				where $\sigma \in \{\vee, \wedge, \rightarrow, \leftrightarrow\}$
 		\end{itemize}
 
-	\subsection{Semantics}
-The goal is to define the semantics of a formula and to answer the question when a given formula is satisfiable.
-When trying to define the satisfiability of a formula, a couple of questions arise, such as:
-		\begin{itemize}
-			\item How is a region represented 
-			\item What does it mean for two regions to be in contact
-			\item In which scope is the formula satisfiable
-		\end{itemize}
-Let us first define the semantics of a formula, which will lead us to its valuation and satisfiability.
-\newline
-Let W be a countable set and $W \neq \emptyset$. This set will represent all elements in the world.
-A region will be a subset of W. Namely, a set of elements represents a region.
-Let $R \subseteq W^2$ be a binary relation over regions. The relation R defines the contacts between regions.
-The relation R is a reflexive and symmetric relation. \\
-For example, let us take:
-		\begin{equation*}
-			W = \text{"the set of all countries in the world"}
-		\end{equation*}
-With the above W, we can define the relation R, for example let $x, y \in W$, then:
-		\begin{equation*}
-			R(x,y) = \text{"x has similar population count with y"}
-		\end{equation*}
+	\paragraph{Abbreviations}
+which are commonly used in this paper. Let a and b be two terms, then:
+	\begin{itemize}
+		\item $a = b,\textit{if}\: (a \le b) \land (b \le a)$
+		\item $a \neq b,\textit{if}\: \neg (a = b) $
+		\item $a \nleq b,\textit{if}\: \neg (a \le b)$
+	\end{itemize}
 
-Having (W, R) as defined above, we conclude the followings: 
-		\begin{equation*}
-			R(\text{ Germany, Turkey })
-		 \end{equation*}
-		\begin{equation*}
-			R(\text{ Bulgaria } \sqcup \text{ Macedonia , Austria })
-		 \end{equation*}
-	\paragraph{Relational System} A relational system is defined as $\mathcal{F} = (W, R)$, where $W \neq \emptyset$. $\mathcal{F}$ is usually called a frame.
+	\subsection{Semantics}
+		A relational system is defined as $\mathcal{F} = (W, R)$, where $W \neq \emptyset$. In most modal logic theories $\mathcal{F}$ is called a frame. In many system $\mathcal{F}$ is also called an adjacency relation, where the cells are modeled with W and the adjacency relation is modeled with R. Simple example of such an adjacency space is our planet, where the cells are the countries and two countries are adjacent if they have a common point. In most cases is assumed that R is reflexive and symmetric, however it is more natural for R to be an arbitrary relation. In our example we might specify for countries x and y, that x be adjacent to y on the right (east), on the top (north), etc. Regions in one such adjacency system are arbitrary subsets of W and two sets a, b are in contact $C_R(a, b)$, if for some $x \in a$ and $y \in b$ we have xRy. This relational definition of the contact suggests that we give the following relational semantics. 
 
 	\paragraph{Boolean variable valuation}
 Let $\mathcal{F}$  be a frame, then a boolean variable valuation is any function $\mathscr{v}$ assignig to each Boolean variable a subset $v(a) \subseteq W$. The valuation is then extended inductively to all Boolean terms, as follows
@@ -395,7 +374,7 @@ Let $\mathcal{F}$  be a frame, then a boolean variable valuation is any function
 			\item $\mathscr{v}(1) = W$
 			\item $\mathscr{v}(a \sqcap b) = \mathscr{v}(a) \cap \mathscr{v}(b)$
 			\item $\mathscr{v}(a \sqcup b) = \mathscr{v}(a) \cup \mathscr{v}(b)$
-			\item $\mathscr{v}(a*) = W \ \mathscr{v}(a)$
+			\item $\mathscr{v}(a*) = W \backslash  \mathscr{v}(a)$
 		\end{itemize}
 
 	\subsection{Measured Model}
@@ -415,7 +394,8 @@ Let $\mathcal{F}$  be a frame, then a boolean variable valuation is any function
 			\item $\mathcal{M} \models a \leq b \text{ iff } \mathscr{v}(a) \subseteq \mathscr{v}(b)$
 			\item $\mathcal{M} \models a \leq_\mu b \text{ iff } \mu(\mathscr{v}(a)) \le \mu(\mathscr{v}(b))$
 			\item $\mathcal{M} \models \neg \varphi \text{ iff } \mathcal{M} \not\models \varphi$
-			\item $\mathcal{M} \models a \; \sigma \; b \text{ iff } \mathcal{M} \models a \: \sigma \: \mathcal{M} \models b$, where $\sigma \in \{ \vee, \wedge \}$
+			\item $\mathcal{M} \models a \; \vee \; b \text{ iff } \mathcal{M} \models a \: \textit{ or } \: \mathcal{M} \models b$
+			\item $\mathcal{M} \models a \; \wedge \; b \text{ iff } \mathcal{M} \models a \: \textit{ and } \: \mathcal{M} \models b$
 		\end{itemize}
 In the previously defined semantics we evaluate formulas not locally at points, as it is in the standard modal semantics, but globally in the whole model and this is one of the main differences of the present modal approach with the standard Kripke approach.
 
@@ -448,20 +428,13 @@ is a model of A.
 	\end{equation*}
 \end{lemma}
 
-\begin{lemma}[Formula equality]
-	Let $\varphi$ and $\psi$ be two formulas and let $\mathscr{v}$ be a valuation, then
-	\begin{equation*}
-		\varphi = \psi \implies \mathscr{v}(\varphi) = \mathscr{v}(\psi)
-	\end{equation*}
-\end{lemma}
-
 \begin{lemma}[Zero term formula]
 	Let a and b be two terms, then
 	\begin{equation*}
-		a \le b \iff a \sqcap \neg b = \emptyset
+		a \le b \iff a \sqcap b* = \emptyset
 	\end{equation*}
-	The formula $a \sqcap \neg b = \emptyset$ will be called zero term formula.
-	Since $a \sqcap \neg b$ is a new term, it can be assigned a variable $s = a \sqcap \neg b$, 
+	The formula $a \sqcap b* = \emptyset$ will be called zero term formula.
+	Since $a \sqcap b*$ is a new term, it can be assigned a variable $s = a \sqcap b*$, 
 	and now the zero term formula above can be written as $s  = 0$ which is with better readability and 
 	can be straightforwardly grasped in proofs and definitions.
 \end{lemma}
@@ -469,7 +442,7 @@ is a model of A.
 \begin{lemma}[Non-zero term]
 	Let a and b be two terms, then
 	\begin{equation*}
-		\neg(a \le b) \iff a \sqcap \neg b \neq \emptyset
+		\neg(a \le b) \iff a \sqcap b* \neq \emptyset
 	\end{equation*}
 \end{lemma}
 
@@ -528,32 +501,32 @@ $\Longleftarrow$
 \begin{lemma}[Trivial formula implications]
 	Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	\begin{itemize}
-		\item $\varphi \land T \implies \varphi$,\;\; $T \land \varphi \implies \varphi$,\;\;
-		      $\varphi \land F \implies F$,\;\; $F \land \varphi \implies F$
-		\item $\varphi \lor T \implies T$,\;\; $T \lor \varphi \implies T$,\;\;
-		      $\varphi \lor F \implies \varphi$,\;\; $F \lor \varphi \implies \varphi$,
-		\item $a \sqcap 1 \implies a$,\;\; $1 \sqcap a \implies a$,\;\;
-		      $a \sqcap 0 \implies 0$,\;\; $0 \sqcap a \implies 0$,
-		\item $a \sqcup 1 \implies 1$,\;\; $1 \sqcup a \implies 1$,\;\;
-		      $a \sqcup 0 \implies a$,\;\; $0 \sqcup a \implies a$,
+		\item $\varphi \land T = \varphi$,\;\; $T \land \varphi = \varphi$,\;\;
+		      $\varphi \land F = F$,\;\; $F \land \varphi = F$
+		\item $\varphi \lor T = T$,\;\; $T \lor \varphi = T$,\;\;
+		      $\varphi \lor F = \varphi$,\;\; $F \lor \varphi = \varphi$,
+		\item $a \sqcap 1 = a$,\;\; $1 \sqcap a = a$,\;\;
+		      $a \sqcap 0 = 0$,\;\; $0 \sqcap a = 0$,
+		\item $a \sqcup 1 = 1$,\;\; $1 \sqcup a = 1$,\;\;
+		      $a \sqcup 0 = a$,\;\; $0 \sqcup a = a$,
 		\item $(a \sqcup b)Cc \iff aCc \lor bCc$
 		\item $(a \sqcup b) \leq c \iff a \leq c \land b \leq c$
-		\item $aCb \implies a \neq 0 \land b \neq 0$
-		\item $a \sqcap b \neq 0 \implies aCb$
-		\item $a = 0 \lor b = 0 \implies \neg(aCb)$
-		\item $0 \leq a \implies T$
-		\item $a \leq 1 \implies T$
-		\item $0C0 \implies F$
-		\item $aC0 \implies F$
-		\item $1C1 \implies T$
-		\item $aC1 \implies a \neq 0$
-		\item $a \neq 0 \implies aCa$
-		\item $0 \le_\mu a$
-		\item $a \le_\mu 1$
+		\item $aCb \textit{ implies that } a \neq 0 \land b \neq 0$
+		\item $a \sqcap b \neq 0 \textit{ implies that } aCb$
+		\item $a = 0 \lor b = 0 \textit{ implies that } \neg(aCb)$
+		\item $0 \leq a = T$
+		\item $a \leq 1 = T$
+		\item $0C0 = F$
+		\item $aC0 = F$
+		\item $1C1 = T$
+		\item $aC1 = a \neq 0$
+		\item $a \neq 0 = aCa$
+		\item $0 \le_\mu a = T$
+		\item $a \le_\mu 1 = T$
 		\item $(a = 0) \iff (a \le_\mu 0)$
 		\item $(a = 1) \iff (1 \le_\mu a)$
 		\item $(a \le_\mu b) \lor (b \le_\mu a)$
-		\item $a_1 \le_\mu a_2 \land a_2 \le_\mu a_3 \implies a_1 \le_\mu a_3$
+		\item $a_1 \le_\mu a_2 \land a_2 \le_\mu a_3 \textit{ implies that } a_1 \le_\mu a_3$
 
 	\end{itemize}
 \end{lemma}
