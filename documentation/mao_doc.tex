@@ -710,25 +710,27 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 	\end{center}
 	With definition \ref{def-non-zero-construction} the constructed model satisfies the non zero terms from the branch conjunction. \\
 	With definition \ref{def-contacts-construction} the constructed model satisfies the contacts and the symmetric property of the non contacts from the branch conjunction. \\
-	A model constructed with definitions \ref{def-non-zero-construction} and \ref{def-contacts-construction} will be denoted as a \textbf{partial model}. The points in the partial model are represented with a tuple $\langle \curvedE, a \rangle$.
-           Furthermore, it must be verified that each of the modeled <$\curvedE$, a> modal point satisfies the equal to zero terms and the reflexivity of the non contacts from the branch conjunction.
+	The modal points in the model are represented with a tuple $\langle \curvedE, a \rangle$.
+	For a model constructed with definitions \ref{def-non-zero-construction} and \ref{def-contacts-construction} to satisfy the formula we must verify that each of the modeled  $\langle \curvedE, a \rangle$ modal point satisfies the equal to zero terms and the reflexivity of the non contacts from the branch conjunction.
 
 	\begin{defn}
-		Let M be a partial model. Then we say that the partial model M satisfies an equal to zero term $a = 0$, if the following holds:
+	\label{def-equal-to-zero}
+		Let M be a model constructed with definition \ref{def-non-zero-construction} and \ref{def-contacts-construction}. Then we say that the model M satisfies an equal to zero term $a = 0$, if the following holds:
 		\begin{align*}
-			\forall \langle \curvedE, a \rangle \in M: \vBool_{\curvedE}(a) = \textit{false}
+			\forall \langle \curvedE, a \rangle \in W: \vBool_{\curvedE}(a) = \textit{false}
 		\end{align*}
 	\end{defn}
 
 	\begin{defn}
-		Let M be a partial model. Then we say that the partial model M satisfies the reflexivity of a non contact $\neg C(a, b)$, if the following holds:
+	\label{def-partial-model}
+		Let M be a model constructed with definition \ref{def-equal-to-zero}. Then we say that the model M satisfies the reflexivity of a non contact $\neg C(a, b)$, if the following holds:
 		\begin{align*}
-			\forall \langle \curvedE, a\rangle \in M: \vBool_{\curvedE}(a) = false \lor \vBool_{\curvedE}(b) = false
+			\forall \langle \curvedE, a\rangle \in W: \vBool_{\curvedE}(a) = false \lor \vBool_{\curvedE}(b) = false
 		\end{align*}
 	\end{defn}		
 
 	\begin{defn}
-		Let M be a partial model and let $\Ts$ be the set of all terms. Then the model valuation $\vE : \Ts \rightarrow \mathscr{P}(W)$ is defined inductively as:
+		Let M be a model constructed with \ref{def-partial-model} and let $\Ts$ be the set of all terms. Then the model valuation $\vE : \Ts \rightarrow \mathscr{P}(W)$ is defined inductively as:
 		\begin{itemize}
 			\item $\vE(0) = W$
 			\item $\vE(1) = \emptyset$
@@ -738,7 +740,8 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 			\item $\vE(a*) = W \setminus \vE(a)$
 		\end{itemize}
 	\end{defn}
-		The tuple $(W, R, \vE)$ is called a potential model.
+	\leavevmode\newline
+	The tuple $(W, R, \vE)$ is called a potential model.
 
 	\leavevmode\newline
 	To validate that the potential model is correct, meaning that it satisfies the formula, we must take into account the measure atomic formulas. 
