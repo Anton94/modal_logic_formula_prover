@@ -33,18 +33,19 @@
 
 \newcommand\eqdef{\mathrel{\overset{\makebox[0pt]{\mbox{\normalfont\scriptsize\sffamily def}}}{=\joinrel=}}}
 
+\newcommand\ST{\mathbb{T}}
+\newcommand\SF{\mathbb{F}}
 \newcommand\M{\mathcal{M}}
 \newcommand\F{\mathcal{F}}
 \newcommand\p{\mathcal{P}}
 \newcommand\V{\mathcal{V}}
 \newcommand\E{\mathcal{E}}
-\newcommand\VXi{X_i}
-\newcommand\VX{X}
+\newcommand\T{\mathcal{T}}
 \newcommand\Tn{\mathcal{T}_n}
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{axiom}[theorem]{Axiom}
-\newtheorem{defn}[theorem]{Deffinition}
+\newtheorem{defn}[theorem]{Definition}
 \newcommand{\BranchConjunction}{%
 \begin{alignat}{2}
 			\bigwedge_{i=1}^{I} \; C(a_i, b_i) \:\: \wedge \:\: &
@@ -53,6 +54,11 @@
 			\bigwedge_{l=1}^{L} \; g_l = 0 \:\:
 \end{alignat}%
 }
+\newcommand{\pair}[2]{ \langle #1, #2 \rangle }
+\newcommand{\pairXY}{ \pair{x}{y} }
+\newcommand{\pairXX}{ \pair{x}{x} }
+\newcommand{\pairYX}{ \pair{y}{x} }
+\newcommand{\pairYY}{ \pair{y}{y} }
 
 
 \lstset { %
@@ -75,101 +81,102 @@
 
 	\section{Tableau Method For Classic Propositional Logic}
 
-	\subsection{What Is A Tableau?}
-	A tableau method is a formal proof procedure. First, it could be used as a refutation procedure: to show a formula X is valid we begin with some syntactical expression intended to assert it is not. This expression is broken down syntactically, generally splitting things into several cases. This part of a tableau procedure - the tableau expansion stage - can be thought of as a generalization of disjunctive normal form expansion. Generally, it moves from formulas to subformulas. Finally, there are rules for closing cases: impossibility conditions based on syntax. If each case closes, the tableau itself is said to be closed. A closed tableau beginning with an expression asserting that X is not valid is a tableau proof of X. \par	
-	There is a second way of thinking about the tableau method: as a search procedure for models meeting certain conditions. Each branch of a tableau can be considered to be a partial description of a model. In automated theorem-proving, tableaus can be used to generate counter-examples. \par	
-	The connection between the two roles for tableaus - as a proof procedure and as a model search procedure - is simple. If we use tableaus to search for a model in which X is false, and we produce a closed tableau, no such model exists, so X must be valid.
+	\subsection{What Is A tableau?}
+	A tableau method is a formal proof procedure. First, it could be used as a refutation procedure: to show that a formula X is valid we begin with some syntactical expression intended to assert it is not valid. This expression is broken down syntactically, generally splitting things into several cases. This part of a tableau procedure - the tableau expansion stage - can be thought of as a generalization of disjunctive normal form expansion. Generally, it moves from formulas to subformulas. Finally, there are rules for closing cases: impossibility conditions based on syntax. If each case closes, the tableau itself is said to be closed. A closed tableau beginning with an expression asserting that X is not valid is a tableau proof of X.
+	\par
+	There is a second way of thinking about the tableau method: as a search procedure for models meeting certain conditions. Each branch of a tableau can be considered to be a partial description of a model. In automated theorem-proving, tableaux can be used to generate counter-examples.
+	\par
+	The connection between the two roles for tableau - as a proof procedure and as a model search procedure - is simple. If we use tableau to search for a model in which X is false, and we produce a closed tableau, no such model exists, so X must be valid.
 
-	\subsection{Classical Propositional Tableaus}
+	\subsection{Classical Propositional Tableau}
 	We will look into the signed tableau system for classical propositional logic.
 
 	\par
-	First, we need syntactical machinery for asserting the invalidity of a formula, and for doing case analysis. For this purpose two signs are introduced: $T$ and $F$, where these are simply two new symbols, not part of the language of formulas. \textit{Signed formulas} are expressions of the form $F X$ and $T X$, where X is a formula. The intuitive meaning of $F X$ is that X is \textit{false} (in some model). Similarly, $T X$ intuitively asserts that X is \textit{true}. Then $F X$ is the syntactical device for (informally) asserting the invalidity of X. A tableau proof of X begins with $F X$.
+	First, we need syntactical machinery for asserting the non-validity of a formula, and for doing case analysis. For this purpose two signs are introduced: $\ST$ and $\SF$, where these are simply two new symbols, not part of the language of formulas. \textit{Signed formulas} are expressions of the form $\SF X$ and $\ST X$, where X is a formula. The intuitive meaning of $\SF X$ is that X is \textit{false} (in some model). Similarly, $\ST X$ intuitively asserts that X is \textit{true}. Then $\SF X$ is the syntactical device for (informally) asserting the non-validity of X. A tableau proof of X begins with $\SF X$.
 
 	\par
 	Next, we need machinery (rules) for breaking signed formulas down and doing a case division. We will define rules for each logical operator ($\neg \land \lor \Rightarrow \Leftrightarrow$).
 
 	\par
-	The treatment of \textbf{negation} is straightforward: from \textit{T $\neg$X} we get \textit{F X} and from \textit{F $\neg$X} we get \textit{T X}. These rules can be conveniently presented as follows.
+	The treatment of \textbf{negation} is straightforward: from \textit{$\ST\neg$X} we get \textit{$\SF$X} and from \textit{$\SF\neg$X} we get \textit{$\ST$X}. These rules can be conveniently presented as follows.
 
 	\[
-		\frac{T \neg X}{F X}\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{F \neg X}{T X}
+		\frac{\ST \neg X}{\SF X}\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{\SF \neg X}{\ST X}
 	\]
 
 	\par
-
 	The rules for \textbf{conjunction} are somewhat more complex. From truth tables we know that if $X \land Y$ is \textit{true}, X must be \textit{true} and Y must be \textit{true}. Likewise, if $X \land Y$ is \textit{false}, either X is \textit{false} or Y is \textit{false}. This involves a split into two cases. Corresponding syntactic rules are as follows.
 	\[
-		\frac{T X \land Y}{\displaystyle{T X \atop T Y}}\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{F X \land Y}{F X \mid F Y}
+		\frac{\ST X \land Y}{\displaystyle{\ST X \atop \ST Y}}\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{\SF X \land Y}{\SF X \mid \SF Y}
 	\]
 
 	The rules for \textbf{disjunction} are similar. From truth tables we know that if $X \lor Y$ is \textit{true}, either X is \textit{true} or Y is \textit{true}. This involves a split into two cases. Likewise, if $X \lor Y$ is \textit{false}, X must be \textit{false} and Y must be \textit{false}. Corresponding syntactic rules are as follows.
 	\[
-		\frac{T X \lor Y}{T X \mid T Y}\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{F X \lor Y}{\displaystyle{F X \atop F Y}}
+		\frac{\ST X \lor Y}{\ST X \mid \ST Y}\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{\SF X \lor Y}{\displaystyle{\SF X \atop \SF Y}}
 	\]
 
 	\par
 	The rules for \textbf{implication}. From truth tables we know that if $X \Rightarrow Y$ is \textit{true}, either X is \textit{false} or Y is \textit{true}. Likewise, if $X \Rightarrow Y$ is \textit{false}, X must be \textit{true} and Y must be \textit{false}. Corresponding syntactic rules are as follows.
 	\[
-		\frac{T X \Rightarrow Y}{F X \mid T Y}\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{F X \Rightarrow Y}{\displaystyle{T X \atop F Y}}
+		\frac{\ST X \Rightarrow Y}{\SF X \mid \ST Y}\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{\SF X \Rightarrow Y}{\displaystyle{\ST X \atop \SF Y}}
 	\]
 
 	\par
 	The rules for \textbf{equivalence}. From truth tables we know that if $X \Leftrightarrow Y$ is \textit{true}, either X is \textit{true} and Y is \textit{true} or X is \textit{false} and Y is \textit{false}. Likewise, if $X \Rightarrow Y$ is \textit{false}, either X is \textit{true} and Y is \textit{false} or X is \textit{false} and Y is \textit{true}. Corresponding syntactic rules are as follows.
 	\[
-		\frac{T X \Leftrightarrow Y}{\left.\displaystyle{T X \atop T Y}\right\vert\displaystyle{F X \atop F Y}}\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{F X \Leftrightarrow Y}{\left.\displaystyle{T X \atop F Y}\right\vert\displaystyle{F X \atop T Y}}
+		\frac{\ST X \Leftrightarrow Y}{\left.\displaystyle{\ST X \atop \ST Y}\right\vert\displaystyle{\SF X \atop \SF Y}}\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{\SF X \Leftrightarrow Y}{\left.\displaystyle{\ST X \atop \SF Y}\right\vert\displaystyle{\SF X \atop \ST Y}}
 	\]
 
 	\par
-	The standard way of displaying tableaus is as downward branching trees with signed formulas as node labels. Indeed, the tableau method is often referred to as the tree method. Think of a tree as representing the disjunction of its branches, and a branch as representing the conjunction of the signed formulas on it.
+	The standard way of displaying tableau is as downward branching trees with signed formulas as node labels. Indeed, the tableau method is often referred to as the tree method. Think of a tree as representing the disjunction of its branches, and a branch as representing the conjunction of the signed formulas on it.
 
 	\par
-	When using a tree display, a tableau expansion is thought of temporally, and one talks about the stages of constructing a tableau, meaning the stages of growing a tree. The rules given above are thought of as branch-lengthening rules. Thus, a branch containing \textit{T $\neg$ X} can be lengthened by adding a new node to its end, with \textit{F X} as a label. Likewise, a branch containing \textit{F X $\lor$ Y} can be lengthened with two new nodes, labelled \textit{F X} and \textit{F Y} (take the node with \textit{F Y} as the child of the one labeled \textit{F X}). A branch containing \textit{T X $\lor$ Y} can be split - its leaf is given a new left and a new right child, with one labeled \textit{T X}, the other \textit{T Y}. This is how the schematic rules above are applied to trees.
+	When using a tree display, a tableau expansion is thought of temporally, and one talks about the stages of constructing a tableau, meaning the stages of growing a tree. The rules given above are thought of as branch-lengthening rules. Thus, a branch containing \textit{$\ST \neg$ X} can be lengthened by adding a new node to its end, with \textit{$\SF$ X} as a label. Likewise, a branch containing \textit{$\SF$ X $\lor$ Y} can be lengthened with two new nodes, labelled \textit{$\SF$ X} and \textit{$\SF$ Y} (take the node with \textit{$\SF$ Y} as the child of the one labeled \textit{$\SF$ X}). A branch containing \textit{$\ST$ X $\lor$ Y} can be split - its leaf is given a new left and a new right child, with one labeled \textit{$\ST$ X}, the other \textit{$\ST$ Y}. This is how the schematic rules above are applied to trees.
 	\par
-	An important point to note is that the tableau rules are non-deterministic. They say what can be done, not what must be done. At each stage, we choose a signed formula occurrence on a branch and apply a rule to it. Since the order of choice is arbitrary, there can be many tableaus for a single signed formula.
+	An important point to note is that the tableau rules are non-deterministic. They say what can be done, not what must be done. At each stage, we choose a signed formula occurrence on a branch and apply a rule to it. Since the order of choice is arbitrary, there can be many tableaux for a single signed formula.
 	\par
 	Here is the final stage of a tableau expansion beginning with the signed formula $F (X \land Y) \Rightarrow (\neg X \land \neg Y)$.
-	\\\indent\indent\indent\indent 1. $F(X \land Y) \Rightarrow \neg(\neg X \lor \neg Y)$
-	\\\indent\indent\indent\indent 2. $TX \land Y$
-	\\\indent\indent\indent\indent 3. $F\neg(\neg X \lor \neg Y)$
-	\\\indent\indent\indent\indent 4. $T X$
-	\\\indent\indent\indent\indent 5. $T Y$
-	\\\indent\indent\indent\indent 6. $T\neg X \lor \neg Y$
+	\\\indent\indent\indent\indent 1. $\SF(X \land Y) \Rightarrow \neg(\neg X \lor \neg Y)$
+	\\\indent\indent\indent\indent 2. $\ST X \land Y$
+	\\\indent\indent\indent\indent 3. $\SF \neg(\neg X \lor \neg Y)$
+	\\\indent\indent\indent\indent 4. $\ST X$
+	\\\indent\indent\indent\indent 5. $\ST Y$
+	\\\indent\indent\indent\indent 6. $\ST \neg X \lor \neg Y$
 	\\
 	\begin{tikzpicture}[scale = 0.8]
 		\draw (-4,0) (4,1);
         \draw[thick] (-1.5,0) -- (0,1) -- (1.5,0);
     \end{tikzpicture}
-	\\\indent\indent\;\;  7. $T \neg X$  \indent \indent\indent 8. $T \neg Y$
-	\\\indent\indent\;\; 9. $F X$ \indent\indent\indent 10. $F Y$
+	\\\indent\indent\;\;  7. $\ST \neg X$  \indent \indent\indent 8. $\ST \neg Y$
+	\\\indent\indent\;\; 9. $\SF X$ \indent\indent\indent 10. $\SF Y$
 
 	\par
-	In this we have added numbers for reference purposes. Items 2 and 3 are from 1 by $F \Rightarrow $. 4 and 5 are from 2 by $T \land$. 6 is from 3 by $F \neg$. 7 and 8 are from 6 by $T \lor$. 9 is from 7 by $T \neg$. 10 is from 8 by $T \neg$.
+	In this we have added numbers for reference purposes. Items 2 and 3 are from 1 by $\SF \Rightarrow $. 4 and 5 are from 2 by $\ST \land$. 6 is from 3 by $\SF \neg$. 7 and 8 are from 6 by $\ST \lor$. 9 is from 7 by $\ST \neg$. 10 is from 8 by $\ST \neg$.
 	\par
-	Finally, the conditions for closing off a case (declaring a branch closed) are	simple. A \textbf{branch is closed} if it contains a contradiction, i.e. $T A$ and $F A$ for some formula $A$. A \textbf{branch is opened} if it does not contain any contradiction. If each branch is closed, then the \textbf{tableau is closed}. A closed tableau for $F X$ is a tableau proof of $X$, meaning that A is a tautology. The tableau displayed above is closed, so the formula $(X \land Y) \Rightarrow (\neg X \land \neg Y)$ has a tableau proof.
+	Finally, the conditions for closing off a case (declaring a branch closed) are	simple. A \textbf{branch is closed} if it contains a contradiction, i.e. $\ST X$ and $\SF X$ for some formula $X$. A \textbf{branch is finished} if all formulas are applied, i.e. contains only signed variables(atomic formulas). A \textbf{branch is opened} if it is finished and does not contain any contradiction. If each branch is closed, then the \textbf{tableau is closed}. A closed tableau for $\SF X$ is a tableau proof of $X$, meaning that $X$ is a tautology. The tableau displayed above is closed, so the formula $(X \land Y) \Rightarrow (\neg X \land \neg Y)$ has a tableau proof.
 	\par
-	It may happen that no tableau proof is forthcoming, and we can think of the tableau construction as providing us with contra examples. Consider the following attempt to prove $(X \Rightarrow Y) \Rightarrow ((Y \Rightarrow X) \Rightarrow \neg Y)$
-	\\\indent\indent\indent\indent\indent\indent 1. $F ((X \Rightarrow Y) \Rightarrow ((Y \Rightarrow X) \Rightarrow \neg Y))$
-	\\\indent\indent\indent\indent\indent\indent 2. $T X \Rightarrow Y$
-	\\\indent\indent\indent\indent\indent\indent 3. $F ((Y \Rightarrow X) \Rightarrow \neg Y)$
-	\\\indent\indent\indent\indent\indent\indent 4. $T Y \Rightarrow X$
-	\\\indent\indent\indent\indent\indent\indent 5. $F \neg Y$
-	\\\indent\indent\indent\indent\indent\indent 6. $T Y$
+	It may happen that no tableau proof is forthcoming, and we can think of the tableau construction as proving with counterexamples. Consider the following attempt to prove $(X \Rightarrow Y) \Rightarrow ((Y \Rightarrow X) \Rightarrow \neg Y)$
+	\\\indent\indent\indent\indent\indent\indent 1. $\SF ((X \Rightarrow Y) \Rightarrow ((Y \Rightarrow X) \Rightarrow \neg Y))$
+	\\\indent\indent\indent\indent\indent\indent 2. $\ST X \Rightarrow Y$
+	\\\indent\indent\indent\indent\indent\indent 3. $\SF ((Y \Rightarrow X) \Rightarrow \neg Y)$
+	\\\indent\indent\indent\indent\indent\indent 4. $\ST Y \Rightarrow X$
+	\\\indent\indent\indent\indent\indent\indent 5. $\SF \neg Y$
+	\\\indent\indent\indent\indent\indent\indent 6. $\ST Y$
 	\\
 	\begin{tikzpicture}[scale = 0.8]
 		\draw (-5,0) (5,1);
         \draw[thick] (-2,0) -- (-0.4,1) -- (1.6,0);
     \end{tikzpicture}
-	\\\indent\indent\indent 7. $F X$  \indent\indent\indent\indent\;\; 8. $T Y$
+	\\\indent\indent\indent 7. $\SF X$  \indent\indent\indent\indent\;\; 8. $\ST Y$
 	\\
 	\begin{tikzpicture}[scale = 0.8]
 		\draw (-5,0) (5,1);
         \draw[thick] (-3.2,0) -- (-2.3,1) -- (-1.4,0);
         \draw[thick] (1,0) -- (2,1) -- (3,0);
     \end{tikzpicture}
-	\\\indent\;\; 9. $F Y$ \indent 10. $T X$  \indent 11. $F Y$ \indent 12. $T X$
+	\\\indent\;\; 9. $\SF Y$ \indent 10. $\ST X$  \indent 11. $\SF Y$ \indent 12. $\ST X$
 	\par
-	Item 2 and 3 are from 1 by $F \Rightarrow$, as are 4 and 5 from 3. Item 6 is from 5 by $F \neg$. Items 7 and 8 are from 2 by $T \Rightarrow$, as are 9 and 10 from 4. Items 11 and 12 are also from 4 by $T \Rightarrow$. The leftmost branch is closed because of 6 and 9. The left-right branch is closed because of 7 and 10. The right-left branch is closed because of 8 and 11. But the rightmost branch is not closed. Notice that every non-atomic signed formula has had a rule applied to it on this branch and there is nothing left to do. (For classical propositional logic it is sufficient to apply a rule to a formula on a branch only once.) In fact the branch yields a counterexample, as follows. Let $\upsilon$ be a propositional valuation that maps X to \textit{true} and Y to \textit{true} in accordance to 8 and 12. Now, we work our way back up the branch. Since $\upsilon(Y) = true$, $\upsilon(\neg Y) = false$, item 5. From $\upsilon(X) = true$ follows that $\upsilon(Y \Rightarrow X) = true$, item 4. From $\upsilon(Y) = true$ follows that $\upsilon(X \Rightarrow Y) = true$, item 2. Since $\upsilon(Y \Rightarrow X) = true$ and $\upsilon(\neg Y) = false$ we have $\upsilon((Y \Rightarrow X) \Rightarrow \neg Y) = false$, item 3. Finally, $\upsilon((X \Rightarrow Y) \Rightarrow ((Y \Rightarrow X) \Rightarrow \neg Y)) = false$, item 1.
+	Item 2 and 3 are from 1 by $\SF \Rightarrow$, as are 4 and 5 from 3. Item 6 is from 5 by $\SF \neg$. Items 7 and 8 are from 2 by $\ST \Rightarrow$, as are 9 and 10 from 4. Items 11 and 12 are also from 4 by $\ST \Rightarrow$. The leftmost branch is closed because of 6 and 9. The left-right branch is closed because of 7 and 10. The right-left branch is closed because of 8 and 11. But the rightmost branch is not closed. Notice that every non-atomic signed formula has had a rule applied to it on this branch and there is nothing left to do. (For classical propositional logic it is sufficient to apply a rule to a formula on a branch only once.) In fact the branch yields a counterexample, as follows. Let $\upsilon$ be a propositional valuation that maps X to \textit{true} and Y to \textit{true} in accordance to 8 and 12. Now, we work our way back up the branch. Since $\upsilon(Y) = true$, $\upsilon(\neg Y) = false$, item 5. From $\upsilon(X) = true$ follows that $\upsilon(Y \Rightarrow X) = true$, item 4. From $\upsilon(Y) = true$ follows that $\upsilon(X \Rightarrow Y) = true$, item 2. Since $\upsilon(Y \Rightarrow X) = true$ and $\upsilon(\neg Y) = false$ we have $\upsilon((Y \Rightarrow X) \Rightarrow \neg Y) = false$, item 3. Finally, $\upsilon((X \Rightarrow Y) \Rightarrow ((Y \Rightarrow X) \Rightarrow \neg Y)) = false$, item 1.
 	\par
 	Later, we are going to use the tableau method to produce a model in which the initial formula is valid.
 	\par
@@ -184,7 +191,7 @@
 		\item \textit{Boolean constants}: 0 and 1
 		\item \textit{Boolean operations}:
 		\begin{itemize}
-			\item $\sqcap$ boolean meat
+			\item $\sqcap$ boolean meet
 			\item $\sqcup$ boolean join
 			\item $^*$ boolean complement
 		\end{itemize}
@@ -195,7 +202,7 @@
 		\item \textit{Complex formulas} (or simply \textit{formulas})
 	\end{itemize}
 
-	\noindent\textbf{\textit{Terms}} are defined in the following inductive process:
+	\noindent\textbf{\textit{Terms}} are defined by the following inductive definition:
 	\begin{itemize}
 		\item Each Boolean variable is a term
 		\item Each Boolean constant is a term
@@ -206,7 +213,7 @@
 	\noindent\textbf{\textit{Atomic formulas}} are of the form $a \leq b$ and $aCb$, where $a$ and $b$ are terms.
 \\
 \\
-	\noindent\textbf{\textit{Formulas}} are defined in the following inductive process:
+	\noindent\textbf{\textit{Formulas}} are defined by the following inductive definition:
 	\begin{itemize}
 		\item Each propositional constant is a formula
 		\item Each atomic formula is a formula
@@ -280,10 +287,6 @@
 	\end{defn}
 
 	\begin{lemma}
-		(Equality of formulas) Let f and g are formulas. Then \par $f = g \implies \upsilon(f) = \upsilon(g)$.
-	\end{lemma}
-
-	\begin{lemma}
 		(Equality of terms) Let a and b are terms. Then \par $a = b \implies \upsilon(a) = \upsilon(b)$.
 	\end{lemma}
 
@@ -316,10 +319,10 @@
 			\item $f \land F \implies F$, $F \land f \implies F$
 			\item $f \lor T \implies T$, $T \lor f \implies T$
 			\item $f \lor F \implies f$, $F \lor f \implies f$
-			\item $a \sqcap 0 \implies 0$, $0 \sqcap a \implies 0$
-			\item $a \sqcup 0 \implies a$, $0 \sqcup a \implies a$
-			\item $a \sqcap 1 \implies a$, $1 \sqcap a \implies a$
-			\item $a \sqcup 1 \implies 1$, $1 \sqcup a \implies 1$
+			\item $a \sqcap 0 = 0$, $0 \sqcap a = 0$
+			\item $a \sqcup 0 = a$, $0 \sqcup a = a$
+			\item $a \sqcap 1 = a$, $1 \sqcap a = a$
+			\item $a \sqcup 1 = 1$, $1 \sqcup a = 1$
 			\item $(a \sqcup b)Cc \iff aCc \lor bCc$
 			\item $(a \sqcup b) \leq c \iff a \leq c \land b \leq c$
 			\item $aCb \implies a \neq 0 \land b \neq 0$
@@ -340,32 +343,32 @@
 		\paragraph{}
 		Let $\phi$ be a formula. Let us build a tableau beginning with $\phi$. Let the tableau has an opened branch $B$. The branch $B$ is a set of signed atomic formulas of the following type:
 		\begin{itemize}
-			\item $T C(a,b)$
-			\item $F C(e,f)$
-			\item $T a \leq b$
-			\item $F a \leq b$
+			\item $\ST C(a,b)$
+			\item $\SF C(e,f)$
+			\item $\ST a \leq b$
+			\item $\SF a \leq b$
 		\end{itemize}
 		where a and b are terms.
 
-		\noindent $B$ is an opened branch, so there are no contradicting formulas in it, i.e. $(\neg \exists X)(T X \in B \land F X \in B)$.
+		\noindent $B$ is an opened branch, so there are no contradicting formulas in it, i.e. $(\neg \exists X)(\ST X \in B \land \SF X \in B)$.
 		The signed atomic formulas could be written as atomic formulas as follows:
 		\begin{itemize}
-			\item $T C(a,b)$ $\rightarrow$ $C(a,b)$ (contact)
-			\item $F C(a,b)$ $\rightarrow$ $\neg C(a,b)$ (non-contact)
-			\item $T a \leq b$ $\rightarrow$ $a \leq b$ $\rightarrow$ $a \sqcap b^*=0$ $\rightarrow$ $g = 0$ (zero term)
-			\item $F a \leq b$ $\rightarrow$ $\neg (a \leq b)$ $\rightarrow$ $a \sqcap b^* \neq 0$ $\rightarrow$ $d \neq 0$ (non-zero term)
+			\item $\ST C(a,b)$ $\rightarrow$ $C(a,b)$ (contact)
+			\item $\SF C(a,b)$ $\rightarrow$ $\neg C(a,b)$ (non-contact)
+			\item $\ST a \leq b$ $\rightarrow$ $a \leq b$ $\rightarrow$ $a \sqcap b^*=0$ $\rightarrow$ $g = 0$ (zero term)
+			\item $\SF a \leq b$ $\rightarrow$ $\neg (a \leq b)$ $\rightarrow$ $a \sqcap b^* \neq 0$ $\rightarrow$ $d \neq 0$ (non-zero term)
 		\end{itemize}
 			\noindent where a,b,d and g are terms.
 
 		All atomic formulas in the branch should be satisfied, so we can think of it as a conjunction of them. Let's call it a \textbf{branch conjunction}. It is sufficient to build a satisfiable model for the branch conjunction to verify that $\phi$ is satisfiable. Building  such a model could be done a lot more effective than building a model for an arbitrary formula because it is just a conjunction.
 		\begin{defn}
 			\label{branch-conjunction}
-			Let $\phi$ be a formula. Let T be a tableau beginning with $\phi$. Let B be a set of all atomic signed formulas in a branch of T, as follows:
+			Let $\phi$ be a formula. Let $\mathcal{T}$ be a tableau beginning with $\phi$. Let B be a set of all atomic signed formulas in a branch of $\mathcal{T}$, as follows:
 			\begin{alignat}{2}
-				B = \{T C(a_i, b_i) \mid i \in \{1, \ldots, I\} \} \cup
-					\{F d_j = 0 \mid j \in \{1, \ldots, J\} \} \cup \\\nonumber
-					\{F C(e_k, f_k) \mid k \in \{1, \ldots, K\} \} \cup
-					\{T g_l = 0 \mid l \in \{1, \ldots, L\} \}
+				B = \{\ST C(a_i, b_i) \mid i \in \{1, \ldots, I\} \} \cup
+					\{\SF d_j = 0 \mid j \in \{1, \ldots, J\} \} \cup \\\nonumber
+					\{\SF C(e_k, f_k) \mid k \in \{1, \ldots, K\} \} \cup
+					\{\ST g_l = 0 \mid l \in \{1, \ldots, L\} \}
 			\end{alignat}
 		\end{defn}
 		A \textbf{branch conjunction} $\beta$ is the following formula:
@@ -374,51 +377,36 @@
 	\subsection{Branch conjunction model building}
 		The branch conjunction formula $\beta$ is satisfiable if $\beta$ has a model $\M$. We have to construct such a model $\M$ = ($\F, \upsilon$) = ((W, R), $\upsilon$). 
 		\begin{defn}
-			A denumerable set of $n$ boolean variables $\V_n$ is defined as follows:
+			A finite set of $n$ boolean variables $\V_n$ is defined as follows:
 			\begin{equation}
 				\label{boolean-evaluation}
 				\V_n = \{x_1, x_2, \ldots , x_n \}
 			\end{equation}
 		\end{defn}
-		Let n be the number of the unique boolean variables in $\beta$. Let $\V_n$ be the set of them. There are four types of atomic formulas in $\beta$, namely contacts, non-contacts, zero terms and non-zero terms. Only contacts and non-zero terms require existence of modal points. The valuation $\upsilon$ should assign a set of modal points to each boolean variable $x \in \V_n$. One way to define $\upsilon$ and W is the following:
 		
-		\begin{itemize}
-			\item Assign an empty set of modal points for each boolean variable $x \in \V_n$.
-	
-			$\upsilon$ = \{ <x, $\emptyset$> $\mid$ $ x \in \V_n$ \}
-			
-			\item Add a modal point for each term in the contacts and non-zero terms of $\beta$. 
-			
-			W = \{ $p_i$ $\mid$ C($a_i$, $b_i$) $\in$ $\beta$ \} $\cup$ \{ $p_{I+i}$ $\mid$ C($a_i$, $b_i$) $\in$ $\beta$ \} $\cup$ \{ $p_{I*2+j}$ $\mid$ $d_j \neq 0$ $\in$ $\beta$ \}
-						
-			\item Extend $\upsilon$ such as:
-			
-			\begin{itemize}
-				\item $p_i$ $\in$ $\upsilon(a_i)$ for each C($a_i$, $b_i$) $\in$ $\beta$ 
-				\item $p_{I+i}$ $\in$ $\upsilon(b_i)$ for each C($a_i$, $b_i$) $\in$ $\beta$ 
-				\item $p_{I*2+j}$ $\in$ $\upsilon(d_j)$ for each $d_j$  $\neq$ 0 $\in$ $\beta$ 
-			\end{itemize}
-		\end{itemize}
-				
 		\begin{defn}
-			Let $\V_n$ be a denumerable set of $n$ boolean variables. Let W be a set of modal points. Let $\upsilon$ be a valuation over $\V_n$ and W. Then $\VXi$ $\subseteq$ W is the evaluation set of the boolean variable $x_i$ in $\V_n$.
-			\begin{equation}
-				\VXi = \upsilon(x_i) \;for x_i \in \V_n
-			\end{equation}
+			Let $\T$ be the set of all boolean terms.
 		\end{defn}
 		
 		\begin{defn}
-			Let $\V_n$ be a denumerable set of $n$ boolean variables. Let W be a set of modal points. Let $\upsilon$ be a valuation over $\V_n$ and W.
-			Then $\VX$ is the union of all evaluations of boolean variables in $\V_n$.
+			Let the function $Var : \T \rightarrow \p(\V)$ gives all unique variables used in a term.
+		\end{defn}
+
+		\begin{defn}
+			Let $\V_n$ be a finite set of n boolean variables. Then $\Tn$ is the set of all boolean terms with variables of $\V_n$.
 			\begin{equation}
-				\VX = \bigcup\limits_{x_i \in \V_n}\upsilon(x_i) = \bigcup\limits_{x_i \in \V_n}\VXi
+				\Tn = \{t \mid t \in \T \; and \;\ Var(t) \subseteq \V_n \}
 			\end{equation}
 		\end{defn}
-		
-		Let t be an arbitrary term. Let p $\notin$ W be a new modal point. Let us extend $\upsilon$ such as p $\in$ $\upsilon(t)$. By the valuation definition  $\upsilon(t)$ is a composition of intersections, unions, and compliments of some $\VXi$ $\subseteq$ W. Therefore, the modal point p should be added to zero or more $\VXi$ depending on the boolean operations in the term t. With n boolean variables there are $2^n$ ways of adding the point p.
-		
-		
-		
+
+		Let n be the number of the unique boolean variables in $\beta$. Let $\V_n$ be the set of them. There are four types of atomic formulas in $\beta$, namely contacts, non-contacts, zero terms and non-zero terms. Only contacts and non-zero terms require existence of modal points. The valuation $\upsilon$ should assign a set of modal points to each boolean variable $x \in \V_n$. Such that the contacts and non-zero terms be satisfied.
+
+		Let t $\in \Tn$ such that $Var(t) = \V$. Let p $\notin$ W be a new modal point. Let us try to extend $\upsilon$ such as $p \in$ $\upsilon(t)$. By the valuation definition  $\upsilon(t)$ is a composition of intersections, unions, and compliments of valuations $\upsilon(x_i)$ for $x_i \in \V$. Therefore, the modal point p should be added to zero or more variable valuations depending on the boolean operations in the term t. With n boolean variables there are $2^n$ ways of adding the point p. Note that it might not be possible to adjust the variable valuations such that $p \in \upsilon(t)$. For example, if t is $a \sqcap a^* \neq 0$.
+
+		Let $d \neq 0 \in \beta$. If it is not possible to create a modal point p such that $p \in \upsilon(t)$, then there is no satisfaible model for $\beta$.
+
+		Let $C(a,b) \in \beta$. If it is not possible to create a modal point $p_a$ such that $p_a \in \upsilon(a)$, then there is no satisfaible model for $\beta$. Analogously for the term b.
+
 		\begin{defn}
 			A \textbf{variable evaluation $\E_n$} for $n$ boolean variables is a sequence of 1s and 0s, as follows:
 			\begin{equation}
@@ -426,14 +414,23 @@
 			\end{equation}
 		\end{defn}
 
-		For $n$ boolean variables there are $2^n$ unique variable evaluations. We will define the modal points as variable evaluations. By the definition of the valuation, it is not possible to distinguish two or more different modal points in some subsets. For example, the W $\setminus$ $\VX$ subset. The modal point representation also has this limitation. The modal connectives require the existence of a point in those sets. It is sufficient to work with only one point from them.
+		\begin{defn}
+			Let $\V_n$ be a denumerable set of $n$ boolean variables. Let W be a set of modal points. Let $\upsilon$ be a valuation over $\V_n$ and W.
+-			Then $X$ is the union of all evaluations of boolean variables in $\V_n$.
+			\begin{equation}
+				\label{X-all-variable-valuations}
+				X = \bigcup\limits_{x_i \in \V_n}\upsilon(x_i)
+			\end{equation}
+		\end{defn}
+
+		For $n$ boolean variables there are $2^n$ unique variable evaluations. We will define the modal points as variable evaluations. By the definition of the valuation, it is not possible to distinguish two or more different modal points in some subsets. For example, the W $\setminus$ $X$ subset. The modal point representation also has this limitation. Therefore, it is sufficient to work with the $2^n$ unique modal points while building the model.
 
 		\begin{defn}
 			Let $\E_n$ be a variable evaluation for $n$ boolean variables. Then $(\E_n)^i$ is the i-th element in the sequence $\E_n$.
 		\end{defn}
 
 		\begin{defn}
-			Let $\V_n$ be a denumerable set of $n$ boolean variables. The set of \textbf{all unique variable evaluations $W_n$} over $n$ variables is defined as follows:
+			Let $\V_n$ be a finite set of $n$ boolean variables. The set of \textbf{all unique variable evaluations $W_n$} over $n$ variables is defined as follows:
 			\begin{equation}
 				\label{all-unique-points}
 				W_n = \{< e_1, e_2, \ldots , e_n > \mid e_1, \ldots, e_n \in \{0, 1 \} \}
@@ -442,146 +439,109 @@
 
 		\begin{defn}
 			\label{valuation-modal-points}
-			Let $\V_n$ be a denumerable set of $n$ boolean variables. Let $W_n$ be the set of all unique points over n variables. Let W $\subseteq$ $W_n$. Then the \textbf{valuation $\upsilon_n : \V_n \rightarrow \p(W)$} is inductively defined as follows:
+			Let $\V_n$ be a finite set of $n$ boolean variables. Let $W_n$ be the set of all unique points over n variables. Then the \textbf{valuation $\upsilon_n : \V_n \rightarrow \p(W_n)$} is defined by the following inductive definition:
 			\begin{itemize}
 				\item Boolean constants
 					\begin{itemize}
 						\item $\upsilon_n(0) = \emptyset$
-						\item $\upsilon_n(1) = W$
+						\item $\upsilon_n(1) = W_n$
 					\end{itemize}
 				\item Boolean variables
 					\begin{itemize}
-						\item $\upsilon_n(x_i) = \{ \E_n \mid \E_n \in W \land (\E_n)^i = 1 \}$, for $x_i \in \V_n$
+						\item $\upsilon_n(x_i) = \{ \E_n \mid \E_n \in W_n \; and \; (\E_n)^i = 1 \}$, for $x_i \in \V_n$
 					\end{itemize}
 				\item Boolean terms
 					\begin{itemize}
 						\item $\upsilon_n(a \sqcap b) = \upsilon_n(a) \cap \upsilon_n(b)$
 						\item $\upsilon_n(a \sqcup b) = \upsilon_n(a) \cup \upsilon_n(b)$
-						\item $\upsilon_n(a^*) = W \setminus \upsilon_n(a) = -\upsilon_n(a)$
+						\item $\upsilon_n(a^*) = W_n \setminus \upsilon_n(a)$
 					\end{itemize}
 			\end{itemize}
 		\end{defn}
 
-		Let $\beta$ be a branch conjunction as in \ref{branch-conjunction} . Let W be a set of modal points. Let $\V_n$ be the set of boolean variables in $\beta$. Let $\upsilon_n$ be a valuation as in \ref{valuation-modal-points} . Let $W \subseteq W_n$. Let R $\subseteq$ $W^2$ be a reflexive and symmetric relation.
+		Let $\beta$ be a branch conjunction as in \ref{branch-conjunction} . Let $\V_n$ be the finite set of boolean variables in $\beta$. Let $\upsilon_n$ be a valuation as in \ref{valuation-modal-points} . Let $W \subseteq W_n$. Let R $\subseteq$ $W^2$ be a reflexive and symmetric relation.
 
 		\begin{defn}
-			The zero terms in $\beta$ are satisfied iff each zero term's valuation is the empty set.
+			The zero terms in $\beta$ are satisfied if each zero term's valuation is the empty set.
 			\begin{equation}
-				(\forall (g_l = 0) \in \beta)(\upsilon_n(g_l) = \emptyset)
+				g = 0 \in \beta \rightarrow \upsilon_n(g) = \emptyset
 			\end{equation}
 		\end{defn}
 
 		\begin{defn}
-			The non-contacts in $\beta$ are satisfied iff:
+			The non-contacts in $\beta$ are satisfied if:
 			\begin{equation}
-				(\forall_{\neg C(e_k, f_k) \in \beta})\neg(\exists x \in \upsilon_n(e_k))(\exists y \in \upsilon_n(f_k))(xRy)
+				\neg C(e, f) \in \beta \rightarrow \neg(\exists x \in \upsilon_n(e))(\exists y \in \upsilon_n(f))(xRy)
 			\end{equation}
 		\end{defn}
 
 		\begin{lemma}
-			The valuations of the non-contact terms in $\beta$ do not have a common modal point. Follows from the reflexivity of R.
+			The valuations of the non-contact terms in $\beta$ do not have a common modal point. The proof follows from the reflexivity of R.
 			\begin{equation}
-				(\forall_{\neg C(e_k, f_k) \in \beta})(\upsilon_n(e_k) \cap \upsilon_n(f_k) = \emptyset)
+				\neg C(e, f) \in \beta \rightarrow (\upsilon_n(e) \cap \upsilon_n(f)) = \emptyset
 			\end{equation}
 		\end{lemma}
 
 		\begin{defn}
-			Let t be an arbitrary boolean term. Then $\V_t$ is the set of the boolean variables used in t.
-		\end{defn}
-
-		\begin{defn}
-			Let $\V_n$ be a denumerable set of boolean variables. Then $\Tn$ is the set of all boolean terms with variables of $\V_n$.
-			\begin{equation}
-				\Tn = \{t \mid t \;is\; a \;boolean \;term \;and \;\V_t \subseteq \V_n \}
-			\end{equation}
-		\end{defn}
-
-		\begin{defn}
-			\label{boolean-valuation}
-			Let $\V_n$ be a denumerable set of boolean variables. Let $\Tn$ be the set of all boolean terms with variables of $\V_n$. Let W $\subseteq$ $W_n$. By a \textbf{boolean valuation} of a boolean term in $\Tn$ we mean the function $\eta$. It assigns a boolean constant for each pair of term t $\in$ $\Tn$ and variable evaluation $\E_n \in W_n$.
-			\begin{equation}
-				\eta(t, \E_n) \in \{0, 1\}
-			\end{equation}
-			Let t $\in$ $\Tn$. Let $\E_n \in W_n$. The inductive definition of $\eta$ on the structure of the term t is as follows:
-			\begin{itemize}
-				\item $\eta(0, E_n) = 0$
-				\item $\eta(1, E_n) = 1$
-				\item $\eta(x_i, E_n) = (E_n)^i$		
-				\item $\eta(a \sqcap b, E_n) = \eta(a, E_n) \sqcap \eta(b, E_n)$
-				\item $\eta(a \sqcup b, E_n) = \eta(a, E_n) \sqcup \eta(b, E_n)$
-				\item $\eta(a^*, E_n) = \;^*\eta(a, E_n)$
-			\end{itemize}
-		\end{defn}
-
-		\begin{lemma}
-			Let t $\in \Tn$ be an arbitrary term. Let W $\subseteq$ $W_n$. Let $\E_n$ $\in$ W. Let $\eta$ be a boolean valuation. Let $\upsilon_n$ be a valuation as in \ref{valuation-modal-points} . By the definition of $\eta$ and $\upsilon_n$ follows:
-			\begin{equation}
-				\eta(t, \E_n) = 1 \iff \E_n \in \upsilon_n(t)
-			\end{equation}
-		\end{lemma}
-
-		\begin{defn}
-			Let t $\in \Tn$ be an arbitrary term. Let $\eta$ be a boolean valuation. Let $\E_n$ $\in$ $W_n$. Then $\mathbf{\E_n \; satisfies \; t}$ iff $\E_n$ evaluates t to the constant 1.
-			\begin{equation}
-				\E_n \; satisfies \; t \iff \eta(t, \E_n) = 1
-			\end{equation}
-		\end{defn}
-
-		\begin{defn}
-			Let t $\in \Tn$ be an arbitrary term. Let $\eta$ be a boolean valuation. The set of all variable evaluations $\E_t$ which satisfies t is defined as follows:
-			\begin{equation}
-				\E_t = \{ \E_n \mid \E_n \in W_n \land \eta(t, \E_n) = 1 \}
-			\end{equation}
-		\end{defn}
-
-		\begin{defn}
-			Let $\E_n \in W_n$. Let W $\subseteq W_n$. Let W = $W \cup {\E_n}$. Then $\E_n$ is a $\mathbf{valid \; modal \; point \; of \; \beta}$ if it does not break the satisfaction of the zero terms and non-contacts in $\beta$:
-			\begin{align*}
-				(\forall (g_l = 0) \in \beta)(\E_n \notin \upsilon_n(g_l)) \land
-				(\forall_{\neg C(e_k, f_k) \in \beta})(\E_n \notin \upsilon_n(e_k) \cap \upsilon_n(f_k)) \iff \\
-				(\forall (g_l = 0) \in \beta)(\eta(g_l, \E_n) = 0) \land
-				(\forall_{\neg C(e_k, f_k) \in \beta})(\eta(e_k, \E_n) = 0 \land \eta(f_k, \E_n) = 0)
-			\end{align*}
+			Let $\E_n \in W_n$. $\E_n$ is a $\mathbf{valid \; modal \; point}$ of $\beta$ if it preserve the satisfaction of the zero terms and non-contacts in $\beta$:
+			\begin{gather*}
+				g = 0 \in \beta \rightarrow \E_n \notin \upsilon_n(g_l) \\ and \\
+				\neg C(e, f) \in \beta \rightarrow \E_n \notin (\upsilon_n(e) \cap \upsilon_n(f))
+			\end{gather*}
 		\end{defn}
 
 		\begin{defn}\label{set-all-valid-modal-points}
 			Let $W^v \subseteq W_n$ be the set of all valid modal points of $\beta$.
 			\begin{equation}
-				W^v = \{ \E_n \mid \E_n \in W_n \land \E_n \; is \; a \; valid \; modal \; point \; of \; \beta \}
+				W^v = \{ \E_n \mid \E_n \in W_n \; and \; \E_n \; is \; a \; valid \; modal \; point \; of \; \beta \}
 			\end{equation}
 		\end{defn}
 
 		\begin{defn}
-			Let x, y $\in W^v$. Then <x, y> is a $\mathbf{valid \; connected \; pair \; of \; \beta}$ modal points if it does not break the satisfaction of non-contacts in $\beta$.
+			Let x, y $\in W^v$. Then $\pairXY$ is a $\mathbf{valid \; connected \; pair}$ of $\beta$ modal points if it preserves the satisfaction of non-contacts in $\beta$.
 			\begin{align*}
-			(\forall_{\neg C(e_k, f_k) \in \beta})\neg(
-			(x \in \upsilon_n(e_k) \land y \in \upsilon_n(f_k)) \:\lor \\
-			(x \in \upsilon_n(f_k) \land y \in \upsilon_n(e_k)) \:\lor \\
-			(x \in \upsilon_n(e_k) \land y \in \upsilon_n(e_k)) \:\lor \\
-			(x \in \upsilon_n(f_k) \land y \in \upsilon_n(f_k))) \\ \:\iff \\
-			(\forall_{\neg C(e_k, f_k) \in \beta})\neg(
-			(\eta(e_k, x) = 1 \land \eta(f_k, y) = 1) \:\lor \\
-			(\eta(f_k, x) = 1 \land \eta(e_k, y) = 1) \:\lor \\
-			(\eta(e_k, x) = 1 \land \eta(e_k, y) = 1) \:\lor \\
-			(\eta(f_k, x) = 1 \land \eta(f_k, y) = 1))
+			\neg C(e, f) \in \beta \rightarrow
+			(x \notin \upsilon_n(e) \; or \; y \notin \upsilon_n(f)) \; and \\
+			(x \notin \upsilon_n(f) \; or \; y \notin \upsilon_n(e)) \; and \\
+			(x \notin \upsilon_n(e) \; or \; y \notin \upsilon_n(e)) \; and  \\
+			(x \notin \upsilon_n(f) \; or \; y \notin \upsilon_n(f))\;\;\;\;\;\;
 			\end{align*}
 		\end{defn}
 
 		\begin{defn}\label{set-all-valid-modal-point-pairs}
 			Let $R^v \subseteq {W^v}^2$ be the set of all valid connected pairs of $\beta$ modal points.
 			\begin{equation}
-				R^v = \{ <x, y\> \mid x, y \in W^v \land <x, y> \; is \; a \; valid \; connected \; pair \; of \; \beta \; modal \; points\}
+				R^v = \{ \pairXY  \mid x, y \in W^v \; and \; \pairXY \; is \; a \; valid \; connected \; pair \; of \; \beta \; modal \; points\}
 			\end{equation}
 		\end{defn}
 
 		\begin{lemma}\label{satisfied-contacts-non-zero-terms}
 			Let $\F = (W^v, R^v)$ be a relational system. $\F$ satisfies the contacts and non-zero terms in $\beta$ iff:
-			\begin{align*}
-				(\forall (d_j \neq 0) \in \beta)(\exists \E_n \in W^v)(\E_n \in \upsilon_n(d_j)) \: \land \\
-				(\forall_{C(a_i, b_i) \in \beta})(\exists <x, y> \in R^v)(x \in \upsilon_n(a_i) \land y \in \upsilon_n(b_i)) \\ \iff \\
-				(\forall (d_j \neq 0) \in \beta)(\exists \E_n \in W^v)(\eta(d_j, \E_n) = 1 \: \land \\
-				(\forall_{C(a_i, b_i) \in \beta})(\exists <x, y> \in R^v)(\eta(a_i, x) = 1 \land \eta(b_i, y) = 1)
-			\end{align*}
+			\begin{gather*}
+				C(a, b) \in \beta \rightarrow (\exists \pairXY \in R^v)(x \in \upsilon_n(a) \land y \in \upsilon_n(b))
+				 \\ and \\
+				 d \neq 0 \in \beta \rightarrow (\exists \E_n \in W^v)(\E_n \in \upsilon_n(d))
+			\end{gather*}
+		\end{lemma}
+
+		\begin{defn}
+			\label{eta-valuation}
+			Let $\eta: (\Tn \times W_n) \rightarrow \{0, 1 \}$ be a function which defines whether a modal point is in the valuation of a term. Let t $\in$ $\Tn$. Let $\E_n \in W_n$. The inductive definition of $\eta$ on the structure of the term t is as follows:
+			\begin{itemize}
+				\item $\eta(0, \E_n) = 0$
+				\item $\eta(1, \E_n) = 1$
+				\item $\eta(x_i, \E_n) = 1 \iff (\E_n)^i = 1$
+				\item $\eta(a \sqcap b, \E_n) = 1 \iff \eta(a, \E_n) = 1 \; and \; \eta(b, \E_n) = 1$
+				\item $\eta(a \sqcup b, \E_n) = 1 \iff \eta(a, \E_n) = 1 \; or \; \eta(b, \E_n) = 1$
+				\item $\eta(a^*, \E_n) = 1 \iff \eta(a, \E_n) = 0$
+			\end{itemize}
+		\end{defn}
+
+		\begin{lemma}
+			Let t $\in \Tn$ be an arbitrary term. By the definition of $\eta$ and $\upsilon_n$ ifollows:
+			\begin{equation}
+				\eta(t, \E_n) = 1 \iff \E_n \in \upsilon_n(t)
+			\end{equation}
 		\end{lemma}
 
 			Let $\F = (W^v, R^v)$. Let $\M = (\F, \upsilon_n)$. $\M$ satisfies the zero terms and non-contacts in $\beta$. $\M$ is a model of $\beta$ if the non-zero terms and contacts are satisfied \ref{satisfied-contacts-non-zero-terms} .
@@ -590,6 +550,7 @@
 
 	The following algorithm builds a more convenient model. Creates modal points and connections only for the non-zero and contact terms in $\beta$.
 
+		\newpage
 		\LinesNumbered
 		\DontPrintSemicolon
 		\begin{algorithm}
@@ -598,12 +559,12 @@
 			$R \gets \emptyset$
 			\;
 			\tcc{Process the non-zero terms in $\beta$}
-			\For{$d_j \neq 0 \in \beta$}{\label{non-zero-terms}
+			\For{$d \neq 0 \in \beta$}{\label{non-zero-terms}
 				\For{$\E_n \in W^v$}{
-					\uIf{$\eta(d_j, \E_n) = 1$}{
+					\uIf{$\eta(d, \E_n) = 1$}{
 						$W \gets W \cup \{ x \}$
 						\;
-						$R \gets R \cup \{ <x,x> \}$
+						$R \gets R \cup \{ \pairXX \}$
 						\;
 						\Goto{non-zero-terms}
 					}
@@ -611,12 +572,12 @@
 				Unable to construct a model.
 			}
 			\tcc{Process the contacts in $\beta$}
-			\For{$C(a_i, b_i) \in \beta$}{\label{contacts}
-				\For{$<x, y> \in R^v$}{
-					\uIf{$\eta(a_i, x) = 1 \land \eta(b_i, x) = 1$}{
+			\For{$C(a, b) \in \beta$}{\label{contacts}
+				\For{$\pairXY \in R^v$}{
+					\uIf{$\eta(a, x) = 1 \land \eta(b, x) = 1$}{
 						$W \gets W \cup \{x, y \}$
 						\;
-						$R \gets R \cup \{<x,x>, <y,y>, <x,y>, <y,x> \}$
+						$R \gets R \cup \{\pairXX, \pairYY, \pairXY, \pairYX \}$
 						\;
 						\Goto{contacts}
 					}
@@ -726,7 +687,7 @@
 		0 				    & 0      & Boolean constant 0 \\
 		1 					& 1      & Boolean constant 1 \\
 		- 					& *      & Boolean complement \\
-		*				 	& $\cap$ & Boolean meat \\
+		*				 	& $\cap$ & Boolean meet \\
 		+ 					& $\cup$ & Boolean join \\
 		()                  & ()     & Parentheses \\
 		\text{[a-zA-Z0-9]+} & $x_1$  & Boolean variable. Syntax $x1$, $Y42$, $Var101$ \\
@@ -1428,20 +1389,20 @@ void term::construct_hash()
 	The formula building from an AST is straightforward. Recursive depth first iteration over the AST. For each AST node a coresponding formula/term node is constructed. The implementation could be found in \textit{term.cpp} and \textit{formula.cpp} in the repository.
 
 	\newpage
-	\section{Tableaux Implementation}
-	The Tableaux process is a decision procedure. Recursively breaks down a given formula into basic components. Based on that a decision can be concluded. The recursive step breaks down a formula part into one or two subformulas. Continuously appling the recursive step produces a binary tree. The nodes are the formulas and the links represent the recursive step.
+	\section{Tableau Implementation}
+	The Tableau process is a decision procedure. Recursively breaks down a given formula into basic components. Based on that a decision can be concluded. The recursive step breaks down a formula part into one or two subformulas. Continuously appling the recursive step produces a binary tree. The nodes are the formulas and the links represent the recursive step.
 
 	All formulas in a branch are considered to be in conjunction. Contradiction may arise in a same branch if there exists a formula and its negation.
 
-	The main principle of the tableaux is to break complex formula into smaller ones until complementary pairs of atomic formulas are produced.
+	The main principle of the tableau is to break complex formula into smaller ones until complementary pairs of atomic formulas are produced.
 
 	\subsubsection*{Definition: Signed formulas set}
 	The signed formulas set consists only of signed formulas. The letter \textit{X} is usually used for its representation.
 
-	\subsection{Definition: Tableaux Step}
-	The \textit{Tableaux Step} takes as input a formula and a signed formulas set and produces as output one or two new formulas, depending on the operation.
-	The signed formulas set consists of the broken down formulas by previous tableaux steps.
-	The output of the tableaux step depends on the rule applied to the formula.
+	\subsection{Definition: Tableau Step}
+	The \textit{Tableau Step} takes as input a formula and a signed formulas set and produces as output one or two new formulas, depending on the operation.
+	The signed formulas set consists of the broken down formulas by previous tableau steps.
+	The output of the tableau step depends on the rule applied to the formula.
 
 	\subsubsection{Rules}
 	Only \textit{negation} \textit{conjunction} and \textit{disjunction} operations will be handled. The implication and equivalence are converted.
@@ -1486,11 +1447,11 @@ void term::construct_hash()
 			\end{array}$
 
 	\newpage
-	For our case the functionality of the tableaux process shall be extended. If the branch is not closed there are additional calculations needed in order to verify that there is no contradiction. Namely to verify that there is no contradiction on Term level. This means that there exists a satisfiable model.
-	This verification can be done in different manners. Depending on the algorithm type. The best way to think about it is that the tableaux process returns a not-closed branch and if there is a model for the set of atomic formuas in this branch, then the formula is satisfiable, otherwise the tableaux process proceeds with the next not-closed branch. If such branch does not exist then the formula is not satisfiable. 
+	For our case the functionality of the tableau process shall be extended. If the branch is not closed there are additional calculations needed in order to verify that there is no contradiction. Namely to verify that there is no contradiction on Term level. This means that there exists a satisfiable model.
+	This verification can be done in different manners. Depending on the algorithm type. The best way to think about it is that the tableau process returns a not-closed branch and if there is a model for the set of atomic formuas in this branch, then the formula is satisfiable, otherwise the tableau process proceeds with the next not-closed branch. If such branch does not exist then the formula is not satisfiable.
 
 	\subsection{Implementation}
-	The program implementation of the tableaux method follows the standard tableaux process. First interesting design decision is to keep all true signed formulas in one data set, and all false signed formulas in another data set. This enables fast searches whether a formula has been signed as true or false.
+	The program implementation of the tableau method follows the standard tableau process. First interesting design decision is to keep all true signed formulas in one data set, and all false signed formulas in another data set. This enables fast searches whether a formula has been signed as true or false.
 
 	\subsubsection*{Definition: Signed Formula Collection}
 	Let X be a set of formulas, then X is called signed formula collection if and only if all formulas in X are signed as true or all formulas are signed as false.
@@ -1505,7 +1466,7 @@ void term::construct_hash()
 	\begin{itemize}
 		\item formulas\_T - contains only non-atomic formulas signed as true
 		\item formulas\_F - contains only non-atomic formulas signed as false, \\
-				For example, if $\neg\varphi$ is encountered as an output of the tableaux step, then only $\varphi$ is inserted into the formula\_F
+				For example, if $\neg\varphi$ is encountered as an output of the tableau step, then only $\varphi$ is inserted into the formula\_F
 		\item contacts\_T - contains only atomic contact formulas signed as true
 		\item contacts\_F - contains only atomic contact formulas signed as false
 		\item zero\_terms\_T - contains only formulas of type $\varphi \le \psi$ signed as true
@@ -1560,8 +1521,8 @@ tableau.h
 
 	Then the $\mathbb{T}\neg C(a,b)$ will be decomposed to $\mathbb{F} C(a,b)$ by the ( $\neg$ ) rule, which causes a contradiction since $C(a,b)$ is already present in $contacts\_T$ formulas.
 
-	\subsubsection*{Tableaux Algorithm}
-	Given a formula $\varphi$, the following algorithm determines the atomic formulas in all branches of the tableaux process.
+	\subsubsection*{Tableau Algorithm}
+	Given a formula $\varphi$, the following algorithm determines the atomic formulas in all branches of the tableau process.
 
 	As a first step if the formula $\varphi$ is the constant F, then false is returned directly, otherwise the whole formula $\varphi$ is inserted in $formulas\_T$.
 	\newline
@@ -1572,7 +1533,7 @@ tableau.h
 		\item Contact atomic formula is commutative, meaning that: $C(a,b) \iff C(b,a)$
 	\end{itemize}
 
-	Few lemmas which will provide a much more efficient contradiction finding in the tableaux process.
+	Few lemmas which will provide a much more efficient contradiction finding in the tableau process.
 	\subsubsection*{Lemma: A}
 	Let x be a term. Suppose that the atomic formula $x = 0$ has already been signed as true.
 	Then marking the following formulas as true will lead to contradiction:
@@ -1671,8 +1632,8 @@ void remove_formula_from_F(const formula* f)
 	\end{itemize}
 
 	\newpage
-	\subsubsection*{Tableaux Satisfiable Step Implementation}
-	The Tableaux satisfiable step is the whole Tableaux algorithm.
+	\subsubsection*{Tableau Satisfiable Step Implementation}
+	The Tableau satisfiable step is the whole tableau algorithm.
 \begin{lstlisting}
 auto tableau::satisfiable_step() -> bool
 {
@@ -1931,9 +1892,9 @@ auto tableau::satisfiable_step() -> bool
 	\newpage
 	\section{Model Implementation}
 
-	\subsection*{Tableaux branch output}
-	\label{tableaux:branch:output}
-	As stated above the ouput of a branch in the tableaux process is a set of atomic formulas. These atomic formulas are grouped in six sets:
+	\subsection*{Tableau branch output}
+	\label{tableau:branch:output}
+	As stated above the ouput of a branch in the tableau process is a set of atomic formulas. These atomic formulas are grouped in six sets:
 	\begin{itemize}
 		\item Contacts ($contacts\_T$)
 		\item Non Contacts ($contacts\_F$)
@@ -1954,7 +1915,7 @@ auto tableau::satisfiable_step() -> bool
 	\end{align*}
 
 	\subsection*{Model output}
-	\label{tableaux:branch:output}
+	\label{tableau:branch:output}
 	The model bulding algorithm should produce a set of modal points. The contacts between them and to define the valuation for each boolean variable.
 
 	\subsection{Modal point representation}
