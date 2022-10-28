@@ -73,13 +73,13 @@
 	\section{Introduction}
 	The modal logics are in a constant exploration and extended by the today's researchers. The contact modal logics is one such topic with increasing interests. This paper works its way to an algorithm which for a given contact modal logics formula constructs a model which satisfies the formula. If such a model does not exist then the algorithm proves that the formula is not satisfiable. 
 
-The model construction process begins with a formal prove procedure to decompose the formula to a simpler state. For this the tableau method is used. The tableau method branches the formula in many paths where each path is possible to derive a valid model for the formula. The procedure of model building is done for each path, until a model is successfully constructed. This procedure creates a modal points, the relations between them and the variables valuations in order to find a prove for a model satisfying the formula. 
+The model construction process begins with a formal prove procedure to decompose the formula to a simpler state. For this the tableau method is used. The tableau method branches the formula in many paths where each path is possible to derive a valid model for the formula. The procedure of model building is done for each path, until a model is successfully constructed. This procedure creates modal points, the relations between them and the variables valuations in order to find a prove for a model satisfying the formula. 
 
-As of today an algorithm which can solve this problem in a polynomial time is not possible. This is because the problem for constructing a satisfiable model for a quantitative contact formula is as hard as the Boolean satisfiability problem (SAT). That is why each optimization during the formula proving process is significantly reduces the algorithm execution time.
+As of today an algorithm which can solve this problem in a polynomial time is not possible. This is because the problem for constructing a satisfiable model for a quantitative contact formula is as hard as the Boolean satisfiability problem (SAT). That is why each optimization during the formula proving process significantly reduces the algorithm execution time.
 
 	\newpage
 	\section{Tableaux Method}
-	The tableau is a formal proof procedure which can be found in many variants and for different logics. In modal logics the tableau method is quite common and is mostly used for as a search procedure for models meeting certain conditions.
+	The tableau is a formal proof procedure which can be found in many variants and for different logics. In modal logics the tableau method is quite common and is mostly used as a search procedure for models meeting certain conditions.
 Formally, the tableau procedure is used as a refutation procedure; to prove that a formula X is satisfied, we begin the process with some syntactical assertion that the formula is not satisfiable. After that the assertion stating that the formula is not valid is broken down syntactically, in most cases breaking the formula into several cases. This decomposition of the initial formula is called tableau expansion stage and can be thought as a generalization of disjunctive normal form expansion. 
 
 During the expansion stage of the tableau an impossible cases can be met, where the validity and invalidity of a formula are claimed to be true. These cases are said to be closed and if each case of the tableau is closed, then we say that the tableau is closed.
@@ -308,7 +308,7 @@ represents a region. Two predefined variables shall be used in order to simplify
 			\item W represents the whole world, namely the biggest region which contains all elements.
 			\item $\emptyset$ represents the empty region
 		\end{itemize}
-Let $\mathbb{V}ar$ be a countable set of all variables.
+The $\mathbb{V}ar$ set will be used to denote a countable set of all variables used in a formula.
 
 	\paragraph{Boolean constants}
 are defined for W and $\emptyset$, namely 1 represents the world, while 0 represents the empty region.
@@ -360,9 +360,9 @@ is defined by the following inductive definition:
 	\paragraph{Abbreviations}
 which are commonly used in this paper. Let a and b be two terms, then:
 	\begin{itemize}
-		\item $a = b,\textit{if}\: (a \le b) \land (b \le a)$
-		\item $a \neq b,\textit{if}\: \neg (a = b) $
-		\item $a \nleq b,\textit{if}\: \neg (a \le b)$
+		\item $a = b,\:\textit{if}\:\: (a \le b) \land (b \le a)$
+		\item $a \neq b,\:\textit{if}\:\: \neg (a = b) $
+		\item $a \nleq b,\:\textit{if}\:\: \neg (a \le b)$
 	\end{itemize}
 
 	\subsection{Semantics}
@@ -391,7 +391,7 @@ Let $\mathcal{F}$  be a frame, then a boolean variable valuation is any function
 		\begin{itemize}
 			\item $\mathcal{M} \not\models \bot$ 
 			\item $\mathcal{M} \models \top$
-			\item $\mathcal{M} \models aCb \text{ iff } \mathscr{v}(a) \text{ iff } (\exists x \in \mathscr{v}(a)), (\exists y \in \mathscr{v}(b)) (xRy)$
+			\item $\mathcal{M} \models aCb \text{ iff } (\exists x \in \mathscr{v}(a)), (\exists y \in \mathscr{v}(b)) (xRy)$
 			\item $\mathcal{M} \models a \leq b \text{ iff } \mathscr{v}(a) \subseteq \mathscr{v}(b)$
 			\item $\mathcal{M} \models a \leq_\mu b \text{ iff } \mu(\mathscr{v}(a)) \le \mu(\mathscr{v}(b))$
 			\item $\mathcal{M} \models \neg \varphi \text{ iff } \mathcal{M} \not\models \varphi$
@@ -409,9 +409,9 @@ is a model of A.
 
 	\subsection{Formula Properties}
 \begin{axiom}[Contact reflexivity]
-	Let a be a term, then
+	Let b be a term, then
 	\begin{equation*}
-		a \neq 0 \implies aCa
+		b \neq 0 \implies bCb
 	\end{equation*}
 \end{axiom}
 
@@ -474,7 +474,6 @@ Let $\mathcal{M} = \langle B, \mu, \mathscr{v}\rangle$ be an arbitrary model. Fr
 		\mathcal{M} \models (a \sqcap d = 0) &\land (b \sqcap d = 0) \\
 		\mathcal{M} \models a \sqcap d = 0 \text{ and }& \mathcal{M} \models (b \sqcap d = 0) \\
 		\mathscr{v}(a \sqcap d) = \mathscr{v}(0) \text{ and }& \mathscr{v}(b \sqcap d) = \mathscr{v}(0) \\ 
-		\mathscr{v}(a) \sqcap_B \mathscr{v}(d) = 0_B  \;\;\;\;\;\;\;& \mathscr{v}(b) \sqcap_B \mathscr{v}(d) = 0_B  \\
 		\mathscr{v}(a) \cap \mathscr{v}(d) = \emptyset  \;\;\;\;\;\;\;& \mathscr{v}(b) \cap \mathscr{v}(d) = \emptyset
 	\end{align*}
 
@@ -499,35 +498,36 @@ $\Longleftarrow$
 		\Rightarrow \mathcal{M} &\models  a \le_\mu b \\
 	\end{align*}
 \end{proof}
-\begin{lemma}[Trivial formula implications]
+\begin{lemma}[Trivial implications] The following trivial implications are of huge importance for the model construction algorithm since they are trivial to be applied and can in some cases eliminate a lot of computations. This is because they can be applied over a complex term or formula to reduce it to something simple.
+\newline
 	Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	\begin{itemize}
-		\item $\varphi \land T = \varphi$,\;\; $T \land \varphi = \varphi$,\;\;
-		      $\varphi \land F = F$,\;\; $F \land \varphi = F$
-		\item $\varphi \lor T = T$,\;\; $T \lor \varphi = T$,\;\;
-		      $\varphi \lor F = \varphi$,\;\; $F \lor \varphi = \varphi$,
-		\item $a \sqcap 1 = a$,\;\; $1 \sqcap a = a$,\;\;
-		      $a \sqcap 0 = 0$,\;\; $0 \sqcap a = 0$,
-		\item $a \sqcup 1 = 1$,\;\; $1 \sqcup a = 1$,\;\;
-		      $a \sqcup 0 = a$,\;\; $0 \sqcup a = a$,
+		\item $\varphi \land T \Longrightarrow \varphi$,\;\; $T \land \varphi \Longrightarrow \varphi$,\;\;
+		      $\varphi \land F \Longrightarrow F$,\;\; $F \land \varphi \Longrightarrow F$
+		\item $\varphi \lor T \Longrightarrow T$,\;\; $T \lor \varphi \Longrightarrow T$,\;\;
+		      $\varphi \lor F \Longrightarrow \varphi$,\;\; $F \lor \varphi \Longrightarrow \varphi$,
+		\item $a \sqcap 1 \Longrightarrow a$,\;\; $1 \sqcap a \Longrightarrow a$,\;\;
+		      $a \sqcap 0 \Longrightarrow 0$,\;\; $0 \sqcap a \Longrightarrow 0$,
+		\item $a \sqcup 1 \Longrightarrow 1$,\;\; $1 \sqcup a \Longrightarrow 1$,\;\;
+		      $a \sqcup 0 \Longrightarrow a$,\;\; $0 \sqcup a \Longrightarrow a$,
 		\item $(a \sqcup b)Cc \iff aCc \lor bCc$
 		\item $(a \sqcup b) \leq c \iff a \leq c \land b \leq c$
-		\item $aCb \textit{ implies that } a \neq 0 \land b \neq 0$
-		\item $a \sqcap b \neq 0 \textit{ implies that } aCb$
-		\item $a = 0 \lor b = 0 \textit{ implies that } \neg(aCb)$
-		\item $0 \leq a = T$
-		\item $a \leq 1 = T$
-		\item $0C0 = F$
-		\item $aC0 = F$
-		\item $1C1 = T$
-		\item $aC1 = a \neq 0$
-		\item $a \neq 0 = aCa$
-		\item $0 \le_\mu a = T$
-		\item $a \le_\mu 1 = T$
+		\item $aCb \Longrightarrow a \neq 0 \land b \neq 0$
+		\item $a \sqcap b \neq 0 \Longrightarrow aCb$
+		\item $a = 0 \lor b = 0 \Longrightarrow \neg(aCb)$
+		\item $0 \leq a \Longrightarrow T$
+		\item $a \leq 1 \Longrightarrow T$
+		\item $0C0 \Longrightarrow F$
+		\item $aC0 \Longrightarrow F$
+		\item $1C1 \Longrightarrow T$
+		\item $aC1 \Longrightarrow a \neq 0$
+		\item $a \neq 0 \Longrightarrow aCa$
+		\item $0 \le_\mu a \Longrightarrow T$
+		\item $a \le_\mu 1 \Longrightarrow T$
 		\item $(a = 0) \iff (a \le_\mu 0)$
 		\item $(a = 1) \iff (1 \le_\mu a)$
 		\item $(a \le_\mu b) \lor (b \le_\mu a)$
-		\item $a_1 \le_\mu a_2 \land a_2 \le_\mu a_3 \textit{ implies that } a_1 \le_\mu a_3$
+		\item $a_1 \le_\mu a_2 \land a_2 \le_\mu a_3 \Longrightarrow a_1 \le_\mu a_3$
 
 	\end{itemize}
 \end{lemma}
@@ -543,19 +543,19 @@ $\Longleftarrow$
 		Where $\mu$ is a measure function. Detailed definition is given in \ref{measured-model}.
 	
 	\subsection{Formula Satisfiability} 
-The satisfiability verification or sometimes called a satisfiability proof for a given formula is done by constructing a model. The formula is satisfiable only if such a model exists. The model construction is done in several steps. Foremost, the tableau method is used to simplify the problem and to detect contradictions earlier in the process, even before the model construction begins. If the produced tableau is closed as per definition \ref{closed-tableau}, then a model in which the given formula is satisfiable does not exist. If there are open branches in the tableau result, then semantical reasoning shall be done in order to construct a model, if such a model exists. Let us define few definitions before we define the procedure the satisfiability proof of a formula.
+The satisfiability verification or sometimes called a satisfiability proof for a given formula is done by constructing a model. The formula is satisfiable only if such a model exists. The model construction is done in several steps. Foremost, the tableau method is used to simplify the problem and to detect contradictions earlier in the process, even before the model construction begins. If the produced tableau is closed as per definition \ref{closed-tableau}, then a model in which the given formula is satisfiable does not exist. If there are open branches in the tableau result, then semantical reasoning shall be done in order to construct a model, if such a model exists. Let us define few definitions before we dive into the procedure for the satisfiability proof of a formula.
 
 	\paragraph{Tableau Branch Conjunction}
-		A branch from the tableau method consists of signed atomic formulas. For a formula to be satisfiable, it means that all atomic formulas in a tableau branch should be satisfied. This in terms can be represented as a conjunction of the atomic formulas. Let's call it a branch conjunction. For the quantitative contact logics, the conjunction contains the signed contact, zero term and measure atomic formulas.
+		A branch from the tableau method consists of signed atomic formulas. For a formula to be satisfiable, it means that all atomic formulas in a tableau branch should be satisfied. This in terms can be represented as a conjunction of the atomic formulas. Let us call it a branch conjunction. For the quantitative contact logics, the conjunction contains the signed contact, zero term and measure atomic formulas.
 	\begin{defn}
 		Let $\varphi$ be a formula and let $\mathcal{T}$ be a tableau applied over the $\varphi$ formula. Then a branch of the tableau method is defined with the following notation:
 		\begin{align*}
-				B = \{T C(a_i, b_i) \mid i \in \{1, \ldots, I\} \} &\cup 
-					\{F C(e_k, f_k) \mid k \in \{1, \ldots, K\} \} \cup \\
-					\{F d_j = 0 \mid j \in \{1, \ldots, J\} \} &\cup 
-					\{T g_l = 0 \mid l \in \{1, \ldots, L\} \} \cup \\
-					\{T m_p \le_\mu n_p \mid p \in \{1, \ldots, P\} \} &\cup 
-					\{F u_q \le_\mu v_q \mid q \in \{1, \ldots, Q\} \}
+				B = \{\signT C(a_i, b_i) \mid i \in \{1, \ldots, I\} \} &\cup 
+					\{\signF C(e_k, f_k) \mid k \in \{1, \ldots, K\} \} \cup \\
+					\{\signF d_j = 0 \mid j \in \{1, \ldots, J\} \} &\cup 
+					\{\signT g_l = 0 \mid l \in \{1, \ldots, L\} \} \cup \\
+					\{\signT m_p \le_\mu n_p \mid p \in \{1, \ldots, P\} \} &\cup 
+					\{\signF u_q \le_\mu v_q \mid q \in \{1, \ldots, Q\} \}
 		\end{align*}
 	\end{defn}
 	For the sake of simplicity we can remove the signed symbols $\signT \textit{ and } \signF$, in which case the branch conjunction of the tableau method branch is defined as:
@@ -571,7 +571,7 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 			\curvedE : \Var_B \rightarrow \{ \textbf{false}, \textbf{true}\}
 		\end{align*}
 	\end{defn}
-	The variable valuation can be thought as an array of 1's and 0's where the indexes of this array are the variables from $\Var_B$. Having in mind that the size of $\Var_B$ is n, we know that there are $2^n$ possible valuations. Later on we are going to map one variable valuation function per modal point, this will imply that there will be $2^n$ possible values for one modal point.
+	The variable valuation can be thought as an array of 1's and 0's where the indexes of this array are the variables from $\Var_B$. Having in mind that the size of $\Var_B$ is n, we know that there are $2^n$ possible valuations. Later on we are going to map one variable valuation function per modal point, this will imply that there will be $2^n$ possible values for one modal point representation.
 	% The idea of a modal points is to be represented by a separate $\curvedE$ variable valuation, which will be used to satisfy the term representing that modal point.
 
 	\begin{defn} 
@@ -1687,7 +1687,7 @@ using terms_t = std::unordered_set<
 	A contradiction may occur if a formula is split and some resulting components causes a contradiction.
 
 	\subsubsection*{Example}
-	Let's assume that $contacts\_T = \{ C(a, b)\}$ and let's have a look at the following formula $\signT(T \wedge \neg C(a,b))$.
+	Let us assume that $contacts\_T = \{ C(a, b)\}$ and let us have a look at the following formula $\signT(T \wedge \neg C(a,b))$.
 	\newline
 	By the rules of decomposition, namely the ( $\wedge$ ) rule produces $\signT T \text{ and } \signT\neg C(a,b)$.
 
