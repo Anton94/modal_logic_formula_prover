@@ -256,7 +256,7 @@
 					\item $\M \models \top$
 					\item $\M \not\models \bot$
 					\item $\M \models a \leq b \iff \upsilon(a) \subseteq \upsilon(b)$
-					\item $\M \models aCb \iff \upsilon(a)$ $C_R$ $\upsilon(b$ $\iff (\exists x \in \upsilon(a))(\exists y \in \upsilon(b))(xRy)$
+					\item $\M \models aCb \iff \upsilon(a)$ $C_R$ $\upsilon(b)$ $\iff (\exists x \in \upsilon(a))(\exists y \in \upsilon(b))(xRy)$
 				\end{itemize}
 			\item For complex formulas:
 				\begin{itemize}
@@ -591,52 +591,48 @@
 	\section{Connected Contact Logic}
 
 	\subsection{Connectivity}
-	In topology and related branches of mathematics, a connected space is a topological space that cannot be represented as the union of two or more disjoint non-empty open subsets. Connectedness is one of the principal topological properties that are used to distinguish topological spaces.
+	In topology and related branches of mathematics, a connected space is a topological space that cannot be represented as the union of two disjoint non-empty open subsets. Connectedness is one of the principal topological properties that are used to distinguish topological spaces.
 
 	\begin{axiom}
-		(Connectivity) Let b is a term. Then
+		(Connectivity) Let b be a term. Then
 		\label{connectivity-theorem}\begin{equation}
 			b \neq 0 \land b \neq 1 \implies bCb^*
 		\end{equation}
 	\end{axiom}
 
-	\paragraph{} Let $\F$ = (W, R) be a relational system with W $\neq$ $\emptyset$, R $\subseteq$ $W^2$ and a, b are terms. Let us recall the definition of C:
+	\paragraph{} Let $\F = (W, R)$ be a relational system with W $\neq$ $\emptyset$, R $\subseteq$ $W^2$ and a, b are terms. Let us recall the definition of C:
 	\begin{equation}
 		aCb \iff (\exists x \in \upsilon(a)) (\exists y \in \upsilon(b))(xRy)
 	\end{equation}
 
-	\paragraph{} The connectivity theorem can be written as follows:
+	\paragraph{} The connectivity axiom can be written as follows:
 	\begin{equation}
 		\upsilon(b) \neq \emptyset \land \upsilon(b) \neq W \implies (\exists x \in \upsilon(b)) (\exists y \in W \setminus \upsilon(b))(xRy)
 	\end{equation}
 
+	The relational system $\F = (W, R)$ defines an unidrected graph. $W$ is the set of vertices and $R$ is the set of edges.
+
 	\begin{defn}
-		Let G = (W, R) be a graph. W is the set of vertexes and R the set of edges. A \textbf{path} $\pi(v_1, v_n)$ is a sequence of vertexes $(v_1, v_2, \dotsc , v_n)$ such that $v_1,\dotsc,v_n \in V$ and $v_iRv_{i+1}$, for $i \in \{1,\dotsc,n-1\}$.
+		Let G = (W, R) be a graph. W is the set of vertices and R the set of edges. A \textbf{path} $\pi_G(x, y)$ is a sequence of vertices $(x, v_1, \dotsc , v_k, y)$ such that $x,  v_1,\dotsc,v_k, y \in V$ and $xRv1,v_1Rv_2,\dotsc, v_{k-1}Rv_k, v_kRy$.
 	\end{defn}
 
 	\begin{defn}
-		Let $G = (W, R)$ be an undirected graph. $W$ is the set of vertexes and R the set of edges. $G$ is $\mathbf{connected}$ if there is a path between every two vertices in $W$.
+		Let $G = (W, R)$ be an undirected graph. $W$ is the set of vertices and R the set of edges. $G$ is $\mathbf{connected}$ if there is a path between every two different vertices in $W$.
 		\begin{equation}
-			(\forall x \in W)(\forall y \in W)(\exists \pi(x, y)) (\pi(x, y)\;is\;a\;path\;in\;G)
+			(\forall x \in W)(\forall y \in W)(x \neq y \implies (\exists \pi_G(x, y)) (\pi_G(x, y)\;is\;a\;path\;in\;G))
 		\end{equation}
 	\end{defn}
 
-	Let $G = (W, R)$. The connectivity theorem implies that there is a connection out of each evaluation set(except the $\emptyset$ and W). Mind that the modal point representation is a variable evaluation. Thus, the set of all evaluations is  $\p(W)$.
-
-	If G is connected, then there is a path between every two points. Therefore, there is a connection out of each $W' \in \p(W)$.
-		\begin{equation}
-			(\forall W' \in \p(W))(W' \neq \emptyset \land W' \neq W \implies(\exists x \in W')(\exists y \in W \setminus W)(xRy))
+	\begin{theorem}
+		(Connectivity) Let $\F = (W, R)$ be a relational system. Let G = (W, R) be the undirected graph defined by $\F$.
+		\label{connectivity-theorem}\begin{equation}
+			connectivity \; axiom \; is \; satisfied\; in \; \F \iff
+			G \; is \; connected
 		\end{equation}
-
-	If G is disconnected, then G has a not connected component. Let G'=(W', R') be such a component. Thus, $W' \subseteq W$ and $W' \in \p(W)$. There are no outgoing connections from W'. Otherwise, G' would be connected with at least one more point from $W \setminus W'$.
-		\begin{equation}
-			(\exists W' \in \p(W))(W' \neq \emptyset \land W' \neq W \land (\not\exists y \in W \setminus W')(xRy))
-		\end{equation}
-
-	Therefore, the connectivity theorem implies that graph G is connected.
+	\end{theorem}
 
 	\begin{defn}
-		Let $\F$ = (W, R) be a relational system. Let $\M = (\F, \upsilon_n)$ be a model of $\beta$. $\M$ is a \textbf{connected model} if $G = (W, R)$ is connected.
+		Let $\F$ = (W, R) be a relational system. Let G = (W, R) be the undirected graph defined by $\F$. Let $\M = (\F, \upsilon_n)$ be a model of $\beta$. $\M$ is a \textbf{connected model} if $G = (W, R)$ is connected.
 	\end{defn}
 
 	\subsection{Connected model building}
@@ -645,7 +641,7 @@
 		Let $\beta$ be a branch conjunction as in \ref{branch-conjunction} :
 		\nonumber\BranchConjunction
 
-		Let $\F^v = (W^v, R^v)$ be a relational system. Let $\M^v = (\F^v, \upsilon_n)$ be a model. $\M^v$ is a model of $\beta$ if the non-zero terms and contacts in $\beta$ are satisfied \ref{satisfied-contacts-non-zero-terms} .	If $\M^v$ is not a model of $\beta$, then $\beta$ does not have a model neither a connected model.
+		Let $\F^v = (W^v, R^v)$ be a relational system and $\M^v = (\F^v, \upsilon_n)$ be a model in this system. $\M^v$ is a model of $\beta$ if the non-zero terms and contacts in $\beta$ are satisfied \ref{satisfied-contacts-non-zero-terms} .	If $\M^v$ is not a model of $\beta$, then $\beta$ does not have a model neither a connected model.
 
 		Let $\M^v$ is a model of $\beta$. $\M^v$ is the biggest model of $\beta$ w.r.t unique modal points and connections between them. Let $G^v=(W^v, R^v)$ be the graph of $\F^v$.
 
