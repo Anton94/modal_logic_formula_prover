@@ -35,6 +35,7 @@
 
 \newcommand\ST{\mathbb{T}}
 \newcommand\SF{\mathbb{F}}
+\newcommand\SB{\mathbb{B}}
 \newcommand\M{\mathcal{M}}
 \newcommand\F{\mathcal{F}}
 \newcommand\p{\mathcal{P}}
@@ -42,16 +43,18 @@
 \newcommand\E{\mathcal{E}}
 \newcommand\T{\mathcal{T}}
 \newcommand\Tn{\mathcal{T}_n}
+\newcommand\TableauExampleCenter{\indent\indent\indent\indent\indent\indent\indent\indent\indent}
+\newcommand\TableauExampleFirstChildOffset{\indent\indent\indent\indent\indent\indent\indent}
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{axiom}[theorem]{Axiom}
 \newtheorem{defn}[theorem]{Definition}
 \newcommand{\BranchConjunction}{%
 \begin{alignat}{2}
-			\bigwedge_{i=1}^{I} \; C(a_i, b_i) \:\: \wedge \:\: &
-			\bigwedge_{j=1}^{J} \; d_j \neq 0 \:\: \wedge \:\:
-			\bigwedge_{k=1}^{K} \; \neg C(e_k, f_k) \:\: \wedge \:\: &
-			\bigwedge_{l=1}^{L} \; g_l = 0 \:\:
+			\bigwedge_{\ST C(a,b)\in{\SB}} C(a, b) \:\: \wedge \:\:
+			\bigwedge_{\ST d = 0\in{\SB}} d = 0 \:\: \wedge \:\:
+			\bigwedge_{\SF C(e,f)\in{\SB}} \neg C(e, f) \:\: \wedge \:\:
+			\bigwedge_{\SF g = 0\in{\SB}} g \neq 0
 \end{alignat}%
 }
 \newcommand{\pair}[2]{ \langle #1, #2 \rangle }
@@ -134,47 +137,83 @@
 	When using a tree display, a tableau expansion is thought of temporally, and one talks about the stages of constructing a tableau, meaning the stages of growing a tree. The rules given above are thought of as branch-lengthening rules. Thus, a branch containing \textit{$\ST \neg$ X} can be lengthened by adding a new node to its end, with \textit{$\SF$ X} as a label. Likewise, a branch containing \textit{$\SF$ X $\lor$ Y} can be lengthened with two new nodes, labelled \textit{$\SF$ X} and \textit{$\SF$ Y} (take the node with \textit{$\SF$ Y} as the child of the one labeled \textit{$\SF$ X}). A branch containing \textit{$\ST$ X $\lor$ Y} can be split - its leaf is given a new left and a new right child, with one labeled \textit{$\ST$ X}, the other \textit{$\ST$ Y}. This is how the schematic rules above are applied to trees.
 	\par
 	An important point to note is that the tableau rules are non-deterministic. They say what can be done, not what must be done. At each stage, we choose a signed formula occurrence on a branch and apply a rule to it. Since the order of choice is arbitrary, there can be many tableaux for a single signed formula.
-	\par
-	Here is the final stage of a tableau expansion beginning with the signed formula $F (X \land Y) \Rightarrow (\neg X \land \neg Y)$.
-	\\\indent\indent\indent\indent 1. $\SF(X \land Y) \Rightarrow \neg(\neg X \lor \neg Y)$
-	\\\indent\indent\indent\indent 2. $\ST X \land Y$
-	\\\indent\indent\indent\indent 3. $\SF \neg(\neg X \lor \neg Y)$
-	\\\indent\indent\indent\indent 4. $\ST X$
-	\\\indent\indent\indent\indent 5. $\ST Y$
-	\\\indent\indent\indent\indent 6. $\ST \neg X \lor \neg Y$
-	\\
-	\begin{tikzpicture}[scale = 0.8]
-		\draw (-4,0) (4,1);
-        \draw[thick] (-1.5,0) -- (0,1) -- (1.5,0);
-    \end{tikzpicture}
-	\\\indent\indent\;\;  7. $\ST \neg X$  \indent \indent\indent 8. $\ST \neg Y$
-	\\\indent\indent\;\; 9. $\SF X$ \indent\indent\indent 10. $\SF Y$
+
+	\begin{defn}
+		A branch is called \textbf{closed} if it contains a contradiction, For example, if it contains $\ST X$ and $\SF X$ for some formula $X$.
+	\end{defn}
+
+	\begin{defn}
+		A branch is called \textbf{finished} if all formulas in it are applied, i.e. contains only signed variables(atomic formulas).
+	\end{defn}
+
+	\begin{defn}
+		A branch is called \textbf{opened} if it is finished and is not closed.
+	\end{defn}
+
+	\begin{defn}
+		A tableau is called \textbf{closed} if all branches are closed.
+	\end{defn}
+
+	\begin{defn}
+		A tableau is called \textbf{closed} if all branches are closed.
+	\end{defn}
+
+	\begin{lemma}
+		A closed tableau for $\SF X$ is a tableau proof of $X$, meaning that $X$ is a \textbf{tautology}.
+	\end{lemma}
 
 	\par
-	In this we have added numbers for reference purposes. Items 2 and 3 are from 1 by $\SF \Rightarrow $. 4 and 5 are from 2 by $\ST \land$. 6 is from 3 by $\SF \neg$. 7 and 8 are from 6 by $\ST \lor$. 9 is from 7 by $\ST \neg$. 10 is from 8 by $\ST \neg$.
+	Here is the final stage of a tableau expansion beginning with the signed formula $\SF (X \land Y) \Rightarrow (\neg X \land \neg Y)$.
+	\\ \TableauExampleCenter 1. $\SF(X \land Y) \Rightarrow \neg(\neg X \lor \neg Y)$
+	\\ \TableauExampleCenter 2. $\ST X \land Y$
+	\\ \TableauExampleCenter 3. $\SF \neg(\neg X \lor \neg Y)$
+	\\ \TableauExampleCenter 4. $\ST X$
+	\\ \TableauExampleCenter 5. $\ST Y$
+	\\ \TableauExampleCenter 6. $\ST \neg X \lor \neg Y$
+	\\
+	\begin{tikzpicture}[scale = 0.8]
+		\draw (-7,0) (7,1);
+        \draw[thick] (-1.5,0) -- (0,1) -- (1.5,0);
+    \end{tikzpicture}
+	\\
+	\TableauExampleFirstChildOffset 7. $\ST \neg X$
+	\indent \indent\indent 8. $\ST \neg Y$
+	\\
+	\TableauExampleFirstChildOffset 9. $\SF X$
+	\indent\indent\indent 10. $\SF Y$
+
 	\par
-	Finally, the conditions for closing off a case (declaring a branch closed) are	simple. A \textbf{branch is closed} if it contains a contradiction, i.e. $\ST X$ and $\SF X$ for some formula $X$. A \textbf{branch is finished} if all formulas are applied, i.e. contains only signed variables(atomic formulas). A \textbf{branch is opened} if it is finished and does not contain any contradiction. If each branch is closed, then the \textbf{tableau is closed}. A closed tableau for $\SF X$ is a tableau proof of $X$, meaning that $X$ is a tautology. The tableau displayed above is closed, so the formula $(X \land Y) \Rightarrow (\neg X \land \neg Y)$ has a tableau proof.
+	The numbers are for reference purposes. Items 2 and 3 are from 1 by $\SF \Rightarrow $. 4 and 5 are from 2 by $\ST \land$. 6 is from 3 by $\SF \neg$. 7 and 8 are from 6 by $\ST \lor$. 9 is from 7 by $\ST \neg$. 10 is from 8 by $\ST \neg$.
+
+	The tableau displayed above is closed, so the formula $(X \land Y) \Rightarrow (\neg X \land \neg Y)$ is a tautology.
+
 	\par
 	It may happen that no tableau proof is forthcoming, and we can think of the tableau construction as proving with counterexamples. Consider the following attempt to prove $(X \Rightarrow Y) \Rightarrow ((Y \Rightarrow X) \Rightarrow \neg Y)$
-	\\\indent\indent\indent\indent\indent\indent 1. $\SF ((X \Rightarrow Y) \Rightarrow ((Y \Rightarrow X) \Rightarrow \neg Y))$
-	\\\indent\indent\indent\indent\indent\indent 2. $\ST X \Rightarrow Y$
-	\\\indent\indent\indent\indent\indent\indent 3. $\SF ((Y \Rightarrow X) \Rightarrow \neg Y)$
-	\\\indent\indent\indent\indent\indent\indent 4. $\ST Y \Rightarrow X$
-	\\\indent\indent\indent\indent\indent\indent 5. $\SF \neg Y$
-	\\\indent\indent\indent\indent\indent\indent 6. $\ST Y$
+	\\ \TableauExampleCenter 1. $\SF ((X \Rightarrow Y) \Rightarrow ((Y \Rightarrow X) \Rightarrow \neg Y))$
+	\\ \TableauExampleCenter 2. $\ST X \Rightarrow Y$
+	\\ \TableauExampleCenter 3. $\SF ((Y \Rightarrow X) \Rightarrow \neg Y)$
+	\\ \TableauExampleCenter 4. $\ST Y \Rightarrow X$
+	\\ \TableauExampleCenter 5. $\SF \neg Y$
+	\\ \TableauExampleCenter 6. $\ST Y$
 	\\
 	\begin{tikzpicture}[scale = 0.8]
-		\draw (-5,0) (5,1);
-        \draw[thick] (-2,0) -- (-0.4,1) -- (1.6,0);
+		\draw (-7,0) (5,1);
+        \draw[thick] (-3,0) -- (-0.4,1.5) -- (2.6,0);
     \end{tikzpicture}
-	\\\indent\indent\indent 7. $\SF X$  \indent\indent\indent\indent\;\; 8. $\ST Y$
 	\\
-	\begin{tikzpicture}[scale = 0.8]
-		\draw (-5,0) (5,1);
-        \draw[thick] (-3.2,0) -- (-2.3,1) -- (-1.4,0);
-        \draw[thick] (1,0) -- (2,1) -- (3,0);
+	\indent\indent\indent\indent\indent 7. $\SF X$
+	\indent\indent\indent\indent\indent\indent\indent 8. $\ST Y$
+	\\
+	\begin{tikzpicture}[scale = 1]
+		\draw (-3.2,0);
+        \draw[thick] (1,0) -- (0,1) -- (-1,0);
+        \draw[thick] (3.6,0) -- (4.6,1) -- (5.6,0); %The second argument is height and the center point, the first is offset to the left from the center point and the thirth is offset to the right of the center point
     \end{tikzpicture}
-	\\\indent\;\; 9. $\SF Y$ \indent 10. $\ST X$  \indent 11. $\SF Y$ \indent 12. $\ST X$
+	\\
+	\indent\indent\indent 9. $\SF Y$
+	\indent\indent 10. $\ST X$
+	\indent\indent\indent 11. $\SF Y$
+	\indent\indent 12. $\ST X$
 	\par
 	Item 2 and 3 are from 1 by $\SF \Rightarrow$, as are 4 and 5 from 3. Item 6 is from 5 by $\SF \neg$. Items 7 and 8 are from 2 by $\ST \Rightarrow$, as are 9 and 10 from 4. Items 11 and 12 are also from 4 by $\ST \Rightarrow$. The leftmost branch is closed because of 6 and 9. The left-right branch is closed because of 7 and 10. The right-left branch is closed because of 8 and 11. But the rightmost branch is not closed. Notice that every non-atomic signed formula has had a rule applied to it on this branch and there is nothing left to do. (For classical propositional logic it is sufficient to apply a rule to a formula on a branch only once.) In fact the branch yields a counterexample, as follows. Let $\upsilon$ be a propositional valuation that maps X to \textit{true} and Y to \textit{true} in accordance to 8 and 12. Now, we work our way back up the branch. Since $\upsilon(Y) = true$, $\upsilon(\neg Y) = false$, item 5. From $\upsilon(X) = true$ follows that $\upsilon(Y \Rightarrow X) = true$, item 4. From $\upsilon(Y) = true$ follows that $\upsilon(X \Rightarrow Y) = true$, item 2. Since $\upsilon(Y \Rightarrow X) = true$ and $\upsilon(\neg Y) = false$ we have $\upsilon((Y \Rightarrow X) \Rightarrow \neg Y) = false$, item 3. Finally, $\upsilon((X \Rightarrow Y) \Rightarrow ((Y \Rightarrow X) \Rightarrow \neg Y)) = false$, item 1.
 	\par
@@ -233,7 +272,14 @@
 	Let $\F$ = (W, R) be a relational system with W $\neq$ $\emptyset$ and R $\subseteq$ $W^2$. We call such systems \textit{frames}. Following Galton we may give a spatial meaning of frames naming the elements of W, \textit{cells} and the relation R, \textit{adjacency relation}. Then $\F$ is called \textit{adjacency space}. An example of adjacency space is the chessboard table, the cells are the squares, and two squares are adjacent if they have a common point.
 
 	\par
-	Originally Galton assumed R to be a reflexive and symmetric relation but it is more natural for R to be an arbitrary relation. \textit{Regions} in an adjacency space are arbitrary subsets of W and two sets $a$ and $b$ are in \textit{contact} ($aC_Rb$) if for some $x \in a$ and $y \in b$ we have $xRy$. Another way to define this relation is the following. For a subset $a \subseteq W$ define as in modal logic $\langle R \rangle a = \{ x \in W : (\exists y \in W)(xRy$ and $y \in a)\}$. Then $aC_Rb$ iff $a \cap \langle R \rangle b \neq \emptyset$ iff $\langle R^{-1} \rangle a \cap b \neq \emptyset$, where $R^{-1}$ is the converse relation of R. Note that if R is a symmetric relation then $aCb$ iff $a \cap \langle R \rangle b \neq \emptyset$ iff $\langle R \rangle a \cap b \neq \emptyset$.
+	Originally Galton assumed R to be a reflexive and symmetric relation but it is more natural for R to be an arbitrary relation. \textit{Regions} in an adjacency space are arbitrary subsets of W.
+
+	\begin{defn} (\textbf{Contact})
+	Let a, b $\subseteq$ W. Then
+		\begin{equation}
+			aCb \iff (\exists x \in \upsilon(a))(\exists y \in \upsilon(b))(xRy)
+		\end{equation}
+	\end{defn}
 
 	\begin{defn}
 		\label{valuation}
@@ -244,7 +290,7 @@
 			\item $\upsilon(1) = W$
 			\item $\upsilon(a \sqcap b) = \upsilon(a) \cap \upsilon(b)$
 			\item $\upsilon(a \sqcup b) = \upsilon(a) \cup \upsilon(b)$
-			\item $\upsilon(a^*) = W \setminus \upsilon(a) = -\upsilon(a)$
+			\item $\upsilon(a^*) = W \setminus \upsilon(a)$
 		\end{itemize}
 	\end{defn}
 
@@ -256,7 +302,7 @@
 					\item $\M \models \top$
 					\item $\M \not\models \bot$
 					\item $\M \models a \leq b \iff \upsilon(a) \subseteq \upsilon(b)$
-					\item $\M \models aCb \iff \upsilon(a)$ $C_R$ $\upsilon(b)$ $\iff (\exists x \in \upsilon(a))(\exists y \in \upsilon(b))(xRy)$
+					\item $\M \models aCb \iff (\exists x \in \upsilon(a))(\exists y \in \upsilon(b))(xRy)$
 				\end{itemize}
 			\item For complex formulas:
 				\begin{itemize}
@@ -341,7 +387,7 @@
 	\subsection{Formula satisfiability}
 		Let $\psi$ be a propositional formula. Let us build a tableau beginning with $\psi$. If the tableau has an opened branch then $\psi$ is satisfiable. Unfortunately, for the contact logic this is not enough because we need to verify the modal connectives ($\leq$ and $C$).
 		\paragraph{}
-		Let $\phi$ be a formula. Let us build a tableau beginning with $\phi$. Let the tableau has an opened branch $B$. The branch $B$ is a set of signed atomic formulas of the following type:
+		Let $\phi$ be a formula. Let us build a tableau beginning with $\phi$. Let the tableau has an opened branch $B$. The branch $\SB$ is a set of signed atomic formulas of the following type:
 		\begin{itemize}
 			\item $\ST C(a,b)$
 			\item $\SF C(e,f)$
@@ -351,7 +397,7 @@
 		where a and b are terms.
 
 		\noindent $B$ is an opened branch, so there are no contradicting formulas in it, i.e. $(\neg \exists X)(\ST X \in B \land \SF X \in B)$.
-		The signed atomic formulas could be written as atomic formulas as follows:
+		The signed atomic formulas could be written as follows:
 		\begin{itemize}
 			\item $\ST C(a,b)$ $\rightarrow$ $C(a,b)$ (contact)
 			\item $\SF C(a,b)$ $\rightarrow$ $\neg C(a,b)$ (non-contact)
@@ -363,16 +409,9 @@
 		All atomic formulas in the branch should be satisfied, so we can think of it as a conjunction of them. Let's call it a \textbf{branch conjunction}. It is sufficient to build a satisfiable model for the branch conjunction to verify that $\phi$ is satisfiable. Building  such a model could be done a lot more effective than building a model for an arbitrary formula because it is just a conjunction.
 		\begin{defn}
 			\label{branch-conjunction}
-			Let $\phi$ be a formula. Let $\mathcal{T}$ be a tableau beginning with $\phi$. Let B be a set of all atomic signed formulas in a branch of $\mathcal{T}$, as follows:
-			\begin{alignat}{2}
-				B = \{\ST C(a_i, b_i) \mid i \in \{1, \ldots, I\} \} \cup
-					\{\SF d_j = 0 \mid j \in \{1, \ldots, J\} \} \cup \\\nonumber
-					\{\SF C(e_k, f_k) \mid k \in \{1, \ldots, K\} \} \cup
-					\{\ST g_l = 0 \mid l \in \{1, \ldots, L\} \}
-			\end{alignat}
-		\end{defn}
-		A \textbf{branch conjunction} $\beta$ is the following formula:
+			Let $\phi$ be a formula. Let $\mathcal{T}$ be a tableau beginning with $\phi$. Let $\SB$ be a set of all atomic signed formulas in an open branch of $\mathcal{T}$.	A \textbf{branch conjunction} $\beta$ is the following formula:
 		 \BranchConjunction
+		\end{defn}
 
 	\subsection{Branch conjunction model building}
 		The branch conjunction formula $\beta$ is satisfiable if $\beta$ has a model $\M$. We have to construct such a model $\M$ = ($\F, \upsilon$) = ((W, R), $\upsilon$). 
@@ -601,9 +640,9 @@
 	\end{axiom}
 
 	\paragraph{} Let $\F = (W, R)$ be a relational system with W $\neq$ $\emptyset$, R $\subseteq$ $W^2$ and a, b are terms. Let us recall the definition of C:
-	\begin{equation}
+	\begin{equation*}
 		aCb \iff (\exists x \in \upsilon(a)) (\exists y \in \upsilon(b))(xRy)
-	\end{equation}
+	\end{equation*}
 
 	\paragraph{} The connectivity axiom can be written as follows:
 	\begin{equation}
@@ -618,9 +657,9 @@
 
 	\begin{defn}
 		Let $G = (W, R)$ be an undirected graph. $W$ is the set of vertices and R the set of edges. $G$ is $\mathbf{connected}$ if there is a path between every two different vertices in $W$.
-		\begin{equation}
-			(\forall x \in W)(\forall y \in W)(x \neq y \implies (\exists \pi_G(x, y)) (\pi_G(x, y)\;is\;a\;path\;in\;G))
-		\end{equation}
+		\begin{align*}
+			x, y \in W \rightarrow (x \neq y \implies \pi_G(x, y))
+		\end{align*}
 	\end{defn}
 
 	\begin{theorem}
@@ -632,7 +671,7 @@
 	\end{theorem}
 
 	\begin{defn}
-		Let $\F$ = (W, R) be a relational system. Let G = (W, R) be the undirected graph defined by $\F$. Let $\M = (\F, \upsilon_n)$ be a model of $\beta$. $\M$ is a \textbf{connected model} if $G = (W, R)$ is connected.
+		Let $\F$ = (W, R) be a relational system. Let G = (W, R) be the undirected graph defined by $\F$. Let $\M = (\F, \upsilon_n)$ be a model of $\beta$. $\M$ is a \textbf{connected model} if $G = (W, R)$ is connected. Thus, the connectivity axiom is satisfied in $\F$.
 	\end{defn}
 
 	\subsection{Connected model building}
@@ -641,29 +680,99 @@
 		Let $\beta$ be a branch conjunction as in \ref{branch-conjunction} :
 		\nonumber\BranchConjunction
 
-		Let $\F^v = (W^v, R^v)$ be a relational system and $\M^v = (\F^v, \upsilon_n)$ be a model in this system. $\M^v$ is a model of $\beta$ if the non-zero terms and contacts in $\beta$ are satisfied \ref{satisfied-contacts-non-zero-terms} .	If $\M^v$ is not a model of $\beta$, then $\beta$ does not have a model neither a connected model.
+		Let $\F^v = (W^v, R^v)$ be a relational system and $\M^v = (\F^v, \upsilon_n)$ be a model in this system. $\M^v$ contains all valid modal points and valid connections between them w.r.t zero terms and non-contacts in $\beta$. $\M^v$ is a model of $\beta$ if the contacts and non-zero terms in $\beta$ are satisfied \ref{satisfied-contacts-non-zero-terms} . If $\M^v$ is not a model of $\beta$, then $\beta$ does not have a model. There is no way of adding new modal points or relations to satisfy the contacts and non-zero terms. Therefore, there is no connected model eigther.
 
-		Let $\M^v$ is a model of $\beta$. $\M^v$ is the biggest model of $\beta$ w.r.t unique modal points and connections between them. Let $G^v=(W^v, R^v)$ be the graph of $\F^v$.
+	\begin{lemma}
+		Let $\M^v = (\F^v, \upsilon_n)$ be a model. Let $G^v=(W^v, R^v)$ be the graph of $\F^v$. Let $G=(W,R) \subseteq G^v$.
+		\begin{itemize}
+			\item G preserves the satisfaction of the contacts in $\beta$ if
+			\begin{gather*}
+				C(a,b) \in \beta \rightarrow (\exists x \in \upsilon_n(a) \cap W)(\exists y \in \upsilon_n(b) \cap W)(xRy)
+			\end{gather*}
 
-		\begin{defn}
-			Let G'=(W', R') and G''=(W'', R'') are an undirected graphs. G' and G' $\mathbf{does \; not \; overlap}$ iff:
-			\begin{equation}
-				W' \cap W'' = \emptyset \land R' \cap R'' = \emptyset
-			\end{equation}
-		\end{defn}
+			\item G preserves the satisfaction of the non-contacts in $\beta$ if
+			\begin{gather*}
+				\neg C(e,f) \in \beta \rightarrow \neg ((\exists x \in \upsilon_n(e) \cap W)(\exists y \in \upsilon_n(f) \cap W)(xRy))
+			\end{gather*}
 
-		\begin{defn}
-			Let $F = (W, R)$ be a relational system. Let $G = (W, R)$ be an undirected graph. Then $Comp^G$ is the splitting of G to it's $\mathbf{connected \; components}$ .
-			\begin{align*}
-				Comp^G = \{G'=(W', R') \mid W' \subseteq W \land R' \subseteq R \land G'\;is\;connected \} \land \\
-				(\forall \; G' \in Comp^G)(\forall \; G'' \in Comp^G)(G' \; and \; G'' \; does \; not \; overlap) \land \\
-				\{ W' \mid G'=(W', R') \in Comp^G \} = W \land \{ R' \mid G'=(W', R') \in Comp^G \} = R
-			\end{align*}
-		\end{defn}
+			\item G preserves the satisfaction of the zero terms in $\beta$ if
+			\begin{gather*}
+				d = 0 \in \beta \rightarrow \upsilon(d) \cap W = \emptyset
+			\end{gather*}
 
-		Let $Comp^{G^v}$ is the set of the connected components of $G^v$. If $Comp^{G^v}$ contains a graph that defines a model of $\beta$, then it is a connected model, too. Otherwise, $\beta$ does not have a connected model.
+			\item G preserves the satisfaction of the non-zero terms in $\beta$ if
+			\begin{gather*}
+				g \neq 0 \in \beta \rightarrow \upsilon(g) \cap W \neq \emptyset
+			\end{gather*}
+		\end{itemize}
+	\end{lemma}
 
-		Let $G' \in Comp^{G^v}$. Let $\M' = (W', R', \upsilon_n)$ is a model. In order $\M'$ to be a model of $\beta$ the non-zero terms and contacts in $\beta$ should be satisfied \ref{satisfied-contacts-non-zero-terms} . The zero terms and non-contacts are satisfied because $\M'$ has not introduces new modal points neither a connection.
+	\begin{lemma}
+		Let $\M^v = (\F^v, \upsilon_n)$ be a model. Let $G^v=(W^v, R^v)$ be the graph of $\F^v$. Let $G=(W,R) \subseteq G^v$. If G preserves the satisfaction of the contacts, non-contacts, zero terms and non-zero terms in $\beta$, then G defines a model $\M = (\F(W, R), \upsilon_n)$ of $\beta$.
+	\end{lemma}
+
+	\begin{defn}
+		Let $G=(W, R)$ be a graph. Let $G'=(W', R') \subseteq G(W, R)$. If $G'$ is connected, then G' is a \textbf{connected component} of G.
+	\end{defn}
+
+		Let $\M^v$ be a model of $\beta$. Let $G^v=(W^v, R^v)$ be the graph of $\F^v$. $G^v$ preserves the satisfaction of zero terms and non-contacts.
+		All connected components of $G^v$ preserve the satisfaction of the zero terms and non-contacts in $\beta$. If there is a connected component $G'=(W', R')$ which satisfied the contacts and non-zero terms in $\beta$, then G' defines a connected model $\M'$ of $\beta$. Where $\F' = (W', R')$ and $\M' = (\F', \upsilon_n)$.
+
+		Let n be the number of elements in $W^v$. There are $2^n$ subgraphs of $G^v$. It is far from sufficient to check each one of them if it's connected and whether it satisfies the contacts and non-zero terms of $\beta$.
+
+	\begin{defn}
+		Let $G=(W, R)$ be a graph. Let $G'=(W', R')$ be a connected component of G. $G'$ is a \textbf{maximal connected component} of G if:
+		\begin{gather*}
+			x \in W' \rightarrow \neg(\exists y \in W \setminus W')(xRy) \\
+			x,y \in W' \rightarrow xRy \iff xR'y
+		\end{gather*}
+	\end{defn}
+
+	\begin{defn}
+		Let $G=(W, R)$ be a graph. Let $Comp^G$ be the set of all maximal connected components of G.
+		\begin{gather*}
+			Comp^G = \{ G' \mid G' \subseteq G \; and \; G' \; is \; maximal \; connected \; component\}
+		\end{gather*}
+	\end{defn}
+
+	\begin{defn}
+		Let $G'=(W', R')$ and $G''=(W'', R'')$ are gaphs. The union of these graphs is the graph $G=(W,R)=(W' \cup W'', R' \cup R'')$.
+	\end{defn}
+
+	\begin{lemma}
+		Let $G=(W, R)$ be a graph. Let $Comp^G$ be the set of all maximal connected components of G. The union of $Comp^G$ is the graph G.
+		\begin{gather*}
+			G = \bigcup\limits_{G' \in Comp^g} G'
+		\end{gather*}
+	\end{lemma}
+
+	\begin{lemma}
+		Let $G=(W, R)$ be a graph. Let $Comp^G$ be the set of all maximal connected components of G. Let $G'=(W', R')$, $G''=(W'', R'') \in Comp^G$. Then G' and G'' does not have a common vertices and edges.
+		\begin{gather*}
+			 W' \cap W'' = \emptyset \; and \; R' \cap R'' = \emptyset
+		\end{gather*}
+	\end{lemma}
+
+		Let $Comp^{G^v}$ is the set of the maximal connected components of $G^v$. Let n be the number of elements in $W^v$. The number elements in $Comp^{G^v}$ is at most n. The maximal connected components of $G^v$ does not have common vertices and edges. Therfore, the splitting of G to it's maximal connected components could be done in a very efficient way.
+
+		Each graph of $Comp^{G^v}$ satisfies the zero terms and non-contacts of $\beta$. They do not introduce new modal points netiher a connections. If $Comp^{G^v}$ contains a graph that satisfied the contacts and non-zero terms of $\beta$, then this graph defines a connected model of $\beta$. Otherwise, $\beta$ does not have a connected model.
+
+	\begin{lemma}(Connected component extension)
+
+		Let $G=(W, R)$ be a graph. Let and $G'=(W', R') \subseteq G$ be a connected component of G.
+		G' could be extended to a maximal connected component $G_m(W_m, R_m)$  of G as follows.
+		\label{connected-component-extension}\begin{gather*}
+			 W_m = W' \cup \{ x \mid x \in W \setminus W' \; and \; (\exists y \in W')(\pi_G(x,y)) \} \\
+			 R_m = \{ \pairXY \mid \pairXY \in R \; and \; x, y \in W_m \}
+		\end{gather*}
+	\end{lemma}
+
+	\begin{theorem}
+		Let $G^v=(W^v, R^v)$ be the graph of $\F^v$. If $G^v$ does not have a maximal connected component which defines a model of $\beta$, then $\beta$ does not have a connected model.
+		\begin{proof}
+			Let $G^v$ does not have a maximal connected component which defines a model of $\beta$. Let $\beta$ has a connected model $\M = (\F(W, R), \upsilon_n)$. Let $G=(W, R)$ be the graph defined by $\F$. From the definition of the connected model follows that G is connected. $G$ contains only valid modal points and valid relations between them. $G^v$ contains all valid modal points and all vlaid connections between them. Therfore, $G \subseteq G^v$ and G is a connected component of $G^v$. By the connected component extension lemma G can be extended to a maximal connected component $G_m=(W_m, R_m)$ of $G^v$. The extension adds points from $W^v$ and relations from $R^v$ to $G_m$. These are only valid modal points and valid connections between them. Therefore, $G_m$ preserves the satisfaction of the non-contacts and zero terms in $\beta$. $G_m$ keeps the points and relations from $G$. Thus, $G_m$ preserves the satisfaction of the contacts and non-zero terms in $\beta$. Hence, $G_m$ defines a connected model $\M_m = (\F_m(W_m, R_m), \upsilon_n)$ of $\beta$. This leads to a contradiction with the assumption that $G^v$ does not have a maximal connected component which defines a model of $\beta$.
+		\end{proof}
+	\end{theorem}
 
 	\newpage
 	\section{Implementation Introduction}
