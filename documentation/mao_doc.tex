@@ -571,7 +571,7 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 			\curvedE : \Var_B \rightarrow \{ \textbf{false}, \textbf{true}\}
 		\end{align*}
 	\end{defn}
-	The variable valuation can be thought as an array of 1's and 0's where the indexes of this array are the variables from $\Var_B$. Having in mind that the size of $\Var_B$ is n, we know that there are $2^n$ possible valuations. Later on we are going to map one variable valuation function per modal point, this will imply that there will be $2^n$ possible values for one modal point representation.
+	The variable valuation can be thought as a boolean array where the indexes are the variables from $\Var_B$. This way a \emph{true} element in the array at index \emph{i} corresponds to a true valuation of the variable represented with index \emph{i} . Having in mind that the size of $\Var_B$ is n, we know that there are $2^n$ possible valuations. Later on we are going to map one variable valuation function per modal point, this will imply that there will be $2^n$ possible values for one modal point representation.
 	% The idea of a modal points is to be represented by a separate $\curvedE$ variable valuation, which will be used to satisfy the term representing that modal point.
 
 	\begin{defn} 
@@ -585,9 +585,9 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 			\item $\vBool_{\curvedE}(0) = \textbf{false}$
 			\item $\vBool_{\curvedE}(1) = \textbf{true}$
 			\item $\vBool_{\curvedE}(p) = \curvedE(p), \textit{ where } p \in \Var_B$
-			\item $\vBool_{\curvedE}(a \sqcap b) = \vBool_{\curvedE}(a) \land \vBool_{\curvedE}(b)$
-			\item $\vBool_{\curvedE}(a \sqcup b) = \vBool_{\curvedE}(a) \lor \vBool_{\curvedE}(b)$
-			\item $\vBool_{\curvedE}(a*) = \neg \vBool_{\curvedE}(a)$
+			\item $\vBool_{\curvedE}(a \sqcap b) = \vBool_{\curvedE}(a) \textit{ and } \vBool_{\curvedE}(b)$
+			\item $\vBool_{\curvedE}(a \sqcup b) = \vBool_{\curvedE}(a) \textit{ or } \vBool_{\curvedE}(b)$
+			\item $\vBool_{\curvedE}(a*) = \textit{not } \vBool_{\curvedE}(a)$
 		\end{itemize}
 
 
@@ -608,18 +608,15 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 		The number of modal points generated in the model depend on the contacts, non zero terms and the atomic measure formulas.
 		The goal is to search for a model with enough modal points in order to make sure that all possible models which are not duplicated are considered.
 		Duplicated modal points lead to additional unnecessary computation. 
+		\newline
 
-	\begin{defn}
 		Let $\Var_B$ be the set of all variables in a branch conjunction B and let a be a term.
-		Then a modal point p is constructed by generating a variable valuation $\curvedE$, such that p is valid:
+		Then we will say that a modal point p is constructed, when a variable valuation $\curvedE$ is generated, such that p is valid:
 		\begin{align*}
 			\vBool_{\curvedE}(a) = 1
 		\end{align*}
 		Let n be the number of variables in $\Var_B$, then all possible variants of a variable valuations are $2^n$.
-	\end{defn}
-
-	\begin{defn}
-		Let B be a branch conjunction as:
+		It is of huge importance for us to be able to determine the number of points required in order to construct a valid model. The number of modal points is determined from the atomic formulas in the tableau branch. Let B be a branch conjunction as:
 		\BranchConjunction
 		The following atomic formulas require modal point existence:
 		\begin{itemize}
@@ -628,28 +625,34 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 			\item $m_p \le_\mu n_p, \textit{ for } p < P$
 			\item $u_q <_\mu v_q, \textit{ for } q < Q$
 		\end{itemize}
-	\end{defn}
 
-	\begin{defn}\label{def-contacts-construction}
+	\paragraph{Contact modal point construction step}\label{def-contacts-construction}
 		Let B be a branch conjunction and $C(a, b) \in B$, where a and b are two terms. Then two modal points are generated p1 and p2 with their corresponding variable valuations $\curvedE^1$ and $\curvedE^2$ such that:
 		\begin{itemize}
 			\item $\vBool_{\curvedE^1}(a) = \textbf{true}$
 			\item $\vBool_{\curvedE^2}(b) = \textbf{true}$
 		\end{itemize}
-		To validate that the newly generated modal points for this contact do not break the non contacts, the following must be true.
+		To validate that the newly generated modal points for this contact satisfy the non contacts, the following must be true.
 		\begin{align*}
-			\forall \neg C(e_k, f_k) : (\vBool_{\curvedE^1}(e_k) = \textbf{false} & \lor \vBool_{\curvedE^2}(f_k) = \textbf{false}) \; \land \\
-				(\vBool_{\curvedE^1}(f_k) = \textbf{false} & \lor \vBool_{\curvedE^2}(e_k) = \textbf{false})
+			 \neg C(e, f) \in B: (\vBool_{\curvedE^1}(e) = \textbf{false} & \textit{ or } \vBool_{\curvedE^2}(f) = \textbf{false}) \; \textit{ and } \\
+				(\vBool_{\curvedE^1}(f) = \textbf{false} & \textit{ or } \vBool_{\curvedE^2}(e) = \textbf{false}) \; \textit{ and } \\
+				(\vBool_{\curvedE^1}(e) = \textbf{false} & \textit{ or } \vBool_{\curvedE^1}(f) = \textbf{false}) \; \textit{ and } \\
+				(\vBool_{\curvedE^2}(e) = \textbf{false} & \textit{ or } \vBool_{\curvedE^2}(f) = \textbf{false})
 		\end{align*}
-		
-		Along with the generation of a valid variable valuation, the R relations is extended as well, namely the following relations are added:
-		\begin{itemize}
-			\item $p_1Rp_1$ - reflexivity of the modal point $p_1$
-			\item $p_2Rp_2$ - reflexivity of the modal point $p_2$
-			\item $p_1Rp_2$ - symmetric relation between $p_1$ and $p_2$
-			\item $p_2Rp_1$ - symmetric relation between $p_2$ and $p_1$
-		\end{itemize}
-	\end{defn}
+
+	To validate that the newly generated modal points satisfy the equal to zero terms, the following must be true:
+	\begin{align*}
+		t = 0 \in B: \vBool_{\curvedE^1}(t) = \textit{false} \text{ and }  \vBool_{\curvedE^2}(t) = \textit{false}
+	\end{align*}
+
+	Along with the generation of a valid variable valuation, the R relations is extended as well, namely the following relations are added:
+	\begin{itemize}
+		\item $p_1Rp_1$ - reflexivity of the modal point $p_1$
+		\item $p_2Rp_2$ - reflexivity of the modal point $p_2$
+		\item $p_1Rp_2$ - symmetric relation between $p_1$ and $p_2$
+		\item $p_2Rp_1$ - symmetric relation between $p_2$ and $p_1$
+	\end{itemize}
+
 	\leavevmode\newline
 	The constructed points and the relation between them is best seen on a diagram
 	\begin{center}
@@ -680,16 +683,22 @@ The satisfiability verification or sometimes called a satisfiability proof for a
       \end{tikzpicture}
 	\end{center}
 
-	\begin{defn}\label{def-non-zero-construction}
+	\paragraph{Non zero term modal point construction step}\label{def-non-zero-construction}
 		Let B be a branch conjunction and $a \neq 0 \in B$, where a is a term. Then one modal point p is generated and its variable valuations $\curvedE$ such that:
 		\begin{itemize}
 			\item $\vBool_{\curvedE}(a) = \textbf{true}$
 		\end{itemize}
+
+	To validate that the newly generated modal point satisfies the equal to zero terms, the following must be true:
+	\begin{align*}
+		t = 0 \in B: \vBool_{\curvedE}(t) = \textit{false}
+	\end{align*}
+	\newline
 		The R relation is extended as follows:
 		\begin{itemize}
 			\item $pRp$ - reflexivity of the modal point $p$
 		\end{itemize}
-	\end{defn}
+
 	\leavevmode\newline
 	The constructed point diagram:
 	\begin{center}
@@ -705,37 +714,16 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 		\node at (-0,0) {$p$};
 		\node at (-0.5,-0.7) {a};
 		\node[text width=10cm, anchor=west, right] at (-4.5,-2)
-    		{Generated modal point and its relation for not equal term $a \neq 0$};
+    		{Generated modal point and its relation for not equal zero term $a \neq 0$};
       \end{tikzpicture}
 	\end{center} 
-% TODO fix this it should be steps not definitions
-	With definition \ref{def-non-zero-construction} the constructed model satisfies the non zero terms from the branch conjunction. \\
-	With definition \ref{def-contacts-construction} the constructed model satisfies the contacts and the symmetric property of the non contacts from the branch conjunction. \\
-	The modal points in the model are represented with a tuple $\langle \curvedE, a \rangle$.
-	For a model constructed with definitions \ref{def-non-zero-construction} and \ref{def-contacts-construction} to satisfy the formula we must verify that each of the modeled  $\langle \curvedE, a \rangle$ modal point satisfies the equal to zero terms and the reflexivity of the non contacts from the branch conjunction.
 
 	\begin{defn}
-	\label{def-equal-to-zero}
-		Let M be a model constructed with definition \ref{def-non-zero-construction} and \ref{def-contacts-construction}. Then we say that the model M satisfies an equal to zero term $a = 0$, if the following holds:
-		\begin{align*}
-			\forall \langle \curvedE, a \rangle \in W: \vBool_{\curvedE}(a) = \textit{false}
-		\end{align*}
-	\end{defn}
-
-	\begin{defn}
-	\label{def-partial-model}
-		Let M be a model constructed with definition \ref{def-equal-to-zero}. Then we say that the model M satisfies the reflexivity of a non contact $\neg C(a, b)$, if the following holds:
-		\begin{align*}
-			\forall \langle \curvedE, a\rangle \in W: \vBool_{\curvedE}(a) = false \lor \vBool_{\curvedE}(b) = false
-		\end{align*}
-	\end{defn}		
-
-	\begin{defn}
-		Let M be a model constructed with \ref{def-partial-model} and let $\Ts$ be the set of all terms. Then the model valuation $\vE : \Ts \rightarrow \mathscr{P}(W)$ is defined inductively as:
+		let $\Ts$ be the set of all terms and let M be a model constructed with the Contact and Non zero term modal point construction steps. Then the model valuation $\vE : \Ts \rightarrow \mathscr{P}(W)$ is defined inductively as:
 		\begin{itemize}
 			\item $\vE(0) = W$
 			\item $\vE(1) = \emptyset$
-			\item $\vE(p) = \{ \langle \curvedE, a \rangle \; | \; \langle \curvedE, a \rangle \in W \:\:\textit{and}\:\: \curvedE(p) = \textit{true}$
+			\item $\vE(p) = \{ \langle \curvedE, a \rangle \; | \; \langle \curvedE, a \rangle \in W \:\:\textit{and}\:\: \curvedE(p) = \textit{true} \}$
 			\item $\vE(a \sqcap b) = \vE(a) \cap \vE(b)$
 			\item $\vE(a \sqcup b) = \vE(a) \cup \vE(b)$
 			\item $\vE(a*) = W \setminus \vE(a)$
@@ -745,13 +733,14 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 	The tuple $(W, R, \vE)$ is called a potential model.
 
 	\leavevmode\newline
+% this is not valid and should be redone once we get to the full algorithm.
 	To validate that the potential model is correct, meaning that it satisfies the formula, we must take into account the measure atomic formulas. 
 	In order to satisfy the measure atomic formulas, additional points are generated and have the following structure $\langle \curvedE, 1 \rangle$. This means that 
 	for each modal point the constant term 1 is taken together with a variable evaluation function. The variable evaluation functions of these modal points 
 	is chosen such that the model satisfies all measure atomic formulas.
 
 	\begin{defn}
-		Let B be a branch conjunction and let N be the number of all measure atomic formulas ( $\le_\mu$ and $\leq_\mu$).
+		Let B be a branch conjunction and let N be the number of all measure atomic formulas ( $\le_\mu$ and $<_\mu$).
 		Then N additional modal points are generated in the potential model \{$\langle \curvedE_i, 1 \rangle : 0 < i \leq N$ \}. The variable evaluation of the generated points must satisfy the measure atomic formulas.
 		Satisfying a set of measure atomic formulas produces a system of inequalities.
 	\end{defn}
