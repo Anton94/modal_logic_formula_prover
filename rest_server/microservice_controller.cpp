@@ -88,6 +88,20 @@ void microservice_controller::handle_get(const http_request& message)
     }
     ucout << message.to_string() << std::endl;
 
+	// Eventual enchancment is to read the files and folders in the simple_client on boot and 
+	// only allow these files to be requested afterwards.
+	// Since now we do not have many files this is good to go.
+	if (message_path != "/index.html" 
+		&& message_path != "/home.html"
+		&& message_path != "/howto.html"
+		&& message_path != "/samples.html"
+		&& message_path != "/lib/jquery.min.js"
+		&& message_path != "/lib/d3.v4.js"
+		&& message_path != "/img/home-icon.png") {
+		message.reply(status_codes::BadGateway);
+		return;
+	}
+
     fs::path relative_file(CLIENT_DIR + message_path);
     if(fs::exists(relative_file))
     {
