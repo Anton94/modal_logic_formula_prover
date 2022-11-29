@@ -26,7 +26,6 @@ time_type process_formula_group_for_model(const std::vector<std::string>& formul
     assert(!formulas.empty());
     static_assert(std::is_same<T, model>::value ||
         std::is_same<T, measured_model>::value ||
-        std::is_same<T, optimized_measured_model>::value ||
         std::is_same<T, connected_model>::value ||
         std::is_same<T, basic_bruteforce_model>::value, "The type T should be one of the model types!");
 
@@ -131,7 +130,6 @@ void process_formula_group(std::ifstream& in, int formulas_per_group)
 
     std::cout << "Model took average                    : " << process_formula_group_for_model<model>(formulas).count() << "ms\n";
     std::cout << "Connected model took average          : " << process_formula_group_for_model<connected_model>(formulas).count() << "ms\n";
-    std::cout << "Optimized measured model took average : " << process_formula_group_for_model<optimized_measured_model>(formulas).count() << "ms\n";
     std::cout << "Measured model took average           : " << process_formula_group_for_model<measured_model>(formulas).count() << "ms\n";
     std::cout << "Brute force model took average        : " << process_formula_group_for_model<basic_bruteforce_model>(formulas).count() << "ms\n";
 }

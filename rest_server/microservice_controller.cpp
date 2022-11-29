@@ -310,10 +310,6 @@ void microservice_controller::handle_task(const http_request& message)
                         {
                             the_model = std::make_unique<measured_model>();
                         }
-                        else if(algorithm_type == "OPTIMIZED_MEASURED_MODEL")
-                        {
-                            the_model = std::make_unique<optimized_measured_model>();
-                        }
                         else if(algorithm_type == "FAST_MODEL")
                         {
                             the_model = std::make_unique<model>();

@@ -33,13 +33,6 @@ void is_satisfiable(const char* input_f, bool has_satisfiable_model, bool has_sa
             CHECK(f.is_model_satisfiable(measured_m));
         }
 
-        optimized_measured_model optimized_measured_m;
-        CHECK(f.is_satisfiable(optimized_measured_m) == has_satisfiable_measured_model);
-
-        if(has_satisfiable_measured_model)
-        {
-            CHECK(f.is_model_satisfiable(optimized_measured_m));
-        }
 
         basic_bruteforce_model brute_force_model;
         CHECK(f.brute_force_evaluate_with_points_count(brute_force_model) == has_satisfiable_model);
