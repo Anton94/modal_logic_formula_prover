@@ -4,7 +4,6 @@
 #include "imodel.h"
 #include "term.h"
 #include "types.h"
-#include "variables_evaluations_block_stack.h"
 
 #include <ostream>
 #include <unordered_map>

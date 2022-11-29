@@ -4,7 +4,6 @@
 #include "logger.h"
 #include "term.h"
 #include "utils.h"
-#include "variables_evaluations_block_stack.h"
 #include "../include/thread_termiator.h"
 
 auto tableau::is_satisfiable(const formula& f, imodel& out_model) -> bool
