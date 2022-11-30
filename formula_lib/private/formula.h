@@ -27,7 +27,7 @@ public:
     // TODO: remove and use the one with contact relations if it does not have negative performance impact
     auto evaluate(const variable_id_to_points_t& evals, int R, int P) const -> bool;
 
-    // Evalates the formula but ignores all measured less or equal atomic formulas, as if there were not existing
+    // Evalates the formula but ignores all measured less or equal atomic formulas, as if they were not existing
     auto evaluate(const variable_id_to_points_t& evals, const contacts_t& contact_relations) const -> bool;
 
     std::pair<int, int> get_contacts_count() const;

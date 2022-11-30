@@ -91,7 +91,7 @@ void microservice_controller::handle_get(const http_request& message)
 	// Eventual enchancment is to read the files and folders in the simple_client on boot and 
 	// only allow these files to be requested afterwards.
 	// Since now we do not have many files this is good to go.
-	if (message_path != "/index.html" 
+	if (message_path != "/index.html"
 		&& message_path != "/home.html"
 		&& message_path != "/howto.html"
 		&& message_path != "/samples.html"

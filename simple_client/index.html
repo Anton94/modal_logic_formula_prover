@@ -84,7 +84,7 @@
                         if (jsonified["status"] == "FINISHED") {
                             clearInterval(timer_id);
                             valid_op_id = null;
-                            document.getElementById('formula_output').innerText = "The formula is : " + jsonified["is_satisfied"];
+                            document.getElementById('algorithm_result').innerText = jsonified["is_satisfied"];
                             document.getElementById('verbose_output').innerText += jsonified["output"];
                             graphis = transform_contacts_to_graph(jsonified["contacts"]);
                             do_visualization(graphis, 2000, 800);
@@ -93,7 +93,7 @@
                         } else if (jsonified["status"] == "CANCELED") {
                             clearInterval(timer_id);
                             valid_op_id = null;
-                            document.getElementById('formula_output').innerText = "The Task was Canceled.";
+                            document.getElementById('algorithm_result').innerText = "Canceled";
                             document.getElementById('verbose_output').innerText += jsonified["output"];
                             running_count = 0;
                             change_computing_components_availability(true)
@@ -107,11 +107,11 @@
                             else if (running_count % 3 == 1)
                                 dots = ".."
                             running_count += 1;
-                            document.getElementById('formula_output').innerText = "Running" + dots;
+                            document.getElementById('algorithm_result').innerText = "Running";
                         }
                     })
                     .fail(function () {
-                        document.getElementById("formula_output").innerText = "Sorry, the server is down, please try again after a few seconds.";
+                        document.getElementById("verbose_output").innerText = "Sorry, the server is down, please try again after a few seconds.";
                         clearInterval(timer_id);
                         valid_op_id = null;
                         running_count = 0;
@@ -129,7 +129,7 @@
                         console.log('Cancel answer: ' + data);
                     })
                     .fail(function() {
-                        document.getElementById("formula_output").innerText = "Sorry, the server is down, not able to cancel the task.";
+                        document.getElementById("verbose_output").innerText = "Sorry, the server is down, not able to cancel the task.";
                         console.log("Unable to cancel a task because the server is down");
                         cancel_btn.disabled = false;
                     });
@@ -143,7 +143,7 @@
 
                 var formula_filters = get_formula_filters();
 
-                document.getElementById("formula_output").innerText = "";
+                document.getElementById("algorithm_result").innerText = "Running";
                 document.getElementById("verbose_output").innerText = "";
                 d3.select("svg").empty();
                 d3.select("#visualization-graph").select("svg").remove();
@@ -163,10 +163,10 @@
                     })
                     .fail(function (data, xx, yyy) {
                         if (data.status === 429) {
-                            document.getElementById("formula_output").innerText = "There are too many requests right now, please try again later.";
+                            document.getElementById("verbose_output").innerText = "There are too many requests right now, please try again later.";
                         }
                         else {
-                            document.getElementById("formula_output").innerText = "Sorry, the server is down, please try again after a few seconds.";
+                            document.getElementById("verbose_output").innerText = "Sorry, the server is down, please try again after a few seconds.";
                         }
                     });
 
@@ -383,51 +383,79 @@
             };
         </script>
         <style>
-                code {
-                        font-size: 15px;
-                }
-                label {
-                        font-size: 15px;
-                }
+            code {
+                    font-size: 15px;
+            }
+            label {
+                    font-size: 15px;
+            }
         </style>
         <style>
-                .accordion {
-                  background-color: #eee;
-                  color: #444;
-                  cursor: pointer;
-                  padding: 18px;
-                  width: 100%;
-                  border: none;
-                  text-align: left;
-                  outline: none;
-                  font-size: 15px;
-                  transition: 0.4s;
-                  margin-left: 20px;
-                  margin-right: 20px;
-                }
+            .collapsable {
+              background-color: #eee;
+              color: #444;
+              cursor: pointer;
+              padding: 18px;
+              width: 100%;
+              border: none;
+              text-align: left;
+              outline: none;
+              font-size: 15px;
+              transition: 0.4s;
+              margin-left: 20px;
+              margin-right: 20px;
+            }
 
-                .active, .accordion:hover {
-                  background-color: #ccc;
-                }
+            .accordion {
+              background-color: #eee;
+              color: #444;
+              cursor: pointer;
+              padding: 18px;
+              width: 100%;
+              border: none;
+              text-align: left;
+              outline: none;
+              font-size: 15px;
+              transition: 0.4s;
+              margin-left: 20px;
+              margin-right: 20px;
+            }
 
-                .panel {
-                  padding: 0 18px;
-                  display: none;
-                  background-color: white;
-                  overflow: hidden;
-                  margin-left: 20px;
-                  margin-right: 20px;
-                }
+            .active, .accordion:hover {
+              background-color: #ccc;
+            }
 
-                .verbose_output {
-                    height: auto;
-                    max-height: 400px;
-                    overflow: auto;
-                    background-color: #eeeeee;
-                    word-break: normal !important;
-                    word-wrap: normal !important;
-                    white-space: pre !important;
-                }​
+            .panel {
+              padding: 0 18px;
+              display: none;
+              background-color: white;
+              overflow: hidden;
+              margin-left: 20px;
+              margin-right: 20px;
+            }
+
+            .verbose_output {
+                height: auto;
+                max-height: 400px;
+                overflow: auto;
+                background-color: #eeeeee;
+                word-break: normal !important;
+                word-wrap: normal !important;
+                white-space: pre !important;
+            }​
+        </style>
+        <!-- footer style -->
+        <style type="text/css">
+        	.footer {
+			  position: absolute;
+			  right: 0;
+			  bottom: 0;
+			  left: 200px;
+  		      width: inherit;
+			  padding: 1rem;
+			  background-color: #efefef;
+			  text-align: center;
+			}
         </style>
         <script>
             function pre_init() {
@@ -439,6 +467,53 @@
                 }
             }
         </script>
+        <style>
+        	.run_algorithm {
+        		margin-top: 0.5rem;
+        	}
+        	.algorithm_buttons {
+    		    border: 0.5rem outset #716da7;
+			    border-radius: 12px;
+			    font: bold 1rem sans-serif;
+			    margin-top: 0.5rem;
+			    padding: 0.5rem;
+			    background: #ebebf3;
+        	}
+        	.formula_filters {
+    		    width: 60%;
+			    margin: 1rem;
+			    border: 0.5rem outset #87656b;
+			    border-radius: 12px;
+			    font: bold 1rem sans-serif;
+			    padding: 0.5rem;
+			    outline-offset: 0.5rem;
+        	}
+        	.algorithm_cancelations {
+    		    width: 40%;
+			    margin: 1rem;
+			    border: 0.5rem outset #87656b;
+			    border-radius: 12px;
+			    font: bold 1rem sans-serif;
+			    padding: 0.5rem;
+			    outline-offset: 0.5rem;
+        	}
+        	.legend {
+        		margin-left: 1rem;
+			    border: 0.5rem outset #8d8485;
+			    box-shadow: 0 0 0 0.3rem #26627a;
+			    border-radius: 12px;
+			    padding: 0.4rem;
+			    outline-offset: 0.5rem;
+        	}
+        	.result {
+    		    margin-left: 20px;
+			    border: 0.5rem outset #87656b;
+			    border-radius: 12px;
+			    font: bold 1rem sans-serif;
+			    padding-left: 0.3rem;
+			    padding-right: 0.3rem;
+        	}
+        </style>
     </head>
     <body onload="pre_init();">
         <div class="sidenav">
@@ -447,12 +522,55 @@
             <a href="./samples.html">Samples</a>
             <a href="./howto.html">How To</a>
         </div>
-        <div class="main">
-            <div id="formula_input" style="margin: 20px;">
-                Formula:<br>
-                <input id="formula" style="width: 100%; height: 20px;"/>
+        <div class="main" style="display: flex; flex-direction: row">
+            <div class="formula_container" style="margin: 20px; display: flex; flex-direction: column; width: 100%">
+            	<div>
+	            	<div style="display: flex; flex-direction: row; align-items: center;">
+		                <div class="formula_itself" style="width: 90%; display: flex; flex-direction: row">
+		                	<span style="margin-right: 0.6rem">Formula:</span><br>
+		                	<input id="formula" style="width: 100%; height: 20px;"/>
+		                </div>
+		                Status:<span id="algorithm_result" class="result">Resting</span>
+		            </div>
+		            <div class="algorithm_buttons">
+		                Algorithms: 
+		                <button class="run_algorithm" onclick="create_task('MEASURED_MODEL')" class="computing_element">MEASURED MODEL</button>
+		                <!-- <button class="run_algorithm" onclick="create_task('OPTIMIZED_MEASURED_MODEL')" class="computing_element">OPTIMIZED MEASURED MODEL</button> -->
+		                <button class="run_algorithm" onclick="create_task('FAST_MODEL')" class="computing_element">FAST MODEL</button>
+		                <button class="run_algorithm" onclick="create_task('CONNECTIVITY')" class="computing_element">CONNECTED MODEL</button>
+		                <!-- Add killswitch which is only for development so that this line does not be present -->
+		                <button class="run_algorithm" onclick="create_task('BRUTEFORCE_MODEL')" class="computing_element">BRUTEFORCE MODEL</button>
+		            </div>
+	            </div>
+	            <div style="display: flex; flex-direction: row;">
+					<div id="formula_filters" class="formula_filters">
+		                Formula Filters:<br>
+		                <input type="checkbox" id="convert_contact_less_eq_with_same_terms" checked> Convert Contacts in &lt;=<br>
+		                <input type="checkbox" id="convert_disjunction_in_contact_less_eq" checked> Split Disjunctions in Atomic Formulas<br>
+		                <input type="checkbox" id="reduce_constants" checked> Reduce Contacts<br>
+		                <input type="checkbox" id="reduce_contacts_less_eq_with_constants" checked> Reduce Atomic Formulas with Contacts<br>
+		                <input type="checkbox" id="remove_double_negation" checked> Remove Double Negations<br>
+		            </div>
+		            <div class="algorithm_cancelations">
+		                If the calculation takes too long, try to cancel it. It might help to optimize the input formula<br>
+		                <button style="margin-top:0.5rem" id="cancel_calculation" onclick="cancel_task('valid_op_id')">CANCEL CALCULATION</button>
+		            </div>
+		        </div>
+
+
+	            <div id="is_satisfied">
+	                <pre id="is_satisfied_output"></pre>
+	            </div>
+	            <h2 style="margin-left: 20px;">Output</h2>
+	            <div style="width: 50%; float: left">
+	                <button class="accordion" style="margin-bottom: 20px;">Visualized Model</button>
+	                <div class="panel">
+	                    <div id="visualization-graph">
+	                    </div>
+	                </div>
+	            </div>			
             </div>
-            <div id="legend" style="float: right">
+            <div class="legend" style="margin-left: auto">
                 <h2 style="margin-left: 8px;">Term's legend</h2>
                 <code>0&nbsp;&nbsp;&nbsp;-&nbsp;&#x2205;&nbsp; - </code><label>Empty set constant</label><br>
                 <code>1&nbsp;&nbsp;&nbsp;-&nbsp;W&nbsp; - </code><label>Whole world constant</label><br>
@@ -468,55 +586,41 @@
                 <code>~&nbsp;&nbsp;&nbsp;-&nbsp;&#xac;&nbsp; - </code><label>Negation</label><br>
                 <code>-&gt;&nbsp;&nbsp;-&nbsp;<font size="+1">&#x21d2;</font>&nbsp;&nbsp;-&nbsp;</code><label>Implication</label><br>
                 <code>&lt;-&gt;&nbsp;-&nbsp;<font size="+1">&#x21D4;</font>&nbsp;&nbsp;-&nbsp;</code><label>Equivalence</label><br>
-                <code>C&nbsp;&nbsp;&nbsp;-&nbsp;&#x2201;&nbsp; - </code><label>Contact, syntax:</label><code>&nbsp;C(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
-                <code>&lt;=&nbsp;&nbsp;-&nbsp;&le;&nbsp; - </code><label>Part Of, syntax:</label><code>&nbsp;&lt;=(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
-                <code>&lt;=m&nbsp;-&nbsp;&le;<sub>m</sub> - </code><label>Measured Part Of, syntax:</label><code>&nbsp;&lt;=m(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
-                <code>=0&nbsp;&nbsp;-&nbsp;=0 - </code><label>Syntax suggar for zero term, syntax:</label><code>&nbsp;T=0</code><br>
+                <code>C&nbsp;&nbsp;&nbsp;-&nbsp;&#x2201;&nbsp; - </code><label>Contact, <br/>
+                	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;syntax:</label><code>&nbsp;C(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
+                <code>&lt;=&nbsp;&nbsp;-&nbsp;&le;&nbsp; - </code><label>Part Of, <br/>
+                	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;syntax:</label><code>&nbsp;&lt;=(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
+                <code>&lt;=m&nbsp;-&nbsp;&le;<sub>m</sub> - </code><label>Measured Part Of, <br/>
+                	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;syntax:</label><code>&nbsp;&lt;=m(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
+                <code>=0&nbsp;&nbsp;-&nbsp;=0 - </code><label>Syntax suggar for <br/>
+                	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;zero term, syntax:</label><code>&nbsp;T=0</code><br>
                 <code>()&nbsp;&nbsp;-&nbsp;() - </code><label>Parentheses</label><br>
             </div>
-            <div id="formula_filters" style="margin: 20px;">
-                Formula Filters:<br>
-                <input type="checkbox" id="convert_contact_less_eq_with_same_terms" checked> Convert Contacts in &lt;=<br>
-                <input type="checkbox" id="convert_disjunction_in_contact_less_eq" checked> Split Disjunctions in Atomic Formulas<br>
-                <input type="checkbox" id="reduce_constants" checked> Reduce Contacts<br>
-                <input type="checkbox" id="reduce_contacts_less_eq_with_constants" checked> Reduce Atomic Formulas with Contacts<br>
-                <input type="checkbox" id="remove_double_negation" checked> Remove Double Negations<br>
-            </div>
-            <div id="algorith_buttons" style="margin: 20px;">
-                Run algorithm:<br><br>
-                <button onclick="create_task('MEASURED_MODEL')" class="computing_element">MEASURED MODEL</button>
-                <button onclick="create_task('OPTIMIZED_MEASURED_MODEL')" class="computing_element">OPTIMIZED MEASURED MODEL</button>
-                <button onclick="create_task('FAST_MODEL')" class="computing_element">FAST MODEL</button>
-                <button onclick="create_task('CONNECTIVITY')" class="computing_element">CONNECTED MODEL</button>
-                <!-- Add killswitch which is only for development so that this line does not be present -->
-                <button onclick="create_task('BRUTEFORCE_MODEL')" class="computing_element">BRUTEFORCE MODEL</button>
-            </div>
-            <div id="algorithm_cancelations" style="margin: 20px;">
-                If the calculation takes too long, try to cancel it and it might help to optimize the input formula<br>
-                <button id="cancel_calculation" onclick="cancel_task('valid_op_id')">CANCEL CALCULATION</button>
-            </div>
-            <div id="is_satisfied">
-                <pre id="is_satisfied_output"></pre>
-            </div>
-            <h2 style="margin-left: 20px;">Output</h2>
-            <div style="width: 50%; float: left">
-                <button class="accordion">Result</button>
-                <div class="panel">
-                    <div id="qqq">
-                        <pre id="formula_output"></pre>
-                    </div>
-                </div>
-                <button class="accordion">Verbose Output / Console</button>
-                <div class="panel">
-                    <pre class="verbose_output" id="verbose_output"></pre>
-                </div>
-                <button class="accordion" style="margin-bottom: 20px;">Visualized Model</button>
-                <div class="panel">
-                    <div id="visualization-graph">
-                    </div>
-                </div>
-            </div>
         </div>
+        <div class="footer collapsable" style="display: none" id="footer-with-logs"><b>Hide complete output<b>.
+	        <pre class="verbose_output" id="verbose_output"></pre>
+        </div>
+        <div class="footer collapsable" id="simple-footer"> 
+        	Show complete output
+        </div>
+        <script type="text/javascript">
+        	var withLogs = document.getElementById("footer-with-logs");
+        	var simpleFooter = document.getElementById("simple-footer");
+        	
+        	switchFooters = function() {
+        		var withLogsCurrent = document.getElementById("footer-with-logs");
+        		var simpleFooterCurrent = document.getElementById("simple-footer");
+               	if (withLogsCurrent.style.display === "block") {
+            		withLogsCurrent.style.display = "none";
+            		simpleFooterCurrent.style.display = "block";
+            	} else {
+            		withLogsCurrent.style.display = "block";
+            		simpleFooterCurrent.style.display = "none";
+            	}
+        	}
+        	withLogs.addEventListener("click", switchFooters);
+        	simpleFooter.addEventListener("click", switchFooters);
+        </script>
         <script>
             var acc = document.getElementsByClassName("accordion");
             var i;
