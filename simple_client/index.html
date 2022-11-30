@@ -391,36 +391,6 @@
             }
         </style>
         <style>
-            .collapsable {
-              background-color: #eee;
-              color: #444;
-              cursor: pointer;
-              padding: 18px;
-              width: 100%;
-              border: none;
-              text-align: left;
-              outline: none;
-              font-size: 15px;
-              transition: 0.4s;
-              margin-left: 20px;
-              margin-right: 20px;
-            }
-
-            .accordion {
-              background-color: #eee;
-              color: #444;
-              cursor: pointer;
-              padding: 18px;
-              width: 100%;
-              border: none;
-              text-align: left;
-              outline: none;
-              font-size: 15px;
-              transition: 0.4s;
-              margin-left: 20px;
-              margin-right: 20px;
-            }
-
             .active, .accordion:hover {
               background-color: #ccc;
             }
@@ -442,20 +412,29 @@
                 word-break: normal !important;
                 word-wrap: normal !important;
                 white-space: pre !important;
-            }​
+            }
         </style>
         <!-- footer style -->
         <style type="text/css">
-        	.footer {
-			  position: absolute;
-			  right: 0;
-			  bottom: 0;
-			  left: 200px;
-  		      width: inherit;
-			  padding: 1rem;
-			  background-color: #efefef;
-			  text-align: center;
-			}
+            .footer {
+               position: fixed;
+               left: 200px;
+               bottom: 0;
+               width: calc(100vw - 275px);
+               padding: 1rem;
+               text-align: center;
+               background-color: #eee;
+               color: #444;
+               cursor: pointer;
+               border: none;
+               outline: none;
+               font-size: 15px;
+               transition: 0.4s;
+               margin-left: 20px;
+               margin-right: 20px;
+               max-height: 40vh;
+               overflow-y: scroll;
+            }
         </style>
         <script>
             function pre_init() {
@@ -522,86 +501,89 @@
             <a href="./samples.html">Samples</a>
             <a href="./howto.html">How To</a>
         </div>
-        <div class="main" style="display: flex; flex-direction: row">
-            <div class="formula_container" style="margin: 20px; display: flex; flex-direction: column; width: 100%">
-            	<div>
-	            	<div style="display: flex; flex-direction: row; align-items: center;">
-		                <div class="formula_itself" style="width: 90%; display: flex; flex-direction: row">
-		                	<span style="margin-right: 0.6rem">Formula:</span><br>
-		                	<input id="formula" style="width: 100%; height: 20px;"/>
-		                </div>
-		                Status:<span id="algorithm_result" class="result">Resting</span>
-		            </div>
-		            <div class="algorithm_buttons">
-		                Algorithms: 
-		                <button class="run_algorithm" onclick="create_task('MEASURED_MODEL')" class="computing_element">MEASURED MODEL</button>
-		                <!-- <button class="run_algorithm" onclick="create_task('OPTIMIZED_MEASURED_MODEL')" class="computing_element">OPTIMIZED MEASURED MODEL</button> -->
-		                <button class="run_algorithm" onclick="create_task('FAST_MODEL')" class="computing_element">FAST MODEL</button>
-		                <button class="run_algorithm" onclick="create_task('CONNECTIVITY')" class="computing_element">CONNECTED MODEL</button>
-		                <!-- Add killswitch which is only for development so that this line does not be present -->
-		                <button class="run_algorithm" onclick="create_task('BRUTEFORCE_MODEL')" class="computing_element">BRUTEFORCE MODEL</button>
-		            </div>
-	            </div>
-	            <div style="display: flex; flex-direction: row;">
-					<div id="formula_filters" class="formula_filters">
-		                Formula Filters:<br>
-		                <input type="checkbox" id="convert_contact_less_eq_with_same_terms" checked> Convert Contacts in &lt;=<br>
-		                <input type="checkbox" id="convert_disjunction_in_contact_less_eq" checked> Split Disjunctions in Atomic Formulas<br>
-		                <input type="checkbox" id="reduce_constants" checked> Reduce Contacts<br>
-		                <input type="checkbox" id="reduce_contacts_less_eq_with_constants" checked> Reduce Atomic Formulas with Contacts<br>
-		                <input type="checkbox" id="remove_double_negation" checked> Remove Double Negations<br>
-		            </div>
-		            <div class="algorithm_cancelations">
-		                If the calculation takes too long, try to cancel it. It might help to optimize the input formula<br>
-		                <button style="margin-top:0.5rem" id="cancel_calculation" onclick="cancel_task('valid_op_id')">CANCEL CALCULATION</button>
-		            </div>
-		        </div>
+        <div>
+            <div class="main" style="display: flex; flex-direction: row;">
+                <div class="formula_container" style="margin: 20px; display: flex; flex-direction: column; width: 100%">
+                	<div>
+    	            	<div style="display: flex; flex-direction: row; align-items: center;">
+    		                <div class="formula_itself" style="width: 90%; display: flex; flex-direction: row">
+    		                	<span style="margin-right: 0.6rem">Formula:</span><br>
+    		                	<input id="formula" style="width: 100%; height: 20px;"/>
+    		                </div>
+    		                Status:<span id="algorithm_result" class="result">Resting</span>
+    		            </div>
+    		            <div class="algorithm_buttons">
+    		                Algorithms: 
+    		                <button class="run_algorithm" onclick="create_task('MEASURED_MODEL')" class="computing_element">MEASURED MODEL</button>
+    		                <!-- <button class="run_algorithm" onclick="create_task('OPTIMIZED_MEASURED_MODEL')" class="computing_element">OPTIMIZED MEASURED MODEL</button> -->
+    		                <button class="run_algorithm" onclick="create_task('FAST_MODEL')" class="computing_element">FAST MODEL</button>
+    		                <button class="run_algorithm" onclick="create_task('CONNECTIVITY')" class="computing_element">CONNECTED MODEL</button>
+    		                <!-- Add killswitch which is only for development so that this line does not be present -->
+    		                <button class="run_algorithm" onclick="create_task('BRUTEFORCE_MODEL')" class="computing_element">BRUTEFORCE MODEL</button>
+    		            </div>
+    	            </div>
+    	            <div style="display: flex; flex-direction: row;">
+    					<div id="formula_filters" class="formula_filters">
+    		                Formula Filters:<br>
+    		                <input type="checkbox" id="convert_contact_less_eq_with_same_terms" checked> Convert Contacts in &lt;=<br>
+    		                <input type="checkbox" id="convert_disjunction_in_contact_less_eq" checked> Split Disjunctions in Atomic Formulas<br>
+    		                <input type="checkbox" id="reduce_constants" checked> Reduce Contacts<br>
+    		                <input type="checkbox" id="reduce_contacts_less_eq_with_constants" checked> Reduce Atomic Formulas with Contacts<br>
+    		                <input type="checkbox" id="remove_double_negation" checked> Remove Double Negations<br>
+    		            </div>
+    		            <div class="algorithm_cancelations">
+    		                If the calculation takes too long, try to cancel it. It might help to optimize the input formula<br>
+    		                <button style="margin-top:0.5rem" id="cancel_calculation" onclick="cancel_task('valid_op_id')">CANCEL CALCULATION</button>
+    		            </div>
+    		        </div>
 
 
-	            <div id="is_satisfied">
-	                <pre id="is_satisfied_output"></pre>
-	            </div>
-	            <h2 style="margin-left: 20px;">Output</h2>
-	            <div style="width: 50%; float: left">
-	                <button class="accordion" style="margin-bottom: 20px;">Visualized Model</button>
-	                <div class="panel">
-	                    <div id="visualization-graph">
-	                    </div>
-	                </div>
-	            </div>			
+    	            <div id="is_satisfied">
+    	                <pre id="is_satisfied_output"></pre>
+    	            </div>
+    	            <h2 style="margin-left: 20px;">Output</h2>
+    	            <div style="width: 50%; float: left">
+    	                <button class="accordion" style="margin-bottom: 20px;">Visualized Model</button>
+    	                <div class="panel">
+    	                    <div id="visualization-graph">
+    	                    </div>
+    	                </div>
+    	            </div>			
+                </div>
+                <div class="legend" style="margin-left: auto">
+                    <h2 style="margin-left: 8px;">Term's legend</h2>
+                    <code>0&nbsp;&nbsp;&nbsp;-&nbsp;&#x2205;&nbsp; - </code><label>Empty set constant</label><br>
+                    <code>1&nbsp;&nbsp;&nbsp;-&nbsp;W&nbsp; - </code><label>Whole world constant</label><br>
+                    <code>-&nbsp;&nbsp;&nbsp;-&nbsp;T<sup>c</sup> - </code><label>Unary Complement</label><br>
+                    <code>*&nbsp;&nbsp;&nbsp;-&nbsp;&#x2229;&nbsp; - </code><label>Intersection</label><br>
+                    <code>+&nbsp;&nbsp;&nbsp;-&nbsp;&#x222a;&nbsp; - </code><label>Union</label><br>
+                    <code>()&nbsp;&nbsp;-&nbsp;() - </code><label>Parentheses</label><br>
+                    <h2 style="margin-left: 8px;">Formula's legend</h2>
+                    <code>F&nbsp;&nbsp;&nbsp;-&nbsp;&#8869;&nbsp; - </code><label>False constant</label><br>
+                    <code>T&nbsp;&nbsp;&nbsp;-&nbsp;&#8868;&nbsp; - </code><label>True constant</label><br>
+                    <code>&amp;&nbsp;&nbsp;&nbsp;-&nbsp;&and;&nbsp; - </code><label>Conjunction</label><br>
+                    <code>|&nbsp;&nbsp;&nbsp;-&nbsp;&or;&nbsp; - </code><label>Disjunction</label><br>
+                    <code>~&nbsp;&nbsp;&nbsp;-&nbsp;&#xac;&nbsp; - </code><label>Negation</label><br>
+                    <code>-&gt;&nbsp;&nbsp;-&nbsp;<font size="+1">&#x21d2;</font>&nbsp;&nbsp;-&nbsp;</code><label>Implication</label><br>
+                    <code>&lt;-&gt;&nbsp;-&nbsp;<font size="+1">&#x21D4;</font>&nbsp;&nbsp;-&nbsp;</code><label>Equivalence</label><br>
+                    <code>C&nbsp;&nbsp;&nbsp;-&nbsp;&#x2201;&nbsp; - </code><label>Contact, <br/>
+                    	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;syntax:</label><code>&nbsp;C(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
+                    <code>&lt;=&nbsp;&nbsp;-&nbsp;&le;&nbsp; - </code><label>Part Of, <br/>
+                    	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;syntax:</label><code>&nbsp;&lt;=(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
+                    <code>&lt;=m&nbsp;-&nbsp;&le;<sub>m</sub> - </code><label>Measured Part Of, <br/>
+                    	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;syntax:</label><code>&nbsp;&lt;=m(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
+                    <code>=0&nbsp;&nbsp;-&nbsp;=0 - </code><label>Syntax suggar for <br/>
+                    	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;zero term, syntax:</label><code>&nbsp;T=0</code><br>
+                    <code>()&nbsp;&nbsp;-&nbsp;() - </code><label>Parentheses</label><br>
+                </div>
             </div>
-            <div class="legend" style="margin-left: auto">
-                <h2 style="margin-left: 8px;">Term's legend</h2>
-                <code>0&nbsp;&nbsp;&nbsp;-&nbsp;&#x2205;&nbsp; - </code><label>Empty set constant</label><br>
-                <code>1&nbsp;&nbsp;&nbsp;-&nbsp;W&nbsp; - </code><label>Whole world constant</label><br>
-                <code>-&nbsp;&nbsp;&nbsp;-&nbsp;T<sup>c</sup> - </code><label>Unary Complement</label><br>
-                <code>*&nbsp;&nbsp;&nbsp;-&nbsp;&#x2229;&nbsp; - </code><label>Intersection</label><br>
-                <code>+&nbsp;&nbsp;&nbsp;-&nbsp;&#x222a;&nbsp; - </code><label>Union</label><br>
-                <code>()&nbsp;&nbsp;-&nbsp;() - </code><label>Parentheses</label><br>
-                <h2 style="margin-left: 8px;">Formula's legend</h2>
-                <code>F&nbsp;&nbsp;&nbsp;-&nbsp;&#8869;&nbsp; - </code><label>False constant</label><br>
-                <code>T&nbsp;&nbsp;&nbsp;-&nbsp;&#8868;&nbsp; - </code><label>True constant</label><br>
-                <code>&amp;&nbsp;&nbsp;&nbsp;-&nbsp;&and;&nbsp; - </code><label>Conjunction</label><br>
-                <code>|&nbsp;&nbsp;&nbsp;-&nbsp;&or;&nbsp; - </code><label>Disjunction</label><br>
-                <code>~&nbsp;&nbsp;&nbsp;-&nbsp;&#xac;&nbsp; - </code><label>Negation</label><br>
-                <code>-&gt;&nbsp;&nbsp;-&nbsp;<font size="+1">&#x21d2;</font>&nbsp;&nbsp;-&nbsp;</code><label>Implication</label><br>
-                <code>&lt;-&gt;&nbsp;-&nbsp;<font size="+1">&#x21D4;</font>&nbsp;&nbsp;-&nbsp;</code><label>Equivalence</label><br>
-                <code>C&nbsp;&nbsp;&nbsp;-&nbsp;&#x2201;&nbsp; - </code><label>Contact, <br/>
-                	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;syntax:</label><code>&nbsp;C(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
-                <code>&lt;=&nbsp;&nbsp;-&nbsp;&le;&nbsp; - </code><label>Part Of, <br/>
-                	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;syntax:</label><code>&nbsp;&lt;=(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
-                <code>&lt;=m&nbsp;-&nbsp;&le;<sub>m</sub> - </code><label>Measured Part Of, <br/>
-                	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;syntax:</label><code>&nbsp;&lt;=m(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
-                <code>=0&nbsp;&nbsp;-&nbsp;=0 - </code><label>Syntax suggar for <br/>
-                	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;zero term, syntax:</label><code>&nbsp;T=0</code><br>
-                <code>()&nbsp;&nbsp;-&nbsp;() - </code><label>Parentheses</label><br>
+            <div class="empty-footer-holder" style="height: 5rem"></div>
+            <div class="footer collapsable" style="display: none" id="footer-with-logs"><b>Hide complete output<b>.
+                <pre class="verbose_output" id="verbose_output"></pre>
             </div>
-        </div>
-        <div class="footer collapsable" style="display: none" id="footer-with-logs"><b>Hide complete output<b>.
-	        <pre class="verbose_output" id="verbose_output"></pre>
-        </div>
-        <div class="footer collapsable" id="simple-footer"> 
-        	Show complete output
+            <div class="footer collapsable" id="simple-footer"> 
+                Show complete output
+            </div>
         </div>
         <script type="text/javascript">
         	var withLogs = document.getElementById("footer-with-logs");
@@ -620,23 +602,6 @@
         	}
         	withLogs.addEventListener("click", switchFooters);
         	simpleFooter.addEventListener("click", switchFooters);
-        </script>
-        <script>
-            var acc = document.getElementsByClassName("accordion");
-            var i;
-
-            for (i = 0; i < acc.length; i++) {
-                acc[i].addEventListener("click", function () {
-                    this.classList.toggle("active");
-                    var panel = this.nextElementSibling;
-                    if (panel.style.display === "block") {
-                        panel.style.display = "none";
-                    } else {
-                        panel.style.display = "block";
-                    }
-                });
-                acc[i].click(); // open by default
-            }
         </script>
     </body>
 </html>
