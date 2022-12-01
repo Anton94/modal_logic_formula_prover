@@ -33,7 +33,6 @@ void is_satisfiable(const char* input_f, bool has_satisfiable_model, bool has_sa
             CHECK(f.is_model_satisfiable(measured_m));
         }
 
-
         basic_bruteforce_model brute_force_model;
         CHECK(f.brute_force_evaluate_with_points_count(brute_force_model) == has_satisfiable_model);
         CHECK(f.is_satisfiable(brute_force_model) == has_satisfiable_model);
@@ -534,4 +533,24 @@ TEST_CASE("empty model satisfies the formula but there should be at least one po
 TEST_CASE("empty model satisfies the formula but there should be at least one point 6", "[satisfiability]")
 {
     is_satisfiable("~C(a + -a, b + -b)", false, false, false);
+}
+
+TEST_CASE("system with solution 0", "[satisfiability]")
+{
+    is_satisfiable("<=m(x, x + y) & <=m(x+y, x)", true, true, true);
+}
+
+TEST_CASE("system with solution 1", "[satisfiability]")
+{
+    is_satisfiable("~(x = 0) & ~(y = 0) & <=m(x, x + y) & <=m(x+y, x)", true, true, true); // Satisfiable with one modal point
+}
+
+TEST_CASE("system with solution 2", "[satisfiability]")
+{
+    is_satisfiable("~(x = 0) & ~(y = 0) & ~(<=(x,y)) & <=m(x, x + y) & <=m(x+y, x)", true, true, true); // Satisfiable with v(x) = 0, 1 v(y) = 0
+}
+
+TEST_CASE("system without solution 0", "[satisfiability]")
+{
+    is_satisfiable("~(x = 0) & ~(y = 0) & ~(<=(x,y)) & ~(<=(y,x)) & <=m(x, x + y) & <=m(x+y, x)", true, true, false);
 }
