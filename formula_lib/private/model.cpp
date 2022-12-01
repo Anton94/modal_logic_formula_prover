@@ -96,7 +96,7 @@ auto model::generate_next_point_evaluation(const term* t, variables_evaluations_
     while(out_evaluation.generate_next_evaluation_over_A())
     {
         // TODO the generation can be done smarter, e.g. when the evaluation of 't' is false, generate new
-        // variable evaluations just for the varaibles in @t.
+        // variable evaluations just for the varaibles in @t. Maybe the variables_evaluations_block_for_positive_term?
         if(does_point_evaluation_satisfies_basic_rules(t, out_evaluation, contacts_F, zero_terms_T))
         {
             return true;

@@ -22,7 +22,7 @@ auto tableau::is_satisfiable(const formula& f, imodel& out_model) -> bool
     model_ = &out_model;
     if(satisfiable_step())
     {
-        info() << "Model:\n" << out_model;
+        //info() << "Model:\n" << out_model;
         return true;
     }
     model_ = nullptr;
@@ -667,6 +667,7 @@ auto tableau::has_satisfiable_model() -> bool
         return false;
     }
 
+    trace() << "Constructed a satisfiable model.";
     return true;
 }
 

@@ -15,7 +15,7 @@ void basic_bruteforce_model::clear()
 
 auto basic_bruteforce_model::generate_next(variables_evaluations_t& current) const -> bool
 {
-    for(int i = 0; i < current.size(); ++i)
+    for(size_t i = 0; i < current.size(); ++i)
     {
         current[i].flip();
 

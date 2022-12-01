@@ -30,9 +30,10 @@ protected:
     // Useful for models which have their first 2*@number_of_contacts points in contact (point 2k is in contact with point (2k+1))
     // Inserts 1s in the contact relations matrix between points 2k and 2k+1 (for each k in range [0, @number_of_contacts))
     // Inserts 1s in the contact relations matrix between each point and itself (reflexivity).
+    // TODO(toni): move to utils!
     void create_contact_relations_first_2k_in_contact(size_t number_of_points, size_t number_of_contacts);
 
-    const formula_mgr* mgr_{};
+    const formula_mgr* mgr_{}; // TODO(toni): remove this ugly dependency and pass the variables info to 'create'!!!
 
     /*
         Symetric square bit matrix. contacts_[i] gives a bit mask of all points which are in contact with the point 'i'.
