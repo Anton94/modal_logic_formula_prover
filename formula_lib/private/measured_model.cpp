@@ -3,159 +3,26 @@
 #include "formula_mgr.h"
 #include "term.h"
 #include "thread_termiator.h"
+#include "utils.h"
 
 #include <algorithm>
 #include <cassert>
 
-measured_model::measured_model()
-    : system_(0)
+namespace
 {
-}
 
-measured_model::~measured_model() = default;
-
-auto measured_model::create(const formulas_t& contacts_T, const formulas_t& contacts_F, const terms_t& zero_terms_T,
-            const terms_t& zero_terms_F, const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F, const variables_mask_t& used_variables, const formula_mgr* mgr)
-    -> bool
+auto is_contact_satisfied(const formula* contact, const model_points_set_t& points, const term_to_modal_points_t& term_evaluations, const contacts_t& contact_relations) -> bool
 {
-    clear();
-    mgr_ = mgr;
-    used_variables_ = used_variables;
-    number_of_contacts_ = contacts_T.size();
+    const auto a = contact->get_left_child_term();
+    const auto b = contact->get_right_child_term();
+    const auto eval_it_a = term_evaluations.find(a);
+    const auto eval_it_b = term_evaluations.find(b);
+    assert(eval_it_a != term_evaluations.end());
+    assert(eval_it_b != term_evaluations.end());
 
-    measured_less_eq_T_ = measured_less_eq_T;
-    measured_less_eq_F_ = measured_less_eq_F;
-
-    if (!construct_contact_model_points(contacts_T) || !construct_non_zero_model_points(zero_terms_F))
-    {
-        trace() << "Unable to construct the model points with binary var. evaluations which evaluates the contact & non-zero terms to 1";
-        return false;
-    }
-
-    // We need at least one modal point in the model
-    // and additional one point per atomic measured formula.
-    auto additional_points = measured_less_eq_T.size() + measured_less_eq_F.size();
-    if(points_.empty() && additional_points == 0)
-    {
-        additional_points = 1;
-    }
-    if(additional_points > 0)
-    {
-        info() << "Adding additional " << additional_points << " points because of the <=m/~<=m atomics or empty model. "
-                  "We need a potential one model point for each side of each inequality in the system.";
-        constant_true_ = std::make_unique<term>(mgr_);
-        constant_true_->construct_constant(true);
-        points_.insert(points_.end(), additional_points, {constant_true_.get(), variables_evaluations_block_for_positive_term(*constant_true_, used_variables_)});
-    }
-
-    create_contact_relations_first_2k_in_contact(points_.size(), contacts_T.size());
-    calculate_the_model_evaluation_of_each_variable();
-
-    system_ = system_of_inequalities(points_.size());
-    while (!is_zero_term_rule_satisfied(zero_terms_T) || !is_contact_F_rule_satisfied(contacts_F) ||
-           !has_solvable_system_of_inequalities())
-    {
-        TERMINATE_IF_NEEDED();
-        if (!generate_next())
-        {
-            trace() << "Unable to generate a new combination of binary var. evaluations for the model points.";
-            return false;
-        }
-    }
-
-    return true;
-}
-
-auto measured_model::generate_next() -> bool
-{
-    // TODO: maybe cache the valid evaluations per term
-    // simulation of +1 operation from left to right but not just 0/1 bits but all combinations per element
-    for (auto& point : points_)
-    {
-        if (point.evaluation.generate_next_evaluation())
-        {
-            // TODO: this maybe can be done smarter and not just whole new calculation
-            calculate_the_model_evaluation_of_each_variable();
-            return true;
-        }
-
-        const auto is_reset = point.evaluation.reset();
-        assert(is_reset);
-        (void)is_reset;
-    }
-    return false;
-}
-
-auto measured_model::is_contact_F_rule_satisfied(const formulas_t& contacts_F) const -> bool
-{
-    for (const auto& c : contacts_F)
-    {
-        if (is_in_contact(c->get_left_child_term(), c->get_right_child_term()))
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-auto measured_model::is_zero_term_rule_satisfied(const terms_t& zero_terms_T) const -> bool
-{
-    // The zero term, i.e. the <=(a,b) operation which is translated to (a * -b = 0),
-    // has the following semantic: <=(a,b) is satisfied iif v(a * -b) = empty_set which is a bitset of only zeros
-    // v(a * -b) = v(a) & v(-b) = v(a) & v(W\v(b)) = v(a) & ~v(b)
-    for (const auto& z : zero_terms_T)
-    {
-        if (is_not_empty_set(z))
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-auto measured_model::has_solvable_system_of_inequalities() -> bool
-{
-    // For each <=m(a,b) calculate v(a) and v(b), then we will create
-    // an inequality of the following type: SUM_I Xi <= SUM_J Xj, where I is v(a) and J is v(b).
-    // For each ~<=m(a,b) calculate v(a) and v(b), then we will create
-    // an inequality of the following type: SUM_I Xi > SUM_J Xj, where I is v(a) and J is v(b).
-    // Each inequality is a row in the system of inequalities. If this system has a solution, then we are good.
-
-    const auto points_size = points_.size();
-    system_.clear();
-
-    for(const auto& m : measured_less_eq_T_)
-    {
-        const auto v_a = m->get_left_child_term()->evaluate(variable_evaluations_, points_size);
-        const auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
-        if (!system_.add_constraint(v_a, v_b, system_of_inequalities::inequality_operation::LE))
-        {
-            verbose() << "Unable to find a solution for the system when adding the constraint for " << *m << "\n" << *static_cast<imodel* const>(this); // TODO: why not able to call directly *this??? why unresolved ???
-            return false;
-        }
-    }
-
-    for(const auto& m : measured_less_eq_F_)
-    {
-        const auto v_a = m->get_left_child_term()->evaluate(variable_evaluations_, points_size);
-        const auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
-        if (!system_.add_constraint(v_a, v_b, system_of_inequalities::inequality_operation::G))
-        {
-            std::stringstream out;
-            print_system(out);
-            verbose() << "Unable to find a solution for the system when adding the constraint for ~" << *m << "\n" << *static_cast<imodel* const>(this);
-            return false;
-        }
-    }
-
-    info() << "Found a solution for the system:\n" << *static_cast<imodel* const>(this);
-    return true;
-}
-
-auto measured_model::is_in_contact(const term* a, const term* b) const -> bool
-{
-    const auto eval_a = a->evaluate(variable_evaluations_, points_.size());
-    const auto eval_b = b->evaluate(variable_evaluations_, points_.size());
+    // The evaluations contains all valid modal points, so restrict them to the provided subset @points.
+    const auto eval_a = eval_it_a->second & points;
+    const auto eval_b = eval_it_b->second & points;
     if (eval_a.none() || eval_b.none())
     {
         return false; // there is no way to be in contact if at least on of the evaluations is the empty set
@@ -168,7 +35,7 @@ auto measured_model::is_in_contact(const term* a, const term* b) const -> bool
     auto point_in_eval_a = eval_a.find_first(); // TODO: iterate over the bitset with less set bits
     while (point_in_eval_a != model_points_set_t::npos)
     {
-        const auto& points_in_contact_with_point_in_eval_a = contact_relations_[point_in_eval_a];
+        const auto& points_in_contact_with_point_in_eval_a = contact_relations[point_in_eval_a];
         if ((points_in_contact_with_point_in_eval_a & eval_b).any())
         {
             return true;
@@ -178,19 +45,224 @@ auto measured_model::is_in_contact(const term* a, const term* b) const -> bool
     return false;
 }
 
-auto measured_model::is_not_in_contact(const term* a, const term* b) const -> bool
+auto are_contacts_T_satisfied(const formulas_t& contacts_T,
+                              const model_points_set_t& points,
+                              const term_to_modal_points_t& term_evaluations,
+                              const contacts_t& contact_relations) -> bool
 {
-    return !is_in_contact(a, b);
+    for(const auto& c : contacts_T)
+    {
+        if(!is_contact_satisfied(c, points, term_evaluations, contact_relations))
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
-auto measured_model::is_empty_set(const term* a) const -> bool
+auto are_zero_terms_F_satisfied(const terms_t& zero_terms_F,
+                                const model_points_set_t& points,
+                                const term_to_modal_points_t& term_evaluations) -> bool
 {
-    return a->evaluate(variable_evaluations_, points_.size()).none();
+    for(const auto& t : zero_terms_F)
+    {
+        const auto eval_it = term_evaluations.find(t);
+        assert(eval_it != term_evaluations.end());
+
+        const auto eval = eval_it->second & points;
+        if(!eval.any())
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
-auto measured_model::is_not_empty_set(const term* a) const -> bool
+}
+
+measured_model::measured_model(size_t max_variables_count) :
+    max_variables_count_(max_variables_count),
+    system_(0)
 {
-    return !is_empty_set(a);
+}
+
+measured_model::~measured_model() = default;
+
+auto measured_model::create(const formulas_t& contacts_T, const formulas_t& contacts_F,
+                            const terms_t& zero_terms_T, const terms_t& zero_terms_F,
+                            const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F,
+                            const variables_mask_t& used_variables, const formula_mgr* mgr)
+    -> bool
+{
+    clear();
+    used_variables_ = used_variables;
+    mgr_ = mgr;
+    measured_less_eq_T_ = measured_less_eq_T;
+    measured_less_eq_F_ = measured_less_eq_F;
+
+    trace() << "Used variables are: " << used_variables_.count();
+    if(used_variables_.count() > max_variables_count_)
+    {
+        trace() << "Unable to create the model because the used variables are more than the preset maximal variables count of " << max_variables_count_;
+        return false;
+    }
+
+    const auto all_valid_points = construct_all_valid_points(used_variables_, contacts_F, zero_terms_T);
+    if(all_valid_points.empty())
+    {
+        trace() << "Unable to create even one model point which does not break the =0 or the reflexivity of ~C atomics.";
+        return false;
+    }
+
+    trace() << "Constructed all valid modal points.";
+
+    assert(used_variables_.size() == mgr_->get_variables().size()); // TODO(toni): what is the diference between this and used variables size?
+    const auto variable_evaluations_over_all_valid_points = generate_variable_evaluations(all_valid_points, used_variables_.size());
+
+    trace() << "Constructed the variable evaluations for all valid modal points.";
+
+    const auto all_valid_contact_relations = build_contact_relations_matrix(contacts_F, variable_evaluations_over_all_valid_points);
+
+    trace() << "Constructed all valid contacts between all valid modal points.";
+
+    // So far, the zero terms and non-contacts are satisfied.
+    // From now on, no new relations, neigther points will be added, therefore the zero terms and non-contacts satistfactionwill be preserved.
+
+    // Cache all term evaluations which will be requested later on.
+    term_to_modal_points_t term_evaluations;
+    add_term_evaluations(term_evaluations, zero_terms_F, variable_evaluations_over_all_valid_points);
+    add_term_evaluations(term_evaluations, contacts_T, variable_evaluations_over_all_valid_points);
+    add_term_evaluations(term_evaluations, measured_less_eq_F, variable_evaluations_over_all_valid_points);
+    add_term_evaluations(term_evaluations, measured_less_eq_T, variable_evaluations_over_all_valid_points);
+
+    system_ = system_of_inequalities(all_valid_points.size());
+
+    const auto all_points = ~model_points_set_t(all_valid_points.size());
+    return generate_model(all_points, contacts_T, contacts_F, zero_terms_F, all_valid_points, all_valid_contact_relations, term_evaluations);
+}
+
+auto measured_model::generate_model(const model_points_set_t& points,
+                                    const formulas_t& contacts_T,
+                                    const formulas_t& contacts_F,
+                                    const terms_t& zero_terms_F,
+                                    const points_t& all_valid_points,
+                                    const contacts_t& all_valid_contact_relations,
+                                    const term_to_modal_points_t& term_evaluations) -> bool
+{
+    TERMINATE_IF_NEEDED();
+
+    // If non-zero terms or contacts are not satisfied then this points does not produce a valid model.
+    // Therefore, they could not produce a measured model neighter.
+    // No subset of them could satisfy the contacts/zero terms because they require existnece of more points/relations but the set of points/relations is even reduced.
+    if(!are_zero_terms_F_satisfied(zero_terms_F, points, term_evaluations) ||
+       !are_contacts_T_satisfied(contacts_T, points, term_evaluations, all_valid_contact_relations))
+    {
+        return false;
+    }
+
+    // So far the subset @points of valid model points produces a valid model.
+    // Check if satisfies the system.
+    if(create_system_of_inequalities(points, term_evaluations, system_))
+    {
+        // Good. Found a measured model.
+        save_as_model(points, contacts_F, all_valid_points);
+        trace() << "Found a measured model for the formula:\n" << *this;
+        return true;
+    }
+
+    if(points.count() <= 1) // The model should have at least one modal point
+    {
+        return false;
+    }
+
+    // Go through every subset with points_count - 1 elements and recursively check them.
+
+    auto point_pos = points.find_first();
+    while (point_pos != model_points_set_t::npos)
+    {
+        auto subset_points = points;
+        subset_points.set(point_pos, false);
+
+        if(generate_model(subset_points, contacts_T, contacts_F, zero_terms_F, all_valid_points, all_valid_contact_relations, term_evaluations))
+        {
+            return true;
+        }
+
+        point_pos = points.find_next(point_pos);
+    }
+
+    return false;
+}
+
+void measured_model::save_as_model(const model_points_set_t& points,
+                                   const formulas_t& contacts_F,
+                                   const points_t& all_valid_points)
+{
+    // TODO this might be done different. But that way it's maybe most readable.
+
+    points_ = get_points_from_subset(points, all_valid_points);
+    variable_evaluations_ = generate_variable_evaluations(points_, used_variables_.size());
+    contact_relations_ = build_contact_relations_matrix(contacts_F, variable_evaluations_);
+
+    // The variables in the system are all valid points. Restrict them only to the subset of points.
+    // It is slower to create different system every time(allocations, remapping, etc...)
+    term_to_modal_points_t term_evaluations;
+    add_term_evaluations(term_evaluations, measured_less_eq_F_, variable_evaluations_);
+    add_term_evaluations(term_evaluations, measured_less_eq_T_, variable_evaluations_);
+
+    auto system = system_of_inequalities(points_.size());
+    const auto points_set = ~model_points_set_t(points_.size());
+    const auto res = create_system_of_inequalities(points_set, term_evaluations, system);
+    assert(res);
+
+    system_ = std::move(system);
+}
+
+auto measured_model::create_system_of_inequalities(const model_points_set_t& points,
+                                                   const term_to_modal_points_t& term_evaluations,
+                                                   system_of_inequalities& system) const -> bool
+{
+    // For each <=m(a,b) calculate v(a) and v(b), then we will create
+    // an inequality of the following type: SUM_I Xi <= SUM_J Xj, where I is v(a) and J is v(b).
+    // For each ~<=m(a,b) calculate v(a) and v(b), then we will create
+    // an inequality of the following type: SUM_I Xi > SUM_J Xj, where I is v(a) and J is v(b).
+    // Each inequality is a row in the system of inequalities. If this system has a solution, then we are good.
+    system.clear();
+
+    auto add_constraint = [](auto& s, const auto& formula, const auto& points, const auto& term_evaluations, const auto& op) -> bool
+    {
+        const auto a = formula->get_left_child_term();
+        const auto b = formula->get_right_child_term();
+        const auto eval_it_a = term_evaluations.find(a);
+        const auto eval_it_b = term_evaluations.find(b);
+        assert(eval_it_a != term_evaluations.end());
+        assert(eval_it_b != term_evaluations.end());
+
+        // The evaluations contains all valid modal points, so restrict them to the provided subset @points.
+        const auto eval_a = eval_it_a->second & points;
+        const auto eval_b = eval_it_b->second & points;
+
+        return s.add_constraint(eval_a, eval_b, op);
+    };
+
+    for(const auto& m : measured_less_eq_T_)
+    {
+        if(!add_constraint(system, m, points, term_evaluations, system_of_inequalities::inequality_operation::LE))
+        {
+            return false;
+        }
+    }
+
+    for(const auto& m : measured_less_eq_F_)
+    {
+        if(!add_constraint(system, m, points, term_evaluations, system_of_inequalities::inequality_operation::G))
+        {
+            return false;
+        }
+    }
+
+    return system.is_solvable();
 }
 
 auto measured_model::get_model_points() const -> const points_t&
@@ -201,72 +273,12 @@ auto measured_model::get_model_points() const -> const points_t&
 void measured_model::clear()
 {
     used_variables_.clear();
-    number_of_contacts_ = 0;
-    constant_true_.reset();
     points_.clear();
     measured_less_eq_T_.clear();
     measured_less_eq_F_.clear();
     system_.clear();
 
     imodel::clear();
-}
-
-auto measured_model::construct_contact_model_points(const formulas_t& contacts) -> bool
-{
-    // For each contact term it will generate an evaluation of all used variables which evaluates it to the constant_true
-    for (const auto& c : contacts)
-    {
-        const term* left = c->get_left_child_term();
-        const term* right = c->get_right_child_term();
-        variables_evaluations_block_for_positive_term left_evaluation(*left, used_variables_); // it will be overriten if succeed
-        variables_evaluations_block_for_positive_term right_evaluation(*right, used_variables_);
-        if (!left_evaluation.reset() || !right_evaluation.reset())
-        {
-            return false;
-        }
-        points_.push_back({ left, std::move(left_evaluation) });
-        points_.push_back({ right, std::move(right_evaluation) });
-    }
-
-    return true;
-}
-
-auto measured_model::construct_non_zero_model_points(const terms_t& non_zero_terms) -> bool
-{
-    // For each non-zero term it will generate an evaluation of all used variables which evaluates it to the constant_true
-    for (const auto& z : non_zero_terms)
-    {
-        variables_evaluations_block_for_positive_term eval(*z, used_variables_); // it will be overriten if succeed
-        if (!eval.reset())
-        {
-            return false;
-        }
-        points_.push_back({ z, std::move(eval) });
-    }
-
-    return true;
-}
-
-void measured_model::calculate_the_model_evaluation_of_each_variable()
-{
-    const auto points_size = points_.size();
-    variable_evaluations_.clear();
-    variable_evaluations_.resize(mgr_->get_variables().size(), model_points_set_t(points_size)); // initialize each variable evaluation as the empty set
-
-    // Calculate the MODEL evaluation of each variable, i.e. each variable_id
-    // v(Pi) = { point | point_evaluation[Pi] == 1 } , i.e. the evaluation of variable with id Pi is 1, i.e. the bit at position Pi is 1
-    for (size_t point = 0; point < points_size; ++point)
-    {
-        const auto& point_evaluation = points_[point].evaluation.get_evaluations_block().get_evaluations();
-
-        // iterate only set bits(1s)
-        auto Pi = point_evaluation.find_first();
-        while (Pi != variables_evaluations_t::npos)
-        {
-            variable_evaluations_[Pi].set(point); // adds the point to the v(Pi) set
-            Pi = point_evaluation.find_next(Pi);
-        }
-    }
 }
 
 auto measured_model::print_system_sum_variables(std::ostream& out, const model_points_set_t& variables) const -> std::ostream&
@@ -329,7 +341,7 @@ auto measured_model::print(std::ostream& out) const -> std::ostream&
     for(size_t i = 0; i < points_size; ++i)
     {
         out << std::to_string(i) << " : ";
-        mgr_->print(out, points_[i].evaluation.get_evaluations_block());
+        mgr_->print(out, points_[i]);
         out << "\n";
     }
 

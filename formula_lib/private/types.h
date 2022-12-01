@@ -43,6 +43,7 @@ using model_points_set_t = boost::dynamic_bitset<>;
 using variable_id_to_points_t = std::vector<model_points_set_t>;
 using contacts_t = std::vector<model_points_set_t>;
 using model_points_sets_t = std::vector<model_points_set_t>;
+using term_to_modal_points_t = std::unordered_map<const term*, model_points_set_t, term_ptr_hasher, term_ptr_comparator>;
 
 std::ostream& operator<<(std::ostream& out, const formulas_t& formulas);
 std::ostream& operator<<(std::ostream& out, const terms_t& terms);

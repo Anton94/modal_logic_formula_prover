@@ -45,6 +45,7 @@ int main(int argc, char* argv[])
         measured_model m;
         const auto res = f.is_satisfiable(m);
         info() << "The formula is " << (res ? "" : "not ") << "satisfiable.";
+        info() << "Measured model:\n" << m;
     }
     catch(const cxxopts::OptionException& e)
     {

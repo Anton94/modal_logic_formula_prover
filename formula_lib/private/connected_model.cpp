@@ -29,7 +29,7 @@ auto connected_model::create(const formulas_t& contacts_T, const formulas_t& con
         return false;
     }
 
-    construct_all_valid_unique_points(contacts_F, zero_terms_T);
+    points_ = construct_all_valid_points(used_variables_, contacts_F, zero_terms_T);
 
     if(points_.empty())
     {
@@ -87,23 +87,6 @@ auto connected_model::create(const formulas_t& contacts_T, const formulas_t& con
 
     trace() << "Unable to find such connected component of points.";
     return false;
-}
-
-void connected_model::construct_all_valid_unique_points(const formulas_t& contacts_F,
-                                                        const terms_t& zero_terms_T)
-{
-    variables_evaluations_block evaluation(used_variables_);
-
-    do
-    {
-        TERMINATE_IF_NEEDED(); // TODO: not every point but maybe every 100 or something
-
-        if(are_zero_terms_T_satisfied(zero_terms_T, evaluation) &&
-           is_contacts_F_reflexive_rule_satisfied(contacts_F, evaluation))
-        {
-            points_.push_back(evaluation);
-        }
-    } while(evaluation.generate_next_evaluation_over_A());
 }
 
 auto connected_model::get_model_points() const -> const points_t&
