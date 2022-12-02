@@ -95,7 +95,6 @@
  *
  */
 
-class formula_mgr;
 class term;
 class formula;
 
@@ -104,13 +103,10 @@ struct model : public imodel
 
     using points_t = std::vector<variables_evaluations_block>;
 
-    auto create(const formulas_t& contacts_T, const formulas_t& contacts_F, const terms_t& zero_terms_T,
-                const terms_t& zero_terms_F, const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F, const variables_mask_t& used_variables, const formula_mgr* mgr)
-        -> bool override;
-
-    auto get_model_points() const -> const points_t&;
-
-    auto print(std::ostream& out) const -> std::ostream& override;
+    auto create(const formulas_t& contacts_T, const formulas_t& contacts_F,
+                const terms_t& zero_terms_T,  const terms_t& zero_terms_F,
+                const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F,
+                const variables_mask_t& used_variables, const variables_t& variable_names) -> bool override;
 
     void clear() override;
 
@@ -171,6 +167,4 @@ protected:
 
 protected:
     variables_mask_t used_variables_{};
-
-    points_t points_;
 };

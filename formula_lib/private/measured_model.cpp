@@ -1,7 +1,7 @@
 #include "measured_model.h"
 #include "formula.h"
-#include "formula_mgr.h"
 #include "term.h"
+#include "logger.h"
 #include "thread_termiator.h"
 #include "utils.h"
 
@@ -90,18 +90,22 @@ measured_model::measured_model(size_t max_variables_count) :
 measured_model::~measured_model() = default;
 
 auto measured_model::create(const formulas_t& contacts_T, const formulas_t& contacts_F,
-                            const terms_t& zero_terms_T, const terms_t& zero_terms_F,
+                            const terms_t& zero_terms_T,  const terms_t& zero_terms_F,
                             const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F,
-                            const variables_mask_t& used_variables, const formula_mgr* mgr)
-    -> bool
+                            const variables_mask_t& used_variables, const variables_t& variable_names) -> bool
 {
+    trace() << "Start creating a measured model.";
+
     clear();
+
+    variable_names_ = variable_names;
     used_variables_ = used_variables;
-    mgr_ = mgr;
+
     measured_less_eq_T_ = measured_less_eq_T;
     measured_less_eq_F_ = measured_less_eq_F;
 
     trace() << "Used variables are: " << used_variables_.count();
+
     if(used_variables_.count() > max_variables_count_)
     {
         trace() << "Unable to create the model because the used variables are more than the preset maximal variables count of " << max_variables_count_;
@@ -115,16 +119,26 @@ auto measured_model::create(const formulas_t& contacts_T, const formulas_t& cont
         return false;
     }
 
-    trace() << "Constructed all valid modal points.";
-
-    assert(used_variables_.size() == mgr_->get_variables().size()); // TODO(toni): what is the diference between this and used variables size?
     const auto variable_evaluations_over_all_valid_points = generate_variable_evaluations(all_valid_points, used_variables_.size());
-
-    trace() << "Constructed the variable evaluations for all valid modal points.";
 
     const auto all_valid_contact_relations = build_contact_relations_matrix(contacts_F, variable_evaluations_over_all_valid_points);
 
-    trace() << "Constructed all valid contacts between all valid modal points.";
+    trace() << "Constructed all valid modal points, valid connections betweeen them and variable evaluations.";
+
+    if(trace().is_enabled())
+    {
+        std::stringstream s;
+        s << "All valid modal points:\n";
+        imodel::print(s, all_valid_points);
+
+        s << "All valid contact relations:\n";
+        imodel::print_contacts(s, all_valid_contact_relations);
+
+        s << "Variable evaluations:\n";
+        imodel::print_evaluations(s, variable_evaluations_over_all_valid_points);
+
+        trace() << s.str();
+    }
 
     // So far, the zero terms and non-contacts are satisfied.
     // From now on, no new relations, neigther points will be added, therefore the zero terms and non-contacts satistfactionwill be preserved.
@@ -137,6 +151,9 @@ auto measured_model::create(const formulas_t& contacts_T, const formulas_t& cont
     add_term_evaluations(term_evaluations, measured_less_eq_T, variable_evaluations_over_all_valid_points);
 
     system_ = system_of_inequalities(all_valid_points.size());
+
+    const auto total_combinations = size_t(std::pow(2, all_valid_points.size()));
+    trace() << "Total combinations of subset of model points are: " << total_combinations;
 
     const auto all_points = ~model_points_set_t(all_valid_points.size());
     return generate_model(all_points, contacts_T, contacts_F, zero_terms_F, all_valid_points, all_valid_contact_relations, term_evaluations);
@@ -167,7 +184,7 @@ auto measured_model::generate_model(const model_points_set_t& points,
     {
         // Good. Found a measured model.
         save_as_model(points, contacts_F, all_valid_points);
-        trace() << "Found a measured model for the formula:\n" << *this;
+        trace() << "Found a measured model:\n" << *this;
         return true;
     }
 
@@ -265,15 +282,9 @@ auto measured_model::create_system_of_inequalities(const model_points_set_t& poi
     return system.is_solvable();
 }
 
-auto measured_model::get_model_points() const -> const points_t&
-{
-    return points_;
-}
-
 void measured_model::clear()
 {
     used_variables_.clear();
-    points_.clear();
     measured_less_eq_T_.clear();
     measured_less_eq_F_.clear();
     system_.clear();
@@ -336,21 +347,11 @@ auto measured_model::print_system(std::ostream& out) const -> std::ostream&
 
 auto measured_model::print(std::ostream& out) const -> std::ostream&
 {
-    out << "Model points: \n";
-    const auto points_size = points_.size();
-    for(size_t i = 0; i < points_size; ++i)
-    {
-        out << std::to_string(i) << " : ";
-        mgr_->print(out, points_[i]);
-        out << "\n";
-    }
-
     if(measured_less_eq_T_.empty() && measured_less_eq_F_.empty())
     {
+        out << "No system needed. No measured atomic formulas:\n";
         return out;
     }
-    out << "Measured  : " << measured_less_eq_T_ << "\n";
-    out << "Measured ~: " << measured_less_eq_F_ << "\n";
 
     print_system(out);
 
@@ -358,8 +359,9 @@ auto measured_model::print(std::ostream& out) const -> std::ostream&
     {
         out << "Solution:\n";
         auto variables_values = system_.get_variables_values();
-        assert(variables_values.size() == points_size);
-        for(size_t i = 0; i < points_size; ++i)
+        assert(variables_values.size() == points_.size());
+
+        for(size_t i = 0; i < variables_values.size(); ++i)
         {
             out << "X" << i << " = " << variables_values[i] << "\n";
         }

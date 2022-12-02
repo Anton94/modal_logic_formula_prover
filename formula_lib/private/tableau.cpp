@@ -661,7 +661,7 @@ auto tableau::has_satisfiable_model() -> bool
     // in the whole formula.
     const auto used_variables = get_used_variables();
 
-    if(!model_->create(contacts_T_, contacts_F_, zero_terms_T_, zero_terms_F_, measured_less_eq_T_, measured_less_eq_F_, used_variables, mgr_))
+    if(!model_->create(contacts_T_, contacts_F_, zero_terms_T_, zero_terms_F_, measured_less_eq_T_, measured_less_eq_F_, used_variables, mgr_->get_variables()))
     {
         trace() << "Unable to construct a satisfiable model.";
         return false;

@@ -104,7 +104,6 @@
  *    If there is no other subset of modal points then there is no measured model.
 */
 
-class formula_mgr;
 class formula;
 
 struct measured_model : public imodel
@@ -115,12 +114,9 @@ struct measured_model : public imodel
     measured_model(size_t max_variables_count = 4u);
 
     auto create(const formulas_t& contacts_T, const formulas_t& contacts_F,
-                const terms_t& zero_terms_T, const terms_t& zero_terms_F,
+                const terms_t& zero_terms_T,  const terms_t& zero_terms_F,
                 const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F,
-                const variables_mask_t& used_variables, const formula_mgr* mgr)
-    -> bool override;
-
-    auto get_model_points() const -> const points_t&;
+                const variables_mask_t& used_variables, const variables_t& variable_names) -> bool override;
 
     auto print(std::ostream& out) const -> std::ostream& override;
 
@@ -156,9 +152,8 @@ private:
     auto print_system(std::ostream& out) const -> std::ostream&;
 
     size_t max_variables_count_{};
-    variables_mask_t used_variables_{}; // TODO(toni): move them to the parent class and reuse it from all other models!
 
-    points_t points_; // TODO(toni): move them to the parent class and reuse it from all other models!
+    variables_mask_t used_variables_;
 
     formulas_t measured_less_eq_T_;
     formulas_t measured_less_eq_F_;

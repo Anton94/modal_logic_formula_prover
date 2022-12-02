@@ -12,9 +12,9 @@ int main(int argc, char* argv[])
     // Use -h to see which arguments are supported by catch.
     // Run specific test by passing it's name as argument.
 
-    // set_trace_logger([](std::stringstream&& s) { std::cout << s.rdbuf() << std::endl; });
+    set_trace_logger([](std::stringstream&& s) { std::cout << s.rdbuf() << std::endl; });
     // set_info_logger([](std::stringstream&& s) { std::cout << s.rdbuf() << std::endl; });
-    set_error_logger([](std::stringstream&& s) { std::cerr << "ERROR: " << s.rdbuf() << std::endl; });
+    // set_error_logger([](std::stringstream&& s) { std::cerr << "ERROR: " << s.rdbuf() << std::endl; });
 
     int result = Catch::Session().run(argc, argv);
     // potential teardown

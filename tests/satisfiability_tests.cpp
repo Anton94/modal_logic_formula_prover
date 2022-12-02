@@ -554,3 +554,13 @@ TEST_CASE("system without solution 0", "[satisfiability]")
 {
     is_satisfiable("~(x = 0) & ~(y = 0) & ~(<=(x,y)) & ~(<=(y,x)) & <=m(x, x + y) & <=m(x+y, x)", true, true, false);
 }
+
+TEST_CASE("system without solution 3 variables 0", "[satisfiability]")
+{
+    is_satisfiable("~(x = 0) & ~(y = 0) & ~(<=(x,y)) & ~(<=(y,x)) & <=m(x, x + y) & <=m(x+y, x) & <=(x2,x2) & (x3 = 0)", true, true, false);
+}
+
+TEST_CASE("system without solution 3 variables 1", "[satisfiability]")
+{
+    is_satisfiable("~(x = 0) & ~(y = 0) & ~(<=(x,y)) & ~(<=(y,x)) & <=m(x, x + y) & <=m(x+y, x) & <=(x2,x2)", true, true, false);
+}

@@ -2,6 +2,7 @@
 
 #include "types.h"
 #include "../private/types.h"
+#include "../private/variables_evaluations_block.h" // TODO remove the private dependency in the header files
 #include <vector>
 
 class formula_mgr;
@@ -9,31 +10,38 @@ class formula_mgr;
 class imodel
 {
 public:
-    virtual auto create(const formulas_t& contacts_T, const formulas_t& contacts_F, const terms_t& zero_terms_T,
-                const terms_t& zero_terms_F, const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F, const variables_mask_t& used_variables, const formula_mgr* mgr)
-        -> bool = 0;
+    using points_t = std::vector<variables_evaluations_block>;
+
+    virtual auto create(const formulas_t& contacts_T, const formulas_t& contacts_F,
+                        const terms_t& zero_terms_T,  const terms_t& zero_terms_F,
+                        const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F,
+                        const variables_mask_t& used_variables, const variables_t& variable_names) -> bool = 0;
 
     virtual auto get_variables_evaluations() const -> const variable_id_to_points_t&;
     virtual auto get_contact_relations() const -> const contacts_t&;
 
-    // TODO: add get_points which returns a vector of binary variable evaluations
+    virtual auto get_model_points() const -> const points_t&;
 
-    virtual auto print(std::ostream& out) const -> std::ostream& = 0;
+    virtual auto print(std::ostream& out) const -> std::ostream&;
 
     virtual void clear();
     virtual ~imodel() = default;
 
-
     friend std::ostream& operator<<(std::ostream& out, const imodel& m);
 
 protected:
+    auto get_variable_name(variable_id_t variable_id) const -> const std::string&;
+
+    auto print(std::ostream& out, const variables_evaluations_block& block) const -> std::ostream&;
+    auto print(std::ostream& out, const points_t& points) const -> std::ostream&;
+    auto print_contacts(std::ostream& out, const contacts_t& contact_relations) const -> std::ostream&;
+    auto print_evaluations(std::ostream& out, const variable_id_to_points_t& variable_evaluations) const -> std::ostream&;
+
     // Useful for models which have their first 2*@number_of_contacts points in contact (point 2k is in contact with point (2k+1))
     // Inserts 1s in the contact relations matrix between points 2k and 2k+1 (for each k in range [0, @number_of_contacts))
     // Inserts 1s in the contact relations matrix between each point and itself (reflexivity).
     // TODO(toni): move to utils!
     void create_contact_relations_first_2k_in_contact(size_t number_of_points, size_t number_of_contacts);
-
-    const formula_mgr* mgr_{}; // TODO(toni): remove this ugly dependency and pass the variables info to 'create'!!!
 
     /*
         Symetric square bit matrix. contacts_[i] gives a bit mask of all points which are in contact with the point 'i'.
@@ -79,4 +87,9 @@ protected:
             2 0110     // v(c) = { 1, 2 }, ... at position 2 ...
     */
     variable_id_to_points_t variable_evaluations_; // a vector of bitsets representing the value of v(p)
+
+    variables_t variable_names_;
+
+    // The modal points.
+    points_t points_;
 };

@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
             return 0;
         }
 
-        std::string formula = "C(a,b) & <=(b,c) & C(a,c) & <=m(a,b) & ~<=m(b,c + a)";
+        std::string formula = "~(x = 0) & ~(y = 0) & ~(<=(x,y)) & ~(<=(y,x)) & <=m(x, x + y) & <=m(x+y, x) & <=m(x2, x3) & (x3 = 0)";
         if(result.count("formula"))
         {
             auto formula_arg = result["formula"].as<std::string>();

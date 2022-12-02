@@ -1,8 +1,8 @@
 #include "connected_model.h"
 #include "formula.h"
-#include "formula_mgr.h"
 #include "term.h"
 #include "utils.h"
+#include "logger.h"
 #include "../include/thread_termiator.h"
 
 #include <cassert>
@@ -14,13 +14,16 @@ connected_model::connected_model(size_t max_variables_count)
 }
 
 auto connected_model::create(const formulas_t& contacts_T, const formulas_t& contacts_F,
-                             const terms_t& zero_terms_T, const terms_t& zero_terms_F,
-                             const formulas_t&, const formulas_t&,
-                             const variables_mask_t& used_variables, const formula_mgr* mgr) -> bool
+                             const terms_t& zero_terms_T,  const terms_t& zero_terms_F,
+                             const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F,
+                             const variables_mask_t& used_variables, const variables_t& variable_names) -> bool
 {
+    trace() << "Start creating a connected model.";
+
     clear();
+
+    variable_names_ = variable_names;
     used_variables_ = used_variables;
-    mgr_ = mgr;
 
     trace() << "Used variables are: " << used_variables_.count();
     if(used_variables_.count() > max_variables_count_)
@@ -56,7 +59,6 @@ auto connected_model::create(const formulas_t& contacts_T, const formulas_t& con
     TERMINATE_IF_NEEDED();
 
     // Now, we have in some sence the biggest model(w.r.t number of unique points and maximal contact relations between them)
-    assert(mgr_->is_model_satisfiable(*this));
 
     trace() << "Will try to find a connected component of points (which itself is a satisfiable model) in the following satisfiable model:\n" << *this;
 
@@ -76,8 +78,7 @@ auto connected_model::create(const formulas_t& contacts_T, const formulas_t& con
             // Good. The connected component is also a valid model.
             // Remove all other points(outside the connected component) because we do not need them.
             reduce_model_to_subset_of_points(connected_component);
-            trace() << "Found a connected component which is also a satisfiable model for the formula:\n" << *this;
-            assert(mgr_->is_model_satisfiable(*this));
+            trace() << "Found a connected component which is also a satisfiable model:\n" << *this;
             return true;
         }
 
@@ -89,15 +90,9 @@ auto connected_model::create(const formulas_t& contacts_T, const formulas_t& con
     return false;
 }
 
-auto connected_model::get_model_points() const -> const points_t&
-{
-    return points_;
-}
-
 void connected_model::clear()
 {
     used_variables_.clear();
-    points_.clear();
 
     imodel::clear();
 }
@@ -332,7 +327,7 @@ void connected_model::calculate_the_model_evaluation_of_each_variable()
     const auto points_size = points_.size();
     variable_evaluations_.clear();
     variable_evaluations_.resize(
-        mgr_->get_variables().size(),
+        used_variables_.size(),
         model_points_set_t(points_size)); // initialize each variable evaluation as the empty set
 
     // Calculate the MODEL evaluation of each variable, i.e. each variable_id
@@ -350,17 +345,4 @@ void connected_model::calculate_the_model_evaluation_of_each_variable()
             Pi = point_evaluation.find_next(Pi);
         }
     }
-}
-
-auto connected_model::print(std::ostream& out) const -> std::ostream&
-{
-    out << "Model points: \n";
-    for(size_t i = 0; i < points_.size(); ++i)
-    {
-        out << std::to_string(i) << " : ";
-        mgr_->print(out, points_[i]);
-        out << "\n";
-    }
-
-    return out;
 }

@@ -1,19 +1,23 @@
 #include "model.h"
 #include "formula.h"
-#include "formula_mgr.h"
 #include "term.h"
+#include "logger.h"
 #include "utils.h"
 #include "../include/thread_termiator.h"
 
 #include <cassert>
 
-auto model::create(const formulas_t& contacts_T, const formulas_t& contacts_F, const terms_t& zero_terms_T,
-                   const terms_t& zero_terms_F, const formulas_t&, const formulas_t&, const variables_mask_t& used_variables,
-                   const formula_mgr* mgr) -> bool
+auto model::create(const formulas_t& contacts_T, const formulas_t& contacts_F,
+                   const terms_t& zero_terms_T,  const terms_t& zero_terms_F,
+                   const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F,
+                   const variables_mask_t& used_variables, const variables_t& variable_names) -> bool
 {
+    trace() << "Start creating a model.";
+
     clear();
+
     used_variables_ = used_variables;
-    mgr_ = mgr;
+    variable_names_ = variable_names;
 
     if(!construct_contact_model_points(contacts_T, contacts_F, zero_terms_T) ||
        !construct_non_zero_model_points(zero_terms_F, contacts_F, zero_terms_T))
@@ -29,18 +33,15 @@ auto model::create(const formulas_t& contacts_T, const formulas_t& contacts_F, c
 
     calculate_the_model_evaluation_of_each_variable();
     create_contact_relations_first_2k_in_contact(points_.size(), contacts_T.size());
-    return true;
-}
 
-auto model::get_model_points() const -> const points_t&
-{
-    return points_;
+    trace() << "Found a model:\n" << *this;
+
+    return true;
 }
 
 void model::clear()
 {
     used_variables_.clear();
-    points_.clear();
 
     imodel::clear();
 }
@@ -145,18 +146,19 @@ auto model::does_point_evaluation_satisfies_basic_rules(const term* t,
                                                         const formulas_t& contacts_F,
                                                         const terms_t& zero_terms_T) const -> bool
 {
-    return t->evaluate(evaluation).is_constant_true() &&
-           are_zero_terms_T_satisfied(zero_terms_T, evaluation) &&
+    if(t && !t->evaluate(evaluation).is_constant_true())
+    {
+        return false;
+    }
+
+    return are_zero_terms_T_satisfied(zero_terms_T, evaluation) &&
            is_contacts_F_reflexive_rule_satisfied(contacts_F, evaluation);
 }
 
 auto model::construct_point(const formulas_t& contacts_F, const terms_t& zero_terms_T) -> bool
 {
-    term t(mgr_);
-    t.construct_constant(true);
-
     variables_evaluations_block eval(variables_mask_t(0)); // it will be overridden if succeed
-    if(create_point_evaluation(&t, eval, contacts_F, zero_terms_T))
+    if(create_point_evaluation(nullptr, eval, contacts_F, zero_terms_T))
     {
         points_.push_back(std::move(eval));
         return true;
@@ -170,7 +172,7 @@ void model::calculate_the_model_evaluation_of_each_variable()
     const auto points_size = points_.size();
     variable_evaluations_.clear();
     variable_evaluations_.resize(
-        mgr_->get_variables().size(),
+        used_variables_.size(),
         model_points_set_t(points_size)); // initialize each variable evaluation as the empty set
 
     // Calculate the MODEL evaluation of each variable, i.e. each variable_id
@@ -188,17 +190,4 @@ void model::calculate_the_model_evaluation_of_each_variable()
             Pi = point_evaluation.find_next(Pi);
         }
     }
-}
-
-auto model::print(std::ostream& out) const -> std::ostream&
-{
-    out << "Model points: \n";
-    for(size_t i = 0; i < points_.size(); ++i)
-    {
-        out << std::to_string(i) << " : ";
-        mgr_->print(out, points_[i]);
-        out << "\n";
-    }
-
-    return out;
 }

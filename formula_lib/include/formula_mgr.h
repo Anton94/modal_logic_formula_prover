@@ -57,7 +57,7 @@ public:
     auto get_variables() const -> const variables_t&;
 
     /// Internal API
-    auto get_variable(variable_id_t id) const -> std::string;
+    auto get_variable(variable_id_t id) const -> const std::string&;
     auto get_variable(const std::string& name) const -> variable_id_t;
     auto get_internal_formula() const -> const formula*;
 

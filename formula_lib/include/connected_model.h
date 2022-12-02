@@ -56,26 +56,20 @@
  * Overall time complexity: O(2^N * 2^N * M)
 */
 
-class formula_mgr;
 class term;
 class formula;
 
 struct connected_model : public imodel
 {
-    using points_t = std::vector<variables_evaluations_block>;
-
     /*
      * Does not creates a model if the formula's used variables are more than @max_variables_count, because it's memory intensive.
      */
     connected_model(size_t max_variables_count = 32u);
 
-    auto create(const formulas_t& contacts_T, const formulas_t& contacts_F, const terms_t& zero_terms_T,
-                const terms_t& zero_terms_F, const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F, const variables_mask_t& used_variables, const formula_mgr* mgr)
-        -> bool override;
-
-    auto get_model_points() const -> const points_t&;
-
-    auto print(std::ostream& out) const -> std::ostream& override;
+    auto create(const formulas_t& contacts_T, const formulas_t& contacts_F,
+                const terms_t& zero_terms_T,  const terms_t& zero_terms_F,
+                const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F,
+                const variables_mask_t& used_variables, const variables_t& variable_names) -> bool override;
 
     void clear() override;
 
@@ -121,8 +115,5 @@ private:
     void calculate_the_model_evaluation_of_each_variable();
 
     size_t max_variables_count_;
-
     variables_mask_t used_variables_{};
-
-    points_t points_;
 };

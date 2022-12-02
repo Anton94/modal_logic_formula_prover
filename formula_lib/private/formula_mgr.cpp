@@ -183,7 +183,7 @@ auto formula_mgr::get_variables() const -> const variables_t&
     return variables_;
 }
 
-auto formula_mgr::get_variable(variable_id_t id) const -> std::string
+auto formula_mgr::get_variable(variable_id_t id) const -> const std::string&
 {
     assert(id < variables_.size());
     return variables_[id];
