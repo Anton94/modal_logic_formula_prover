@@ -158,4 +158,6 @@ private:
     formulas_t measured_less_eq_T_;
     formulas_t measured_less_eq_F_;
     system_of_inequalities system_;
+
+    std::unordered_set<model_points_set_t> processed_combinations_{};
 };

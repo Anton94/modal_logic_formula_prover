@@ -169,6 +169,20 @@ auto measured_model::generate_model(const model_points_set_t& points,
 {
     TERMINATE_IF_NEEDED();
 
+    // Already processed.
+    // TODO make a better algorithm which does not need to keep track of already generated subsets in order to generate subsets with decreasing size.
+    if(processed_combinations_.find(points) != processed_combinations_.end())
+    {
+        return false;
+    }
+
+    processed_combinations_.insert(points);
+
+    if(processed_combinations_.size() % 1000 == 0)
+    {
+        trace() << "Checked " << processed_combinations_.size() << " combinations of subsets of modal points.";
+    }
+
     // If non-zero terms or contacts are not satisfied then this points does not produce a valid model.
     // Therefore, they could not produce a measured model neighter.
     // No subset of them could satisfy the contacts/zero terms because they require existnece of more points/relations but the set of points/relations is even reduced.
@@ -289,6 +303,8 @@ void measured_model::clear()
     measured_less_eq_F_.clear();
     system_.clear();
 
+    processed_combinations_ = {};
+
     imodel::clear();
 }
 
@@ -319,6 +335,7 @@ auto measured_model::print_system_sum_variables(std::ostream& out, const model_p
 auto measured_model::print_system(std::ostream& out) const -> std::ostream&
 {
     const auto points_size = points_.size();
+
     out << "System:\n";
     for(const auto& m : measured_less_eq_T_) // <=m(a,b)
     {
