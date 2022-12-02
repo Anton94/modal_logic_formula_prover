@@ -83,7 +83,7 @@ auto construct_all_valid_points(const variables_mask_t& used_variables,
                                 const terms_t& zero_terms_T) -> points_t
 {
     const auto expected_points_count = size_t(std::pow(2, used_variables.size()));
-    const auto heuristic_points_count = std::min(4096ul, expected_points_count);
+    const auto heuristic_points_count = std::min(size_t(4096), expected_points_count);
 
     points_t points;
     points.reserve(heuristic_points_count);
