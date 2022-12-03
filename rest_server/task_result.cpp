@@ -7,6 +7,7 @@ std::string task_result::to_string()
     result[U("is_satisfied")] = json::value(is_satisfied);
     result[U("contacts")] = json_contants();
     result[U("ids")] = json_ids();
+    result[U("variables")] = json_variables();
     result[U("output")] = json::value(utility::conversions::to_string_t(output));
 
     try
@@ -45,14 +46,25 @@ json::value task_result::json_contants()
 json::value task_result::json_ids()
 {
     json::value result = json::value::array();
-    for(size_t i = 0, len = ids.size(); i < len; ++i)
+    for (size_t i = 0, len = ids.size(); i < len; ++i)
     {
         json::value inner_array = json::value::array();
-        for(size_t j = 0, len_j = ids[i].size(); j < len_j; ++j)
+        for (size_t j = 0, len_j = ids[i].size(); j < len_j; ++j)
         {
             inner_array[j] = json::value(ids[i][j] == true ? U("1") : U("0"));
         }
         result[i] = inner_array;
+    }
+
+    return result;
+}
+
+json::value task_result::json_variables()
+{
+    json::value result = json::value::array();
+    for (size_t i = 0, len = variables.size(); i < len; ++i)
+    {
+        result[i] = json::value(utility::conversions::to_string_t(variables[i]));
     }
 
     return result;

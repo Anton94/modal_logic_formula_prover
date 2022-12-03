@@ -347,6 +347,7 @@ void microservice_controller::handle_task(const http_request& message)
 
                             if(is_parsed && is_satisfiable)
                             {
+                                final_result.variables = mgr.get_variables();
                                 final_result.ids = the_model->get_variables_evaluations();
                                 final_result.contacts = the_model->get_contact_relations();
                             }

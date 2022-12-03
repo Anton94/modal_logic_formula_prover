@@ -6,6 +6,14 @@
         <script src="./lib/d3.v4.js"></script>
 
         <style>
+            #result_sets {
+              margin: 5px;
+              border: 0.5rem outset #716da7;
+              border-radius: 12px;
+              flex: 1 1 auto;
+              padding: 10px;
+            }
+
             #visualization-graph {
               width: 70%;
               aspect-ratio : 1 / 1;
@@ -121,6 +129,7 @@
                             document.getElementById('verbose_output').innerText += jsonified["output"];
                             graphis = transform_contacts_to_graph(jsonified);
                             do_visualization_v2(graphis, 500, 500);
+                            print_result_sets(jsonified["variables"], jsonified["ids"]);
                             change_computing_components_availability(true)
                             running_count = 0;
                         } else if (jsonified["status"] == "CANCELED") {
@@ -515,22 +524,16 @@
                 };
             }
 
-            var graph1 = {
-              "nodes": [
-                {"id": "Myriel", "name": "A12", "groups": [1, 3]},
-                {"id": "Myriel1", "name": "D", "groups": [1]},
-                {"id": "Myriel2", "name": "C", "groups": [1]},
-                {"id": "Napoleon", "name": "E", "groups": [2]},
-                {"id": "x", "name": "x", "groups": [3]},
-              ],
-              "links": [
-                {"source": "Napoleon", "target": "Myriel", "value": 1},
-                {"source": "Myriel1", "target": "Myriel2", "value": 3},
-                {"source": "Myriel1", "target": "Napoleon", "value": 1},
-              ]
+            function print_result_sets(variables, ids) {
+                var text = "";
+                all_strings = variables.map((x, i) => "v(" + x + ") =  { " + 
+                    ids[i].map((a, i) => a == 1 ? i : -1)
+                    .filter(a => a >= 0)
+                    .map(x => "A" + x + " ")
+                     + "}");
+                all_strings.forEach(x => text += x + "\n");
+                document.getElementById("result_sets").innerText = text;
             }
-
-            //setTimeout(() => do_visualization_v2(graph1, 500, 500), 100);
 
             function do_visualization(graph, width, height) {
                 d3.select("svg").empty();
@@ -759,51 +762,51 @@
             }
         </script>
         <style>
-        	.run_algorithm {
-        		margin-top: 0.5rem;
-        	}
-        	.algorithm_buttons {
-    		    border: 0.5rem outset #716da7;
-			    border-radius: 12px;
-			    font: bold 1rem sans-serif;
-			    margin-top: 0.5rem;
-			    padding: 0.5rem;
-			    background: #ebebf3;
-        	}
-        	.formula_filters {
-    		    width: 60%;
-			    margin: 1rem;
-			    border: 0.5rem outset #87656b;
-			    border-radius: 12px;
-			    font: bold 1rem sans-serif;
-			    padding: 0.5rem;
-			    outline-offset: 0.5rem;
-        	}
-        	.algorithm_cancelations {
-    		    width: 40%;
-			    margin: 1rem;
-			    border: 0.5rem outset #87656b;
-			    border-radius: 12px;
-			    font: bold 1rem sans-serif;
-			    padding: 0.5rem;
-			    outline-offset: 0.5rem;
-        	}
-        	.legend {
-        		margin-left: 1rem;
-			    border: 0.5rem outset #8d8485;
-			    box-shadow: 0 0 0 0.3rem #26627a;
-			    border-radius: 12px;
-			    padding: 0.4rem;
-			    outline-offset: 0.5rem;
-        	}
-        	.result {
-    		    margin-left: 10px;
-			    border: 0.5rem outset #87656b;
-			    border-radius: 12px;
-			    font: bold 1rem sans-serif;
-			    padding-left: 0.3rem;
-			    padding-right: 0.3rem;
-        	}
+            .run_algorithm {
+                margin-top: 0.5rem;
+            }
+            .algorithm_buttons {
+                border: 0.5rem outset #716da7;
+                border-radius: 12px;
+                font: bold 1rem sans-serif;
+                margin-top: 0.5rem;
+                padding: 0.5rem;
+                background: #ebebf3;
+            }
+            .formula_filters {
+                width: 60%;
+                margin: 1rem;
+                border: 0.5rem outset #87656b;
+                border-radius: 12px;
+                font: bold 1rem sans-serif;
+                padding: 0.5rem;
+                outline-offset: 0.5rem;
+            }
+            .algorithm_cancelations {
+                width: 40%;
+                margin: 1rem;
+                border: 0.5rem outset #87656b;
+                border-radius: 12px;
+                font: bold 1rem sans-serif;
+                padding: 0.5rem;
+                outline-offset: 0.5rem;
+            }
+            .legend {
+                margin-left: 1rem;
+                border: 0.5rem outset #8d8485;
+                box-shadow: 0 0 0 0.3rem #26627a;
+                border-radius: 12px;
+                padding: 0.4rem;
+                outline-offset: 0.5rem;
+            }
+            .result {
+                margin-left: 10px;
+                border: 0.5rem outset #87656b;
+                border-radius: 12px;
+                font: bold 1rem sans-serif;
+                padding-left: 0.3rem;
+                padding-right: 0.3rem;
+            }
         </style>
     </head>
     <body onload="pre_init();">
@@ -816,40 +819,41 @@
         <div>
             <div class="main" style="display: flex; flex-direction: row;">
                 <div class="formula_container" style="margin: 20px; display: flex; flex-direction: column; width: 100%">
-                	<div>
-    	            	<div style="display: flex; flex-direction: row; align-items: center;">
-    		                <div class="formula_itself" style="width: 90%; display: flex; flex-direction: row">
-    		                	<span style="margin-right: 0.6rem">Formula:</span><br>
-    		                	<input id="formula" style="width: 100%; height: 20px;"/>
-    		                </div>
-    		                <span style="margin-left: 4px;">Status:</span><span id="algorithm_result" class="result">Resting</span>
-    		            </div>
-    		            <div class="algorithm_buttons">
-    		                Algorithms: 
-    		                <button class="run_algorithm" onclick="create_task('MEASURED_MODEL')" class="computing_element">MEASURED MODEL</button>
-    		                <!-- <button class="run_algorithm" onclick="create_task('OPTIMIZED_MEASURED_MODEL')" class="computing_element">OPTIMIZED MEASURED MODEL</button> -->
-    		                <button class="run_algorithm" onclick="create_task('FAST_MODEL')" class="computing_element">FAST MODEL</button>
-    		                <button class="run_algorithm" onclick="create_task('CONNECTIVITY')" class="computing_element">CONNECTED MODEL</button>
-    		                <!-- Add killswitch which is only for development so that this line does not be present -->
-    		                <button class="run_algorithm" onclick="create_task('BRUTEFORCE_MODEL')" class="computing_element">BRUTEFORCE MODEL</button>
-    		            </div>
-    	            </div>
-    	            <div style="display: flex; flex-direction: row;">
-    					<div id="formula_filters" class="formula_filters">
-    		                Formula Filters:<br>
-    		                <input type="checkbox" id="convert_contact_less_eq_with_same_terms" checked> Convert Contacts in &lt;=<br>
-    		                <input type="checkbox" id="convert_disjunction_in_contact_less_eq" checked> Split Disjunctions in Atomic Formulas<br>
-    		                <input type="checkbox" id="reduce_constants" checked> Reduce Contacts<br>
-    		                <input type="checkbox" id="reduce_contacts_less_eq_with_constants" checked> Reduce Atomic Formulas with Contacts<br>
-    		                <input type="checkbox" id="remove_double_negation" checked> Remove Double Negations<br>
-    		            </div>
-    		            <div class="algorithm_cancelations">
-    		                If the calculation takes too long, try to cancel it. It might help to optimize the input formula<br>
-    		                <button style="margin-top:0.5rem" id="cancel_calculation" onclick="cancel_task('valid_op_id')">CANCEL CALCULATION</button>
-    		            </div>
-    		        </div>
-                    <div style="width: 100%; display: flex; flex-direction: column;align-items: center;">
+                    <div>
+                        <div style="display: flex; flex-direction: row; align-items: center;">
+                            <div class="formula_itself" style="width: 90%; display: flex; flex-direction: row">
+                                <span style="margin-right: 0.6rem">Formula:</span><br>
+                                <input id="formula" style="width: 100%; height: 20px;"/>
+                            </div>
+                            <span style="margin-left: 4px;">Status:</span><span id="algorithm_result" class="result">Resting</span>
+                        </div>
+                        <div class="algorithm_buttons">
+                            Algorithms: 
+                            <button class="run_algorithm" onclick="create_task('MEASURED_MODEL')" class="computing_element">MEASURED MODEL</button>
+                            <!-- <button class="run_algorithm" onclick="create_task('OPTIMIZED_MEASURED_MODEL')" class="computing_element">OPTIMIZED MEASURED MODEL</button> -->
+                            <button class="run_algorithm" onclick="create_task('FAST_MODEL')" class="computing_element">FAST MODEL</button>
+                            <button class="run_algorithm" onclick="create_task('CONNECTIVITY')" class="computing_element">CONNECTED MODEL</button>
+                            <!-- Add killswitch which is only for development so that this line does not be present -->
+                            <button class="run_algorithm" onclick="create_task('BRUTEFORCE_MODEL')" class="computing_element">BRUTEFORCE MODEL</button>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: row;">
+                        <div id="formula_filters" class="formula_filters">
+                            Formula Filters:<br>
+                            <input type="checkbox" id="convert_contact_less_eq_with_same_terms" checked> Convert Contacts in &lt;=<br>
+                            <input type="checkbox" id="convert_disjunction_in_contact_less_eq" checked> Split Disjunctions in Atomic Formulas<br>
+                            <input type="checkbox" id="reduce_constants" checked> Reduce Contacts<br>
+                            <input type="checkbox" id="reduce_contacts_less_eq_with_constants" checked> Reduce Atomic Formulas with Contacts<br>
+                            <input type="checkbox" id="remove_double_negation" checked> Remove Double Negations<br>
+                        </div>
+                        <div class="algorithm_cancelations">
+                            If the calculation takes too long, try to cancel it. It might help to optimize the input formula<br>
+                            <button style="margin-top:0.5rem" id="cancel_calculation" onclick="cancel_task('valid_op_id')">CANCEL CALCULATION</button>
+                        </div>
+                    </div>
+                    <div style="width: 100%; display: flex; flex-direction: row">
                         <div id="visualization-graph"></div>
+                        <div id="result_sets"></div>
                     </div>
                 </div>
                 <div class="legend" style="margin-left: auto">
@@ -869,13 +873,13 @@
                     <code>-&gt;&nbsp;&nbsp;-&nbsp;<font size="+1">&#x21d2;</font>&nbsp;&nbsp;-&nbsp;</code><label>Implication</label><br>
                     <code>&lt;-&gt;&nbsp;-&nbsp;<font size="+1">&#x21D4;</font>&nbsp;&nbsp;-&nbsp;</code><label>Equivalence</label><br>
                     <code>C&nbsp;&nbsp;&nbsp;-&nbsp;&#x2201;&nbsp; - </code><label>Contact, <br/>
-                    	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;syntax:</label><code>&nbsp;C(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
+                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;syntax:</label><code>&nbsp;C(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
                     <code>&lt;=&nbsp;&nbsp;-&nbsp;&le;&nbsp; - </code><label>Part Of, <br/>
-                    	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;syntax:</label><code>&nbsp;&lt;=(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
+                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;syntax:</label><code>&nbsp;&lt;=(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
                     <code>&lt;=m&nbsp;-&nbsp;&le;<sub>m</sub> - </code><label>Measured Part Of, <br/>
-                    	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;syntax:</label><code>&nbsp;&lt;=m(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
+                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;syntax:</label><code>&nbsp;&lt;=m(T<sub>1</sub>,&nbsp;T<sub>2</sub>)</code><br>
                     <code>=0&nbsp;&nbsp;-&nbsp;=0 - </code><label>Syntax suggar for <br/>
-                    	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;zero term, syntax:</label><code>&nbsp;T=0</code><br>
+                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;zero term, syntax:</label><code>&nbsp;T=0</code><br>
                     <code>()&nbsp;&nbsp;-&nbsp;() - </code><label>Parentheses</label><br>
                 </div>
             </div>
@@ -889,22 +893,22 @@
             </div>
         </div>
         <script type="text/javascript">
-        	var withLogs = document.getElementById("hide-output");
-        	var simpleFooter = document.getElementById("simple-footer");
-        	
-        	switchFooters = function() {
-        		var withLogsCurrent = document.getElementById("footer-with-logs");
-        		var simpleFooterCurrent = document.getElementById("simple-footer");
-               	if (withLogsCurrent.style.display === "block") {
-            		withLogsCurrent.style.display = "none";
-            		simpleFooterCurrent.style.display = "block";
-            	} else {
-            		withLogsCurrent.style.display = "block";
-            		simpleFooterCurrent.style.display = "none";
-            	}
-        	}
-        	withLogs.addEventListener("click", switchFooters);
-        	simpleFooter.addEventListener("click", switchFooters);
+            var withLogs = document.getElementById("hide-output");
+            var simpleFooter = document.getElementById("simple-footer");
+            
+            switchFooters = function() {
+                var withLogsCurrent = document.getElementById("footer-with-logs");
+                var simpleFooterCurrent = document.getElementById("simple-footer");
+                if (withLogsCurrent.style.display === "block") {
+                    withLogsCurrent.style.display = "none";
+                    simpleFooterCurrent.style.display = "block";
+                } else {
+                    withLogsCurrent.style.display = "block";
+                    simpleFooterCurrent.style.display = "none";
+                }
+            }
+            withLogs.addEventListener("click", switchFooters);
+            simpleFooter.addEventListener("click", switchFooters);
         </script>
     </body>
 </html>

@@ -13,12 +13,13 @@ public:
     bool is_satisfied{};
     contacts_t contacts;
     variable_id_to_points_t ids;
+    variables_t variables;
     std::string output;
 
     std::string to_string();
 
 private:
     json::value json_contants();
-
     json::value json_ids();
+    json::value json_variables();
 };
