@@ -650,7 +650,9 @@
 			\end{equation}
 		\end{defn}
 
-		Let $\F^v = (W^v, R^v)$ be a relational system and $\M^v = (\F^v, \upsilon_n)$ be a model in this system. $\M^v$ contains all valid modal points and valid connections between them w.r.t zero terms and non-contacts in $\beta$. $\M^v$ is a model of $\beta$ if the contacts and non-zero terms in $\beta$ are satisfied \ref{satisfied-contacts-non-zero-terms} . If $\M^v$ is not a model of $\beta$, then $\beta$ does not have a model. There is no way of adding new modal points or relations to satisfy the contacts and non-zero terms. Therefore, there is no connected model eigther.
+		\begin{step}
+			Let $\F^v = (W^v, R^v)$ be a relational system and $\M^v = (\F^v, \upsilon_n)$ be a model in this system. $\M^v$ contains all valid modal points and valid connections between them w.r.t zero terms and non-contacts in $\beta$. $\M^v$ is a model of $\beta$ if the contacts and non-zero terms in $\beta$ are satisfied. If $\M^v$ is not a model of $\beta$, then $\beta$ does not have a model. There is no way of adding new modal points or relations to satisfy the contacts and non-zero terms. Therefore, there is no connected model eigther.
+		\end{step}
 
 	\begin{lemma}
 		Let $\M^v = (\F^v, \upsilon_n)$ be a model. Let $G^v=(W^v, R^v)$ be the graph of $\F^v$. Let $G=(W,R) \subseteq G^v$.
@@ -723,9 +725,13 @@
 		\end{gather*}
 	\end{lemma}
 
+	\begin{step}
 		Let $Comp^{G^v}$ is the set of the maximal connected components of $G^v$. Let n be the number of elements in $W^v$. The number elements in $Comp^{G^v}$ is at most n. The maximal connected components of $G^v$ does not have common vertices and edges. Therfore, the splitting of G to it's maximal connected components could be done in a very efficient way.
+	\end{step}
 
+	\begin{step}
 		Each graph of $Comp^{G^v}$ satisfies the zero terms and non-contacts of $\beta$. They do not introduce new modal points netiher a connections. If $Comp^{G^v}$ contains a graph that satisfied the contacts and non-zero terms of $\beta$, then this graph defines a connected model of $\beta$. Otherwise, $\beta$ does not have a connected model.
+	\end{step}
 
 	\begin{lemma}(Connected component extension)
 
