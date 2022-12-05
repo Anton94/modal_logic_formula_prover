@@ -6,8 +6,6 @@
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{systeme}
-\usepackage{newtxtext}
-\usepackage{newtxmath}
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{array}
@@ -41,14 +39,15 @@
 \newcommand\p{\mathcal{P}}
 \newcommand\V{\mathcal{V}}
 \newcommand\E{\mathcal{E}}
-\newcommand\T{\mathcal{T}}
-\newcommand\Tn{\mathcal{T}_n}
+\newcommand\Tb{\mathbf{T}}
+\newcommand\Vb{\mathbf{V}}
 \newcommand\TableauExampleCenter{\indent\indent\indent\indent\indent\indent\indent\indent\indent}
 \newcommand\TableauExampleFirstChildOffset{\indent\indent\indent\indent\indent\indent\indent}
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{axiom}[theorem]{Axiom}
 \newtheorem{defn}[theorem]{Definition}
+\newtheorem{step}[theorem]{Step}
 \newcommand{\BranchConjunction}{%
 \begin{alignat}{2}
 			\bigwedge_{\ST C(a,b)\in{\SB}} C(a, b) \:\: \wedge \:\:
@@ -414,37 +413,28 @@
 		\end{defn}
 
 	\subsection{Branch conjunction model building}
-		The branch conjunction formula $\beta$ is satisfiable if $\beta$ has a model $\M$. We have to construct such a model $\M$ = ($\F, \upsilon$) = ((W, R), $\upsilon$). 
-		\begin{defn}
-			A finite set of $n$ boolean variables $\V_n$ is defined as follows:
-			\begin{equation}
-				\label{boolean-evaluation}
-				\V_n = \{x_1, x_2, \ldots , x_n \}
-			\end{equation}
-		\end{defn}
-		
-		\begin{defn}
-			Let $\T$ be the set of all boolean terms.
-		\end{defn}
-		
-		\begin{defn}
-			Let the function $Var : \T \rightarrow \p(\V)$ gives all unique variables used in a term.
-		\end{defn}
+		The branch conjunction formula $\beta$ is satisfiable if $\beta$ has a model $\M$. We have to construct such a model $\M$ = ($\F, \upsilon$) = ((W, R), $\upsilon$).
 
-		\begin{defn}
-			Let $\V_n$ be a finite set of n boolean variables. Then $\Tn$ is the set of all boolean terms with variables of $\V_n$.
-			\begin{equation}
-				\Tn = \{t \mid t \in \T \; and \;\ Var(t) \subseteq \V_n \}
-			\end{equation}
-		\end{defn}
+		Let $\Vb$ be the finite set of all boolean variables in $\beta$. Let their count be n.
 
-		Let n be the number of the unique boolean variables in $\beta$. Let $\V_n$ be the set of them. There are four types of atomic formulas in $\beta$, namely contacts, non-contacts, zero terms and non-zero terms. Only contacts and non-zero terms require existence of modal points. The valuation $\upsilon$ should assign a set of modal points to each boolean variable $x \in \V_n$. Such that the contacts and non-zero terms be satisfied.
+		Let $\Tb$ be the infinite set of all boolean terms with variables of $\Vb$.
 
-		Let t $\in \Tn$ such that $Var(t) = \V$. Let p $\notin$ W be a new modal point. Let us try to extend $\upsilon$ such as $p \in$ $\upsilon(t)$. By the valuation definition  $\upsilon(t)$ is a composition of intersections, unions, and compliments of valuations $\upsilon(x_i)$ for $x_i \in \V$. Therefore, the modal point p should be added to zero or more variable valuations depending on the boolean operations in the term t. With n boolean variables there are $2^n$ ways of adding the point p. Note that it might not be possible to adjust the variable valuations such that $p \in \upsilon(t)$. For example, if t is $a \sqcap a^* \neq 0$.
+		There are four types of atomic formulas in $\beta$, namely contacts, non-contacts, zero terms and non-zero terms. Only contacts and non-zero terms require existence of modal points. The valuation $\upsilon$ should assign a set of modal points to each boolean variable $x \in \Vb$. Such that the contacts and non-zero terms be satisfied.
 
-		Let $d \neq 0 \in \beta$. If it is not possible to create a modal point p such that $p \in \upsilon(t)$, then there is no satisfaible model for $\beta$.
+	\begin{step} Creating modal points
+
+		Let t $\in \Tb$. Let p be a modal point. Let us try to extend $\upsilon$ such that $p \in$ $\upsilon(t)$. By the valuation definition  $\upsilon(t)$ is a composition of intersections, unions, and compliments of valuations $\upsilon(x)$ for $x \in \Vb$. Therefore, the modal point p should be added to zero or more variable valuations depending on the boolean operations in the term t. With n boolean variables there are $2^n$ ways of adding the point p. Note that it might not be possible to adjust the variable valuations such that $p \in \upsilon(t)$. For example, if t is $a \sqcap a^* \neq 0$.
+	\end{step}
+
+	\begin{step} Creating modal points for non-zero terms
+
+		Let $g \neq 0 \in \beta$. If it is not possible to create a modal point p such that $p \in \upsilon(t)$, then there is no satisfaible model for $\beta$.
+	\end{step}
+
+	\begin{step} Creating modal points for contacts
 
 		Let $C(a,b) \in \beta$. If it is not possible to create a modal point $p_a$ such that $p_a \in \upsilon(a)$, then there is no satisfaible model for $\beta$. Analogously for the term b.
+	\end{step}
 
 		\begin{defn}
 			A \textbf{variable evaluation $\E_n$} for $n$ boolean variables is a sequence of 1s and 0s, as follows:
@@ -453,14 +443,11 @@
 			\end{equation}
 		\end{defn}
 
-		\begin{defn}
-			Let $\V_n$ be a denumerable set of $n$ boolean variables. Let W be a set of modal points. Let $\upsilon$ be a valuation over $\V_n$ and W.
--			Then $X$ is the union of all evaluations of boolean variables in $\V_n$.
-			\begin{equation}
-				\label{X-all-variable-valuations}
-				X = \bigcup\limits_{x_i \in \V_n}\upsilon(x_i)
-			\end{equation}
-		\end{defn}
+		Let $X$ be the union of all evaluations of boolean variables in $\Vb$.
+		\begin{equation}
+			\label{X-all-variable-valuations}
+			X = \bigcup\limits_{x \in \Vb}\upsilon(x)
+		\end{equation}
 
 		For $n$ boolean variables there are $2^n$ unique variable evaluations. We will define the modal points as variable evaluations. By the definition of the valuation, it is not possible to distinguish two or more different modal points in some subsets. For example, the W $\setminus$ $X$ subset. The modal point representation also has this limitation. Therefore, it is sufficient to work with the $2^n$ unique modal points while building the model.
 
@@ -469,7 +456,7 @@
 		\end{defn}
 
 		\begin{defn}
-			Let $\V_n$ be a finite set of $n$ boolean variables. The set of \textbf{all unique variable evaluations $W_n$} over $n$ variables is defined as follows:
+			The set of \textbf{all unique variable evaluations $W_n$} over $n$ variables is defined as follows:
 			\begin{equation}
 				\label{all-unique-points}
 				W_n = \{< e_1, e_2, \ldots , e_n > \mid e_1, \ldots, e_n \in \{0, 1 \} \}
@@ -478,16 +465,16 @@
 
 		\begin{defn}
 			\label{valuation-modal-points}
-			Let $\V_n$ be a finite set of $n$ boolean variables. Let $W_n$ be the set of all unique points over n variables. Then the \textbf{valuation $\upsilon_n : \V_n \rightarrow \p(W_n)$} is defined by the following inductive definition:
+			Let $\V_n$ be a finite set of $n$ boolean variables. Let $W_n$ be the set of all unique points over n variables. Then the \textbf{valuation $\upsilon_n : \V_n \rightarrow \p(W_n)$} is defined as follows:
+		\begin{equation}
+			\upsilon_n(x_i) = \{ \E_n \mid \E_n \in W_n \; and \; (\E_n)^i = 1 \}, \; for \; x_i \in \V_n
+		\end{equation}
+			It is then extended inductively to all boolean terms as standard valuation as follows:
 			\begin{itemize}
 				\item Boolean constants
 					\begin{itemize}
 						\item $\upsilon_n(0) = \emptyset$
 						\item $\upsilon_n(1) = W_n$
-					\end{itemize}
-				\item Boolean variables
-					\begin{itemize}
-						\item $\upsilon_n(x_i) = \{ \E_n \mid \E_n \in W_n \; and \; (\E_n)^i = 1 \}$, for $x_i \in \V_n$
 					\end{itemize}
 				\item Boolean terms
 					\begin{itemize}
@@ -498,33 +485,24 @@
 			\end{itemize}
 		\end{defn}
 
-		Let $\beta$ be a branch conjunction as in \ref{branch-conjunction} . Let $\V_n$ be the finite set of boolean variables in $\beta$. Let $\upsilon_n$ be a valuation as in \ref{valuation-modal-points} . Let $W \subseteq W_n$. Let R $\subseteq$ $W^2$ be a reflexive and symmetric relation.
-
-		\begin{defn}
+		\begin{lemma}
 			The zero terms in $\beta$ are satisfied if each zero term's valuation is the empty set.
 			\begin{equation}
 				g = 0 \in \beta \rightarrow \upsilon_n(g) = \emptyset
 			\end{equation}
-		\end{defn}
+		\end{lemma}
 
-		\begin{defn}
+		\begin{lemma}
 			The non-contacts in $\beta$ are satisfied if:
 			\begin{equation}
 				\neg C(e, f) \in \beta \rightarrow \neg(\exists x \in \upsilon_n(e))(\exists y \in \upsilon_n(f))(xRy)
-			\end{equation}
-		\end{defn}
-
-		\begin{lemma}
-			The valuations of the non-contact terms in $\beta$ do not have a common modal point. The proof follows from the reflexivity of R.
-			\begin{equation}
-				\neg C(e, f) \in \beta \rightarrow (\upsilon_n(e) \cap \upsilon_n(f)) = \emptyset
 			\end{equation}
 		\end{lemma}
 
 		\begin{defn}
 			Let $\E_n \in W_n$. $\E_n$ is a $\mathbf{valid \; modal \; point}$ of $\beta$ if it preserve the satisfaction of the zero terms and non-contacts in $\beta$:
 			\begin{gather*}
-				g = 0 \in \beta \rightarrow \E_n \notin \upsilon_n(g_l) \\ and \\
+				g = 0 \in \beta \rightarrow \E_n \notin \upsilon_n(g) \\ and \\
 				\neg C(e, f) \in \beta \rightarrow \E_n \notin (\upsilon_n(e) \cap \upsilon_n(f))
 			\end{gather*}
 		\end{defn}
@@ -537,35 +515,24 @@
 		\end{defn}
 
 		\begin{defn}
-			Let x, y $\in W^v$. Then $\pairXY$ is a $\mathbf{valid \; connected \; pair}$ of $\beta$ modal points if it preserves the satisfaction of non-contacts in $\beta$.
-			\begin{align*}
-			\neg C(e, f) \in \beta \rightarrow
-			(x \notin \upsilon_n(e) \; or \; y \notin \upsilon_n(f)) \; and \\
-			(x \notin \upsilon_n(f) \; or \; y \notin \upsilon_n(e)) \; and \\
-			(x \notin \upsilon_n(e) \; or \; y \notin \upsilon_n(e)) \; and  \\
-			(x \notin \upsilon_n(f) \; or \; y \notin \upsilon_n(f))\;\;\;\;\;\;
-			\end{align*}
-		\end{defn}
-
-		\begin{defn}\label{set-all-valid-modal-point-pairs}
-			Let $R^v \subseteq {W^v}^2$ be the set of all valid connected pairs of $\beta$ modal points.
+			Let x, y $\in W^v$ are valid modal points. Then $\pairXY$ is a $\mathbf{valid \; connected \; pair}$ of $\beta$ modal points if it preserves the satisfaction of non-contacts in $\beta$.
 			\begin{equation}
-				R^v = \{ \pairXY  \mid x, y \in W^v \; and \; \pairXY \; is \; a \; valid \; connected \; pair \; of \; \beta \; modal \; points\}
+			\neg C(e, f) \in \beta \rightarrow
+			\neg(x \in \upsilon_n(e) \; and \; y \in \upsilon_n(f)) \;  or
+			(x \in \upsilon_n(f) \; and \; y \in \upsilon_n(e)) \;
 			\end{equation}
 		\end{defn}
 
-		\begin{lemma}\label{satisfied-contacts-non-zero-terms}
-			Let $\F = (W^v, R^v)$ be a relational system. $\F$ satisfies the contacts and non-zero terms in $\beta$ iff:
-			\begin{gather*}
-				C(a, b) \in \beta \rightarrow (\exists \pairXY \in R^v)(x \in \upsilon_n(a) \land y \in \upsilon_n(b))
-				 \\ and \\
-				 d \neq 0 \in \beta \rightarrow (\exists \E_n \in W^v)(\E_n \in \upsilon_n(d))
-			\end{gather*}
-		\end{lemma}
+		\begin{defn}
+			Let $IsValidCon: (W^v \times W^v) \rightarrow \{0, 1 \}$ be a function which defines whether a connected pair is valid.
+			\begin{equation}
+				IsValidCon(x,y) = 1 \iff \pairXY \; is \; a \; valid \; connected \; pair
+			\end{equation}
+		\end{defn}
 
 		\begin{defn}
 			\label{eta-valuation}
-			Let $\eta: (\Tn \times W_n) \rightarrow \{0, 1 \}$ be a function which defines whether a modal point is in the valuation of a term. Let t $\in$ $\Tn$. Let $\E_n \in W_n$. The inductive definition of $\eta$ on the structure of the term t is as follows:
+			Let $\eta: (\Tb \times W_n) \rightarrow \{0, 1 \}$ be a function which defines whether a modal point is in the valuation of a term. Let t $\in$ $\Tb$. Let $\E_n \in W_n$. The inductive definition of $\eta$ on the structure of the term t is as follows:
 			\begin{itemize}
 				\item $\eta(0, \E_n) = 0$
 				\item $\eta(1, \E_n) = 1$
@@ -577,17 +544,13 @@
 		\end{defn}
 
 		\begin{lemma}
-			Let t $\in \Tn$ be an arbitrary term. By the definition of $\eta$ and $\upsilon_n$ ifollows:
+			Let t $\in \Tb$ be an arbitrary term. By the definition of $\eta$ and $\upsilon_n$ ifollows:
 			\begin{equation}
 				\eta(t, \E_n) = 1 \iff \E_n \in \upsilon_n(t)
 			\end{equation}
 		\end{lemma}
 
-			Let $\F = (W^v, R^v)$. Let $\M = (\F, \upsilon_n)$. $\M$ satisfies the zero terms and non-contacts in $\beta$. $\M$ is a model of $\beta$ if the non-zero terms and contacts are satisfied \ref{satisfied-contacts-non-zero-terms} .
-
-			The model $\M$ is not convenient. It might have a lot of modal points and connections between them. For example, let $\beta = C((x \sqcap y) \sqcap z, t \sqcup e)$. Then $\V_n = \{x, y, z, t, e\}$. There are no zero terms and non-contacts, so $W^v$ is the same as $W_n$. Therefore, $|W^v|= 32$ and $|R^v| = 32^2$.
-
-	The following algorithm builds a more convenient model. Creates modal points and connections only for the non-zero and contact terms in $\beta$.
+	The algorithm described bellow creates modal points and connections only for the non-zero and contact terms in $\beta$.
 
 		\newpage
 		\LinesNumbered
@@ -612,8 +575,8 @@
 			}
 			\tcc{Process the contacts in $\beta$}
 			\For{$C(a, b) \in \beta$}{\label{contacts}
-				\For{$\pairXY \in R^v$}{
-					\uIf{$\eta(a, x) = 1 \land \eta(b, x) = 1$}{
+				\For{$x,\; y \in W^v$}{
+					\uIf{$\eta(a, x) = 1 \land \eta(b, x) = 1 \land IsValidCon(x,y)$}{
 						$W \gets W \cup \{x, y \}$
 						\;
 						$R \gets R \cup \{\pairXX, \pairYY, \pairXY, \pairYX \}$
@@ -679,6 +642,13 @@
 
 		Let $\beta$ be a branch conjunction as in \ref{branch-conjunction} :
 		\nonumber\BranchConjunction
+
+		\begin{defn}\label{set-all-valid-modal-point-pairs}
+			Let $R^v \subseteq {W^v}^2$ be the set of all valid connected pairs of $\beta$ modal points.
+			\begin{equation}
+				R^v = \{ \pairXY  \mid x, y \in W^v \; and \; \pairXY \; is \; a \; valid \; connected \; pair \; of \; \beta \; modal \; points\}
+			\end{equation}
+		\end{defn}
 
 		Let $\F^v = (W^v, R^v)$ be a relational system and $\M^v = (\F^v, \upsilon_n)$ be a model in this system. $\M^v$ contains all valid modal points and valid connections between them w.r.t zero terms and non-contacts in $\beta$. $\M^v$ is a model of $\beta$ if the contacts and non-zero terms in $\beta$ are satisfied \ref{satisfied-contacts-non-zero-terms} . If $\M^v$ is not a model of $\beta$, then $\beta$ does not have a model. There is no way of adding new modal points or relations to satisfy the contacts and non-zero terms. Therefore, there is no connected model eigther.
 
