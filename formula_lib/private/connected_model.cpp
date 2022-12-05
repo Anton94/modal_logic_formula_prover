@@ -25,7 +25,7 @@ auto connected_model::create(const formulas_t& contacts_T, const formulas_t& con
     variable_names_ = variable_names;
     used_variables_ = used_variables;
 
-    trace() << "Used variables are: " << used_variables_.count();
+    trace() << "Used variables are " << used_variables_.count() << ". Total variables in the formula are " << used_variables_.size() << ".";
     if(used_variables_.count() > max_variables_count_)
     {
         trace() << "Unable to create the model because the used variables are more than the preset maximal variables count of " << max_variables_count_;

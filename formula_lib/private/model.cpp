@@ -19,6 +19,8 @@ auto model::create(const formulas_t& contacts_T, const formulas_t& contacts_F,
     used_variables_ = used_variables;
     variable_names_ = variable_names;
 
+    trace() << "Used variables are " << used_variables_.count() << ". Total variables in the formula are " << used_variables_.size() << ".";
+
     if(!construct_contact_model_points(contacts_T, contacts_F, zero_terms_T) ||
        !construct_non_zero_model_points(zero_terms_F, contacts_F, zero_terms_T))
     {

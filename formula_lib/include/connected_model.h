@@ -64,7 +64,8 @@ struct connected_model : public imodel
     /*
      * Does not creates a model if the formula's used variables are more than @max_variables_count, because it's memory intensive.
      */
-    connected_model(size_t max_variables_count = 32u);
+    // TODO(toni): check if 20 is indeed good number.
+    connected_model(size_t max_variables_count = 20u);
 
     auto create(const formulas_t& contacts_T, const formulas_t& contacts_F,
                 const terms_t& zero_terms_T,  const terms_t& zero_terms_F,

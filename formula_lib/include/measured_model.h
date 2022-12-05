@@ -111,7 +111,7 @@ struct measured_model : public imodel
     using points_t = std::vector<variables_evaluations_block>;
     using contacts_t = std::vector<model_points_set_t>;
 
-    measured_model(size_t max_variables_count = 4u);
+    measured_model(size_t max_valid_modal_points_count = 18u);
 
     auto create(const formulas_t& contacts_T, const formulas_t& contacts_F,
                 const terms_t& zero_terms_T,  const terms_t& zero_terms_F,
@@ -151,7 +151,7 @@ private:
     auto print_system_sum_variables(std::ostream& out, const model_points_set_t& variables) const -> std::ostream&;
     auto print_system(std::ostream& out) const -> std::ostream&;
 
-    size_t max_variables_count_{};
+    size_t max_valid_modal_points_count_{};
 
     variables_mask_t used_variables_;
 

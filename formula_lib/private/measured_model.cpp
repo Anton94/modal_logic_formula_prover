@@ -81,8 +81,8 @@ auto are_zero_terms_F_satisfied(const terms_t& zero_terms_F,
 
 }
 
-measured_model::measured_model(size_t max_variables_count) :
-    max_variables_count_(max_variables_count),
+measured_model::measured_model(size_t max_valid_modal_points_count) :
+    max_valid_modal_points_count_(max_valid_modal_points_count),
     system_(0)
 {
 }
@@ -104,13 +104,14 @@ auto measured_model::create(const formulas_t& contacts_T, const formulas_t& cont
     measured_less_eq_T_ = measured_less_eq_T;
     measured_less_eq_F_ = measured_less_eq_F;
 
-    trace() << "Used variables are: " << used_variables_.count();
-
-    if(used_variables_.count() > max_variables_count_)
+    constexpr const auto max_used_variables_support = 25;
+    if(used_variables_.count() >= max_used_variables_support)
     {
-        trace() << "Unable to create the model because the used variables are more than the preset maximal variables count of " << max_variables_count_;
+        trace() << "Used variables are more than " << max_used_variables_support << ". Unable to calculate for so many variables.";
         return false;
     }
+
+    trace() << "Used variables are " << used_variables_.count() << ". Total variables in the formula are " << used_variables_.size() << ".";
 
     const auto all_valid_points = construct_all_valid_points(used_variables_, contacts_F, zero_terms_T);
     if(all_valid_points.empty())
@@ -119,11 +120,23 @@ auto measured_model::create(const formulas_t& contacts_T, const formulas_t& cont
         return false;
     }
 
+    trace() << "Constructed " << all_valid_points.size() << " valid modal points. "
+            << "This points are such that the zero terms and the reflexivity of non-contacts are satisfied.";
+
+    if(all_valid_points.size() > max_valid_modal_points_count_)
+    {
+        trace() << "Unable to create the model because the valid modal points are " << all_valid_points.size() << ".\n"
+                << "They are more than the preset maximal of " << max_valid_modal_points_count_ << ".\n"
+                << "Add more zero terms/non-contacts to reduce the number of valid modal points.";
+        return false;
+    }
+
     const auto variable_evaluations_over_all_valid_points = generate_variable_evaluations(all_valid_points, used_variables_.size());
 
     const auto all_valid_contact_relations = build_contact_relations_matrix(contacts_F, variable_evaluations_over_all_valid_points);
 
-    trace() << "Constructed all valid modal points, valid connections betweeen them and variable evaluations.";
+    trace() << "Constructed all valid connections betweeen the valid modal points and variable evaluations."
+            << "This connections preserves the non-contacts satisfiability.";
 
     if(trace().is_enabled())
     {
