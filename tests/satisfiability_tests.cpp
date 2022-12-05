@@ -33,14 +33,14 @@ void is_satisfiable(const char* input_f, bool has_satisfiable_model, bool has_sa
             CHECK(f.is_model_satisfiable(measured_m));
         }
 
-        basic_bruteforce_model brute_force_model;
-        CHECK(f.brute_force_evaluate_with_points_count(brute_force_model) == has_satisfiable_model);
-        CHECK(f.is_satisfiable(brute_force_model) == has_satisfiable_model);
+//        basic_bruteforce_model brute_force_model;
+//        CHECK(f.brute_force_evaluate_with_points_count(brute_force_model) == has_satisfiable_model);
+//        CHECK(f.is_satisfiable(brute_force_model) == has_satisfiable_model);
 
-        if(has_satisfiable_model)
-        {
-            CHECK(f.is_model_satisfiable(brute_force_model));
-        }
+//        if(has_satisfiable_model)
+//        {
+//            CHECK(f.is_model_satisfiable(brute_force_model));
+//        }
     }
 }
 
@@ -563,4 +563,26 @@ TEST_CASE("system without solution 3 variables 0", "[satisfiability]")
 TEST_CASE("system without solution 3 variables 1", "[satisfiability]")
 {
     is_satisfiable("~(x = 0) & ~(y = 0) & ~(<=(x,y)) & ~(<=(y,x)) & <=m(x, x + y) & <=m(x+y, x) & <=(x2,x2)", true, true, false);
+}
+
+TEST_CASE("system without solution many variables restricted valid modal points 1", "[satisfiability]")
+{
+    is_satisfiable("~(x = 0) & ~(y = 0) & ~(<=(x,y)) & ~(<=(y,x)) & <=m(x, x + y) & <=m(x+y, x) & x1 = 0 & x2 = 0 & x3 = 0 & x4 = 0 & x5 = 0 & x6 = 0", true, true, false);
+}
+
+TEST_CASE("system without solution too many valid modal points", "[satisfiability]")
+{
+    is_satisfiable("<=m(x+y, x) & ~(x1 + x2 + x3 + x4 + x5 + x6) = 0", true, true, false);
+}
+
+TEST_CASE("system with solution many variables restricted valid modal points", "[satisfiability]")
+{
+    is_satisfiable("<=m(x+y, x) & (x1 + x2 + x3 + x4 + x5 + x6) = 0", true, true, true);
+}
+
+TEST_CASE("system with solution many variables branch with restricted valid modal points", "[satisfiability]")
+{
+    is_satisfiable("(~(x = 0) & ~(y = 0) & ~(<=(x,y)) & ~(<=(y,x)) & <=m(x, x + y) & <=m(x+y, x) & x1 = 0 & x2 = 0 & x3 = 0 & x4 = 0 & x5 = 0 & x6 = 0) |"
+                   "(<=m(x+y, x) & ~(z1 + z2 + z3 + z4 + z5 + z6) = 0) |"
+                   "(<=m(x+y, x) & (x1 + x2 + x3 + x4 + x5 + x6 + z7 + y2 + y3) = 0)", true, true, true);
 }
