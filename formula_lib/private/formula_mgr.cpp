@@ -126,11 +126,18 @@ auto formula_mgr::build(const std::string& f, const formula_refiners& refiners_f
     formula_AST->accept(variables_getter);
 
     variables_.reserve(variables.size());
-    variable_to_id_.reserve(variables.size());
     for(const auto& variable : variables)
     {
-        variable_to_id_[variable] = variables_.size();
         variables_.emplace_back(variable);
+    }
+
+    std::sort(variables_.begin(), variables_.end());
+
+    variable_to_id_.reserve(variables_.size());
+    for(size_t i = 0; i < variables_.size(); ++i)
+    {
+        const auto& variable = variables_[i];
+        variable_to_id_[variable] = i;
     }
 
     return f_.build(*formula_AST);

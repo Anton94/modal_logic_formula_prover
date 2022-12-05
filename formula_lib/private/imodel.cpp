@@ -66,7 +66,7 @@ auto imodel::print(std::ostream& out, const variables_evaluations_block& block) 
     {
         if(variables[i])
         {
-            out << "<" << get_variable_name(i) << " : " << evaluations.test(i) << "> ";
+            out << get_variable_name(i) << ":" << evaluations.test(i) << " ";
         }
     }
 
