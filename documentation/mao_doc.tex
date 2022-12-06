@@ -42,6 +42,14 @@
 			\bigwedge_{i=1}^{I} \; C(a_i, b_i) \:\: & \wedge \:\: 
 			\bigwedge_{k=1}^{K} \; \neg C(e_k, f_k) \:\: \wedge \:\: \\
 			\bigwedge_{j=1}^{J} \; d_j \neq 0 \:\: & \wedge \:\:
+			\bigwedge_{l=1}^{L} \; g_l = 0 \:\:
+\end{align*}%
+}
+\newcommand{\BranchConjunctionWithMeasure}{%
+\begin{align*}
+			\bigwedge_{i=1}^{I} \; C(a_i, b_i) \:\: & \wedge \:\: 
+			\bigwedge_{k=1}^{K} \; \neg C(e_k, f_k) \:\: \wedge \:\: \\
+			\bigwedge_{j=1}^{J} \; d_j \neq 0 \:\: & \wedge \:\:
 			\bigwedge_{l=1}^{L} \; g_l = 0 \:\: \wedge \:\:\\
 			\bigwedge_{p=1}^{P} \; m_p \le_\mu n_p \:\: &\wedge \:\:
 			\bigwedge_{q=1}^{Q} \; u_q <_\mu v_q \:\:
@@ -343,7 +351,6 @@ is defined by the following forms, where a and b are two terms:
 		\begin{itemize}
 			\item C(a, b)
 			\item $a \le b$
-			\item $a \le_\mu b$
 		\end{itemize}
 
 	\paragraph{Formula}
@@ -378,22 +385,14 @@ Let $\mathcal{F}$  be a frame, then a boolean variable valuation is any function
 			\item $\mathscr{v}(a*) = W \backslash  \mathscr{v}(a)$
 		\end{itemize}
 
-	\subsection{Measured Model}
-
-	\paragraph{Measure function} A measure function will denote a function which maps a region to a positive real number.
-		\begin{equation*}
-			\mu : \mathscr{P}(W) \longrightarrow \mathbb{R}^+
-		\end{equation*}
-
-	\paragraph{Measured Model}
-		\label{measured-model} 
-		Let $\mu$ be a measure function. The tuple $\mathcal{M} = (\mathcal{F}, \mu, \mathscr{v})$ is called a model. The truth of a formula $\varphi$ in $\mathcal{M}$ ( in symbols $\mathcal{M} \models \varphi$) is defined inductively as follows:
+	\paragraph{Model}
+		\label{formula-satisfiability-model} 
+		The tuple $\mathcal{M} = (\mathcal{F}, \mu, \mathscr{v})$ is called a model. The truth of a formula $\varphi$ in $\mathcal{M}$ ( in symbols $\mathcal{M} \models \varphi$) is defined inductively as follows:
 		\begin{itemize}
 			\item $\mathcal{M} \not\models \bot$ 
 			\item $\mathcal{M} \models \top$
 			\item $\mathcal{M} \models aCb \text{ iff } (\exists x \in \mathscr{v}(a)), (\exists y \in \mathscr{v}(b)) (xRy)$
 			\item $\mathcal{M} \models a \leq b \text{ iff } \mathscr{v}(a) \subseteq \mathscr{v}(b)$
-			\item $\mathcal{M} \models a \leq_\mu b \text{ iff } \mu(\mathscr{v}(a)) \le \mu(\mathscr{v}(b))$
 			\item $\mathcal{M} \models \neg \varphi \text{ iff } \mathcal{M} \not\models \varphi$
 			\item $\mathcal{M} \models a \; \vee \; b \text{ iff } \mathcal{M} \models a \: \textit{ or } \: \mathcal{M} \models b$
 			\item $\mathcal{M} \models a \; \wedge \; b \text{ iff } \mathcal{M} \models a \: \textit{ and } \: \mathcal{M} \models b$
@@ -461,43 +460,6 @@ is a model of A.
 	\end{equation*}
 \end{lemma}
 
-\begin{lemma}[Measure Formula Addition Property of Equality]
-	Let a, b and d be three terms, then
-	\begin{equation*}
-		(a \sqcap d = 0) \land (b \sqcap d = 0) \implies (a \le_\mu b \iff a \sqcup d \le_\mu b \sqcup d)
-	\end{equation*}
-\end{lemma}
-
-\begin{proof}
-Let $\mathcal{M} = \langle B, \mu, \mathscr{v}\rangle$ be an arbitrary model. From the implication we can assume the following:
-	\begin{align*}
-		\mathcal{M} \models (a \sqcap d = 0) &\land (b \sqcap d = 0) \\
-		\mathcal{M} \models a \sqcap d = 0 \text{ and }& \mathcal{M} \models (b \sqcap d = 0) \\
-		\mathscr{v}(a \sqcap d) = \mathscr{v}(0) \text{ and }& \mathscr{v}(b \sqcap d) = \mathscr{v}(0) \\ 
-		\mathscr{v}(a) \cap \mathscr{v}(d) = \emptyset  \;\;\;\;\;\;\;& \mathscr{v}(b) \cap \mathscr{v}(d) = \emptyset
-	\end{align*}
-
-$\Longrightarrow$
-	\begin{align*} 
-		\text{Let } \mathcal{M} &\models  a \le_\mu b \\
-		\mu(\mathscr{v}(a)) &\le \mu(\mathscr{v}(b)) \\
-		\text{We know that } & \mu(\mathscr{v}(d)) \in \mathbb{R}^+ \\
-		\Rightarrow \mu(\mathscr{v}(a)) +  \mu(\mathscr{v}(d)) &\le \mu(\mathscr{v}(b)) +  \mu(\mathscr{v}(d)) \\
-		\text{From } \mathscr{v}(a) \cap \mathscr{v}(d) = \emptyset \Rightarrow & \mu(\mathscr{v}(a)) +  \mu(\mathscr{v}(d)) = \mu(\mathscr{v}(a \sqcup d)) \\
-		\text{From } \mathscr{v}(b) \cap \mathscr{v}(d) = \emptyset \Rightarrow & \mu(\mathscr{v}(b)) +  \mu(\mathscr{v}(d)) = \mu(\mathscr{v}(b \sqcup d)) \\
-		\Rightarrow \mu(\mathscr{v}(a \sqcup d)) &\le \mu(\mathscr{v}(b \sqcup d)) \\
-		\Rightarrow \mathcal{M} \models  a \sqcup d &\le_\mu b \sqcup d
-	\end{align*}
-
-$\Longleftarrow$
-	\begin{align*} 
-		\text{Let } \mathcal{M} \models  a &\sqcup d \le_\mu b \sqcup d \\
-		\Rightarrow \mu(\mathscr{v}(a \sqcup d)) &\le \mu(\mathscr{v}(b \sqcup d)) \\
-		\Rightarrow \mu(\mathscr{v}(a)) +  \mu(\mathscr{v}(d)) &\le \mu(\mathscr{v}(b)) +  \mu(\mathscr{v}(d)) \\
-		\Rightarrow \mu(\mathscr{v}(a)) &\le \mu(\mathscr{v}(b)) \\
-		\Rightarrow \mathcal{M} &\models  a \le_\mu b \\
-	\end{align*}
-\end{proof}
 \begin{lemma}[Trivial implications] The following trivial implications are of huge importance for the model construction algorithm since they are trivial to be applied and can in some cases eliminate a lot of computations. This is because they can be applied over a complex term or formula to reduce it to something simple.
 \newline
 	Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
@@ -522,40 +484,21 @@ $\Longleftarrow$
 		\item $1C1 \Longrightarrow T$
 		\item $aC1 \Longrightarrow a \neq 0$
 		\item $a \neq 0 \Longrightarrow aCa$
-		\item $0 \le_\mu a \Longrightarrow T$
-		\item $a \le_\mu 1 \Longrightarrow T$
-		\item $(a = 0) \iff (a \le_\mu 0)$
-		\item $(a = 1) \iff (1 \le_\mu a)$
-		\item $(a \le_\mu b) \lor (b \le_\mu a)$
-		\item $a_1 \le_\mu a_2 \land a_2 \le_\mu a_3 \Longrightarrow a_1 \le_\mu a_3$
-
 	\end{itemize}
 \end{lemma}
 
-	\newpage
-	\section{Quantitative Contact Logics}
-		The quantitative contact logics is basically the region based contact logics with the addition of quantitative measures. The quantitative measure is represented 
-		with two new atomic formulas:
-		\begin{itemize} 
-			\item $\le_\mu$
-			\item $<_\mu$
-		\end{itemize}
-		Where $\mu$ is a measure function. Detailed definition is given in \ref{measured-model}.
-	
-	\subsection{Formula Satisfiability} 
+	\subsection{Formula Satisfiability} \label{formula-satisfiability}
 The satisfiability verification or sometimes called a satisfiability proof for a given formula is done by constructing a model. The formula is satisfiable only if such a model exists. The model construction is done in several steps. Foremost, the tableau method is used to simplify the problem and to detect contradictions earlier in the process, even before the model construction begins. If the produced tableau is closed as per definition \ref{closed-tableau}, then a model in which the given formula is satisfiable does not exist. If there are open branches in the tableau result, then semantical reasoning shall be done in order to construct a model, if such a model exists. Let us define few definitions before we dive into the procedure for the satisfiability proof of a formula.
 
 	\paragraph{Tableau Branch Conjunction}
-		A branch from the tableau method consists of signed atomic formulas. For a formula to be satisfiable, it means that all atomic formulas in a tableau branch should be satisfied. This in terms can be represented as a conjunction of the atomic formulas. Let us call it a branch conjunction. For the quantitative contact logics, the conjunction contains the signed contact, zero term and measure atomic formulas.
+		A branch from the tableau method consists of signed atomic formulas. For a formula to be satisfiable, it means that all atomic formulas in a tableau branch should be satisfied. This in terms can be represented as a conjunction of the atomic formulas. Let us call it a branch conjunction.
 	\begin{defn}
 		Let $\varphi$ be a formula and let $\mathcal{T}$ be a tableau applied over the $\varphi$ formula. Then a branch of the tableau method is defined with the following notation:
 		\begin{align*}
 				B = \{\signT C(a_i, b_i) \mid i \in \{1, \ldots, I\} \} &\cup 
 					\{\signF C(e_k, f_k) \mid k \in \{1, \ldots, K\} \} \cup \\
 					\{\signF d_j = 0 \mid j \in \{1, \ldots, J\} \} &\cup 
-					\{\signT g_l = 0 \mid l \in \{1, \ldots, L\} \} \cup \\
-					\{\signT m_p \le_\mu n_p \mid p \in \{1, \ldots, P\} \} &\cup 
-					\{\signF u_q \le_\mu v_q \mid q \in \{1, \ldots, Q\} \}
+					\{\signT g_l = 0 \mid l \in \{1, \ldots, L\} \}
 		\end{align*}
 	\end{defn}
 	For the sake of simplicity we can remove the signed symbols $\signT \textit{ and } \signF$, in which case the branch conjunction of the tableau method branch is defined as:
@@ -622,8 +565,6 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 		\begin{itemize}
 			\item $C(a_i, b_i), \textit{ for } i < I$
 			\item $d_j \neq 0, \textit{ for } j < J$
-			\item $m_p \le_\mu n_p, \textit{ for } p < P$
-			\item $u_q <_\mu v_q, \textit{ for } q < Q$
 		\end{itemize}
 
 	\paragraph{Contact modal point construction step}\label{def-contacts-construction}
@@ -719,7 +660,7 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 	\end{center} 
 
 	\begin{defn}
-		let $\Ts$ be the set of all terms and let M be a model constructed with the Contact and Non zero term modal point construction steps. Then the model valuation $\vE : \Ts \rightarrow \mathscr{P}(W)$ is defined inductively as:
+		let $\Ts$ be the set of all terms and let $\mathcal{F}$ be a frame constructed with the Contact and Non zero term modal point construction steps. Then the model valuation $\vE : \Ts \rightarrow \mathscr{P}(W)$ is defined inductively as:
 		\begin{itemize}
 			\item $\vE(0) = W$
 			\item $\vE(1) = \emptyset$
@@ -730,21 +671,85 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 		\end{itemize}
 	\end{defn}
 	\leavevmode\newline
-	The tuple $(W, R, \vE)$ is called a potential model.
+	The tuple $(W, R, \vE)$ is called a model.
+	%TODO note here that this model is for the given input formula.
 
-	\leavevmode\newline
-% this is not valid and should be redone once we get to the full algorithm.
-	To validate that the potential model is correct, meaning that it satisfies the formula, we must take into account the measure atomic formulas. 
-	In order to satisfy the measure atomic formulas, additional points are generated and have the following structure $\langle \curvedE, 1 \rangle$. This means that 
-	for each modal point the constant term 1 is taken together with a variable evaluation function. The variable evaluation functions of these modal points 
-	is chosen such that the model satisfies all measure atomic formulas.
+	\newpage
+	\section{Quantitative Contact Logics}
+	The quantitative contact logics is basically the region based contact logics with the addition of quantitative measures. This is done by assigning a 
+	positive real number to each of the model points in the model. The assignment (restriction) of the weight is done with an atomic measure formula.
 
-	\begin{defn}
-		Let B be a branch conjunction and let N be the number of all measure atomic formulas ( $\le_\mu$ and $<_\mu$).
-		Then N additional modal points are generated in the potential model \{$\langle \curvedE_i, 1 \rangle : 0 < i \leq N$ \}. The variable evaluation of the generated points must satisfy the measure atomic formulas.
-		Satisfying a set of measure atomic formulas produces a system of inequalities.
-	\end{defn}
+	\paragraph{Measure function} A measure function will denote a function which maps a region to a positive real number.
+	\begin{equation*}
+		\mu : \mathscr{P}(W) \longrightarrow \mathbb{R}^+
+	\end{equation*}
 
+	The quantitative measure between two terms is represented with the following atomic formula:
+	\begin{itemize} 
+		\item a $\le_\mu b$
+	\end{itemize}
+	Where $\mu$ is a measure function and a, b are two terms.
+	
+	\paragraph{Measure model semantics} Let $\mu$ be a measure function.
+	Let  $\mathcal{M} = (\mathcal{F}, \mu, \mathscr{v})$ be a model. 
+	The model is extended to a measure model with the addition of the following inductive satisfiability definition: 
+	\begin{itemize}
+		\item $\mathcal{M} \models a \leq_\mu b \text{ iff } \mu(\mathscr{v}(a)) \le \mu(\mathscr{v}(b))$
+	\end{itemize}
+
+	\paragraph{Measure formula properties} The following lemmas define useful properties of a measure model and measure formulas
+
+	\begin{lemma}[Measure Formula Addition Property of Equality]
+	Let a, b and d be three terms, then
+	\begin{equation*}
+		(a \sqcap d = 0) \land (b \sqcap d = 0) \implies (a \le_\mu b \iff a \sqcup d \le_\mu b \sqcup d)
+	\end{equation*}
+	\end{lemma}
+
+\begin{proof}
+Let $\mathcal{M} = \langle B, \mu, \mathscr{v}\rangle$ be an arbitrary model. From the implication we can assume the following:
+	\begin{align*}
+		\mathcal{M} \models (a \sqcap d = 0) &\land (b \sqcap d = 0) \\
+		\mathcal{M} \models a \sqcap d = 0 \text{ and }& \mathcal{M} \models (b \sqcap d = 0) \\
+		\mathscr{v}(a \sqcap d) = \mathscr{v}(0) \text{ and }& \mathscr{v}(b \sqcap d) = \mathscr{v}(0) \\ 
+		\mathscr{v}(a) \cap \mathscr{v}(d) = \emptyset  \;\;\;\;\;\;\;& \mathscr{v}(b) \cap \mathscr{v}(d) = \emptyset
+	\end{align*}
+
+$\Longrightarrow$
+	\begin{align*} 
+		\text{Let } \mathcal{M} &\models  a \le_\mu b \\
+		\mu(\mathscr{v}(a)) &\le \mu(\mathscr{v}(b)) \\
+		\text{We know that } & \mu(\mathscr{v}(d)) \in \mathbb{R}^+ \\
+		\Rightarrow \mu(\mathscr{v}(a)) +  \mu(\mathscr{v}(d)) &\le \mu(\mathscr{v}(b)) +  \mu(\mathscr{v}(d)) \\
+		\text{From } \mathscr{v}(a) \cap \mathscr{v}(d) = \emptyset \Rightarrow & \mu(\mathscr{v}(a)) +  \mu(\mathscr{v}(d)) = \mu(\mathscr{v}(a \sqcup d)) \\
+		\text{From } \mathscr{v}(b) \cap \mathscr{v}(d) = \emptyset \Rightarrow & \mu(\mathscr{v}(b)) +  \mu(\mathscr{v}(d)) = \mu(\mathscr{v}(b \sqcup d)) \\
+		\Rightarrow \mu(\mathscr{v}(a \sqcup d)) &\le \mu(\mathscr{v}(b \sqcup d)) \\
+		\Rightarrow \mathcal{M} \models  a \sqcup d &\le_\mu b \sqcup d
+	\end{align*}
+
+$\Longleftarrow$
+	\begin{align*} 
+		\text{Let } \mathcal{M} \models  a &\sqcup d \le_\mu b \sqcup d \\
+		\Rightarrow \mu(\mathscr{v}(a \sqcup d)) &\le \mu(\mathscr{v}(b \sqcup d)) \\
+		\Rightarrow \mu(\mathscr{v}(a)) +  \mu(\mathscr{v}(d)) &\le \mu(\mathscr{v}(b)) +  \mu(\mathscr{v}(d)) \\
+		\Rightarrow \mu(\mathscr{v}(a)) &\le \mu(\mathscr{v}(b)) \\
+		\Rightarrow \mathcal{M} &\models  a \le_\mu b \\
+	\end{align*}
+\end{proof}
+
+\begin{lemma}[Trivial measure model implications]
+Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
+	\begin{itemize}
+		\item $0 \le_\mu a \Longrightarrow T$
+		\item $a \le_\mu 1 \Longrightarrow T$
+		\item $(a = 0) \iff (a \le_\mu 0)$
+		\item $(a = 1) \iff (1 \le_\mu a)$
+		\item $(a \le_\mu b) \lor (b \le_\mu a)$
+		\item $a_1 \le_\mu a_2 \land a_2 \le_\mu a_3 \Longrightarrow a_1 \le_\mu a_3$
+	\end{itemize}
+\end{lemma}
+
+	\newpage
 	\subsection{System of Inequalities} 
 		The system of inequality has the following structure:
 		\[
@@ -760,7 +765,10 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 
 		\leavevmode\newline
 		\subsection{System Construction}
-		Let $M = (W, R, \vE)$ be a potential model. The system of inequalities is constructed from the potential model by evaluating each
+		A formula with multiple measure atomic formulas produce a system of inequalities.
+		This system of inequalities must have a solution in order for a model to satisfy the given formula.
+
+		Let $M = (W, R, \vE)$ be a model. The system of inequalities is constructed from a formula by evaluating each
 		of the terms in the $\le_\mu$ and $<_\mu$ atomic formulas. The number of points in the model are $N = | \; W \; |$. Let us enumerate the points
 		$p_0, p_1, ..., p_N$. The system will have N different variables $X_0, X_1, ..., X_N$, 
 		where $\forall i < N: X_i \textit{ is mapped to point }p_i$.
@@ -779,7 +787,7 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 			\end{align*}
 		\end{defn}
 
-		\begin{defn}
+		\begin{defn} \label{measure_less_equal_without_duplication}
 			Let x and y be two terms and let $\mathscr{I}_q$ be the inequality produced from $\le_\mu(x, y)$. Then the inequality $\mathscr{L}_q$ can be simplified 
 			by removing all variables present on both sides of the equation. This can be written as:
 			\begin{align*}
@@ -787,7 +795,7 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 			\end{align*}
 		\end{defn}
 
-		\begin{defn}
+		\begin{defn} \label{measure_less_without_duplication}
 			Let x and y be two terms and let $\mathscr{I}_q$ be the inequality produced from $<_\mu(x, y)$. Then the inequality $\mathscr{L}_q$ can be simplified 
 			by removing all variables present on both sides of the equation. This can be written as:
 			\begin{align*}
@@ -796,21 +804,110 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 		\end{defn}
 
 		\begin{defn}
-			Let $M = (W, R, \vE)$ be a potential model. Let $\mathscr{S}$ be the system of inequalities defined by
+			Let $M = (W, R, \vE)$ be a model. Let $\mathscr{S}$ be the system of inequalities defined by
 			\begin{itemize}
-				\item inequalities for all $\le_\mu$ fromulas by def: 3.16 
-				\item inequalities for all $<_\mu$ fromulas by def: 3.17
+				\item inequalities for all $\le_\mu$ fromulas by def \ref{measure_less_equal_without_duplication}
+				\item inequalities for all $<_\mu$ fromulas by def: \ref{measure_less_without_duplication}
 				\item inequality $0 < X_i$ for each $0 \le i < N$  
 			\end{itemize}
 			If the system of inequalities $\mathscr{S}$ has a solution, then we say that the system is valid.
 		\end{defn}
-		\begin{lemma}
-			\label{building-lemma}
-			Let $\varphi$ be a formula. If there exists branch conjunction B for the formula $\varphi$
-			and there exists a potential model M for the branch conjunction B and 
-			there exists a valid system of inequalities defined from the potential model M,
-			then the formula $\varphi$ is satisfiable by the model M.
-		\end{lemma}
+
+\subsection{Measure formula satisfiability}
+	Finding a model to satisfy a formula which includes measure atomic formulas, follows the same initial steps as the formula satisfiability in \ref{formula-satisfiability}, 
+	namely the tableau method is used to simplify the formula and to create a tableau branch conjunctions.
+	The tableau branch conjunction for the quantitative contact logics contains the signed contact, zero term and measure atomic formula.
+	For the rest of this section the term formula will be used to indicate a formula which might be defined with atomic measure formulas.
+
+	\begin{defn}
+		Let $\varphi$ be a formula and let $\mathcal{T}$ be a tableau applied over the $\varphi$ formula.
+		Then a branch of the tableau method is defined with the following notation:
+		\begin{align*}
+				B = \{\signT C(a_i, b_i) \mid i \in \{1, \ldots, I\} \} &\cup 
+					\{\signF C(e_k, f_k) \mid k \in \{1, \ldots, K\} \} \cup \\
+					\{\signF d_j = 0 \mid j \in \{1, \ldots, J\} \} &\cup 
+					\{\signT g_l = 0 \mid l \in \{1, \ldots, L\} \} \cup \\
+					\{\signT m_p \le_\mu n_p \mid p \in \{1, \ldots, P\} \} &\cup
+					\{\signF u_q \le_\mu v_q \mid q \in \{1, \ldots, Q\} \}
+		\end{align*}
+	\end{defn}
+	To simplify it further we can remove the signed symbols $\signT \textit{ and } \signF$, in which case the branch conjunction of the tableau method branch is defined as:
+	\BranchConjunctionWithMeasure
+
+	Having measure atomic formulas in a branch conjunction makes it difficult to define an approach where a suitable point valuation is created for each term 
+	in the atomic formulas in that branch conjunction. The reason behind this is because of the global property of the measure atomic formulas. 
+	The measure atomic formulas require some weight to be computed over all existing points. Because of this a top to bottom approach is chosen for this 
+	algorithm, where all valid modal points are generated for the variables in the branch conjunction.
+	Where a modal point is represented by a variable valuation function. To prove that a model exists each subset of valid modal points 
+	is tested whether it satisfies the branch conjunction.
+
+	\paragraph{Valid modal point}
+	Let B be a branch conjunction. We say that the modal point p, represented with a variable valuation function $\curvedE$ is valid, if the following statements hold:
+	\begin{itemize}
+		\item $t = 0 \in B:  \vBool_{\curvedE}(t) = \textbf{false}$
+		\item $\neg C(e, f) \in B: \vBool_{\curvedE}(e) = \textbf{false} \textit{ or } \vBool_{\curvedE}(f) = \textbf{false}$
+	\end{itemize}
+	Let W be the set of all valid points, without duplication. The number of W has an upper bound of $2^n$, where n is the number of different variables in the branch
+	conjunction. To determine all valid relations between the valid points we need to figure out 
+
+	\paragraph{Valid modal valuation}
+	Each valid point p is represented with a variable valuation function $\curvedE$ which means that for a given variable m we can 
+	determine if $p \in \vE(m)$ with $\vBool_{\curvedE}(m))$. Doing this for each variable and for each valid modal point defines the valid $\vE$.
+	This procedure is done by looping over each valid modal point p and extending $\vE$ for each variable set in the variable valuation of the modal point p.
+
+	\paragraph{Valid modal relation}
+	Let B be a branch conjunction. Let W be the set of all valid points and $\vE$ be the valid valuation function constructed from W.
+	Then a valid modal relation R is defined by creating a relation between each modal point except for the modal points which are not in contact.
+	\begin{itemize}
+		\item $\neg C(e, f) \in B: (\forall x \in \vE(e) \textit{ and } \forall y \in \vE(f) \: \neg xRy)$
+	\end{itemize}
+
+	Let B be a branch conjunction. Let $\mathcal{M} = (W, R, \vE)$ be a model defined by all valid modal points and the corresponding 
+	valuation and relation functions over the branch conjunction B.
+	M is a possible model which satisfies the branch, which means that it satisfies the formula. 
+	In case the system of inequalities over M and B has a solution, then this model satisfies the initial formula.
+	However in the opposite scenario, where the system of inequalities does not have a solution it does 
+	not mean that the branch conjunction B does not construct a model.
+	It is possible that the satisfying model has less modal points. 
+	This means that we should test the satisfiability of the branch conjunction against all models produced from the modal points for each subset of W.
+	
+	Testing the satisfiability for each subset of W creates a lot of combinations, that is why having a structural approach to eliminate 
+	multiple combinations at once is a huge performance optimization. The following lemmas provide such optimization.
+
+	\begin{lemma}[Impossible subset models] \label{impossible-subset-models}
+		Let B be a branch conjunction. Let  $\mathcal{M} = (W, R, \vE)$ be a model,
+		where W is a subset of all valid modal points over B, then the following statements hold:
+		\begin{align*}
+			t \neq 0 \in B: \vE(t) = \emptyset \implies (\forall W' \subseteq W) \vE'(t) = \emptyset
+		\end{align*}
+
+		\begin{align*}
+			C(a,b) \in B: \vE(a) = \emptyset \textit{ or } \vE(b) = \emptyset \implies (\forall W' \subseteq W) \vE'(a) = \emptyset \textit{ or } \vE'(b) = \emptyset
+		\end{align*}
+	\end{lemma}
+
+	\begin{lemma}[Valuation deduction] \label{valuation-deduction}
+		Let B be a branch conjunction. Let  $\mathcal{M} = (W, R, \vE)$ be a model, where W is a set of all valid modal points over B.
+		Let $\{ q_0, ... q_n \}$ be valid modal points and let W' be defined as $W' = W \textbackslash \{ q_0, ... q_n \}$, then $\vE'$ can be calculated as:
+		\begin{itemize}
+			\item $t \neq 0 \in B: \vE'(t) =  \vE(t) \{ q_0, ... q_n \}$
+			\item $C(a,b) \in B: \vE'(a) =  \vE(a) \{ q_0, ... q_n \} \textit{ and } \vE'(b) =  \vE(b) \{ q_0, ... q_n \}$
+			\item $a \leq_\mu b \in B: \vE'(a) =  \vE(a) \{ q_0, ... q_n \} \textit{ and } \vE'(b) =  \vE(b) \{ q_0, ... q_n \}$
+			\item $a <_\mu b \in B: \vE'(a) =  \vE(a) \{ q_0, ... q_n \} \textit{ and } \vE'(b) =  \vE(b) \{ q_0, ... q_n \}$
+		\end{itemize}
+	\end{lemma}
+	
+	This lemma implies that the valuation for each subset of W can be deduced from $\vE$ with less computations.
+
+	\paragraph{Measure formula satisfiability algorithm} The satisfiability of a measure formula is defined with the following steps:
+	\begin{enumerate}
+		\item Generate all valid modal points W, which implies the model $\mathcal{M} = (W, R, \vE)$.
+		\item Precompute the valuation of the $t \neq 0, C(a,b), a \leq_\mu b, a <_\mu b$ formulas \ref{valuation-deduction}
+		\item For each subset $W' \subseteq W$ test if it satisfies the $t \neq 0, C(a,b)$ and the system of inequality.
+		\item If a subset $W'  \subseteq W$ does not satisfy the $t \neq 0, C(a,b)$ by lemma \ref{impossible-subset-models} then all $W'' \subseteq W'$ are eliminated.
+		\item If a W' is found such that it satisfies $t \neq 0, C(a,b)$ and the system of inequality then a valid model has been constructed for the input formula.
+	\end{enumerate}
+
 
 	\newpage
 	\section{Implementation Introduction}
