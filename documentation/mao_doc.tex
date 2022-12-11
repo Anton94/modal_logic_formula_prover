@@ -838,8 +838,8 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	in the atomic formulas in that branch conjunction. The reason behind this is because of the global property of the measure atomic formulas. 
 	The measure atomic formulas require some weight to be computed over all existing points. Because of this a top to bottom approach is chosen for this 
 	algorithm, where all valid modal points are generated for the variables in the branch conjunction.
-	Where a modal point is represented by a variable valuation function. To prove that a model exists each subset of valid modal points 
-	is tested whether it satisfies the branch conjunction.
+	Same as in the definition for the model without measure formulas a modal point is represented by a variable valuation function. 
+	To prove that a model exists each subset of valid modal points is tested whether it satisfies the branch conjunction.
 
 	\paragraph{Valid modal point}
 	Let B be a branch conjunction. We say that the modal point p, represented with a variable valuation function $\curvedE$ is valid, if the following statements hold:
@@ -848,26 +848,31 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 		\item $\neg C(e, f) \in B: \vBool_{\curvedE}(e) = \textbf{false} \textit{ or } \vBool_{\curvedE}(f) = \textbf{false}$
 	\end{itemize}
 	Let W be the set of all valid points, without duplication. The number of W has an upper bound of $2^n$, where n is the number of different variables in the branch
-	conjunction. To determine all valid relations between the valid points we need to figure out 
+	conjunction. To determine all valid relations between the valid points we need to figure out each variable valuation first.
 
-	\paragraph{Valid modal valuation}
+	\paragraph{Valid model valuation}
 	Each valid point p is represented with a variable valuation function $\curvedE$ which means that for a given variable m we can 
-	determine if $p \in \vE(m)$ with $\vBool_{\curvedE}(m))$. Doing this for each variable and for each valid modal point defines the valid $\vE$.
+	determine if $p \in \vE(m)$ with $\vBool_{\curvedE}(m))$. Doing this for each variable and for each valid modal point defines the valid model valuation $\vE$.
 	This procedure is done by looping over each valid modal point p and extending $\vE$ for each variable set in the variable valuation of the modal point p.
+	\begin{align*}
+		\vE(m) = \{ p \; | \; \vBool_{\curvedE}(m) \; \textit{is true} \}
+	\end{align*}
 
-	\paragraph{Valid modal relation}
+	\paragraph{Valid model relation}
 	Let B be a branch conjunction. Let W be the set of all valid points and $\vE$ be the valid valuation function constructed from W.
-	Then a valid modal relation R is defined by creating a relation between each modal point except for the modal points which are not in contact.
-	\begin{itemize}
-		\item $\neg C(e, f) \in B: (\forall x \in \vE(e) \textit{ and } \forall y \in \vE(f) \: \neg xRy)$
-	\end{itemize}
+	Then a valid model relation R is defined by creating a relation between each modal point except for the modal points which are not in contact.
+	\begin{align*}
+		\neg C(e, f) \in B: (\forall x \in \vE(e) \textit{ and } \forall y \in \vE(f) \: \neg xRy)
+	\end{align*}
 
+	\paragraph{Valid Measure Model} 
 	Let B be a branch conjunction. Let $\mathcal{M} = (W, R, \vE)$ be a model defined by all valid modal points and the corresponding 
 	valuation and relation functions over the branch conjunction B.
-	M is a possible model which satisfies the branch, which means that it satisfies the formula. 
-	In case the system of inequalities over M and B has a solution, then this model satisfies the initial formula.
+	$\mathcal{M}$ is a possible model which satisfies the branch, which means that it satisfies the formula. 
+	In case the system of inequalities over $\mathcal{M}$ and B has a solution, then this model satisfies the initial formula.
 	However in the opposite scenario, where the system of inequalities does not have a solution it does 
 	not mean that the branch conjunction B does not construct a model.
+
 	It is possible that the satisfying model has less modal points. 
 	This means that we should test the satisfiability of the branch conjunction against all models produced from the modal points for each subset of W.
 	
@@ -877,23 +882,21 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	\begin{lemma}[Impossible subset models] \label{impossible-subset-models}
 		Let B be a branch conjunction. Let  $\mathcal{M} = (W, R, \vE)$ be a model,
 		where W is a subset of all valid modal points over B, then the following statements hold:
-		\begin{align*}
-			t \neq 0 \in B: \vE(t) = \emptyset \implies (\forall W' \subseteq W) \vE'(t) = \emptyset
-		\end{align*}
-
-		\begin{align*}
-			C(a,b) \in B: \vE(a) = \emptyset \textit{ or } \vE(b) = \emptyset \implies (\forall W' \subseteq W) \vE'(a) = \emptyset \textit{ or } \vE'(b) = \emptyset
-		\end{align*}
+	\begin{enumerate}
+		\item $t \neq 0 \in B: \vE(t) = \emptyset \implies (\forall W' \subseteq W) \; \vE'(t) = \emptyset$
+		\item $C(a,b) \in B: \vE(a) = \emptyset \implies (\forall W' \subseteq W) \; \vE'(a) = \emptyset$
+		\item $C(a,b) \in B: \vE(b) = \emptyset \implies (\forall W' \subseteq W) \; \vE'(b) = \emptyset$
+	\end{enumerate}
 	\end{lemma}
 
 	\begin{lemma}[Valuation deduction] \label{valuation-deduction}
 		Let B be a branch conjunction. Let  $\mathcal{M} = (W, R, \vE)$ be a model, where W is a set of all valid modal points over B.
 		Let $\{ q_0, ... q_n \}$ be valid modal points and let W' be defined as $W' = W \textbackslash \{ q_0, ... q_n \}$, then $\vE'$ can be calculated as:
 		\begin{itemize}
-			\item $t \neq 0 \in B: \vE'(t) =  \vE(t) \{ q_0, ... q_n \}$
-			\item $C(a,b) \in B: \vE'(a) =  \vE(a) \{ q_0, ... q_n \} \textit{ and } \vE'(b) =  \vE(b) \{ q_0, ... q_n \}$
-			\item $a \leq_\mu b \in B: \vE'(a) =  \vE(a) \{ q_0, ... q_n \} \textit{ and } \vE'(b) =  \vE(b) \{ q_0, ... q_n \}$
-			\item $a <_\mu b \in B: \vE'(a) =  \vE(a) \{ q_0, ... q_n \} \textit{ and } \vE'(b) =  \vE(b) \{ q_0, ... q_n \}$
+			\item $t \neq 0 \in B: \vE'(t) =  \vE(t) \textbackslash \{ q_0, ... q_n \}$
+			\item $C(a,b) \in B: \vE'(a) =  \vE(a) \textbackslash \{ q_0, ... q_n \} \textit{ and } \vE'(b) =  \vE(b) \textbackslash \{ q_0, ... q_n \}$
+			\item $a \leq_\mu b \in B: \vE'(a) =  \vE(a) \textbackslash \{ q_0, ... q_n \} \textit{ and } \vE'(b) =  \vE(b) \textbackslash \{ q_0, ... q_n \}$
+			\item $a <_\mu b \in B: \vE'(a) =  \vE(a) \textbackslash \{ q_0, ... q_n \} \textit{ and } \vE'(b) =  \vE(b) \textbackslash \{ q_0, ... q_n \}$
 		\end{itemize}
 	\end{lemma}
 	
@@ -902,10 +905,13 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	\paragraph{Measure formula satisfiability algorithm} The satisfiability of a measure formula is defined with the following steps:
 	\begin{enumerate}
 		\item Generate all valid modal points W, which implies the model $\mathcal{M} = (W, R, \vE)$.
-		\item Precompute the valuation of the $t \neq 0, C(a,b), a \leq_\mu b, a <_\mu b$ formulas \ref{valuation-deduction}
-		\item For each subset $W' \subseteq W$ test if it satisfies the $t \neq 0, C(a,b)$ and the system of inequality.
-		\item If a subset $W'  \subseteq W$ does not satisfy the $t \neq 0, C(a,b)$ by lemma \ref{impossible-subset-models} then all $W'' \subseteq W'$ are eliminated.
-		\item If a W' is found such that it satisfies $t \neq 0, C(a,b)$ and the system of inequality then a valid model has been constructed for the input formula.
+		\item Compute ahead the valuations of the $t \neq 0, C(a,b), a \leq_\mu b, a <_\mu b$ formulas given in the valuation deduction lemma \ref{valuation-deduction}
+		\item For each subset $W' \subseteq W$ test if it satisfies the $t \neq 0, C(a,b)$: 
+		\begin{enumerate}
+		\item In case it satisfies the $t \neq 0, C(a,b)$ verify whether the system of inequality has a solution. If the system has a solution then a valid model for the formula is constructed, otherwise continue with the next subset $W'$.
+		\item If $W'  \subseteq W$ does not satisfy the $t \neq 0, C(a,b)$ then by lemma \ref{impossible-subset-models} all $W'' \subseteq W'$ are eliminated.
+		\end{enumerate}
+		\item If W' is found such that it satisfies $t \neq 0, C(a,b)$ and the system of inequality then a valid model has been constructed for the input formula.
 	\end{enumerate}
 
 
