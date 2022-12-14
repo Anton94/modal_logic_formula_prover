@@ -883,12 +883,48 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 		Let B be a branch conjunction. Let  $\mathcal{M} = (W, R, \vE)$ be a model,
 		where W is a subset of all valid modal points over B, then the following statements hold:
 	\begin{enumerate}
-		\item $t \neq 0 \in B: \vE(t) = \emptyset \implies (\forall W' \subseteq W) \; \vE'(t) = \emptyset$
+		\item $t \neq 0 \in B: \vE(t) = \emptyset \implies (\forall W' \subseteq W : W' \neq \emptyset) \; \vE'(t) = \emptyset$
 		\item $C(a,b) \in B: \vE(a) = \emptyset \implies (\forall W' \subseteq W) \; \vE'(a) = \emptyset$
 		\item $C(a,b) \in B: \vE(b) = \emptyset \implies (\forall W' \subseteq W) \; \vE'(b) = \emptyset$
 	\end{enumerate}
 	\end{lemma}
 
+	\begin{proof}
+		A proof for the first equation is given, the second and third equation follow analogously.
+	\newline
+		Let us take one formula $t \neq 0$ from B, such that $\vE(t) = \emptyset$. To proove that for all subsets of W, 
+		the valuation remains the empty set we shall use a structural induction over t.
+		Let W' be defined as $W \textbackslash \{ p \}$ for an arbitrary modal point p. This way we will see that if we remove an arbitrary modal point from
+		W the lemma holds and for arbitrary modal points removed from W, namely for every subset of W will follow analogously.
+		By structural induction we have: 
+		\begin{itemize}
+			\item $t \equiv 1$, this is not possible, since $\vE(t) = \emptyset$
+			\item $t \equiv 0$, then $\vE'(t) = \emptyset$ as well
+			\item $t \equiv a$, where a is a variable and $\vE(a) = \emptyset$ \\ 
+				from $\vE(a) = \emptyset$, it follows that $\neg \exists q \in W: q \in \vE(a)$ \\
+				$\Rightarrow p \notin \vE(a)$ \\
+				$\Rightarrow p \notin \vE'(a)$ \\
+				$\Rightarrow \vE(a) = \vE'(a) = \emptyset$
+			\item $t \equiv \neg u$, where u is a term and $\vE(\neg u) = \emptyset$ \\
+				from $\vE(\neg u) = W \textbackslash \vE(u) = \emptyset$ it follows that $\vE(u) = W$ \\
+				$\Rightarrow \neg \exists q \in W: q \in \vE(\neg u )$ \\
+				$\Rightarrow \forall q \in W: q \in \vE(u)$, from $W' = W \textbackslash \{p\}$, it follows that \\
+				$ \neg \exists q \in W': q \in \vE'(\neg u )$ \\
+				$ \forall q \in W': q \in \vE'(u)$ \\
+				$\Rightarrow \vE'(u) = W'$
+				$\Rightarrow \vE'(\neg u) = \emptyset$
+			\item $t \equiv u \sqcap w$, where u and w are terms and $\vE(u \sqcap w) = \emptyset$ \\
+				$\Rightarrow \neg \exists q \in W: q \in \vE(u) \textit{ and } q \in \vE(w)$ \\
+				$\Rightarrow \forall q \in W: q \notin \vE(u) \textit { or } q \notin \vE(w)$, from $W' = W \textbackslash \{p\}$, it follows that \\
+				$\Rightarrow \forall q \in W': q \notin \vE'(u) \textit { or } q \notin \vE'(w)$
+				$\Rightarrow \vE'(u \sqcap w) = \emptyset$
+			\item $t \equiv u \sqcup w$, where u and w are terms and $\vE(u \sqcup w) = \emptyset$ \\
+				$\Rightarrow \neg \exists q \in W: q \in \vE(u) \textit{ or } q \in \vE(w)$ \\
+				$\Rightarrow \forall q \in W: q \notin \vE(u) \textit { and } q \notin \vE(w)$, from $W' = W \textbackslash \{p\}$, it follows that \\
+				$\Rightarrow \forall q \in W': q \notin \vE'(u) \textit { and } q \notin \vE'(w)$
+				$\Rightarrow \vE'(u \sqcup w) = \emptyset$
+		\end{itemize}
+	\end{proof}
 	\begin{lemma}[Valuation deduction] \label{valuation-deduction}
 		Let B be a branch conjunction. Let  $\mathcal{M} = (W, R, \vE)$ be a model, where W is a set of all valid modal points over B.
 		Let $\{ q_0, ... q_n \}$ be valid modal points and let W' be defined as $W' = W \textbackslash \{ q_0, ... q_n \}$, then $\vE'$ can be calculated as:
