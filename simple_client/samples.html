@@ -52,11 +52,23 @@
     <script>
       const sample_formulas = [
         "C(a, b) & C(c, b)",
-        "C(a,b) & <=(a,c) & ~C(b,c)",
-        "T & F",
         "C(a,b) & C(b, c) & ~C(a, c)",
+        "<=(-a, a)",
         "C(a,b) & <=(a,c) | C(a, c) & <=(c, a)",
-        "C(a,b) & C(b, c) => C(a, c)"
+        "C(a,b) & C(b, c) -> C(a, c)",
+        "C(-a , -b) & ~<=(a, 0) & C(-a, a)",
+        "C(-b * a, b) & C(-a , -b) & ~<=(a, 0) & C(-a, a)",
+        "<=(-a, a) & <=(-b, b) & (~<=(a,-b) | ~<=(-a,-b))",
+        "~<=(a,b) & ~<=(b, c) & ~<=(c, a) & <=(a,c)",
+        "T -> T | ~<=(a,c)",
+        "<=(a, 0) & <=(b,0) <-> C(a,b)",
+
+        "T & F",
+        "C(a,b) & <=(a,c) & ~C(b,c)",
+        "<=(-a, a) & <=(-b, b) & ~<=(a,b) & ~<=(-a, -b)",
+        "<=(-a, a) & <=(-b, b) & (~<=(a,b) | ~<=(-a,b))",
+        "<=(a,0) & <=(1, a)",
+        "<=(a, 0) & <=(b,0) & C(a,b)",
       ];
 
       function initialize_samples() {
