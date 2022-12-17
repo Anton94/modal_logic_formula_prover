@@ -49,55 +49,121 @@
       color: black;
     }
     </style>
+    <style>
+		table {
+		  font-family: arial, sans-serif;
+		  border-collapse: collapse;
+		  width: 100%;
+		}
+
+		td, th {
+		  border: 1px solid #dddddd;
+		  text-align: center;
+		  padding: 8px;
+		}
+
+		.formula_cell {
+			text-align: left;
+		}
+
+		tr:nth-child(even) {
+		  background-color: #dddddd;
+		}
+	</style>
     <script>
       const sample_formulas = [
-        "C(a, b) & C(c, b)",
-        "C(a,b) & C(b, c) & ~C(a, c)",
-        "<=(-a, a)",
-        "C(a,b) & <=(a,c) | C(a, c) & <=(c, a)",
-        "C(a,b) & C(b, c) -> C(a, c)",
-        "C(-a , -b) & ~<=(a, 0) & C(-a, a)",
-        "C(-b * a, b) & C(-a , -b) & ~<=(a, 0) & C(-a, a)",
-        "<=(-a, a) & <=(-b, b) & (~<=(a,-b) | ~<=(-a,-b))",
-        "~<=(a,b) & ~<=(b, c) & ~<=(c, a) & <=(a,c)",
-        "T -> T | ~<=(a,c)",
-        "<=(a, 0) & <=(b,0) <-> C(a,b)",
+        ["C(a, b) & C(c, b)", true, true, true],
+        ["C(a,b) & C(b, c) & ~C(a, c)", true, true, true],
+        ["<=(-a, a)", true, true, true],
+        ["C(a,b) & <=(a,c) | C(a, c) & <=(c, a)", true, true, true],
+        ["C(a,b) & C(b, c) -> C(a, c)", true, true, true],
+        ["C(-a , -b) & ~<=(a, 0) & C(-a, a)", true, true, true],
+        ["C(-b * a, b) & C(-a , -b) & ~<=(a, 0) & C(-a, a)", true, true, true],
+        ["<=(-a, a) & <=(-b, b) & (~<=(a,-b) | ~<=(-a,-b))", true, true, true],
+        ["~<=(a,b) & ~<=(b, c) & ~<=(c, a) & <=(a,c)", true, true, true],
+        ["T -> T | ~<=(a,c)", true, true, true],
+        ["<=(a, 0) & <=(b,0) <-> C(a,b)", true, true, true],
 
-        "T & F",
-        "C(a,b) & <=(a,c) & ~C(b,c)",
-        "<=(-a, a) & <=(-b, b) & ~<=(a,b) & ~<=(-a, -b)",
-        "<=(-a, a) & <=(-b, b) & (~<=(a,b) | ~<=(-a,b))",
-        "<=(a,0) & <=(1, a)",
-        "<=(a, 0) & <=(b,0) & C(a,b)",
+        ["T & F", false, false, false],
+        ["C(a,b) & <=(a,c) & ~C(b,c)", false, false, false],
+        ["<=(-a, a) & <=(-b, b) & ~<=(a,b) & ~<=(-a, -b)", false, false, false],
+        ["<=(-a, a) & <=(-b, b) & (~<=(a,b) | ~<=(-a,b))", false, false, false],
+        ["<=(a,0) & <=(1, a)", false, false, false],
+        ["<=(a, 0) & <=(b,0) & C(a,b)", false, false, false],
+
+        ["~<=m(a,b) & <=(a,c) & <=(1, c) & <=(b, a)", true, true, true],
+        ["C(a,b) & C(b, c) -> C(a, c) & <=m(a, b)", true, true, true],
+        ["~<=m(a,b) & C(-a , -b) & ~<=(a, 0) & C(-a, a)", true, true, true],
+        ["T -> T & ~<=m(a,b) | ~<=(a,c)", true, true, true],
+
+        ["~<=m(a,b) & T & F", false, false, false],
+        ["C(a,b) & <=(a,c) & ~C(b,c) & <=m(a,c)", false, false, false],
+        ["<=(-a, a) & <=(-b, b) & ~<=(a,b) & ~<=(-a, -b)", false, false, false],
+        ["<=(-a, a) & <=(-b, b) & <=m(b,-b) & (~<=(a,b) | ~<=(-a,b))", false, false, false],
+        ["<=(a,0) & <=(1, a) & ~<=m(a,1)", false, false, false],
+        ["<=(a, 0) & <=m(a,c) & <=m(b, c) & <=(b,0) & C(a,b)", false, false, false],
       ];
 
-      function initialize_samples() {
-        // create code tags
-        sample_tags = sample_formulas.map(f => {
-          code = document.createElement("CODE");
+      function create_code(formula) {
+  		code = document.createElement("CODE");
           
-          var attr = document.createAttribute("href", )
-          attr.value = "./index.html?formula=" + encodeURIComponent(f);
+	    var attr = document.createAttribute("href")
+	    attr.value = "./index.html?formula=" + encodeURIComponent(formula);
 
-          var text = document.createTextNode(f);
+	    var text = document.createTextNode(formula);
+        a_tag = document.createElement("A");
+	    a_tag.setAttributeNode(attr);
+	    a_tag.appendChild(text);
+	    code.appendChild(a_tag);
+	    return code;
+      }
 
-          a_tag = document.createElement("A");
-          a_tag.setAttributeNode(attr);
-          a_tag.appendChild(text);
-          code.appendChild(a_tag);
-          return code;
-        });
-        
-        sample_tags.forEach(code => {
-          document.getElementById("samples").appendChild(code);
-          document.getElementById("samples").appendChild(document.createElement("HR"));
+      function create_satisfiability_symbol(is_satisfiable) {
+      	var symbol = document.createElement("SPAN");
+      	var text;
+      	if (is_satisfiable) {
+      		text = document.createTextNode("true")
+      	} else {
+			text = document.createTextNode("false")
+      	}
+      	symbol.appendChild(text);
+      	return symbol
+      }
+
+      function create_cell(element, is_formula_cell) {
+  		var td_element = document.createElement("TD");
+  		td_element.appendChild(element);
+  		if (is_formula_cell) {
+	  		var class_attribute = document.createAttribute("class");
+	  		class_attribute.value = "formula_cell";
+	  		td_element.setAttributeNode(class_attribute)
+  		}
+  		return td_element;
+      }
+
+      function create_text_cell(text) {
+      	return create_cell(create_satisfiability_symbol(text));
+      }
+
+      function create_row(sample) {
+  		tr_element = document.createElement("TR");
+  		tr_element.appendChild(create_cell(create_code(sample[0]), true));
+  		tr_element.appendChild(create_text_cell(sample[1], false));
+  		tr_element.appendChild(create_text_cell(sample[2], false));
+  		tr_element.appendChild(create_text_cell(sample[3], false));
+  		return tr_element
+      }
+
+      function initialize_samples_table() {        
+        sample_formulas.forEach(sample => {
+          document.getElementById("samples_table").appendChild(create_row(sample));
         });
       }
 
       
     </script>
   </head>
-  <body onload="initialize_samples();">
+  <body onload="initialize_samples_table();">
 
     <div class="sidenav">
       <a href="./home.html">Home</a>
@@ -108,8 +174,14 @@
 
     <div class="main">
       <h2>Samples</h2>
-      <div id="samples" style="font-size:18px;">
-      </div>
+      <table id="samples_table">
+		  <tr>
+		    <th>Formula</th>
+		    <th>Model</th>
+		    <th>Connectivity Model</th>
+		    <th>Measure Model</th>
+		  </tr>
+      </table>
     </div>
        
   </body>

@@ -193,11 +193,6 @@
         a Contact between the set itself and the opposite set.</p>
       <p>Now for the Connectivity Model itself. The input that it takes is a formula defined using constants, the <i>Contact</i> and <i>Less or equal</i> atomic formulas and the operations over them and verifies that the formula is satisfiable and the connectivity axiom is satisfied as well. If the formula is satisfiable the correspoding model is displayed, otherwise a proof is written as an output 
       describing why the formula can not be satisfied.</p>
-      <h4>Bruteforce Model</h4>
-      <p>The Bruteforce Model is solving the same problem as the Simple Model, but it can do this extrimely slow. This is kinda his secret!!</p>
-      <p>The idea behind the Bruteforce Model was to have a standarized algorithm which does the job in a simple and correct manner, so that 
-      every other algorithm can be compared to it.</p>
-
       <h4>Example formula: (C(a*b, c*d) & C(a,b)) | (<=(a,d) & <=(b,c))</h4>
       <p>The above formula is constructed from 4 atomic formulas:
         <ul>
