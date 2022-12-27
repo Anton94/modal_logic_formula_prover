@@ -57,6 +57,7 @@
 }
 
 \lstset { %
+    literate={~} {$\sim$}{1},
     language=C++,
     backgroundcolor=\color{black!5}, % set backgroundcolor
     basicstyle=\footnotesize,% basic font setting
@@ -894,7 +895,7 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	\newline
 		Let us take one formula $t \neq 0$ from B, such that $\vE(t) = \emptyset$. To proove that for all subsets of W, 
 		the valuation remains the empty set we shall use a structural induction over t.
-		Let W' be defined as $W \textbackslash \{ p \}$ for an arbitrary modal point p. This way we will see that if we remove an arbitrary modal point from
+		Let W' be defined as $W \backslash \{ p \}$ for an arbitrary modal point p. This way we will see that if we remove an arbitrary modal point from
 		W the lemma holds and for arbitrary modal points removed from W, namely for every subset of W will follow analogously.
 		By structural induction we have: 
 		\begin{itemize}
@@ -906,49 +907,53 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 				$\Rightarrow p \notin \vE'(a)$ \\
 				$\Rightarrow \vE(a) = \vE'(a) = \emptyset$
 			\item $t \equiv \neg u$, where u is a term and $\vE(\neg u) = \emptyset$ \\
-				from $\vE(\neg u) = W \textbackslash \vE(u) = \emptyset$ it follows that $\vE(u) = W$ \\
+				from $\vE(\neg u) = W \backslash \vE(u) = \emptyset$ it follows that $\vE(u) = W$ \\
 				$\Rightarrow \neg \exists q \in W: q \in \vE(\neg u )$ \\
-				$\Rightarrow \forall q \in W: q \in \vE(u)$, from $W' = W \textbackslash \{p\}$, it follows that \\
+				$\Rightarrow \forall q \in W: q \in \vE(u)$, from $W' = W \backslash \{p\}$, it follows that \\
 				$ \neg \exists q \in W': q \in \vE'(\neg u )$ \\
 				$ \forall q \in W': q \in \vE'(u)$ \\
 				$\Rightarrow \vE'(u) = W'$
 				$\Rightarrow \vE'(\neg u) = \emptyset$
 			\item $t \equiv u \sqcap w$, where u and w are terms and $\vE(u \sqcap w) = \emptyset$ \\
 				$\Rightarrow \neg \exists q \in W: q \in \vE(u) \textit{ and } q \in \vE(w)$ \\
-				$\Rightarrow \forall q \in W: q \notin \vE(u) \textit { or } q \notin \vE(w)$, from $W' = W \textbackslash \{p\}$, it follows that \\
+				$\Rightarrow \forall q \in W: q \notin \vE(u) \textit { or } q \notin \vE(w)$, from $W' = W \backslash \{p\}$, it follows that \\
 				$\Rightarrow \forall q \in W': q \notin \vE'(u) \textit { or } q \notin \vE'(w)$
 				$\Rightarrow \vE'(u \sqcap w) = \emptyset$
 			\item $t \equiv u \sqcup w$, where u and w are terms and $\vE(u \sqcup w) = \emptyset$ \\
 				$\Rightarrow \neg \exists q \in W: q \in \vE(u) \textit{ or } q \in \vE(w)$ \\
-				$\Rightarrow \forall q \in W: q \notin \vE(u) \textit { and } q \notin \vE(w)$, from $W' = W \textbackslash \{p\}$, it follows that \\
+				$\Rightarrow \forall q \in W: q \notin \vE(u) \textit { and } q \notin \vE(w)$, from $W' = W \backslash \{p\}$, it follows that \\
 				$\Rightarrow \forall q \in W': q \notin \vE'(u) \textit { and } q \notin \vE'(w)$
 				$\Rightarrow \vE'(u \sqcup w) = \emptyset$
 		\end{itemize}
 	\end{proof}
 	\begin{lemma}[Valuation deduction] \label{valuation-deduction}
 		Let B be a branch conjunction. Let  $\mathcal{M} = (W, R, \vE)$ be a model, where W is a set of all valid modal points over B.
-		Let $\{ q_0, ... q_n \}$ be valid modal points and let W' be defined as $W' = W \textbackslash \{ q_0, ... q_n \}$, then $\vE'$ can be calculated as:
+		Let $\{ q_0, ... q_n \}$ be valid modal points and let W' be defined as $W' = W \backslash \{ q_0, ... q_n \}$, then $\vE'$ can be calculated as:
 		\begin{itemize}
-			\item $t \neq 0 \in B: \vE'(t) =  \vE(t) \textbackslash \{ q_0, ... q_n \}$
-			\item $C(a,b) \in B: \vE'(a) =  \vE(a) \textbackslash \{ q_0, ... q_n \} \textit{ and } \vE'(b) =  \vE(b) \textbackslash \{ q_0, ... q_n \}$
-			\item $a \leq_\mu b \in B: \vE'(a) =  \vE(a) \textbackslash \{ q_0, ... q_n \} \textit{ and } \vE'(b) =  \vE(b) \textbackslash \{ q_0, ... q_n \}$
-			\item $a <_\mu b \in B: \vE'(a) =  \vE(a) \textbackslash \{ q_0, ... q_n \} \textit{ and } \vE'(b) =  \vE(b) \textbackslash \{ q_0, ... q_n \}$
+			\item $t \neq 0 \in B: \vE'(t) =  \vE(t) \backslash \{ q_0, ... q_n \}$
+			\item $C(a,b) \in B: \vE'(a) =  \vE(a) \backslash \{ q_0, ... q_n \} \textit{ and } \vE'(b) =  \vE(b) \backslash \{ q_0, ... q_n \}$
+			\item $a \leq_\mu b \in B: \vE'(a) =  \vE(a) \backslash \{ q_0, ... q_n \} \textit{ and } \vE'(b) =  \vE(b) \backslash \{ q_0, ... q_n \}$
+			\item $a <_\mu b \in B: \vE'(a) =  \vE(a) \backslash \{ q_0, ... q_n \} \textit{ and } \vE'(b) =  \vE(b) \backslash \{ q_0, ... q_n \}$
 		\end{itemize}
 	\end{lemma}
 	
 	This lemma implies that the valuation for each subset of W can be deduced from $\vE$ with less computations.
 
-	\paragraph{Measure formula satisfiability algorithm} The satisfiability of a measure formula is defined with the following steps:
-	\begin{enumerate}
-		\item Generate all valid modal points W, which implies the model $\mathcal{M} = (W, R, \vE)$.
-		\item Compute ahead the valuations of the $t \neq 0, C(a,b), a \leq_\mu b, a <_\mu b$ formulas given in the valuation deduction lemma \ref{valuation-deduction}
-		\item For each subset $W' \subseteq W$ test if it satisfies the $t \neq 0, C(a,b)$: 
-		\begin{enumerate}
-		\item In case it satisfies the $t \neq 0, C(a,b)$ verify whether the system of inequality has a solution. If the system has a solution then a valid model for the formula is constructed, otherwise continue with the next subset $W'$.
-		\item If $W'  \subseteq W$ does not satisfy the $t \neq 0, C(a,b)$ then by lemma \ref{impossible-subset-models} all $W'' \subseteq W'$ are eliminated.
-		\end{enumerate}
-		\item If W' is found such that it satisfies $t \neq 0, C(a,b)$ and the system of inequality then a valid model has been constructed for the input formula.
-	\end{enumerate}
+	\subsection{Satisfiability Algorithm}
+	The satisfiability of a measure formula is done with an iteration over the possible subsets of valid modal points in a search for the one which constructs a model satisfing the formula.This algorithm is defined with the following steps.
+
+	\paragraph{1. Branch Conjunction} Using the tableau method iterate over each branch conjunction B.
+
+	\paragraph{2. All Valid  Modal Points} Generate all valid modal points W over B. Following the definitions above the set W of valid modal points implies the model $\mathcal{M} = (W, R, \vE)$.
+
+	\paragraph{3. Precomputed valuations} Compute ahead the valuations of the $t \neq 0, C(a,b), a \leq_\mu b, a <_\mu b$. These computed values will be used to quickly compute the valuations for a submodel with subset of valid modal points. This is done according to the valuation deduction lemma \ref{valuation-deduction}.
+
+	\paragraph{4. Loop Over the Possible Subsets}  For each subset $W' \subseteq W$ test if it satisfies the $t \neq 0$ and C(a,b) atomic formulas from the branch conjunction B:
+	\begin{itemize}
+	\item In case it satisfies the $t \neq 0$ and C(a,b) verify whether the system of inequality has a solution. If the system has a solution then a valid model for the formula is constructed, otherwise continue with the next subset $W'$.
+	\item If $W'  \subseteq W$ does not satisfy the $t \neq 0, C(a,b)$ then by lemma \ref{impossible-subset-models} all $W'' \subseteq W'$ are eliminated.
+	\end{itemize}
+	\paragraph{5. Final model} If W' is found such that it satisfies $t \neq 0, C(a,b)$ and the system of inequality then a valid model has been constructed for the input formula.
 
 
 	\newpage
@@ -2800,7 +2805,7 @@ auto term::evaluate(
 \end{lstlisting}
 
 	\subsection{Measured Less Operator Representation}
-	All t	he researched third party libraries for solving systems of inequalities work only with less or equal than inequalities.
+	All of the researched third party libraries for solving systems of inequalities work only with less or equal than ($\leq$) inequalities.
 		This means that the greater than inequalities must be simulated with the usage of less or equal than inequalities.
 		\newline
 		This absence is solved with the addition of a really
@@ -2821,7 +2826,7 @@ auto term::evaluate(
 		where $\epsilon$ is a small value.
 		\\
 		\\
-		The inequality X > 0, where X is a variable is transformed into:
+		The inequality$ X > 0 $, where X is a variable is transformed into:
 		\[
 			\syslineskipcoeff{1.50}
 			\systeme*{0 <= X - \epsilon} 
@@ -2829,6 +2834,7 @@ auto term::evaluate(
 		\newline
 		Google's linear solver Glop (OR-Tools) was one of the tested libraries and it has precision around $1*10^{-7}$.
 		Kiwi's precision is around $1*10^{-8}$. 
+		\newline
 		\newline
 		These results are based on simple empirical testing, namely:
 		\\
@@ -2844,91 +2850,67 @@ auto term::evaluate(
 	\paragraph{Building the System of Inequalities}
 	The system construction is done by adding constraints for all 	
 	measured atomic formulas. This is done by the \\
-	\textit{has\_solvable\_system\_of\_inequalities} method:
+	\textit{create\_system\_of\_inequalities} method:
 	\\
 	\\
 \noindent
 \textit{measured\_model.h}
 \begin{lstlisting}
-auto measured_model::has_solvable_system_of_inequalities() -> bool
+auto measured_model::create_system_of_inequalities(
+        const model_points_set_t& points,
+        const term_to_modal_points_t& term_evaluations,
+        system_of_inequalities& system) const -> bool
 {
     // For each <=m(a,b) calculate v(a) and v(b), then we will create
-    // an inequality of the following type: 
-    //     SUM_I Xi <= SUM_J Xj, where I is v(a) and J is v(b).
+    // an inequality of the following type: SUM_I Xi <= SUM_J Xj, 
+    //        where I is v(a) and J is v(b).
     // For each ~<=m(a,b) calculate v(a) and v(b), then we will create
-    // an inequality of the following type: 
-    //     SUM_I Xi > SUM_J Xj, where I is v(a) and J is v(b).
+    // an inequality of the following type: SUM_I Xi > SUM_J Xj, 
+    //        where I is v(a) and J is v(b).
     // Each inequality is a row in the system of inequalities. 
     // If this system has a solution, then we are good.
+    system.clear();
 
-    const auto points_size = points_.size();
-    system_.clear();
+    auto add_constraint = [](auto& s, const auto& formula, 
+        const auto& points, const auto& term_evaluations,
+        const auto& op) -> bool
+    {
+        const auto a = formula->get_left_child_term();
+        const auto b = formula->get_right_child_term();
+        const auto eval_it_a = term_evaluations.find(a);
+        const auto eval_it_b = term_evaluations.find(b);
+        assert(eval_it_a != term_evaluations.end());
+        assert(eval_it_b != term_evaluations.end());
+
+        // The evaluations contains all valid modal points, 
+        // so restrict them to the provided subset @points.
+        const auto eval_a = eval_it_a->second & points;
+        const auto eval_b = eval_it_b->second & points;
+
+        return s.add_constraint(eval_a, eval_b, op);
+    };
 
     for(const auto& m : measured_less_eq_T_)
     {
-        const auto v_a = m->get_left_child_term()->evaluate(
-		variable_evaluations_, points_size);
-        const auto v_b = m->get_right_child_term()->evaluate(
-		variable_evaluations_, points_size);
-        if (!system_.add_constraint(v_a, v_b,
-		system_of_inequalities::inequality_operation::LE))
+        if(!add_constraint(system, m, points, term_evaluations, 
+                system_of_inequalities::inequality_operation::LE))
         {
-            verbose() << "Unable to find a solution for the system"
-		"when adding the constraint for " << *m << "\n" << 
-		*static_cast<imodel* const>(this);
             return false;
         }
     }
 
     for(const auto& m : measured_less_eq_F_)
     {
-        const auto v_a = m->get_left_child_term()->evaluate(
-		variable_evaluations_, points_size);
-        const auto v_b = m->get_right_child_term()->evaluate(
-		variable_evaluations_, points_size);
-        if (!system_.add_constraint(v_a, v_b,
-		system_of_inequalities::inequality_operation::G))
+        if(!add_constraint(system, m, points, term_evaluations, 
+                system_of_inequalities::inequality_operation::G))
         {
-            std::stringstream out;
-            print_system(out);
-            verbose() << "Unable to find a solution for the system"
-		"when adding the constraint for ~" << *m << "\n" <<
-		*static_cast<imodel* const>(this);
             return false;
         }
     }
 
-    info() << "Found a solution for the system:\n" <<
-		*static_cast<imodel* const>(this);
-    return true;
+    return system.is_solvable();
 }
 \end{lstlisting}
-
-	\paragraph{Modal Points Valuations Generation}
-	The generation of new modal point valuations is done as follows:
-	\\
-	\\
-\noindent
-\textit{measured\_model.h}
-\begin{lstlisting}
-auto measured_model::generate_next() -> bool
-{
-    for (auto& point : points_)
-    {
-        if (point.evaluation.generate_next_evaluation())
-        {
-            calculate_the_model_evaluation_of_each_variable();
-            return true;
-        }
-
-        const auto is_reset = point.evaluation.reset();
-        assert(is_reset);
-        (void)is_reset;
-    }
-    return false;
-}
-\end{lstlisting}
-% generate_next is different
 
 	\subsection{Building Algorithm}
 		The building algorithm using the described methods. Follows the Lemma \ref{building-lemma}.
@@ -2945,69 +2927,147 @@ auto measured_model::create(
     const formulas_t& measured_less_eq_T,
     const formulas_t& measured_less_eq_F,
     const variables_mask_t& used_variables,
-    const formula_mgr* mgr)
-    -> bool
+    const variables_t& variable_names)
+    -> bool 
 {
+    trace() << "Start creating a measured model.";
     clear();
-    mgr_ = mgr;
+
+    variable_names_ = variable_names;
     used_variables_ = used_variables;
-    number_of_contacts_ = contacts_T.size();
 
     measured_less_eq_T_ = measured_less_eq_T;
     measured_less_eq_F_ = measured_less_eq_F;
 
-    if (!construct_contact_model_points(contacts_T) ||
-        !construct_non_zero_model_points(zero_terms_F))
+    constexpr const auto max_used_variables_support = 25;
+    if(used_variables_.count() >= max_used_variables_support)
     {
-        trace() << "Unable to construct the model points "
-	 "with binary variable evaluations which evaluates "
-	 "the contact & non-zero terms to 1";
         return false;
     }
 
-    auto additional_points = measured_less_eq_T.size() +
-		 measured_less_eq_F.size();
-    if(points_.empty() && additional_points == 0)
+    const auto all_valid_points = construct_all_valid_points(
+		used_variables_, contacts_F, zero_terms_T);
+    if(all_valid_points.empty())
     {
-        additional_points = 1;
-    }
-    if(additional_points > 0)
-    {
-        info() << "Adding additional " << additional_points <<
-            " points because of the <=m/~<=m atomics or empty model. "
-            "We need a potential one model point for each side "
-	 "of each inequality in the system.";
-        constant_true_ = std::make_unique<term>(mgr_);
-        constant_true_->construct_constant(true);
-        points_.insert(points_.end(), additional_points, 
-            {
-                constant_true_.get(),
-                variables_evaluations_block_for_positive_term(
-		*constant_true_, used_variables_)
-            });
-    }
-    create_contact_relations_first_2k_in_contact(points_.size(),
-	 contacts_T.size());
-    calculate_the_model_evaluation_of_each_variable();
-
-    system_ = system_of_inequalities(points_.size());
-    while (!is_zero_term_rule_satisfied(zero_terms_T) ||
-           !is_contact_F_rule_satisfied(contacts_F) ||
-           !has_solvable_system_of_inequalities())
-    {
-        TERMINATE_IF_NEEDED();
-        if (!generate_next())
-        {
-            trace() << "Unable to generate a new combination of " 
-                " binary variable evaluations for the model points.";
-            return false;
-        }
+        return false;
     }
 
-    return true;
+    if(all_valid_points.size() > max_valid_modal_points_count_)
+    {
+        return false;
+    }
+
+    const auto variable_evaluations_over_all_valid_points = 
+	generate_variable_evaluations(all_valid_points,
+		used_variables_.size());
+
+    const auto all_valid_contact_relations =
+	build_contact_relations_matrix(contacts_F, 
+		variable_evaluations_over_all_valid_points);
+
+    // So far, the zero terms and non-contacts are satisfied.
+    // From now on, no new relations, neigther points will be added, 
+    // therefore the zero terms and non-contacts satistfaction 
+    // will be preserved.
+
+    // Cache all term evaluations which will be requested later on.
+    term_to_modal_points_t term_evaluations;
+    add_term_evaluations(term_evaluations, zero_terms_F,
+	variable_evaluations_over_all_valid_points);
+    add_term_evaluations(term_evaluations, contacts_T,
+	variable_evaluations_over_all_valid_points);
+    add_term_evaluations(term_evaluations, measured_less_eq_F, 
+	variable_evaluations_over_all_valid_points);
+    add_term_evaluations(term_evaluations, measured_less_eq_T, 
+	variable_evaluations_over_all_valid_points);
+
+    system_ = system_of_inequalities(all_valid_points.size());
+
+    const auto total_combinations = size_t(
+	std::pow(2, all_valid_points.size()));
+
+    auto all_points = ~model_points_set_t(all_valid_points.size());
+    return generate_model(all_points, contacts_T, contacts_F,
+	zero_terms_F, all_valid_points, all_valid_contact_relations,
+	term_evaluations);
 }
 \end{lstlisting}
+	The recursive function generate\_model is defined as: \\
+	\\
+\noindent
+\textit{measured\_model.h}
+\begin{lstlisting}
+auto measured_model::generate_model(const model_points_set_t& points,
+	const formulas_t& contacts_T,
+        const formulas_t& contacts_F,
+        const terms_t& zero_terms_F,
+        const points_t& all_valid_points,
+        const contacts_t& all_valid_contact_relations,
+        const term_to_modal_points_t& term_evaluations) -> bool
+{
+    TERMINATE_IF_NEEDED();
 
+    // Already processed.
+    if(processed_combinations_.find(points) !=
+	processed_combinations_.end())
+    {
+        return false;
+    }
+
+    processed_combinations_.insert(points);
+
+    // If non-zero terms or contacts are not satisfied then 
+    // this points does not produce a valid model.
+    // Therefore, they could not produce a measured model neighter.
+    // No subset of them could satisfy the contacts/zero terms 
+    // because they require existnece of more points/relations but 
+    // the set of points/relations is even reduced.
+    auto satisfied_zero_terms_F = !are_zero_terms_F_satisfied(
+	zero_terms_F, points, term_evaluations);
+    auto satisfied_contacts_T = are_contacts_T_satisfied(
+	contacts_T, points, term_evaluations,
+	all_valid_contact_relations)
+    if(!satisfied_zero_terms_F || !satisfied_contacts_T)
+    {
+        return false;
+    }
+
+    // So far the subset @points of valid model points produces
+    // a valid model. Check if satisfies the system.
+    if(create_system_of_inequalities(points, term_evaluations, system_))
+    {
+        // Good. Found a measured model.
+        save_as_model(points, contacts_F, all_valid_points);
+        return true;
+    }
+
+    if(points.count() <= 1)
+    {
+        return false;
+    }
+
+    // Go through every subset with points_count - 1 elements
+    // and recursively check them.
+
+    auto point_pos = points.find_first();
+    while (point_pos != model_points_set_t::npos)
+    {
+        auto subset_points = points;
+        subset_points.set(point_pos, false);
+
+        if(generate_model(subset_points, contacts_T, contacts_F, 
+		zero_terms_F, all_valid_points,
+		all_valid_contact_relations, term_evaluations))
+        {
+            return true;
+        }
+
+        point_pos = points.find_next(point_pos);
+    }
+
+    return false;
+}
+\end{lstlisting}
 \newpage
 	\section{Rest Server}
 		The Web Server is used to serve:
