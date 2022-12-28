@@ -76,15 +76,15 @@
 	\pagenumbering{arabic}
 
 	\newpage
-\begin{abstract}
-	In this paper an algorithm is defined for proving the satisfiability of formulas defined in the space of the quantitative contact logics.When a formula is not satisfiable then a model to satisfy the formula does not exist. In case the formula is satisfiable the algorithm constructs a model which satisfies the formula.
-\end{abstract}
+%\begin{abstract}
+%	In this paper an algorithm is defined for proving the satisfiability of formulas defined in the space of the quantitative contact logics.When a formula is not satisfiable then a model to satisfy the formula does not exist. In case the formula is satisfiable the algorithm constructs a model which satisfies the formula.
+%\end{abstract}
 	\section{Introduction}
 	The modal logics are in a constant exploration and extended by the today's researchers. The contact modal logics is one such topic with increasing interests. This paper works its way to an algorithm which for a given contact modal logics formula constructs a model which satisfies the formula. If such a model does not exist then the algorithm proves that the formula is not satisfiable. 
 
 The model construction process begins with a formal prove procedure to decompose the formula to a simpler state. For this the tableau method is used. The tableau method branches the formula in many paths where each path is possible to derive a valid model for the formula. The procedure of model building is done for each path, until a model is successfully constructed. This procedure creates modal points, the relations between them and the variables valuations in order to find a prove for a model satisfying the formula. 
 
-As of today an algorithm which can solve this problem in a polynomial time is not possible. This is because the problem for constructing a satisfiable model for a quantitative contact formula is as hard as the Boolean satisfiability problem (SAT). That is why each optimization during the formula proving process significantly reduces the algorithm execution time.
+As of today an algorithm which can solve this problem in a polynomial time is not possible. This is because the problem for constructing a satisfiable model for a quantitative contact formula is at least as hard as the Boolean satisfiability problem (SAT). That is why each optimization during the formula proving process significantly reduces the algorithm execution time.
 
 	\newpage
 	\section{Tableaux Method}
@@ -96,7 +96,7 @@ During the expansion stage of the tableau an impossible cases can be met, where 
 For our purposes, we will use a slightly different version of the method described above, namely with the help of the expansion stage we will try to find a model with certain properties in which the given formula will be satisfied.
 
 		\subsection{Propositional logic tableau}
-The tableau method for propositional logic is mostly defined based on the presentation of Raymond Smullyan. In its simplest form it is defined with syntactical assertion for the validity of the formula and definition of the expansion stage. To reach this goal, we need to improve our syntactical arsenal, to be able to assert the validity of a formula. In order to accomplish this, we shall introduce two signs. These signs when combined with a formula will assert whether the formula is true or false. Formally, the two signs are $\{ \signT, \signF \}$. Let $\varphi$ be a formula, then
+The tableau method for propositional logic is mostly defined based on the presentation of Raymond Smullyan. In its simplest form it is defined with syntactical assertion for the validity of the formula and definition of the expansion stage. To reach this goal, we need to improve our syntactical arsenal, to be able to assert the validity of a formula. In order to accomplish this, we shall introduce two signs. These signs when combined with a formula will assert whether the formula is to be true or false. Formally, the two signs are $\{ \signT, \signF \}$. Let $\varphi$ be a formula, then
 \begin{itemize}
 	\item $\signT \varphi$ - asserts the validity of the formula $\varphi$
 	\item $\signF \varphi$ - asserts the invalidity of the formula $\varphi$
@@ -695,7 +695,7 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 	Let  $\mathcal{M} = (\mathcal{F}, \mu, \mathscr{v})$ be a model. 
 	The model is extended to a measure model with the addition of the following inductive satisfiability definition: 
 	\begin{itemize}
-		\item $\mathcal{M} \models a \leq_\mu b \text{ iff } \mu(\mathscr{v}(a)) \le \mu(\mathscr{v}(b))$
+		\item $\mathcal{M} \models a \leq_\mu b \text{, iff } \mu(\mathscr{v}(a)) \le \mu(\mathscr{v}(b))$
 	\end{itemize}
 
 	\paragraph{Measure formula properties} The following lemmas define useful properties of a measure model and measure formulas
@@ -772,19 +772,19 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 		Let $M = (W, R, \vE)$ be a model. The system of inequalities is constructed from a formula by evaluating each
 		of the terms in the $\le_\mu$ and $<_\mu$ atomic formulas. The number of points in the model are $N = | \; W \; |$. Let us enumerate the points
 		$p_0, p_1, ..., p_N$. The system will have N different variables $X_0, X_1, ..., X_N$, 
-		where $\forall i < N: X_i \textit{ is mapped to point }p_i$.
+		where $\forall i < N: X_i$ is mapped to point $p_i$.
 
 		\begin{defn}
 			Let x and y be two terms, then the formula $\le_\mu(x, y)$ is transformed to an inequality as follows:
 			\begin{align*}
-				\sum_{i \in \vE(x)} X_i <= \sum_{j \in \vE(y)} X_j
+				\sum_{i: p_i \in \vE(x)} X_i \leq \sum_{j: p_j \in \vE(y)} X_j
 			\end{align*}
 		\end{defn}
 
 		\begin{defn}
 			Let x and y be two terms, then the formula $<_\mu(x, y)$ is transformed to an inequality as follows:
 			\begin{align*}
-				\sum_{i \in \vE(x)} X_i < \sum_{j \in \vE(y)} X_j
+				\sum_{i: p_i \in \vE(x)} X_i < \sum_{j: p_j \in \vE(y)} X_j
 			\end{align*}
 		\end{defn}
 
@@ -792,7 +792,7 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 			Let x and y be two terms and let $\mathscr{I}_q$ be the inequality produced from $\le_\mu(x, y)$. Then the inequality $\mathscr{L}_q$ can be simplified 
 			by removing all variables present on both sides of the equation. This can be written as:
 			\begin{align*}
-				\sum_{i \in \vE(x) \setminus \vE(y)} X_i <= \sum_{j \in \vE(y) \setminus \vE(x)} X_j
+				\sum_{i: p_i \in \vE(x) \setminus \vE(y)} X_i \leq \sum_{j: p_j \in \vE(y) \setminus \vE(x)} X_j
 			\end{align*}
 		\end{defn}
 
@@ -800,7 +800,7 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 			Let x and y be two terms and let $\mathscr{I}_q$ be the inequality produced from $<_\mu(x, y)$. Then the inequality $\mathscr{L}_q$ can be simplified 
 			by removing all variables present on both sides of the equation. This can be written as:
 			\begin{align*}
-				\sum_{i \in \vE(x) \setminus \vE(y)} X_i < \sum_{j \in \vE(y) \setminus \vE(x)} X_j
+				\sum_{i: p_i \in \vE(x) \setminus \vE(y)} X_i < \sum_{j: p_j \in \vE(y) \setminus \vE(x)} X_j
 			\end{align*}
 		\end{defn}
 
@@ -853,7 +853,7 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 
 	\paragraph{Valid model valuation}
 	Each valid point p is represented with a variable valuation function $\curvedE$ which means that for a given variable m we can 
-	determine if $p \in \vE(m)$ with $\vBool_{\curvedE}(m))$. Doing this for each variable and for each valid modal point defines the valid model valuation $\vE$.
+	determine if $p \in \vE(m)$ with $\vBool_{\curvedE}(m)$. Doing this for each variable and for each valid modal point defines the valid model valuation $\vE$.
 	This procedure is done by looping over each valid modal point p and extending $\vE$ for each variable set in the variable valuation of the modal point p.
 	\begin{align*}
 		\vE(m) = \{ p \; | \; \vBool_{\curvedE}(m) \; \textit{is true} \}
