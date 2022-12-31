@@ -374,7 +374,7 @@ which are commonly used in this paper. Let a and b be two terms, then:
 	\end{itemize}
 
 	\subsection{Semantics}
-		A relational system is defined as $\mathcal{F} = (W, R)$, where $W \neq \emptyset$. In most modal logic theories $\mathcal{F}$ is called a frame. In many system $\mathcal{F}$ is also called an adjacency relation, where the cells are modeled with W and the adjacency relation is modeled with R. Simple example of such an adjacency space is our planet, where the cells are the countries and two countries are adjacent if they have a common point. In most cases is assumed that R is reflexive and symmetric, however it is more natural for R to be an arbitrary relation. In our example we might specify for countries x and y, that x be adjacent to y on the right (east), on the top (north), etc. Regions in one such adjacency system are arbitrary subsets of W and two sets a, b are in contact $C_R(a, b)$, if for some $x \in a$ and $y \in b$ we have xRy. This relational definition of the contact suggests that we give the following relational semantics. 
+		A relational system is defined as $\mathcal{F} = (W, R)$, where $W \neq \emptyset$. In most modal logic theories $\mathcal{F}$ is called a frame. In many systems $\mathcal{F}$ is also called an adjacency relation, where the cells are modeled with W and the adjacency relation is modeled with R. Simple example of such an adjacency space is our planet, where the cells are the countries and two countries are adjacent if they have a common point. In most cases is assumed that R is reflexive and symmetric, however it is more natural for R to be an arbitrary relation. In our example we might specify for countries x and y, that x be adjacent to y on the right (east), on the top (north), etc. Regions in one such adjacency system are arbitrary subsets of W and two sets a, b are in contact $C_R(a, b)$, if for some $x \in a$ and $y \in b$ we have xRy. This relational definition of the contact suggests that we give the following relational semantics. 
 
 	\paragraph{Boolean variable valuation}
 Let $\mathcal{F}$  be a frame, then a boolean variable valuation is any function $\mathscr{v}$ assignig to each Boolean variable a subset $v(a) \subseteq W$. The valuation is then extended inductively to all Boolean terms, as follows
@@ -506,7 +506,7 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 	\BranchConjunction
 
 	\begin{defn}
-		Let B be a branch conjunction, then the set of all variables used in all atomic formulas in B is defined as $\Var_B$ and it has a normal ordering of the variable, meaning that we can represent them in a sequence $x_1, x_2, ..., x_n$.
+		Let B be a branch conjunction, then the set of all variables used in all atomic formulas in B is defined as $\Var_B$ and it has a normal ordering of the variables. Meaning that we can represent them in a sequence $x_1, x_2, ..., x_n$.
 	\end{defn}
 
 	\begin{defn}
@@ -515,12 +515,10 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 			\curvedE : \Var_B \rightarrow \{ \textbf{false}, \textbf{true}\}
 		\end{align*}
 	\end{defn}
-	The variable valuation can be thought as a boolean array where the indexes are the variables from $\Var_B$. This way a \emph{true} element in the array at index \emph{i} corresponds to a true valuation of the variable represented with index \emph{i} . Having in mind that the size of $\Var_B$ is n, we know that there are $2^n$ possible valuations. Later on we are going to map one variable valuation function per modal point, this will imply that there will be $2^n$ possible values for one modal point representation.
-	% The idea of a modal points is to be represented by a separate $\curvedE$ variable valuation, which will be used to satisfy the term representing that modal point.
+	The variable valuation can be thought as a boolean array where the indexes are the variables from $\Var_B$. This way a \emph{true} element in the array at index \emph{i} corresponds to a true valuation of the variable represented with index \emph{i} . Having in mind that the size of $\Var_B$ is n, we know that there are $2^n$ possible valuations. 
 
-	\begin{defn} 
-		Let $\curvedE$ be a variable valuation and let a be a term, then we say that the tuple $\langle \curvedE, a \rangle$ represents a modal point.
-	\end{defn}
+For the purposes of our algorithm the elements of W will be such variable valuations. The variable valuations depends on the number of variables in the formula, this bounds the world W to have at most $2^n$ possible elements. From now on we will use the term modal point and variable valuation interchangeably.
+	% The idea of a modal points is to be represented by a separate $\curvedE$ variable valuation, which will be used to satisfy the term representing that modal point.
 
 	\paragraph{Boolean valuation}
 		Let $\curvedE$ be a variable valuation and let $\Ts$ be the set of all terms,
@@ -533,23 +531,14 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 			\item $\vBool_{\curvedE}(a \sqcup b) = \vBool_{\curvedE}(a) \textit{ or } \vBool_{\curvedE}(b)$
 			\item $\vBool_{\curvedE}(a*) = \textit{not } \vBool_{\curvedE}(a)$
 		\end{itemize}
-
-
-	\begin{defn}
-		Let p = $\langle \curvedE, a\rangle$ be a representation of a modal point. Then the following holds:
-		\begin{align*}
-			\vBool_{\curvedE}(a) = true \leftrightarrow p \in \vE(a)
-		\end{align*}
-		Where $\vE$ is the model valuation function. In such a case when $\vBool_{\curvedE}(a) = \textbf{true}$ we will say that the point p is \textbf{valid}.
-	\end{defn}
 	
 	\paragraph{Modal Point Construction}
 		Constructing a valid model for a given branch conjunction of a formula consists of finding W, R and the model valuation function $\vE$.
 		The model construction depends on the atomic formulas in a branch conjunction. 
 		The algorithm to validate that a branch conjunction produces a model where the given formula is satisfiable iterates over the atomic formulas and extends the model in such a way that at any point in time the model does not contain contradictions.
-		If on some step a contradiction occurs, then the $\vE$ is modified in order to remove the contradiction.
+		If on some step a contradiction occurs, then the valuation $\vE$ is modified in order to remove the contradiction.
 		When there are no possibilities for further modifications, then the branch conjunction is closed and a model does not exist for that branch conjunction.
-		The number of modal points generated in the model depend on the contacts, non zero terms and the atomic measure formulas.
+		The number of modal points generated in the model depend on the contacts and non zero terms.
 		The goal is to search for a model with enough modal points in order to make sure that all possible models which are not duplicated are considered.
 		Duplicated modal points lead to additional unnecessary computation. 
 		\newline
@@ -557,7 +546,7 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 		Let $\Var_B$ be the set of all variables in a branch conjunction B and let a be a term.
 		Then we will say that a modal point p is constructed, when a variable valuation $\curvedE$ is generated, such that p is valid:
 		\begin{align*}
-			\vBool_{\curvedE}(a) = 1
+			\vBool_{\curvedE}(a) = \textit{ true }
 		\end{align*}
 		Let n be the number of variables in $\Var_B$, then all possible variants of a variable valuations are $2^n$.
 		It is of huge importance for us to be able to determine the number of points required in order to construct a valid model. The number of modal points is determined from the atomic formulas in the tableau branch. Let B be a branch conjunction as:
@@ -569,7 +558,7 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 		\end{itemize}
 
 	\paragraph{Contact modal point construction step}\label{def-contacts-construction}
-		Let B be a branch conjunction and $C(a, b) \in B$, where a and b are two terms. Then two modal points are generated p1 and p2 with their corresponding variable valuations $\curvedE^1$ and $\curvedE^2$ such that:
+		Let B be a branch conjunction and $C(a, b) \in B$, where a and b are two terms. Then two modal points are generated $\curvedE^1$ and $\curvedE^2$ such that:
 		\begin{itemize}
 			\item $\vBool_{\curvedE^1}(a) = \textbf{true}$
 			\item $\vBool_{\curvedE^2}(b) = \textbf{true}$
@@ -589,10 +578,10 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 
 	Along with the generation of a valid variable valuation, the R relations is extended as well, namely the following relations are added:
 	\begin{itemize}
-		\item $p_1Rp_1$ - reflexivity of the modal point $p_1$
-		\item $p_2Rp_2$ - reflexivity of the modal point $p_2$
-		\item $p_1Rp_2$ - symmetric relation between $p_1$ and $p_2$
-		\item $p_2Rp_1$ - symmetric relation between $p_2$ and $p_1$
+		\item $\curvedE^1R\curvedE^1$ - reflexivity of the modal point $\curvedE^1$
+		\item $\curvedE^2R\curvedE^2$ - reflexivity of the modal point $\curvedE^2$
+		\item $\curvedE^1R\curvedE^2$ - symmetric relation between $\curvedE^1$ and $\curvedE^2$
+		\item $\curvedE^2R\curvedE^1$ - symmetric relation between $\curvedE^2$ and $\curvedE^1$
 	\end{itemize}
 
 	\leavevmode\newline
@@ -600,8 +589,7 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 	\begin{center}
 	\begin{tikzpicture}[scale = 1]
 		\filldraw[color=black!60, fill=red!0, thick](-3,0) circle (0.5);
-		\node at (-3.5,0.7) {$\curvedE^1$};
-		\node at (-3,0) {$p_1$};
+		\node at (-3,0) {$\curvedE^1$};
 		\node at (-3.5,-0.7) {a};
 		\draw[thick, ->] (-3.5,0) arc [
       	  		start angle=10,
@@ -611,8 +599,7 @@ The satisfiability verification or sometimes called a satisfiability proof for a
     			] ;
 		\draw[thick, <->](-2.5,0) -- (2.5,0);
 		\filldraw[color=black!60, fill=red!0, thick](3,0) circle (0.5);
-		\node at (3.5,0.7) {$\curvedE^2$};
-		\node at (3,0) {$p_2$};
+		\node at (3,0) {$\curvedE^2$};
 		\node at (3.5,-0.7) {b};
 		\draw[thick, ->] (3.5,0) arc [
       	  		start angle=180,
@@ -626,7 +613,7 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 	\end{center}
 
 	\paragraph{Non zero term modal point construction step}\label{def-non-zero-construction}
-		Let B be a branch conjunction and $a \neq 0 \in B$, where a is a term. Then one modal point p is generated and its variable valuations $\curvedE$ such that:
+		Let B be a branch conjunction and $a \neq 0 \in B$, where a is a term. Then one modal point $\curvedE$ is generated, such that:
 		\begin{itemize}
 			\item $\vBool_{\curvedE}(a) = \textbf{true}$
 		\end{itemize}
@@ -638,7 +625,7 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 	\newline
 		The R relation is extended as follows:
 		\begin{itemize}
-			\item $pRp$ - reflexivity of the modal point $p$
+			\item $\curvedE R \curvedE$ - reflexivity of the modal point $\curvedE$
 		\end{itemize}
 
 	\leavevmode\newline
@@ -652,8 +639,7 @@ The satisfiability verification or sometimes called a satisfiability proof for a
         		x radius=0.5cm,
         		y radius =0.2cm
     			] ;
-		\node at (-0.5,0.7) {$\curvedE$};
-		\node at (-0,0) {$p$};
+		\node at (-0,0) {$\curvedE$};
 		\node at (-0.5,-0.7) {a};
 		\node[text width=10cm, anchor=west, right] at (-4.5,-2)
     		{Generated modal point and its relation for not equal zero term $a \neq 0$};
@@ -665,7 +651,7 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 		\begin{itemize}
 			\item $\vE(0) = W$
 			\item $\vE(1) = \emptyset$
-			\item $\vE(p) = \{ \langle \curvedE, a \rangle \; | \; \langle \curvedE, a \rangle \in W \:\:\textit{and}\:\: \curvedE(p) = \textit{true} \}$
+			\item $\vE(p) = \{ \curvedE \; | \; \curvedE \in W \:\:\textit{and}\:\: \curvedE(p) = \textit{true} \}$
 			\item $\vE(a \sqcap b) = \vE(a) \cap \vE(b)$
 			\item $\vE(a \sqcup b) = \vE(a) \cup \vE(b)$
 			\item $\vE(a*) = W \setminus \vE(a)$
@@ -674,6 +660,14 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 	\leavevmode\newline
 	The tuple $(W, R, \vE)$ is called a model.
 	%TODO note here that this model is for the given input formula.
+
+	\begin{lemma}
+		Let a be a term and let $\curvedE$ be a variable valuation, by the definitions of $\vBool$ and $\vE$, the following holds:
+		\begin{align*}
+			\vBool_{\curvedE}(a) = true \leftrightarrow \curvedE \in \vE(a)
+		\end{align*}
+		In such a case when $\vBool_{\curvedE}(a) = \textbf{true}$ we will say that the point p is \textbf{valid}.
+	\end{lemma}
 
 	\newpage
 	\section{Quantitative Contact Logics}
@@ -842,7 +836,7 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	Same as in the definition for the model without measure formulas a modal point is represented by a variable valuation function. 
 	To prove that a model exists each subset of valid modal points is tested whether it satisfies the branch conjunction.
 
-	\paragraph{Valid modal point}
+	\begin{defn}
 	Let B be a branch conjunction. We say that the modal point p, represented with a variable valuation function $\curvedE$ is valid, if the following statements hold:
 	\begin{itemize}
 		\item $t = 0 \in B:  \vBool_{\curvedE}(t) = \textbf{false}$
@@ -850,29 +844,33 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	\end{itemize}
 	Let W be the set of all valid points, without duplication. The number of W has an upper bound of $2^n$, where n is the number of different variables in the branch
 	conjunction. To determine all valid relations between the valid points we need to figure out each variable valuation first.
+	\end{defn}
 
-	\paragraph{Valid model valuation}
+	\begin{defn}
 	Each valid point p is represented with a variable valuation function $\curvedE$ which means that for a given variable m we can 
 	determine if $p \in \vE(m)$ with $\vBool_{\curvedE}(m)$. Doing this for each variable and for each valid modal point defines the valid model valuation $\vE$.
 	This procedure is done by looping over each valid modal point p and extending $\vE$ for each variable set in the variable valuation of the modal point p.
 	\begin{align*}
 		\vE(m) = \{ p \; | \; \vBool_{\curvedE}(m) \; \textit{is true} \}
 	\end{align*}
+	\end{defn}
 
-	\paragraph{Valid model relation}
+	\begin{defn}
 	Let B be a branch conjunction. Let W be the set of all valid points and $\vE$ be the valid valuation function constructed from W.
 	Then a valid model relation R is defined by creating a relation between each modal point except for the modal points which are not in contact.
 	\begin{align*}
 		\neg C(e, f) \in B: (\forall x \in \vE(e) \textit{ and } \forall y \in \vE(f) \: \neg xRy)
 	\end{align*}
+	\end{defn}
 
-	\paragraph{Valid Measure Model} 
+	\begin{defn}
 	Let B be a branch conjunction. Let $\mathcal{M} = (W, R, \vE)$ be a model defined by all valid modal points and the corresponding 
 	valuation and relation functions over the branch conjunction B.
 	$\mathcal{M}$ is a possible model which satisfies the branch, which means that it satisfies the formula. 
 	In case the system of inequalities over $\mathcal{M}$ and B has a solution, then this model satisfies the initial formula.
 	However in the opposite scenario, where the system of inequalities does not have a solution it does 
 	not mean that the branch conjunction B does not construct a model.
+	\end{defn}
 
 	It is possible that the satisfying model has less modal points. 
 	This means that we should test the satisfiability of the branch conjunction against all models produced from the modal points for each subset of W.
@@ -942,7 +940,7 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	\subsection{Satisfiability Algorithm}
 	The satisfiability of a measure formula is done with an iteration over the possible subsets of valid modal points in a search for the one which constructs a model satisfing the formula.This algorithm is defined with the following steps.
 
-	\paragraph{1. Branch Conjunction} Using the tableau method iterate over each branch conjunction B.
+	\paragraph{1. Branch Conjunction} Using the tableau method iterate over each branch conjunctions B.
 
 	\paragraph{2. All Valid  Modal Points} Generate all valid modal points W over B. Following the definitions above the set W of valid modal points implies the model $\mathcal{M} = (W, R, \vE)$.
 
