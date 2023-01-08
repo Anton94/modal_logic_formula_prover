@@ -17,6 +17,7 @@
 \usepackage{multicol}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
+\usepackage[T1]{fontenc}
 
 \usetikzlibrary{arrows.meta}
 
@@ -990,8 +991,8 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 		->     & $\Rightarrow$     & Implication \\
 		<->    & $\Leftrightarrow$ & Equivalence \\
 		C      & C                 & Contact, syntax C($t_1$, $t_2$) \\
-		<=     & $\leq$            & Part of , syntax <=($t_1$, $t_2$) \\
-		<=m    & $\leq$$m$$$       & Measured Part of, syntax <=m($t_1$, $t_2$) \\
+		<=     & $\leq$            & Part of , syntax $<=(t_1, t_2)$ \\
+		<=m    & $\leq$$m$$$       & Measured Part of, syntax $<=m(t_1, t_2)$ \\
 		=0     & =0                & Zero term, syntax $t_1=0$ \\
 		()     & ()                & Parentheses \\
 		\hline
@@ -1075,7 +1076,7 @@ enum class term_operation_t
 	\end{lstlisting}
 
 	\newpage
-	\paragraph{Node types} There are two types of nodes. Formula nodes and term nodes. They are defined with a separate classes.
+	\paragraph{Node types} There are two types of nodes. Formula nodes and term nodes. They are defined with separate classes.
 	\\
 	\\
 \noindent
@@ -1115,10 +1116,10 @@ public:
 	\subsubsection{Tokenizer}
 	The tokenizer is responsible for demarcating the special symbols in the input formula.
 	After the symbols are identified, a token is created for each of them, or at least for those significant to the semantic of the input formula.
-	For example, the whitespace is not significant, and a token is not created for them.
+	For example, the whitespaces are not significant, and a token is not created for them.
 	We shall use Flex as a tokenizer \cite{flex-tokenizer}.
 
-	\paragraph{Grammar} The tokenizer's grammar is composed of two types of tokens. Single character and multi character.
+	\paragraph{Grammar} The tokenizer's grammar is composed of two types of tokens. Single character and multi character tokens.
 
 	The Single character tokens are directly matched in the input formula and are representing the token itself.
 	The multi character token is a sequence of characters which have some meaning when bundled together.
@@ -1190,7 +1191,7 @@ public:
 			The AST contains all the data from the input string formula in a more structured way.
 			On the AST additional optimizations can be done which will simplify the initial formula. It will produce better performance when a model is sought in the satisfiability algorithms.
 
-			For convenience, will define two helper methods. Namely, \textbf{create\_term\_node} and \textbf{create\_formula\_node}. Both method construct AST nodes.
+			For convenience, we will define two helper methods. Namely, \textbf{create\_term\_node} and \textbf{create\_formula\_node}. Both method construct AST nodes.
 
 			The create\_term\_node method creates an AST term node. Its arguments are an operation and up to two child terms. Depending on the operation arity.
 
@@ -1198,7 +1199,7 @@ public:
 
 			Few special symbols to define beforehand:
 			\begin{itemize}
-				\item \textbf{\$\$} is the return value to the 'parent'. Later, he can use it, e.g. as a child.
+				\item \textbf{\$\$} is the return value to the 'parent'. Later, the parent can use it, e.g. as a child.
 				\item \textbf{\$i} is the return value of the i-th matched element in the matcher sequence.
 			\end{itemize}
 
@@ -2412,7 +2413,7 @@ void model::calculate_the_model_evaluation_of_each_variable()
 
 	\newpage
 	\subsubsection*{Evaluating a term}
-	The implementation of the boolean valuation \ref{boolean-valuation} is in the \textit{term} class. The details are in the \textit{term.cpp} file.
+	The implementation of the boolean valuation is in the \textit{term} class. The details are in the \textit{term.cpp} file.
 	The boolean valuation assigns a constant true or false to the term for some variable evaluation. This variable evaluation assigns a constant true or false to each boolean variable in the term.
 	\\
 	\\
@@ -2452,7 +2453,7 @@ auto term::evaluate(
 \end{lstlisting}
 
 	\newpage
-	\subsubsection*{Zero terms satisfaction}
+	\subsubsection*{Zero terms satisfiability}
 	Checks whether a modal point(variable evaluation) does not conflict with the zero terms. The point should not be part of any zero term evaluation. So, the point should evaluate all zero terms to constant false.
 	\\
 	\\
@@ -2478,7 +2479,7 @@ auto are_zero_terms_T_satisfied(
 \end{lstlisting}
 
 	\newpage
-	\subsubsection*{Non-contacts satisfaction}
+	\subsubsection*{Non-contacts satisfiability}
 	Checks whether a modal point (or a pair of points) does not conflict with the non-contacts. It is split to two components. Based on the reflexivity and connectivity rules.
 
 	For the reflexivity, it is sufficient to verify that the point is not part of the both non-contact terms evaluations. So, the point should not evaluate both terms to constant true.
