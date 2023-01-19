@@ -153,10 +153,6 @@
 		A tableau is called \textbf{closed} if all branches are closed.
 	\end{defn}
 
-	\begin{defn}
-		A tableau is called \textbf{closed} if all branches are closed.
-	\end{defn}
-
 	\begin{lemma}
 		A closed tableau for $\SF X$ is a tableau proof of $X$, meaning that $X$ is a \textbf{tautology}.
 	\end{lemma}
@@ -500,7 +496,7 @@
 		\end{lemma}
 
 		\begin{defn}
-			Let $\E_n \in W_n$. $\E_n$ is a $\mathbf{valid \; modal \; point}$ of $\beta$ if it preserve the satisfaction of the zero terms and non-contacts in $\beta$:
+			Let $\E_n \in W_n$. $\E_n$ is a $\mathbf{valid \; modal \; point}$ of $\beta$ if it preserve the satisfiability of the zero terms and non-contacts in $\beta$:
 			\begin{gather*}
 				g = 0 \in \beta \rightarrow \E_n \notin \upsilon_n(g) \\ and \\
 				\neg C(e, f) \in \beta \rightarrow \E_n \notin (\upsilon_n(e) \cap \upsilon_n(f))
@@ -515,7 +511,7 @@
 		\end{defn}
 
 		\begin{defn}
-			Let x, y $\in W^v$ are valid modal points. Then $\pairXY$ is a $\mathbf{valid \; connected \; pair}$ of $\beta$ modal points if it preserves the satisfaction of non-contacts in $\beta$.
+			Let x, y $\in W^v$ are valid modal points. Then $\pairXY$ is a $\mathbf{valid \; connected \; pair}$ of $\beta$ modal points if it preserves the satisfiability of non-contacts in $\beta$.
 			\begin{equation}
 			\neg C(e, f) \in \beta \rightarrow
 			\neg(x \in \upsilon_n(e) \; and \; y \in \upsilon_n(f)) \;  or
@@ -657,22 +653,22 @@
 	\begin{lemma}
 		Let $\M^v = (\F^v, \upsilon_n)$ be a model. Let $G^v=(W^v, R^v)$ be the graph of $\F^v$. Let $G=(W,R) \subseteq G^v$.
 		\begin{itemize}
-			\item G preserves the satisfaction of the contacts in $\beta$ if
+			\item G preserves the satisfiability of the contacts in $\beta$ if
 			\begin{gather*}
 				C(a,b) \in \beta \rightarrow (\exists x \in \upsilon_n(a) \cap W)(\exists y \in \upsilon_n(b) \cap W)(xRy)
 			\end{gather*}
 
-			\item G preserves the satisfaction of the non-contacts in $\beta$ if
+			\item G preserves the satisfiability of the non-contacts in $\beta$ if
 			\begin{gather*}
 				\neg C(e,f) \in \beta \rightarrow \neg ((\exists x \in \upsilon_n(e) \cap W)(\exists y \in \upsilon_n(f) \cap W)(xRy))
 			\end{gather*}
 
-			\item G preserves the satisfaction of the zero terms in $\beta$ if
+			\item G preserves the satisfiability of the zero terms in $\beta$ if
 			\begin{gather*}
 				d = 0 \in \beta \rightarrow \upsilon(d) \cap W = \emptyset
 			\end{gather*}
 
-			\item G preserves the satisfaction of the non-zero terms in $\beta$ if
+			\item G preserves the satisfiability of the non-zero terms in $\beta$ if
 			\begin{gather*}
 				g \neq 0 \in \beta \rightarrow \upsilon(g) \cap W \neq \emptyset
 			\end{gather*}
@@ -680,15 +676,15 @@
 	\end{lemma}
 
 	\begin{lemma}
-		Let $\M^v = (\F^v, \upsilon_n)$ be a model. Let $G^v=(W^v, R^v)$ be the graph of $\F^v$. Let $G=(W,R) \subseteq G^v$. If G preserves the satisfaction of the contacts, non-contacts, zero terms and non-zero terms in $\beta$, then G defines a model $\M = (\F(W, R), \upsilon_n)$ of $\beta$.
+		Let $\M^v = (\F^v, \upsilon_n)$ be a mode of $\beta$l. Let $G^v=(W^v, R^v)$ be the graph of $\F^v$. Let $G=(W,R) \subseteq G^v$. If G preserves the satisfiability of the contacts, non-contacts, zero terms and non-zero terms in $\beta$, then G defines a model $\M = (\F(W, R), \upsilon_n)$ of $\beta$.
 	\end{lemma}
 
 	\begin{defn}
 		Let $G=(W, R)$ be a graph. Let $G'=(W', R') \subseteq G(W, R)$. If $G'$ is connected, then G' is a \textbf{connected component} of G.
 	\end{defn}
 
-		Let $\M^v$ be a model of $\beta$. Let $G^v=(W^v, R^v)$ be the graph of $\F^v$. $G^v$ preserves the satisfaction of zero terms and non-contacts.
-		All connected components of $G^v$ preserve the satisfaction of the zero terms and non-contacts in $\beta$. If there is a connected component $G'=(W', R')$ which satisfied the contacts and non-zero terms in $\beta$, then G' defines a connected model $\M'$ of $\beta$. Where $\F' = (W', R')$ and $\M' = (\F', \upsilon_n)$.
+		Let $\M^v$ be a model of $\beta$. Let $G^v=(W^v, R^v)$ be the graph of $\F^v$. $G^v$ preserves the satisfiability of zero terms and non-contacts.
+		All connected components of $G^v$ preserve the satisfiability of the zero terms and non-contacts in $\beta$. If there is a connected component $G'=(W', R')$ which satisfies the contacts and non-zero terms in $\beta$, then G' defines a connected model $\M'$ of $\beta$. Where $\F' = (W', R')$ and $\M' = (\F', \upsilon_n)$.
 
 		Let n be the number of elements in $W^v$. There are $2^n$ subgraphs of $G^v$. It is far from sufficient to check each one of them if it's connected and whether it satisfies the contacts and non-zero terms of $\beta$.
 
@@ -726,11 +722,11 @@
 	\end{lemma}
 
 	\begin{step}
-		Let $Comp^{G^v}$ is the set of the maximal connected components of $G^v$. Let n be the number of elements in $W^v$. The number elements in $Comp^{G^v}$ is at most n. The maximal connected components of $G^v$ does not have common vertices and edges. Therfore, the splitting of G to it's maximal connected components could be done in a very efficient way.
+		Let $Comp^{G^v}$ is the set of the maximal connected components of $G^v$. Let n be the number of elements in $W^v$. The number elements in $Comp^{G^v}$ is at most n. The maximal connected components of $G^v$ does not have common vertices and edges. Therfore, the splitting of G to it's maximal connected components is a fast and simple operation.
 	\end{step}
 
 	\begin{step}
-		Each graph of $Comp^{G^v}$ satisfies the zero terms and non-contacts of $\beta$. They do not introduce new modal points netiher a connections. If $Comp^{G^v}$ contains a graph that satisfied the contacts and non-zero terms of $\beta$, then this graph defines a connected model of $\beta$. Otherwise, $\beta$ does not have a connected model.
+		Each graph of $Comp^{G^v}$ satisfies the zero terms and non-contacts of $\beta$. They do not introduce new modal points netiher a connections. If $Comp^{G^v}$ contains a graph that satisfies the contacts and non-zero terms of $\beta$, then this graph defines a connected model of $\beta$. Otherwise, $\beta$ does not have a connected model.
 	\end{step}
 
 	\begin{lemma}(Connected component extension)
@@ -746,7 +742,7 @@
 	\begin{theorem}
 		Let $G^v=(W^v, R^v)$ be the graph of $\F^v$. If $G^v$ does not have a maximal connected component which defines a model of $\beta$, then $\beta$ does not have a connected model.
 		\begin{proof}
-			Let $G^v$ does not have a maximal connected component which defines a model of $\beta$. Let $\beta$ has a connected model $\M = (\F(W, R), \upsilon_n)$. Let $G=(W, R)$ be the graph defined by $\F$. From the definition of the connected model follows that G is connected. $G$ contains only valid modal points and valid relations between them. $G^v$ contains all valid modal points and all vlaid connections between them. Therfore, $G \subseteq G^v$ and G is a connected component of $G^v$. By the connected component extension lemma G can be extended to a maximal connected component $G_m=(W_m, R_m)$ of $G^v$. The extension adds points from $W^v$ and relations from $R^v$ to $G_m$. These are only valid modal points and valid connections between them. Therefore, $G_m$ preserves the satisfaction of the non-contacts and zero terms in $\beta$. $G_m$ keeps the points and relations from $G$. Thus, $G_m$ preserves the satisfaction of the contacts and non-zero terms in $\beta$. Hence, $G_m$ defines a connected model $\M_m = (\F_m(W_m, R_m), \upsilon_n)$ of $\beta$. This leads to a contradiction with the assumption that $G^v$ does not have a maximal connected component which defines a model of $\beta$.
+			Let $G^v$ does not have a maximal connected component which defines a model of $\beta$. Let $\beta$ have a connected model $\M = (\F(W, R), \upsilon_n)$. Let $G=(W, R)$ be the graph defined by $\F$. From the definition of the connected model follows that G is connected. $G$ contains only valid modal points and valid relations between them. $G^v$ contains all valid modal points and all valid connections between them. Therfore, $G \subseteq G^v$ and G is a connected component of $G^v$. By the connected component extension lemma G can be extended to a maximal connected component $G_m=(W_m, R_m)$ of $G^v$. The extension adds points from $W^v$ and relations from $R^v$ to $G_m$. These are only valid modal points and valid connections between them. Therefore, $G_m$ preserves the satisfiability of the non-contacts and zero terms in $\beta$. $G_m$ keeps the points and relations from $G$. Thus, $G_m$ preserves the satisfiability of the contacts and non-zero terms in $\beta$. Hence, $G_m$ defines a connected model $\M_m = (\F_m(W_m, R_m), \upsilon_n)$ of $\beta$. This leads to a contradiction with the assumption that $G^v$ does not have a maximal connected component which defines a model of $\beta$.
 		\end{proof}
 	\end{theorem}
 
@@ -2225,7 +2221,7 @@ auto term::evaluate(
 \end{lstlisting}
 
 	\newpage
-	\subsubsection*{Zero terms satisfaction}
+	\subsubsection*{Zero terms satisfiability}
 	Checks whether a modal point(variable evaluation) does not conflict with the zero terms. The point should not be part of any zero term evaluation. So, the point should evaluate all zero terms to constant false.
 \\
 \begin{lstlisting}
@@ -2250,7 +2246,7 @@ auto are_zero_terms_T_satisfied(
 \end{lstlisting}
 
 	\newpage
-	\subsubsection*{Non-contacts satisfaction}
+	\subsubsection*{Non-contacts satisfiability}
 	Checks whether a modal point (or a pair of points) does not conflict with the non-contacts. It is splitted to two components. Based on the reflexivity and connectivity rules.
 
 	For the reflexivity it is sufficient to verify that the point is not part of the both non-contact terms evaluations. So, the point should not evaluate both terms to constant true.
@@ -2610,7 +2606,7 @@ auto connected_model::is_contact_satisfied(
 \end{lstlisting}
 
 	\newpage
-	\subsubsection*{Contacts existence satisfaction}
+	\subsubsection*{Contacts existence satisfiability}
 	Checks whether the contacts have at least one point in their term's evaluations. It's a faster verification than the whole contact satisfication.
 \\
 \begin{lstlisting}
@@ -2635,7 +2631,7 @@ auto connected_model::is_contacts_T_existence_rule_satisfied(
 \end{lstlisting}
 
 	\newpage
-	\subsubsection*{Non-zero term satisfaction}
+	\subsubsection*{Non-zero term satisfiability}
 	Checks whether the non-zero terms are satisfied. It is sufficient to verify that there is a at least one modal point in each non-zero term's evaluation.
 \\
 \begin{lstlisting}
