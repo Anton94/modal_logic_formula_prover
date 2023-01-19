@@ -510,7 +510,7 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 		Let B be a branch conjunction, then the set of all variables used in all atomic formulas in B is defined as $\Var_B$ and it has a normal ordering of the variables. Meaning that we can represent them in a sequence $x_1, x_2, ..., x_n$.
 	\end{defn}
 
-	\begin{defn}
+	\begin{defn}\label{variable-valuation}
 		Let B be a branch conjunction and let $\Var_B$ be the set of all variables in B, then the variable valuation $\curvedE$ defines a mapping from $\Var_B$ to a boolean value, namely:
 		\begin{align*}
 			\curvedE : \Var_B \rightarrow \{ \textbf{false}, \textbf{true}\}
@@ -693,46 +693,6 @@ For the purposes of our algorithm the elements of W will be such variable valuat
 		\item $\mathcal{M} \models a \leq_\mu b \text{, iff } \mu(\mathscr{v}(a)) \le \mu(\mathscr{v}(b))$
 	\end{itemize}
 
-	\paragraph{Measure formula properties} The following lemmas define useful properties of a measure model and measure formulas
-
-	\begin{lemma}[Measure Formula Addition Property of Equality]
-	Let a, b and d be three terms, then
-	\begin{equation*}
-		(a \sqcap d = 0) \land (b \sqcap d = 0) \implies (a \le_\mu b \iff a \sqcup d \le_\mu b \sqcup d)
-	\end{equation*}
-	\end{lemma}
-
-\begin{proof}
-Let $\mathcal{M} = \langle B, \mu, \mathscr{v}\rangle$ be an arbitrary model. From the implication we can assume the following:
-	\begin{align*}
-		\mathcal{M} \models (a \sqcap d = 0) &\land (b \sqcap d = 0) \\
-		\mathcal{M} \models a \sqcap d = 0 \text{ and }& \mathcal{M} \models (b \sqcap d = 0) \\
-		\mathscr{v}(a \sqcap d) = \mathscr{v}(0) \text{ and }& \mathscr{v}(b \sqcap d) = \mathscr{v}(0) \\ 
-		\mathscr{v}(a) \cap \mathscr{v}(d) = \emptyset  \;\;\;\;\;\;\;& \mathscr{v}(b) \cap \mathscr{v}(d) = \emptyset
-	\end{align*}
-
-$\Longrightarrow$
-	\begin{align*} 
-		\text{Let } \mathcal{M} &\models  a \le_\mu b \\
-		\mu(\mathscr{v}(a)) &\le \mu(\mathscr{v}(b)) \\
-		\text{We know that } & \mu(\mathscr{v}(d)) \in \mathbb{R}^+ \\
-		\Rightarrow \mu(\mathscr{v}(a)) +  \mu(\mathscr{v}(d)) &\le \mu(\mathscr{v}(b)) +  \mu(\mathscr{v}(d)) \\
-		\text{From } \mathscr{v}(a) \cap \mathscr{v}(d) = \emptyset \Rightarrow & \mu(\mathscr{v}(a)) +  \mu(\mathscr{v}(d)) = \mu(\mathscr{v}(a \sqcup d)) \\
-		\text{From } \mathscr{v}(b) \cap \mathscr{v}(d) = \emptyset \Rightarrow & \mu(\mathscr{v}(b)) +  \mu(\mathscr{v}(d)) = \mu(\mathscr{v}(b \sqcup d)) \\
-		\Rightarrow \mu(\mathscr{v}(a \sqcup d)) &\le \mu(\mathscr{v}(b \sqcup d)) \\
-		\Rightarrow \mathcal{M} \models  a \sqcup d &\le_\mu b \sqcup d
-	\end{align*}
-
-$\Longleftarrow$
-	\begin{align*} 
-		\text{Let } \mathcal{M} \models  a &\sqcup d \le_\mu b \sqcup d \\
-		\Rightarrow \mu(\mathscr{v}(a \sqcup d)) &\le \mu(\mathscr{v}(b \sqcup d)) \\
-		\Rightarrow \mu(\mathscr{v}(a)) +  \mu(\mathscr{v}(d)) &\le \mu(\mathscr{v}(b)) +  \mu(\mathscr{v}(d)) \\
-		\Rightarrow \mu(\mathscr{v}(a)) &\le \mu(\mathscr{v}(b)) \\
-		\Rightarrow \mathcal{M} &\models  a \le_\mu b \\
-	\end{align*}
-\end{proof}
-
 \begin{lemma}[Trivial measure model implications]
 Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	\begin{itemize}
@@ -740,7 +700,7 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 		\item $a \le_\mu 1 \Longrightarrow T$
 		\item $(a = 0) \iff (a \le_\mu 0)$
 		\item $(a = 1) \iff (1 \le_\mu a)$
-		\item $(a \le_\mu b) \lor (b \le_\mu a)$
+		\item $(a \le_\mu b) \lor (b \le_\mu a) \Longrightarrow T$
 		\item $a_1 \le_\mu a_2 \land a_2 \le_\mu a_3 \Longrightarrow a_1 \le_\mu a_3$
 	\end{itemize}
 \end{lemma}
@@ -783,27 +743,27 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 			\end{align*}
 		\end{defn}
 
-		\begin{defn} \label{measure_less_equal_without_duplication}
+		\begin{lemma} \label{measure_less_equal_without_duplication}
 			Let x and y be two terms and let $\mathscr{I}_q$ be the inequality produced from $\le_\mu(x, y)$. Then the inequality $\mathscr{L}_q$ can be simplified 
 			by removing all variables present on both sides of the equation. This can be written as:
 			\begin{align*}
 				\sum_{i: p_i \in \vE(x) \setminus \vE(y)} X_i \leq \sum_{j: p_j \in \vE(y) \setminus \vE(x)} X_j
 			\end{align*}
-		\end{defn}
+		\end{lemma}
 
-		\begin{defn} \label{measure_less_without_duplication}
+		\begin{lemma} \label{measure_less_without_duplication}
 			Let x and y be two terms and let $\mathscr{I}_q$ be the inequality produced from $<_\mu(x, y)$. Then the inequality $\mathscr{L}_q$ can be simplified 
 			by removing all variables present on both sides of the equation. This can be written as:
 			\begin{align*}
 				\sum_{i: p_i \in \vE(x) \setminus \vE(y)} X_i < \sum_{j: p_j \in \vE(y) \setminus \vE(x)} X_j
 			\end{align*}
-		\end{defn}
+		\end{lemma}
 
 		\begin{defn}
 			Let $M = (W, R, \vE)$ be a model. Let $\mathscr{S}$ be the system of inequalities defined by
 			\begin{itemize}
-				\item inequalities for all $\le_\mu$ fromulas by def \ref{measure_less_equal_without_duplication}
-				\item inequalities for all $<_\mu$ fromulas by def: \ref{measure_less_without_duplication}
+				\item inequalities for all $\le_\mu$ fromulas by lemma \ref{measure_less_equal_without_duplication}
+				\item inequalities for all $<_\mu$ fromulas by lemma: \ref{measure_less_without_duplication}
 				\item inequality $0 < X_i$ for each $0 \le i < N$  
 			\end{itemize}
 			If the system of inequalities $\mathscr{S}$ has a solution, then we say that the system is valid.
@@ -831,128 +791,117 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	\BranchConjunctionWithMeasure
 
 	Having measure atomic formulas in a branch conjunction makes it difficult to define an approach where a suitable point valuation is created for each term 
-	in the atomic formulas in that branch conjunction. The reason behind this is because of the global property of the measure atomic formulas. 
+	in the atomic formulas in that branch conjunction. 
 	The measure atomic formulas require some weight to be computed over all existing points. Because of this a top to bottom approach is chosen for this 
 	algorithm, where all valid modal points are generated for the variables in the branch conjunction.
-	Same as in the definition for the model without measure formulas a modal point is represented by a variable valuation function. 
-	To prove that a model exists each subset of valid modal points is tested whether it satisfies the branch conjunction.
+	
+	A modal point is represented by a valuation function defined in \ref{variable-valuation}.
+	To prove that a model exists each subset of valid modal points should be tested whether it satisfies the branch conjunction.
 
-	\begin{defn}
+	\begin{defn}%{Valid modal point}
 	Let B be a branch conjunction. We say that the modal point p, represented with a variable valuation function $\curvedE$ is valid, if the following statements hold:
 	\begin{itemize}
 		\item $t = 0 \in B:  \vBool_{\curvedE}(t) = \textbf{false}$
 		\item $\neg C(e, f) \in B: \vBool_{\curvedE}(e) = \textbf{false} \textit{ or } \vBool_{\curvedE}(f) = \textbf{false}$
 	\end{itemize}
-	Let W be the set of all valid points, without duplication. The number of W has an upper bound of $2^n$, where n is the number of different variables in the branch
-	conjunction. To determine all valid relations between the valid points we need to figure out each variable valuation first.
 	\end{defn}
+	The number of all unique valid modal points has an upper bound of $2^n$, where n is the number of different variables in the branch	conjunction.
 
-	\begin{defn}
-	Each valid point p is represented with a variable valuation function $\curvedE$ which means that for a given variable m we can 
-	determine if $p \in \vE(m)$ with $\vBool_{\curvedE}(m)$. Doing this for each variable and for each valid modal point defines the valid model valuation $\vE$.
-	This procedure is done by looping over each valid modal point p and extending $\vE$ for each variable set in the variable valuation of the modal point p.
+	% introduce the W set computed from valid modal points, and use this W in the upcoming definitions.
+
+	\begin{defn}\label{compute-valuation}
+	Let W be a set of valid points, then for each valid point $\curvedE$ we can determine if it is present in the model valuation of an arbitrary term. Namely we can define the model valuation $\vE$ as follows:
 	\begin{align*}
-		\vE(m) = \{ p \; | \; \vBool_{\curvedE}(m) \; \textit{is true} \}
+		\vE^W(m) = \{ p \; | \; \vBool_{\curvedE}(m) \; \textit{is true} \}
 	\end{align*}
 	\end{defn}
 
-	\begin{defn}
-	Let B be a branch conjunction. Let W be the set of all valid points and $\vE$ be the valid valuation function constructed from W.
-	Then a valid model relation R is defined by creating a relation between each modal point except for the modal points which are not in contact.
+	The procedure for defining the model valuation is done by looping over each valid modal point p and extending $\vE$ for each variable set in the variable valuation of the modal point $\curvedE$.
+
+	\begin{defn}\label{compute-relations}
+	Let B be a branch conjunction. Let W be a set of valid points and $\vE^W$ be the valid valuation function constructed from W.
+	Then a valid model relation $R^W$ is defined by creating a relation between each modal point except for the modal points which are not in contact.
 	\begin{align*}
-		\neg C(e, f) \in B: (\forall x \in \vE(e) \textit{ and } \forall y \in \vE(f) \: \neg xRy)
+		\neg C(e, f) \in B: (\forall x \in \vE^W(e) \textit{ and } \forall y \in \vE^W(f)) \: \neg xR^Wy
 	\end{align*}
 	\end{defn}
 
-	\begin{defn}
-	Let B be a branch conjunction. Let $\mathcal{M} = (W, R, \vE)$ be a model defined by all valid modal points and the corresponding 
-	valuation and relation functions over the branch conjunction B.
-	$\mathcal{M}$ is a possible model which satisfies the branch, which means that it satisfies the formula. 
+	\begin{defn}%{Valid Measure Model} 
+	Let B be a branch conjunction. Then the model $\mathcal{M} = (W, R^W, \vE^W)$ is a valid measure model defined by all valid modal points and the corresponding valuation and relation functions over the branch conjunction B.
+	\end{defn}
+
+	$\mathcal{M}$ is a possible model where the equal to zero and non-contacts formulas are satisfied. For $\mathcal{M}$ to be a model for the branch conjunction B,
+	it must satisfy the contacts and non-equal to zero formulas from B and to have a solution for the system of inequalities defined over $\mathcal{M}$ and B.
+
 	In case the system of inequalities over $\mathcal{M}$ and B has a solution, then this model satisfies the initial formula.
-	However in the opposite scenario, where the system of inequalities does not have a solution it does 
-	not mean that the branch conjunction B does not construct a model.
-	\end{defn}
+	However in the opposite scenario, where the contacts and non-equal to zero formulas from B are not satisfied or the system of inequalities does not have a solution,
+	it does not mean that the branch conjunction B does not construct a model.
 
 	It is possible that the satisfying model has less modal points. 
-	This means that we should test the satisfiability of the branch conjunction against all models produced from the modal points for each subset of W.
+	This imposes that we should test the satisfiability of the branch conjunction against all models produced from the modal points for each subset of W.
 	
 	Testing the satisfiability for each subset of W creates a lot of combinations, that is why having a structural approach to eliminate 
 	multiple combinations at once is a huge performance optimization. The following lemmas provide such optimization.
 
 	\begin{lemma}[Impossible subset models] \label{impossible-subset-models}
-		Let B be a branch conjunction. Let  $\mathcal{M} = (W, R, \vE)$ be a model,
-		where W is a subset of all valid modal points over B, then the following statements hold:
+		Let $\mathcal{M} = (W, R^W, \vE^W)$ be a model, where W is a set of valid modal points.
+		Let $\mathcal{M'} = (W', R^{W'}, \vE^{W'})$ be a model, where $W' \subseteq W$, then the following statements hold:
 	\begin{enumerate}
-		\item $t \neq 0 \in B: \vE(t) = \emptyset \implies (\forall W' \subseteq W : W' \neq \emptyset) \; \vE'(t) = \emptyset$
-		\item $C(a,b) \in B: \vE(a) = \emptyset \implies (\forall W' \subseteq W) \; \vE'(a) = \emptyset$
-		\item $C(a,b) \in B: \vE(b) = \emptyset \implies (\forall W' \subseteq W) \; \vE'(b) = \emptyset$
+		\item $\mathcal{M} \not\models t \neq 0 \implies \mathcal{M'} \not\models t \neq 0$
+		\item $\mathcal{M} \not\models C(a,b) \implies \mathcal{M'} \not\models C(a,b)$
 	\end{enumerate}
 	\end{lemma}
 
 	\begin{proof}
-		A proof for the first equation is given, the second and third equation follow analogously.
-	\newline
-		Let us take one formula $t \neq 0$ from B, such that $\vE(t) = \emptyset$. To proove that for all subsets of W, 
-		the valuation remains the empty set we shall use a structural induction over t.
-		Let W' be defined as $W \backslash \{ p \}$ for an arbitrary modal point p. This way we will see that if we remove an arbitrary modal point from
-		W the lemma holds and for arbitrary modal points removed from W, namely for every subset of W will follow analogously.
-		By structural induction we have: 
-		\begin{itemize}
-			\item $t \equiv 1$, this is not possible, since $\vE(t) = \emptyset$
-			\item $t \equiv 0$, then $\vE'(t) = \emptyset$ as well
-			\item $t \equiv a$, where a is a variable and $\vE(a) = \emptyset$ \\ 
-				from $\vE(a) = \emptyset$, it follows that $\neg \exists q \in W: q \in \vE(a)$ \\
-				$\Rightarrow p \notin \vE(a)$ \\
-				$\Rightarrow p \notin \vE'(a)$ \\
-				$\Rightarrow \vE(a) = \vE'(a) = \emptyset$
-			\item $t \equiv \neg u$, where u is a term and $\vE(\neg u) = \emptyset$ \\
-				from $\vE(\neg u) = W \backslash \vE(u) = \emptyset$ it follows that $\vE(u) = W$ \\
-				$\Rightarrow \neg \exists q \in W: q \in \vE(\neg u )$ \\
-				$\Rightarrow \forall q \in W: q \in \vE(u)$, from $W' = W \backslash \{p\}$, it follows that \\
-				$ \neg \exists q \in W': q \in \vE'(\neg u )$ \\
-				$ \forall q \in W': q \in \vE'(u)$ \\
-				$\Rightarrow \vE'(u) = W'$
-				$\Rightarrow \vE'(\neg u) = \emptyset$
-			\item $t \equiv u \sqcap w$, where u and w are terms and $\vE(u \sqcap w) = \emptyset$ \\
-				$\Rightarrow \neg \exists q \in W: q \in \vE(u) \textit{ and } q \in \vE(w)$ \\
-				$\Rightarrow \forall q \in W: q \notin \vE(u) \textit { or } q \notin \vE(w)$, from $W' = W \backslash \{p\}$, it follows that \\
-				$\Rightarrow \forall q \in W': q \notin \vE'(u) \textit { or } q \notin \vE'(w)$
-				$\Rightarrow \vE'(u \sqcap w) = \emptyset$
-			\item $t \equiv u \sqcup w$, where u and w are terms and $\vE(u \sqcup w) = \emptyset$ \\
-				$\Rightarrow \neg \exists q \in W: q \in \vE(u) \textit{ or } q \in \vE(w)$ \\
-				$\Rightarrow \forall q \in W: q \notin \vE(u) \textit { and } q \notin \vE(w)$, from $W' = W \backslash \{p\}$, it follows that \\
-				$\Rightarrow \forall q \in W': q \notin \vE'(u) \textit { and } q \notin \vE'(w)$
-				$\Rightarrow \vE'(u \sqcup w) = \emptyset$
-		\end{itemize}
+		Let us have two such models $\mathcal{M} = (W, R^W, \vE^W)$ and $\mathcal{M'} = (W', R^{W'}, \vE^{W'})$ where $W' \subseteq W$. 
+		\begin{enumerate}
+		\item Let $\mathcal{M} \not\models t \neq 0$ \\ 
+				$\Rightarrow \vE^W(t) = \emptyset$ \\
+				$\Rightarrow \vE^W(t) \backslash W' = \emptyset$ \\
+				$\Rightarrow \vE^{W'}(t) = \emptyset$ \\
+				$\Rightarrow \mathcal{M'} \not\models t \neq 0$
+		\item Let $\mathcal{M} \not\models C(a,b)$ \\ 
+				$\Rightarrow (\not \exists x \in \vE^W(a)) \textit{ and } (\not \exists y \in \vE^W(b))\: xRy$\\
+				$\Rightarrow (\not \exists x \in \vE^W(a)\backslash W') \textit{ and } (\not \exists y \in \vE^W(b) \backslash W')\: xRy$\\
+				$\Rightarrow (\not \exists x \in \vE^{W'}(a)) \textit{ and } (\not \exists y \in \vE^{W'}(b))\: xR'y$\\
+				$\mathcal{M'} \not\models C(a,b)$
+	\end{enumerate}
 	\end{proof}
+
 	\begin{lemma}[Valuation deduction] \label{valuation-deduction}
-		Let B be a branch conjunction. Let  $\mathcal{M} = (W, R, \vE)$ be a model, where W is a set of all valid modal points over B.
-		Let $\{ q_0, ... q_n \}$ be valid modal points and let W' be defined as $W' = W \backslash \{ q_0, ... q_n \}$, then $\vE'$ can be calculated as:
+		Let  $\mathcal{M} = (W, R, \vE)$ be a model, where W is a set of valid modal points.
+		Let $\{ q_0, ... q_n \} \subseteq W$ be valid modal points and let W' be defined as $W' = W \textbackslash \{ q_0, ... q_n \}$, then for the terms in the non-equal to zero, contacts, measure less or equal and measure less formulas the $\vE^{W'}$ can be calculated as follows:
 		\begin{itemize}
-			\item $t \neq 0 \in B: \vE'(t) =  \vE(t) \backslash \{ q_0, ... q_n \}$
-			\item $C(a,b) \in B: \vE'(a) =  \vE(a) \backslash \{ q_0, ... q_n \} \textit{ and } \vE'(b) =  \vE(b) \backslash \{ q_0, ... q_n \}$
-			\item $a \leq_\mu b \in B: \vE'(a) =  \vE(a) \backslash \{ q_0, ... q_n \} \textit{ and } \vE'(b) =  \vE(b) \backslash \{ q_0, ... q_n \}$
-			\item $a <_\mu b \in B: \vE'(a) =  \vE(a) \backslash \{ q_0, ... q_n \} \textit{ and } \vE'(b) =  \vE(b) \backslash \{ q_0, ... q_n \}$
+			\item $t \neq 0: \vE^{W'}(t) =  \vE^W(t) \textbackslash \{ q_0, ... q_n \}$
+			\item $C(a,b): \vE^{W'}(a) =  \vE^W(a) \textbackslash \{ q_0, ... q_n \} \textit{ and } \vE^{W'}(b) =  \vE^W(b) \textbackslash \{ q_0, ... q_n \}$
+			\item $a \leq_\mu b: \vE^{W'}(a) =  \vE^W(a) \textbackslash \{ q_0, ... q_n \} \textit{ and } \vE^{W'}(b) =  \vE^W(b) \textbackslash \{ q_0, ... q_n \}$
+			\item $a <_\mu b: \vE^{W'}(a) =  \vE^W(a) \textbackslash \{ q_0, ... q_n \} \textit{ and } \vE^{W'}(b) =  \vE^W(b) \textbackslash \{ q_0, ... q_n \}$
 		\end{itemize}
 	\end{lemma}
 	
-	This lemma implies that the valuation for each subset of W can be deduced from $\vE$ with less computations.
+	This lemma implies that the valuation for each subset of W can be deduced from $\vE^W$ with less computations.
 
-	\subsection{Satisfiability Algorithm}
-	The satisfiability of a measure formula is done with an iteration over the possible subsets of valid modal points in a search for the one which constructs a model satisfing the formula.This algorithm is defined with the following steps.
-
-	\paragraph{1. Branch Conjunction} Using the tableau method iterate over each branch conjunctions B.
-
-	\paragraph{2. All Valid  Modal Points} Generate all valid modal points W over B. Following the definitions above the set W of valid modal points implies the model $\mathcal{M} = (W, R, \vE)$.
-
-	\paragraph{3. Precomputed valuations} Compute ahead the valuations of the $t \neq 0, C(a,b), a \leq_\mu b, a <_\mu b$. These computed values will be used to quickly compute the valuations for a submodel with subset of valid modal points. This is done according to the valuation deduction lemma \ref{valuation-deduction}.
-
-	\paragraph{4. Loop Over the Possible Subsets}  For each subset $W' \subseteq W$ test if it satisfies the $t \neq 0$ and C(a,b) atomic formulas from the branch conjunction B:
-	\begin{itemize}
-	\item In case it satisfies the $t \neq 0$ and C(a,b) verify whether the system of inequality has a solution. If the system has a solution then a valid model for the formula is constructed, otherwise continue with the next subset $W'$.
-	\item If $W'  \subseteq W$ does not satisfy the $t \neq 0, C(a,b)$ then by lemma \ref{impossible-subset-models} all $W'' \subseteq W'$ are eliminated.
-	\end{itemize}
-	\paragraph{5. Final model} If W' is found such that it satisfies $t \neq 0, C(a,b)$ and the system of inequality then a valid model has been constructed for the input formula.
+	\paragraph{Measure formula satisfiability algorithm} The satisfiability of a measure formula $\varphi$ is defined with the following steps:
+\newline
+\newline
+	Loop over the following steps for each branch conjunction B in the tableau procedure, until a satisfying model for $\varphi$ is produced or all possibilities are exhausted.
+	\begin{enumerate}
+		\item Generate all valid modal points W over B.% This implies the model $\mathcal{M} = (W, R, \vE)$.
+		\item Compute and cache the valuation $\vE^W$ for each term in the non-equal to zero terms, contacts, 
+			measure less or equal and measure less atomic formulas   from B. Done according to definition \ref{compute-valuation}.
+		\item Compute and cache the relations matrix $R^W$ from the non-contacts from B. Done according to definition \ref{compute-relations}.
+		\item At this point we have constructed the model over all valid modal points $\mathcal{M} = (W, R, \vE)$
+		\item For each subset $W' \subseteq W$ test if it satisfies the non-equal to zero terms and contacts from B where $\vE^{W'}$ and $R^{W'}$ are calculated according to the valuation deduction lemma \ref{valuation-deduction}. The looping over the subsets is ordered by the number of modal points in W' in descending order:
+		\begin{enumerate}
+		\item In case the non-equal to zero terms and contacts from B are satisfied by $\mathcal{M'} = (W', R^{W'}, \vE^{W'})$, 
+			verify whether the system of inequality over B and $\mathcal{M'}$ has a solution. 
+			If the system has a solution then a valid model for the formula is constructed, otherwise continue with the next subset $W'$.
+		\item If $W'  \subseteq W$ does not satisfy the non-equal to zero terms and contacts  
+			then by lemma \ref{impossible-subset-models} all $W'' \subseteq W'$ are not going to be tested for satisfiability.
+			Looping the subsets in descending order is a performance optimization since this way the set of subsets of W' will be as large as possible.
+		\end{enumerate}
+		\item If W' is not found in step 3., then a measure model to satisfy the formula $\varphi$ does not exist.
+	\end{enumerate}
 
 
 	\newpage
