@@ -559,30 +559,30 @@ For the purposes of our algorithm the elements of W will be such variable valuat
 		\end{itemize}
 
 	\paragraph{Contact modal point construction step}\label{def-contacts-construction}
-		Let B be a branch conjunction and $C(a, b) \in B$, where a and b are two terms. Then two modal points are generated $\curvedE^1$ and $\curvedE^2$ such that:
+		Let B be a branch conjunction and $C(a, b) \in B$, where a and b are two terms. Then two modal points are generated p and q such that:
 		\begin{itemize}
-			\item $\vBool_{\curvedE^1}(a) = \textbf{true}$
-			\item $\vBool_{\curvedE^2}(b) = \textbf{true}$
+			\item $\vBool_{p}(a) = \textbf{true}$
+			\item $\vBool_{q}(b) = \textbf{true}$
 		\end{itemize}
 		To validate that the newly generated modal points for this contact satisfy the non contacts, the following must be true.
 		\begin{align*}
-			 \neg C(e, f) \in B: (\vBool_{\curvedE^1}(e) = \textbf{false} & \textit{ or } \vBool_{\curvedE^2}(f) = \textbf{false}) \; \textit{ and } \\
-				(\vBool_{\curvedE^1}(f) = \textbf{false} & \textit{ or } \vBool_{\curvedE^2}(e) = \textbf{false}) \; \textit{ and } \\
-				(\vBool_{\curvedE^1}(e) = \textbf{false} & \textit{ or } \vBool_{\curvedE^1}(f) = \textbf{false}) \; \textit{ and } \\
-				(\vBool_{\curvedE^2}(e) = \textbf{false} & \textit{ or } \vBool_{\curvedE^2}(f) = \textbf{false})
+			 \neg C(e, f) \in B: (\vBool_{p}(e) = \textbf{false} & \textit{ or } \vBool_{q}(f) = \textbf{false}) \; \textit{ and } \\
+				(\vBool_{p}(f) = \textbf{false} & \textit{ or } \vBool_{q}(e) = \textbf{false}) \; \textit{ and } \\
+				(\vBool_{p}(e) = \textbf{false} & \textit{ or } \vBool_{p}(f) = \textbf{false}) \; \textit{ and } \\
+				(\vBool_{q}(e) = \textbf{false} & \textit{ or } \vBool_{q}(f) = \textbf{false})
 		\end{align*}
 
 	To validate that the newly generated modal points satisfy the equal to zero terms, the following must be true:
 	\begin{align*}
-		t = 0 \in B: \vBool_{\curvedE^1}(t) = \textit{false} \text{ and }  \vBool_{\curvedE^2}(t) = \textit{false}
+		t = 0 \in B: \vBool_{p}(t) = \textit{false} \text{ and }  \vBool_{q}(t) = \textit{false}
 	\end{align*}
 
 	Along with the generation of a valid variable valuation, the R relations is extended as well, namely the following relations are added:
 	\begin{itemize}
-		\item $\curvedE^1R\curvedE^1$ - reflexivity of the modal point $\curvedE^1$
-		\item $\curvedE^2R\curvedE^2$ - reflexivity of the modal point $\curvedE^2$
-		\item $\curvedE^1R\curvedE^2$ - symmetric relation between $\curvedE^1$ and $\curvedE^2$
-		\item $\curvedE^2R\curvedE^1$ - symmetric relation between $\curvedE^2$ and $\curvedE^1$
+		\item pRp - reflexivity of the modal point p
+		\item qRq - reflexivity of the modal point q
+		\item pRq - symmetric relation between p and q
+		\item qRp - symmetric relation between q and p
 	\end{itemize}
 
 	\leavevmode\newline
@@ -590,7 +590,7 @@ For the purposes of our algorithm the elements of W will be such variable valuat
 	\begin{center}
 	\begin{tikzpicture}[scale = 1]
 		\filldraw[color=black!60, fill=red!0, thick](-3,0) circle (0.5);
-		\node at (-3,0) {$\curvedE^1$};
+		\node at (-3,0) {p};
 		\node at (-3.5,-0.7) {a};
 		\draw[thick, ->] (-3.5,0) arc [
       	  		start angle=10,
@@ -600,7 +600,7 @@ For the purposes of our algorithm the elements of W will be such variable valuat
     			] ;
 		\draw[thick, <->](-2.5,0) -- (2.5,0);
 		\filldraw[color=black!60, fill=red!0, thick](3,0) circle (0.5);
-		\node at (3,0) {$\curvedE^2$};
+		\node at (3,0) {q};
 		\node at (3.5,-0.7) {b};
 		\draw[thick, ->] (3.5,0) arc [
       	  		start angle=180,
@@ -796,7 +796,7 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	To find a model satisfying the branch conjunction the algorithm tries each subset of the modal points.
 
 	\begin{defn}%{Valid modal point}
-	Let B be a branch conjunction. We say that the modal point p, represented with a variable valuation function $\curvedE$ is valid, if the following statements hold:
+	Let B be a branch conjunction. We say that the modal point $\curvedE$ is valid, if the following statements hold:
 	\begin{itemize}
 		\item $t = 0 \in B:  \vBool_{\curvedE}(t) = \textbf{false}$
 		\item $\neg C(e, f) \in B: \vBool_{\curvedE}(e) = \textbf{false} \textit{ or } \vBool_{\curvedE}(f) = \textbf{false}$
@@ -807,9 +807,9 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	% introduce the W set computed from valid modal points, and use this W in the upcoming definitions.
 
 	\begin{defn}\label{compute-valuation}
-	Let W be a set of valid points, then for each valid point $\curvedE \in W$ we can determine if it is present in the model valuation of an arbitrary term t. Namely we can define the model valuation $\vE$ as follows:
+	Let W be a set of valid points, then for each valid point $\curvedE \in W$ we can define the model valuation $\vE$ as follows:
 	\begin{align*}
-		\vE^W(t) = \{ p \; | \; \vBool_{\curvedE}(t) \; \textit{is true} \}
+		\vE^W(t) = \{ \curvedE \; | \; \vBool_{\curvedE}(t) \; \textit{is true} \}
 	\end{align*}
 	\end{defn}
 
@@ -827,15 +827,15 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	Let B be a branch conjunction. Then the model $\mathcal{M} = (W, R^W, \vE^W)$ is a valid measure model defined by all valid modal points and the corresponding valuation and relation functions over the branch conjunction B.
 	\end{defn}
 
-	$\mathcal{M}$ is a possible model where the equal to zero and non-contacts formulas are satisfied. For $\mathcal{M}$ to be a model for the branch conjunction B,
+	$\mathcal{M}$ is a possible model where the equal to zero and non-contact formulas are satisfied. For $\mathcal{M}$ to be a model for the branch conjunction B,
 	it must satisfy the contacts and non-equal to zero formulas from B and to have a solution for the system of inequalities defined over $\mathcal{M}$ and B.
 
 	In case the system of inequalities over $\mathcal{M}$ and B has a solution, then this model satisfies the initial formula.
 	However in the opposite scenario, where the contacts and non-equal to zero formulas from B are not satisfied or the system of inequalities does not have a solution,
-	it does not mean that the branch conjunction B does not construct a model.
+	it does not mean that the branch conjunction B does not construct a valid model.
 
 	It is possible that the satisfying model has less modal points. 
-	This imposes that we should test the satisfiability of the branch conjunction against all models produced from the modal points for each subset of W.
+	This imposes that we should test the satisfiability of the branch conjunction against each subset of W.
 	
 	Testing the satisfiability for each subset of W creates a lot of combinations, that is why having a structural approach to eliminate 
 	multiple combinations at once is a huge performance optimization. The following lemmas provide such optimization.
