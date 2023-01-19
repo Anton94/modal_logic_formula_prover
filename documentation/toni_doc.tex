@@ -158,7 +158,7 @@
 	\end{lemma}
 
 	\par
-	Here is the final stage of a tableau expansion beginning with the signed formula $\SF (X \land Y) \Rightarrow (\neg X \land \neg Y)$.
+	Here is the tableau expansion beginning with the signed formula $\SF (X \land Y) \Rightarrow (\neg X \land \neg Y)$.
 	\\ \TableauExampleCenter 1. $\SF(X \land Y) \Rightarrow \neg(\neg X \lor \neg Y)$
 	\\ \TableauExampleCenter 2. $\ST X \land Y$
 	\\ \TableauExampleCenter 3. $\SF \neg(\neg X \lor \neg Y)$
@@ -269,13 +269,6 @@
 	\par
 	Originally Galton assumed R to be a reflexive and symmetric relation but it is more natural for R to be an arbitrary relation. \textit{Regions} in an adjacency space are arbitrary subsets of W.
 
-	\begin{defn} (\textbf{Contact})
-	Let a, b $\subseteq$ W. Then
-		\begin{equation}
-			aCb \iff (\exists x \in \upsilon(a))(\exists y \in \upsilon(b))(xRy)
-		\end{equation}
-	\end{defn}
-
 	\begin{defn}
 		\label{valuation}
 		By a \textbf{\textit{valuation}} of the Boolean variables in $\F$ we mean any function $\upsilon : \V \rightarrow \p(W)$ assigning to each Boolean variable $b$ a subset $\upsilon(b) \subseteq W$. The valuation $\upsilon$ is then extended inductively to all Boolean terms as follows:
@@ -287,6 +280,13 @@
 			\item $\upsilon(a \sqcup b) = \upsilon(a) \cup \upsilon(b)$
 			\item $\upsilon(a^*) = W \setminus \upsilon(a)$
 		\end{itemize}
+	\end{defn}
+
+	\begin{defn} (\textbf{Contact})
+	Let a, b $\subseteq$ W. Then
+		\begin{equation}
+			aCb \iff (\exists x \in \upsilon(a))(\exists y \in \upsilon(b))(xRy)
+		\end{equation}
 	\end{defn}
 
 	\begin{defn}
@@ -520,13 +520,6 @@
 		\end{defn}
 
 		\begin{defn}
-			Let $IsValidCon: (W^v \times W^v) \rightarrow \{0, 1 \}$ be a function which defines whether a connected pair is valid.
-			\begin{equation}
-				IsValidCon(x,y) = 1 \iff \pairXY \; is \; a \; valid \; connected \; pair
-			\end{equation}
-		\end{defn}
-
-		\begin{defn}
 			\label{eta-valuation}
 			Let $\eta: (\Tb \times W_n) \rightarrow \{0, 1 \}$ be a function which defines whether a modal point is in the valuation of a term. Let t $\in$ $\Tb$. Let $\E_n \in W_n$. The inductive definition of $\eta$ on the structure of the term t is as follows:
 			\begin{itemize}
@@ -537,6 +530,13 @@
 				\item $\eta(a \sqcup b, \E_n) = 1 \iff \eta(a, \E_n) = 1 \; or \; \eta(b, \E_n) = 1$
 				\item $\eta(a^*, \E_n) = 1 \iff \eta(a, \E_n) = 0$
 			\end{itemize}
+		\end{defn}
+
+		\begin{defn}
+			Let $IsValidCon: (W^v \times W^v) \rightarrow \{0, 1 \}$ be a function which defines whether a connected pair is valid.
+			\begin{equation}
+				IsValidCon(x,y) = 1 \iff \pairXY \; is \; a \; valid \; connected \; pair
+			\end{equation}
 		\end{defn}
 
 		\begin{lemma}
@@ -651,7 +651,7 @@
 		\end{step}
 
 	\begin{lemma}
-		Let $\M^v = (\F^v, \upsilon_n)$ be a model. Let $G^v=(W^v, R^v)$ be the graph of $\F^v$. Let $G=(W,R) \subseteq G^v$.
+		Let $\M^v = (\F^v, \upsilon_n)$ be a model. Let $G^v=(W^v, R^v)$ be the graph of $\F^v$. Let $G=(W,R) \subseteq G^v$, then:
 		\begin{itemize}
 			\item G preserves the satisfiability of the contacts in $\beta$ if
 			\begin{gather*}
@@ -704,7 +704,7 @@
 	\end{defn}
 
 	\begin{defn}
-		Let $G'=(W', R')$ and $G''=(W'', R'')$ are gaphs. The union of these graphs is the graph $G=(W,R)=(W' \cup W'', R' \cup R'')$.
+		Let $G'=(W', R')$ and $G''=(W'', R'')$ are graphs. The union of these graphs is the graph $G=(W,R)=(W' \cup W'', R' \cup R'')$.
 	\end{defn}
 
 	\begin{lemma}
@@ -731,7 +731,7 @@
 
 	\begin{lemma}(Connected component extension)
 
-		Let $G=(W, R)$ be a graph. Let and $G'=(W', R') \subseteq G$ be a connected component of G.
+		Let $G=(W, R)$ be a graph. Let $G'=(W', R') \subseteq G$ be a connected component of G.
 		G' could be extended to a maximal connected component $G_m(W_m, R_m)$  of G as follows.
 		\label{connected-component-extension}\begin{gather*}
 			 W_m = W' \cup \{ x \mid x \in W \setminus W' \; and \; (\exists y \in W')(\pi_G(x,y)) \} \\

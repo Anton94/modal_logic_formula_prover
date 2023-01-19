@@ -791,12 +791,9 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	\BranchConjunctionWithMeasure
 
 	Having measure atomic formulas in a branch conjunction makes it difficult to define an approach where a suitable point valuation is created for each term 
-	in the atomic formulas in that branch conjunction. 
-	The measure atomic formulas require some weight to be computed over all existing points. Because of this a top to bottom approach is chosen for this 
-	algorithm, where all valid modal points are generated for the variables in the branch conjunction.
-	
-	A modal point is represented by a valuation function defined in \ref{variable-valuation}.
-	To prove that a model exists each subset of valid modal points should be tested whether it satisfies the branch conjunction.
+	in the atomic formulas in that branch conjunction.
+	The measure atomic formulas require some weight to be computed over all existing points. 
+	To find a model satisfying the branch conjunction the algorithm tries each subset of the modal points.
 
 	\begin{defn}%{Valid modal point}
 	Let B be a branch conjunction. We say that the modal point p, represented with a variable valuation function $\curvedE$ is valid, if the following statements hold:
@@ -810,9 +807,9 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	% introduce the W set computed from valid modal points, and use this W in the upcoming definitions.
 
 	\begin{defn}\label{compute-valuation}
-	Let W be a set of valid points, then for each valid point $\curvedE$ we can determine if it is present in the model valuation of an arbitrary term. Namely we can define the model valuation $\vE$ as follows:
+	Let W be a set of valid points, then for each valid point $\curvedE \in W$ we can determine if it is present in the model valuation of an arbitrary term t. Namely we can define the model valuation $\vE$ as follows:
 	\begin{align*}
-		\vE^W(m) = \{ p \; | \; \vBool_{\curvedE}(m) \; \textit{is true} \}
+		\vE^W(t) = \{ p \; | \; \vBool_{\curvedE}(t) \; \textit{is true} \}
 	\end{align*}
 	\end{defn}
 
@@ -870,12 +867,12 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 
 	\begin{lemma}[Valuation deduction] \label{valuation-deduction}
 		Let  $\mathcal{M} = (W, R, \vE)$ be a model, where W is a set of valid modal points.
-		Let $\{ q_0, ... q_n \} \subseteq W$ be valid modal points and let W' be defined as $W' = W \textbackslash \{ q_0, ... q_n \}$, then for the terms in the non-equal to zero, contacts, measure less or equal and measure less formulas the $\vE^{W'}$ can be calculated as follows:
+		Let $W' \subseteq W$ , then for the terms in the non-equal to zero, contacts, measure less or equal and measure less formulas the $\vE^{W'}$ can be calculated as follows:
 		\begin{itemize}
-			\item $t \neq 0: \vE^{W'}(t) =  \vE^W(t) \textbackslash \{ q_0, ... q_n \}$
-			\item $C(a,b): \vE^{W'}(a) =  \vE^W(a) \textbackslash \{ q_0, ... q_n \} \textit{ and } \vE^{W'}(b) =  \vE^W(b) \textbackslash \{ q_0, ... q_n \}$
-			\item $a \leq_\mu b: \vE^{W'}(a) =  \vE^W(a) \textbackslash \{ q_0, ... q_n \} \textit{ and } \vE^{W'}(b) =  \vE^W(b) \textbackslash \{ q_0, ... q_n \}$
-			\item $a <_\mu b: \vE^{W'}(a) =  \vE^W(a) \textbackslash \{ q_0, ... q_n \} \textit{ and } \vE^{W'}(b) =  \vE^W(b) \textbackslash \{ q_0, ... q_n \}$
+			\item $t \neq 0: \vE^{W'}(t) =  \vE^W(t) \cap W'$
+			\item $C(a,b): \vE^{W'}(a) =  \vE^W(a) \cap W' \textit{ and } \vE^{W'}(b) =  \vE^W(b) \cap W'$
+			\item $a \leq_\mu b: \vE^{W'}(a) =  \vE^W(a) \cap W' \textit{ and } \vE^{W'}(b) =  \vE^W(b) \cap W'$
+			\item $a <_\mu b: \vE^{W'}(a) =  \vE^W(a) \cap W' \textit{ and } \vE^{W'}(b) =  \vE^W(b) \cap W'$
 		\end{itemize}
 	\end{lemma}
 	
