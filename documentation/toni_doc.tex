@@ -540,7 +540,7 @@
 		\end{defn}
 
 		\begin{lemma}
-			Let t $\in \Tb$ be an arbitrary term. By the definition of $\eta$ and $\upsilon_n$ ifollows:
+			Let t $\in \Tb$ be an arbitrary term. By the definition of $\eta$ and $\upsilon_n$ follows:
 			\begin{equation}
 				\eta(t, \E_n) = 1 \iff \E_n \in \upsilon_n(t)
 			\end{equation}
@@ -641,54 +641,62 @@
 
 		\begin{defn}\label{set-all-valid-modal-point-pairs}
 			Let $W^v$ be the set of all valid modal points of $\beta$. Let $R^v \subseteq {W^v}^2$ be the set of all valid connected pairs of $\beta$ modal points.
-			\begin{equation}
+			\begin{align*}
 				R^v = \{ \pairXY  \mid x, y \in W^v \; and \; \pairXY \; is \; a \; valid \; connected \; pair \; of \; \beta \; modal \; points\}
-			\end{equation}
+			\end{align*}
 		\end{defn}
 
 		\begin{step}
 			Let $\F^v = (W^v, R^v)$ be a relational system and $\M^v = (\F^v, \upsilon_n)$ be a model in this system. $\M^v$ contains all valid modal points and valid connections between them w.r.t zero terms and non-contacts in $\beta$. $\M^v$ is a model of $\beta$ if the contacts and non-zero terms in $\beta$ are satisfied. If $\M^v$ is not a model of $\beta$, then $\beta$ does not have a model. There is no way of adding new modal points or relations to satisfy the contacts and non-zero terms. Therefore, there is no connected model eigther.
 		\end{step}
 
-	\begin{lemma}
-		Let $\M^v = (\F^v, \upsilon_n)$ be a model. Let $G^v=(W^v, R^v)$ be the graph of $\F^v$. Let $G=(W,R) \subseteq G^v$, then:
+	\begin{defn}\label{subgraph}
+		Let $G=(W, R)$ be a graph. Let $G'=(W', R')$. G' is a \textbf{subgraph} of G ($G' \subseteq G$) if:
+		\begin{align*}
+			W' \subseteq W \; and \; R' =  \{ \pairXY  \mid x, y \in W' \; and \; xRy  \}
+		\end{align*}
+	\end{defn}
+
+	\begin{lemma}\label{model-from-graph}
+		Let $\F = (W, R)$ be a relational system and $\M = (\F, \upsilon_n)$ be a model. Let $G=(W, R)$ be the graph of $\F$. Let $G'=(W',R') \subseteq G$. Then G' defines a model $\M' = ((W', R'), \upsilon_n')$. Where $\upsilon_n'$ is defined by the following inductive definition:
 		\begin{itemize}
-			\item G preserves the satisfiability of the contacts in $\beta$ if
-			\begin{gather*}
-				C(a,b) \in \beta \rightarrow (\exists x \in \upsilon_n(a) \cap W)(\exists y \in \upsilon_n(b) \cap W)(xRy)
-			\end{gather*}
-
-			\item G preserves the satisfiability of the non-contacts in $\beta$ if
-			\begin{gather*}
-				\neg C(e,f) \in \beta \rightarrow \neg ((\exists x \in \upsilon_n(e) \cap W)(\exists y \in \upsilon_n(f) \cap W)(xRy))
-			\end{gather*}
-
-			\item G preserves the satisfiability of the zero terms in $\beta$ if
-			\begin{gather*}
-				d = 0 \in \beta \rightarrow \upsilon(d) \cap W = \emptyset
-			\end{gather*}
-
-			\item G preserves the satisfiability of the non-zero terms in $\beta$ if
-			\begin{gather*}
-				g \neq 0 \in \beta \rightarrow \upsilon(g) \cap W \neq \emptyset
-			\end{gather*}
+			\item $\upsilon_n'(x_i) = \upsilon_n(x_i) \cap W'$ for each boolean variable $x_i$
+			\item $\upsilon_n'(0) = \emptyset$
+			\item $\upsilon_n'(1) = W'$
+			\item $\upsilon_n'(a \sqcap b) = \upsilon_n'(a) \cap \upsilon_n'(b)$
+			\item $\upsilon_n'(a \sqcup b) = \upsilon_n'(a) \cup \upsilon_n'(b)$
+			\item $\upsilon_n'(a^*) = W' \setminus \upsilon_n'(a)$
 		\end{itemize}
 	\end{lemma}
 
 	\begin{lemma}
-		Let $\M^v = (\F^v, \upsilon_n)$ be a mode of $\beta$l. Let $G^v=(W^v, R^v)$ be the graph of $\F^v$. Let $G=(W,R) \subseteq G^v$. If G preserves the satisfiability of the contacts, non-contacts, zero terms and non-zero terms in $\beta$, then G defines a model $\M = (\F(W, R), \upsilon_n)$ of $\beta$.
+		Let $\M^v = (\F^v, \upsilon_n)$ be a model containing all valid modal points and relations. Let $G^v=(W^v, R^v)$ be the graph of $\F^v$. Let $G=(W,R) \subseteq G^v$ and $\M=((W,R), \upsilon_n')$ be the model defined from G by lemma \ref{model-from-graph}. Then:
+		\begin{itemize}
+			\item M preserves the satisfiability of the contacts in $\beta$ if
+			\begin{gather*}
+				C(a,b) \in \beta \rightarrow (\exists x \in \upsilon_n'(a))(\exists y \in \upsilon_n'(b))(xRy)
+			\end{gather*}
+
+			\item M preserves the satisfiability of the non-contacts in $\beta$ if
+			\begin{gather*}
+				\neg C(e,f) \in \beta \rightarrow \neg ((\exists x \in \upsilon_n'(e))(\exists y \in \upsilon_n'(f))(xRy))
+			\end{gather*}
+
+			\item M preserves the satisfiability of the zero terms in $\beta$ if
+			\begin{gather*}
+				d = 0 \in \beta \rightarrow \upsilon_n'(d) = \emptyset
+			\end{gather*}
+
+			\item M preserves the satisfiability of the non-zero terms in $\beta$ if
+			\begin{gather*}
+				g \neq 0 \in \beta \rightarrow \upsilon_n'(g) \neq \emptyset
+			\end{gather*}
+		\end{itemize}
 	\end{lemma}
 
 	\begin{defn}
 		Let $G=(W, R)$ be a graph. Let $G'=(W', R') \subseteq G(W, R)$. If $G'$ is connected, then G' is a \textbf{connected component} of G.
 	\end{defn}
-
-	\begin{step}
-		Let $\M^v$ be a model of $\beta$. Let $G^v=(W^v, R^v)$ be the graph of $\F^v$. $G^v$ preserves the satisfiability of zero terms and non-contacts.
-		All connected components of $G^v$ preserve the satisfiability of the zero terms and non-contacts in $\beta$. If there is a connected component $G'=(W', R')$ which satisfies the contacts and non-zero terms in $\beta$, then G' defines a connected model $\M'$ of $\beta$. Where $\F' = (W', R')$ and $\M' = (\F', \upsilon_n)$.
-
-		Let n be the number of elements in $W^v$. There are $2^n$ subgraphs of $G^v$. It is far from sufficient to check each one of them if it's connected and whether it satisfies the contacts and non-zero terms of $\beta$.
-	\end{step}
 
 	\begin{defn}
 		Let $G=(W, R)$ be a graph. Let $G'=(W', R')$ be a connected component of G. $G'$ is a \textbf{maximal connected component} of G if:
@@ -697,6 +705,13 @@
 			x,y \in W' \rightarrow xRy \iff xR'y
 		\end{gather*}
 	\end{defn}
+
+	\begin{step}
+		Let $\M^v$ be a model of $\beta$. Let $G^v=(W^v, R^v)$ be the graph of $\F^v$.
+		All models defined by the connected components of $G^v$ preserve the satisfiability of the zero terms and non-contacts in $\beta$. If there is one which satisfies the contacts and non-zero terms in $\beta$, then this is a connected model of $\beta$.
+
+		Let n be the number of elements in $W^v$. There are $2^n$ subgraphs of $G^v$. It is slow to check each one of them if it's connected and whether it satisfies the contacts and non-zero terms of $\beta$. It is sufficient to split $G^v$ to it's maximal connected components and check only them.
+	\end{step}
 
 	\begin{defn}
 		Let $G=(W, R)$ be a graph. Let $Comp^G$ be the set of all maximal connected components of G.
@@ -724,14 +739,14 @@
 	\end{lemma}
 
 	\begin{step}
-		Let $Comp^{G^v}$ is the set of the maximal connected components of $G^v$. Let n be the number of elements in $W^v$. The number elements in $Comp^{G^v}$ is at most n. The maximal connected components of $G^v$ does not have common vertices and edges. Therfore, the splitting of G to it's maximal connected components is a fast and simple operation.
+		Let $Comp^{G^v}$ is the set of the maximal connected components of $G^v$. Let n be the number of elements in $W^v$. The number elements in $Comp^{G^v}$ is at most n. The maximal connected components of $G^v$ does not have common vertices nor edges. Therefore, the splitting of G to it's maximal connected components is a fast and simple operation.
 	\end{step}
 
 	\begin{step}
-		Each graph of $Comp^{G^v}$ satisfies the zero terms and non-contacts of $\beta$. They do not introduce new modal points netiher a connections. If $Comp^{G^v}$ contains a graph that satisfies the contacts and non-zero terms of $\beta$, then this graph defines a connected model of $\beta$. Otherwise, $\beta$ does not have a connected model.
+		Each model defined by a graph in $Comp^{G^v}$ satisfies the zero terms and non-contacts of $\beta$. They do not introduce new modal points netiher a connections. If there is one which satisfies the contacts and non-zero terms of $\beta$, then this is a connected model of $\beta$. Otherwise, $\beta$ does not have a connected model.
 	\end{step}
 
-	\begin{lemma}(Connected component extension)
+	\begin{lemma}(Connected component extension)\label{connected-component-extension}
 
 		Let $G=(W, R)$ be a graph. Let $G'=(W', R') \subseteq G$ be a connected component of G.
 		G' could be extended to a maximal connected component $G_m(W_m, R_m)$  of G as follows.
@@ -744,7 +759,9 @@
 	\begin{theorem}
 		Let $G^v=(W^v, R^v)$ be the graph of $\F^v$. If $G^v$ does not have a maximal connected component which defines a model of $\beta$, then $\beta$ does not have a connected model.
 		\begin{proof}
-			Let $G^v$ does not have a maximal connected component which defines a model of $\beta$. Let $\beta$ have a connected model $\M = (\F(W, R), \upsilon_n)$. Let $G=(W, R)$ be the graph defined by $\F$. From the definition of the connected model follows that G is connected. $G$ contains only valid modal points and valid relations between them. $G^v$ contains all valid modal points and all valid connections between them. Therfore, $G \subseteq G^v$ and G is a connected component of $G^v$. By the connected component extension lemma G can be extended to a maximal connected component $G_m=(W_m, R_m)$ of $G^v$. The extension adds points from $W^v$ and relations from $R^v$ to $G_m$. These are only valid modal points and valid connections between them. Therefore, $G_m$ preserves the satisfiability of the non-contacts and zero terms in $\beta$. $G_m$ keeps the points and relations from $G$. Thus, $G_m$ preserves the satisfiability of the contacts and non-zero terms in $\beta$. Hence, $G_m$ defines a connected model $\M_m = (\F_m(W_m, R_m), \upsilon_n)$ of $\beta$. This leads to a contradiction with the assumption that $G^v$ does not have a maximal connected component which defines a model of $\beta$.
+			Let $G^v$ does not have a maximal connected component which defines a model of $\beta$. Let $\beta$ have a connected model $\M = (\F(W, R), \upsilon_n'')$. Let $G=(W, R)$ be the graph defined by $\F$. From the definition of the connected model follows that G is connected. $G$ contains only valid modal points and valid relations between them. $G^v$ contains all valid modal points and all valid connections between them. Therfore, $G \subseteq G^v$ and G is a connected component of $G^v$.
+			By lemma \ref{connected-component-extension} G can be extended to a maximal connected component $G_m=(W_m, R_m)$ of $G^v$. Let $\M_m = (\F_m(W_m, R_m), \upsilon_n')$ be the model defined from $G_m$ by lemma \ref{model-from-graph}.
+			The extension adds points from $W^v$ and relations from $R^v$ to $G_m$. These are only valid modal points and valid connections between them. Therefore, $M_m$ preserves the satisfiability of the non-contacts and zero terms in $\beta$. $G_m$ keeps the points and relations from $G$. Thus, $M_m$ preserves the satisfiability of the contacts and non-zero terms in $\beta$. Hence, $M_m$ is a connected model of $\beta$. This leads to a contradiction with the assumption that $G^v$ does not have a maximal connected component which defines a model of $\beta$.
 		\end{proof}
 	\end{theorem}
 
