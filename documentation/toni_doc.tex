@@ -43,7 +43,7 @@
 \newcommand\Vb{\mathbf{V}}
 \newcommand\TableauExampleCenter{\indent\indent\indent\indent\indent\indent\indent\indent\indent}
 \newcommand\TableauExampleFirstChildOffset{\indent\indent\indent\indent\indent\indent\indent}
-\newtheorem{theorem}{Theorem}
+\newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{axiom}[theorem]{Axiom}
 \newtheorem{defn}[theorem]{Definition}
@@ -608,7 +608,7 @@
 		\upsilon(b) \neq \emptyset \land \upsilon(b) \neq W \implies (\exists x \in \upsilon(b)) (\exists y \in W \setminus \upsilon(b))(xRy)
 	\end{equation}
 
-	The relational system $\F = (W, R)$ defines an unidrected graph. $W$ is the set of vertices and $R$ is the set of edges.
+	The relational system $\F = (W, R)$ defines an unidrected graph G(W, R). $W$ is the set of vertices and $R$ is the set of edges.
 
 	\begin{defn}
 		Let G = (W, R) be a graph. W is the set of vertices and R the set of edges. A \textbf{path} $\pi_G(x, y)$ is a sequence of vertices $(x, v_1, \dotsc , v_k, y)$ such that $x,  v_1,\dotsc,v_k, y \in V$ and $xRv1,v_1Rv_2,\dotsc, v_{k-1}Rv_k, v_kRy$.
@@ -640,7 +640,7 @@
 		\nonumber\BranchConjunction
 
 		\begin{defn}\label{set-all-valid-modal-point-pairs}
-			Let $R^v \subseteq {W^v}^2$ be the set of all valid connected pairs of $\beta$ modal points.
+			Let $W^v$ be the set of all valid modal points of $\beta$. Let $R^v \subseteq {W^v}^2$ be the set of all valid connected pairs of $\beta$ modal points.
 			\begin{equation}
 				R^v = \{ \pairXY  \mid x, y \in W^v \; and \; \pairXY \; is \; a \; valid \; connected \; pair \; of \; \beta \; modal \; points\}
 			\end{equation}
@@ -683,10 +683,12 @@
 		Let $G=(W, R)$ be a graph. Let $G'=(W', R') \subseteq G(W, R)$. If $G'$ is connected, then G' is a \textbf{connected component} of G.
 	\end{defn}
 
+	\begin{step}
 		Let $\M^v$ be a model of $\beta$. Let $G^v=(W^v, R^v)$ be the graph of $\F^v$. $G^v$ preserves the satisfiability of zero terms and non-contacts.
 		All connected components of $G^v$ preserve the satisfiability of the zero terms and non-contacts in $\beta$. If there is a connected component $G'=(W', R')$ which satisfies the contacts and non-zero terms in $\beta$, then G' defines a connected model $\M'$ of $\beta$. Where $\F' = (W', R')$ and $\M' = (\F', \upsilon_n)$.
 
 		Let n be the number of elements in $W^v$. There are $2^n$ subgraphs of $G^v$. It is far from sufficient to check each one of them if it's connected and whether it satisfies the contacts and non-zero terms of $\beta$.
+	\end{step}
 
 	\begin{defn}
 		Let $G=(W, R)$ be a graph. Let $G'=(W', R')$ be a connected component of G. $G'$ is a \textbf{maximal connected component} of G if:
