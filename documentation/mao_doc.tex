@@ -796,7 +796,7 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	To find a model satisfying the branch conjunction the algorithm tries each subset of the modal points.
 
 	\begin{defn}%{Valid modal point}
-	Let B be a branch conjunction. We say that the modal point $\curvedE$ is valid, if the following statements hold:
+	Let B be a branch conjunction. We say that the modal point $\curvedE$ is valid over B, if the following statements hold:
 	\begin{itemize}
 		\item $t = 0 \in B:  \vBool_{\curvedE}(t) = \textbf{false}$
 		\item $\neg C(e, f) \in B: \vBool_{\curvedE}(e) = \textbf{false} \textit{ or } \vBool_{\curvedE}(f) = \textbf{false}$
@@ -805,26 +805,22 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	The number of all unique valid modal points has an upper bound of $2^n$, where n is the number of different variables in the branch	conjunction.
 
 	% introduce the W set computed from valid modal points, and use this W in the upcoming definitions.
-
-	\begin{defn}\label{compute-valuation}
-	Let W be a set of valid points, then for each valid point $\curvedE \in W$ we can define the model valuation $\vE$ as follows:
-	\begin{align*}
-		\vE^W(t) = \{ \curvedE \; | \; \vBool_{\curvedE}(t) \; \textit{is true} \}
-	\end{align*}
+	\begin{defn}
+		Let B be a branch conjunction. We say that $\langle x, y \rangle$ is a valid relation if the following holds:
+		\begin{align*}
+				\neg C(e, f) \in B: (x \notin \vE(e) \textit{ or } y \notin \vE(f)) \textit{ and } (x \notin \vE(f) \textit{ or } y \notin \vE(e))
+		\end{align*}
 	\end{defn}
 
-	The procedure for defining the model valuation is done by looping over each valid modal point p and extending $\vE$ for each variable set in the variable valuation of the modal point $\curvedE$.
-
-	\begin{defn}\label{compute-relations}
-	Let B be a branch conjunction. Let W be a set of valid points and $\vE^W$ be the valid valuation function constructed from W.
-	Then a valid model relation $R^W$ is defined by creating a relation between each modal point except for the modal points which are not in contact.
-	\begin{align*}
-		\neg C(e, f) \in B: (\forall x \in \vE^W(e) \textit{ and } \forall y \in \vE^W(f)) \: \neg xR^Wy
-	\end{align*}
-	\end{defn}
-
-	\begin{defn}%{Valid Measure Model} 
-	Let B be a branch conjunction. Then the model $\mathcal{M} = (W, R^W, \vE^W)$ is a valid measure model defined by all valid modal points and the corresponding valuation and relation functions over the branch conjunction B.
+	\begin{defn}%{Valid modal point}
+	Let B be a branch conjunction and let W be the set of valid modal points over B. Then we can define a model $\mathcal{M} = (W, R, v)$ over B where:
+		\begin{align*}
+				\vE(t) = \{ \curvedE \; | \; \curvedE \in W \textit{ and } &\vBool_{\curvedE}(t) \; \textit{is true} \}, \\
+				\textit{ where t is a term } & \textit{from the atomic formulas in B}
+		\end{align*}
+		\begin{align*}
+				R = \{ \langle x, y \rangle\; | \; x, y \in W \textit{ and } \langle x, y \rangle \textit{ is a valid relation}\}
+		\end{align*}
 	\end{defn}
 
 	$\mathcal{M}$ is a possible model where the equal to zero and non-contact formulas are satisfied. For $\mathcal{M}$ to be a model for the branch conjunction B,
@@ -834,15 +830,15 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	However in the opposite scenario, where the contacts and non-equal to zero formulas from B are not satisfied or the system of inequalities does not have a solution,
 	it does not mean that the branch conjunction B does not construct a valid model.
 
-	It is possible that the satisfying model has less modal points. 
+	It is possible that the satisfying model has less modal points,
 	This imposes that we should test the satisfiability of the branch conjunction against each subset of W.
 	
 	Testing the satisfiability for each subset of W creates a lot of combinations, that is why having a structural approach to eliminate 
-	multiple combinations at once is a huge performance optimization. The following lemmas provide such optimization.
+	multiple combinations at once is a huge performance optimization. The following lemmas provide such optimizations.
 
 	\begin{lemma}[Impossible subset models] \label{impossible-subset-models}
-		Let $\mathcal{M} = (W, R^W, \vE^W)$ be a model, where W is a set of valid modal points.
-		Let $\mathcal{M'} = (W', R^{W'}, \vE^{W'})$ be a model, where $W' \subseteq W$, then the following statements hold:
+		Let $\mathcal{M} = (W, R, \vE)$ be a model, where W is a set of valid modal points.
+		Let $\mathcal{M'} = (W', R', \vE')$ be a model, where $W' \subseteq W$, then the following statements hold:
 	\begin{enumerate}
 		\item $\mathcal{M} \not\models t \neq 0 \implies \mathcal{M'} \not\models t \neq 0$
 		\item $\mathcal{M} \not\models C(a,b) \implies \mathcal{M'} \not\models C(a,b)$
@@ -850,56 +846,57 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	\end{lemma}
 
 	\begin{proof}
-		Let us have two such models $\mathcal{M} = (W, R^W, \vE^W)$ and $\mathcal{M'} = (W', R^{W'}, \vE^{W'})$ where $W' \subseteq W$. 
+		Let us have two such models $\mathcal{M} = (W, R, \vE)$ and $\mathcal{M'} = (W', R', \vE')$ where $W' \subseteq W$. 
 		\begin{enumerate}
 		\item Let $\mathcal{M} \not\models t \neq 0$ \\ 
-				$\Rightarrow \vE^W(t) = \emptyset$ \\
-				$\Rightarrow \vE^W(t) \backslash W' = \emptyset$ \\
-				$\Rightarrow \vE^{W'}(t) = \emptyset$ \\
+				$\Rightarrow \vE(t) = \emptyset$ \\
+				$\Rightarrow \vE(t) \cap W' = \emptyset$ \\
+				$\Rightarrow \vE'(t) = \emptyset$ \\
 				$\Rightarrow \mathcal{M'} \not\models t \neq 0$
 		\item Let $\mathcal{M} \not\models C(a,b)$ \\ 
-				$\Rightarrow (\not \exists x \in \vE^W(a)) \textit{ and } (\not \exists y \in \vE^W(b))\: xRy$\\
-				$\Rightarrow (\not \exists x \in \vE^W(a)\backslash W') \textit{ and } (\not \exists y \in \vE^W(b) \backslash W')\: xRy$\\
-				$\Rightarrow (\not \exists x \in \vE^{W'}(a)) \textit{ and } (\not \exists y \in \vE^{W'}(b))\: xR'y$\\
+				$\Rightarrow (\not \exists x \in \vE(a)) \textit{ and } (\not \exists y \in \vE(b))\: xRy$\\
+				$\Rightarrow (\not \exists x \in \vE(a)\cap W') \textit{ and } (\not \exists y \in \vE(b) \cap W')\: xRy$\\
+				$\Rightarrow (\not \exists x \in \vE'(a)) \textit{ and } (\not \exists y \in \vE'(b))\: xR'y$\\
 				$\mathcal{M'} \not\models C(a,b)$
 	\end{enumerate}
 	\end{proof}
 
 	\begin{lemma}[Valuation deduction] \label{valuation-deduction}
 		Let  $\mathcal{M} = (W, R, \vE)$ be a model, where W is a set of valid modal points.
-		Let $W' \subseteq W$ , then for the terms in the non-equal to zero, contacts, measure less or equal and measure less formulas the $\vE^{W'}$ can be calculated as follows:
+		Let $W' \subseteq W$ , then for the terms in the non-equal to zero, contacts, measure less or equal and measure less formulas the $\vE'$ can be calculated as follows:
 		\begin{itemize}
-			\item $t \neq 0: \vE^{W'}(t) =  \vE^W(t) \cap W'$
-			\item $C(a,b): \vE^{W'}(a) =  \vE^W(a) \cap W' \textit{ and } \vE^{W'}(b) =  \vE^W(b) \cap W'$
-			\item $a \leq_\mu b: \vE^{W'}(a) =  \vE^W(a) \cap W' \textit{ and } \vE^{W'}(b) =  \vE^W(b) \cap W'$
-			\item $a <_\mu b: \vE^{W'}(a) =  \vE^W(a) \cap W' \textit{ and } \vE^{W'}(b) =  \vE^W(b) \cap W'$
+			\item $t \neq 0: \vE'(t) =  \vE(t) \cap W'$
+			\item $C(a,b): \vE'(a) =  \vE(a) \cap W' \textit{ and } \vE'(b) =  \vE(b) \cap W'$
+			\item $a \leq_\mu b: \vE'(a) =  \vE(a) \cap W' \textit{ and } \vE'(b) =  \vE(b) \cap W'$
+			\item $a <_\mu b: \vE'(a) =  \vE(a) \cap W' \textit{ and } \vE'(b) =  \vE(b) \cap W'$
 		\end{itemize}
 	\end{lemma}
 	
-	This lemma implies that the valuation for each subset of W can be deduced from $\vE^W$ with less computations.
+	This lemma implies that the valuation for each subset of W can be deduced from $\vE$ with less computations.
 
 	\paragraph{Measure formula satisfiability algorithm} The satisfiability of a measure formula $\varphi$ is defined with the following steps:
 \newline
 \newline
 	Loop over the following steps for each branch conjunction B in the tableau procedure, until a satisfying model for $\varphi$ is produced or all possibilities are exhausted.
 	\begin{enumerate}
-		\item Generate all valid modal points W over B.% This implies the model $\mathcal{M} = (W, R, \vE)$.
-		\item Compute and cache the valuation $\vE^W$ for each term in the non-equal to zero terms, contacts, 
-			measure less or equal and measure less atomic formulas   from B. Done according to definition \ref{compute-valuation}.
-		\item Compute and cache the relations matrix $R^W$ from the non-contacts from B. Done according to definition \ref{compute-relations}.
-		\item At this point we have constructed the model over all valid modal points $\mathcal{M} = (W, R, \vE)$
-		\item For each subset $W' \subseteq W$ test if it satisfies the non-equal to zero terms and contacts from B where $\vE^{W'}$ and $R^{W'}$ are calculated according to the valuation deduction lemma \ref{valuation-deduction}. The looping over the subsets is ordered by the number of modal points in W' in descending order:
+		\item Generate the model $\mathcal{M}$ of all valid model points W over B.
+%		\item Compute and cache the valuation $\vE^W$ for each term in the non-equal to zero terms, contacts, 
+%			measure less or equal and measure less atomic formulas   from B. Done according to definition \ref{compute-valuation}.
+%		\item Compute and cache the relations matrix $R^W$ from the non-contacts from B. Done according to definition \ref{compute-relations}.
+%		\item At this point we have constructed the model over all valid modal points $\mathcal{M} = (W, R, \vE)$
+		\item We are going to look at subsets of W which might produce a valid model, while considering, that the subsets with more elements have priority.
+
+			For each subset $W' \subseteq W$, implying the model $\mathcal{M'}$ test if it satisfies the non-equal to zero terms and contacts from B:
 		\begin{enumerate}
-		\item In case the non-equal to zero terms and contacts from B are satisfied by $\mathcal{M'} = (W', R^{W'}, \vE^{W'})$, 
+		\item In case the non-equal to zero terms and contacts from B are satisfied by $\mathcal{M'}$,
 			verify whether the system of inequality over B and $\mathcal{M'}$ has a solution. 
-			If the system has a solution then a valid model for the formula is constructed, otherwise continue with the next subset $W'$.
-		\item If $W'  \subseteq W$ does not satisfy the non-equal to zero terms and contacts  
+			If the system has a solution then a valid model for the formula is constructed, otherwise continue with the next subset from W.
+		\item If W' does not satisfy the non-equal to zero terms and contacts  
 			then by lemma \ref{impossible-subset-models} all $W'' \subseteq W'$ are not going to be tested for satisfiability.
-			Looping the subsets in descending order is a performance optimization since this way the set of subsets of W' will be as large as possible.
 		\end{enumerate}
 		\item If W' is not found in step 3., then a measure model to satisfy the formula $\varphi$ does not exist.
 	\end{enumerate}
-
+% introduce the descending order !
 
 	\newpage
 	\section{Implementation Introduction}
