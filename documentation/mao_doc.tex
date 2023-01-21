@@ -259,7 +259,7 @@ In most definitions of the tableau process the rules are non-deterministic, howe
 	\newline
 	\newline
 	The tableau method is best explained through examples. First, let us see an example of a formula which is a tautology.
-	\newline
+	\newpage
 	Consider the following formula $((\neg X \wedge (Y \rightarrow X)) \rightarrow \neg Y$
 	\newline
 	\\\indent\indent\indent\indent\indent\indent 1. $\signF (((\neg X \wedge (Y \rightarrow X)) \rightarrow \neg Y)$
@@ -862,14 +862,35 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	\end{proof}
 
 	\begin{lemma}[Valuation deduction] \label{valuation-deduction}
-		Let  $\mathcal{M} = (W, R, \vE)$ be a model, where W is a set of valid modal points. 
-		Let  $\mathcal{M'} = (W', R', \vE')$ be a model, where $W' \subseteq W$ and $R' \subseteq R$, then the following holds:
+		Let $\mathcal{M} = (W, R, \vE)$ be a model, where W is a set of valid modal points. 
+		Let $\mathcal{M'} = (W', R', \vE')$ be a model, defined from $W' \subseteq W$, then the following holds:
 	% NOTE kaji che R' e sechenie na R s W2
 		\begin{align*}
 			\vE'(t) =  \vE(t) \cap W'
 		\end{align*}
 	\end{lemma}
-	
+	\begin{proof}
+		Let  $\mathcal{M} = (W, R, \vE)$ be a model, where W is a set of valid modal points and let
+		$\mathcal{M'} = (W', R', \vE')$ be a model, where $W' \subseteq W$ and $R' \subseteq R$. \\
+		Let us take an arbitrary term t, then:
+		\newline
+		\newline
+		$\Longrightarrow$
+			Let us take an arbitrary valid modal point $\curvedE \in \vE'(t)$, then by definition
+			of $\vE'$ it follows that:
+			\begin{align*}
+				\Rightarrow \;\;&\curvedE \in W' \textit{ and } \vBool_\curvedE(t) = \textit{ true } \\
+				\Rightarrow \;\;&\textit{Since } W' \subseteq W \Rightarrow \curvedE \in W \\
+				\Rightarrow \;\;&\curvedE \in \vE(t) \cap W'
+			\end{align*}
+		$\Longleftarrow$
+			Let us take an arbitrary valid modal point $\curvedE \in v(t) \cap W'$, then:
+			\begin{align*}
+				\Rightarrow \;\;&\curvedE \in \vE(t) \textit{ and } \curvedE \in W' \\
+				\Rightarrow \;\;&\curvedE \in W \textit{ and } \vBool_\curvedE(t) = \textit{ true } \\
+				\Rightarrow \;\;&\curvedE \in v(t)
+			\end{align*}			
+	\end{proof}
 	This lemma implies that the valuation for each subset of W can be deduced from $\vE$ with less computations.
 
 	\paragraph{Measure formula satisfiability algorithm} The satisfiability of a measure formula $\varphi$ is defined with the following steps:
@@ -883,7 +904,7 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 %		\item Compute and cache the relations matrix $R^W$ from the non-contacts from B. Done according to definition \ref{compute-relations}.
 %		\item At this point we have constructed the model over all valid modal points $\mathcal{M} = (W, R, \vE)$
 		\item Let $\mathbb{P} = \mathcal{P}(W)$. We are going to look at $W' \in \mathbb{P}$ starting from the once with most elements.
-			W' implies a model $\mathcal{M'}$. 
+			W' implies a model $\mathcal{M'}$ computed by lemma \ref{valuation-deduction}.
 			Test if $\mathcal{M'}$ satisfies the non-equal to zero terms and contacts from B:
 		\begin{enumerate}
 		\item In case the non-equal to zero terms and contacts from B are satisfied by $\mathcal{M'}$,
