@@ -806,7 +806,7 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 
 	% introduce the W set computed from valid modal points, and use this W in the upcoming definitions.
 	\begin{defn}
-		Let B be a branch conjunction. We say that $\langle x, y \rangle$ is a valid relation if the following holds:
+		Let B be a branch conjunction and let x and y be two valid modal points. We say that $\langle x, y \rangle$ is a valid relation if the following holds:
 		\begin{align*}
 				\neg C(e, f) \in B: (x \notin \vE(e) \textit{ or } y \notin \vE(f)) \textit{ and } (x \notin \vE(f) \textit{ or } y \notin \vE(e))
 		\end{align*}
@@ -823,7 +823,7 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 		\end{align*}
 	\end{defn}
 
-	$\mathcal{M}$ is a possible model where the equal to zero and non-contact formulas are satisfied. For $\mathcal{M}$ to be a model for the branch conjunction B,
+	$\mathcal{M}$ is a model where the equal to zero and non-contact formulas are satisfied. For $\mathcal{M}$ to be a model for the branch conjunction B,
 	it must satisfy the contacts and non-equal to zero formulas from B and to have a solution for the system of inequalities defined over $\mathcal{M}$ and B.
 
 	In case the system of inequalities over $\mathcal{M}$ and B has a solution, then this model satisfies the initial formula.
@@ -838,7 +838,7 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 
 	\begin{lemma}[Impossible subset models] \label{impossible-subset-models}
 		Let $\mathcal{M} = (W, R, \vE)$ be a model, where W is a set of valid modal points.
-		Let $\mathcal{M'} = (W', R', \vE')$ be a model, where $W' \subseteq W$, then the following statements hold:
+		Let $\mathcal{M'} = (W', R', \vE')$ be a model, where $W' \subseteq W, R' \subseteq R$, then the following statements hold:
 	\begin{enumerate}
 		\item $\mathcal{M} \not\models t \neq 0 \implies \mathcal{M'} \not\models t \neq 0$
 		\item $\mathcal{M} \not\models C(a,b) \implies \mathcal{M'} \not\models C(a,b)$
@@ -862,14 +862,12 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	\end{proof}
 
 	\begin{lemma}[Valuation deduction] \label{valuation-deduction}
-		Let  $\mathcal{M} = (W, R, \vE)$ be a model, where W is a set of valid modal points.
-		Let $W' \subseteq W$ , then for the terms in the non-equal to zero, contacts, measure less or equal and measure less formulas the $\vE'$ can be calculated as follows:
-		\begin{itemize}
-			\item $t \neq 0: \vE'(t) =  \vE(t) \cap W'$
-			\item $C(a,b): \vE'(a) =  \vE(a) \cap W' \textit{ and } \vE'(b) =  \vE(b) \cap W'$
-			\item $a \leq_\mu b: \vE'(a) =  \vE(a) \cap W' \textit{ and } \vE'(b) =  \vE(b) \cap W'$
-			\item $a <_\mu b: \vE'(a) =  \vE(a) \cap W' \textit{ and } \vE'(b) =  \vE(b) \cap W'$
-		\end{itemize}
+		Let  $\mathcal{M} = (W, R, \vE)$ be a model, where W is a set of valid modal points. 
+		Let  $\mathcal{M'} = (W', R', \vE')$ be a model, where $W' \subseteq W$ and $R' \subseteq R$, then the following holds:
+	% NOTE kaji che R' e sechenie na R s W2
+		\begin{align*}
+			\vE'(t) =  \vE(t) \cap W'
+		\end{align*}
 	\end{lemma}
 	
 	This lemma implies that the valuation for each subset of W can be deduced from $\vE$ with less computations.
@@ -884,18 +882,20 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 %			measure less or equal and measure less atomic formulas   from B. Done according to definition \ref{compute-valuation}.
 %		\item Compute and cache the relations matrix $R^W$ from the non-contacts from B. Done according to definition \ref{compute-relations}.
 %		\item At this point we have constructed the model over all valid modal points $\mathcal{M} = (W, R, \vE)$
-		\item We are going to look at subsets of W which might produce a valid model, while considering, that the subsets with more elements have priority.
-
-			For each subset $W' \subseteq W$, implying the model $\mathcal{M'}$ test if it satisfies the non-equal to zero terms and contacts from B:
+		\item Let $\mathbb{P} = \mathcal{P}(W)$. We are going to look at $W' \in \mathbb{P}$ starting from the once with most elements.
+			W' implies a model $\mathcal{M'}$. 
+			Test if $\mathcal{M'}$ satisfies the non-equal to zero terms and contacts from B:
 		\begin{enumerate}
 		\item In case the non-equal to zero terms and contacts from B are satisfied by $\mathcal{M'}$,
 			verify whether the system of inequality over B and $\mathcal{M'}$ has a solution. 
-			If the system has a solution then a valid model for the formula is constructed, otherwise continue with the next subset from W.
+			If the system has a solution then a valid model for the formula is constructed, otherwise W' is removed from $\mathbb{P}$.
 		\item If W' does not satisfy the non-equal to zero terms and contacts  
-			then by lemma \ref{impossible-subset-models} all $W'' \subseteq W'$ are not going to be tested for satisfiability.
+			then by lemma \ref{impossible-subset-models} all subsets of W' are removed from $\mathbb{P}$.
 		\end{enumerate}
-		\item If W' is not found in step 3., then a measure model to satisfy the formula $\varphi$ does not exist.
+		\item If W' is not found in step 2., then a measure model to satisfy the formula B does not exist.
 	\end{enumerate}
+	If such a model does not exist for each branch conjunction, then $\neg \exists \mathcal{M}: \mathcal{M} \models \varphi$ 
+
 % introduce the descending order !
 
 	\newpage
