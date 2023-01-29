@@ -106,6 +106,141 @@
             }
 
             function post_task(formula, algorithm_type, formula_filters) {
+                x = {
+  "nodes": [
+      {
+          "id": 0,
+          "name": "A0",
+          "groups": []
+      },
+      {
+          "id": 1,
+          "name": "A1",
+          "groups": [
+              2
+          ]
+      },
+      {
+          "id": 2,
+          "name": "A2",
+          "groups": [
+              1
+          ]
+      },
+      {
+          "id": 3,
+          "name": "A3",
+          "groups": [
+              1,
+              2
+          ]
+      },
+      {
+          "id": 4,
+          "name": "A4",
+          "groups": [
+              0,
+              2
+          ]
+      },
+      {
+          "id": 5,
+          "name": "A5",
+          "groups": [
+              0,
+              1,
+              2
+          ]
+      }
+  ],
+  "links": [
+      {
+          "source": 0,
+          "target": 0
+      },
+      {
+          "source": 1,
+          "target": 0
+      },
+      {
+          "source": 1,
+          "target": 1
+      },
+      {
+          "source": 2,
+          "target": 0
+      },
+      {
+          "source": 2,
+          "target": 1
+      },
+      {
+          "source": 2,
+          "target": 2
+      },
+      {
+          "source": 3,
+          "target": 0
+      },
+      {
+          "source": 3,
+          "target": 1
+      },
+      {
+          "source": 3,
+          "target": 2
+      },
+      {
+          "source": 3,
+          "target": 3
+      },
+      {
+          "source": 4,
+          "target": 0
+      },
+      {
+          "source": 4,
+          "target": 1
+      },
+      {
+          "source": 4,
+          "target": 2
+      },
+      {
+          "source": 4,
+          "target": 3
+      },
+      {
+          "source": 4,
+          "target": 4
+      },
+      {
+          "source": 5,
+          "target": 0
+      },
+      {
+          "source": 5,
+          "target": 1
+      },
+      {
+          "source": 5,
+          "target": 2
+      },
+      {
+          "source": 5,
+          "target": 3
+      },
+      {
+          "source": 5,
+          "target": 4
+      },
+      {
+          "source": 5,
+          "target": 5
+      }
+  ]
+}
+                do_visualization_v2(x, 500, 500);
                 var params =
                     "?algorithm_type=" + algorithm_type +
                     "&formula_filters=" + formula_filters;
@@ -304,7 +439,9 @@
                     link,
                     curveTypes = ['curveBasisClosed', 'curveCardinalClosed', 'curveCatmullRomClosed', 'curveLinearClosed'],
                     simulation = d3.forceSimulation()
-                      .force('link', d3.forceLink().id(function(d) { return d.id; }))
+                      .force('link', d3.forceLink().id(function(d) { return d.id; }).distance(function (d) {
+                            return 150;
+                        }).strength(0.9))
                       .force('charge', d3.forceManyBody())
                       .force('center', d3.forceCenter(width / 2, height / 2));
 
@@ -544,9 +681,12 @@
                     .attr("viewBox", [0, 0, width, height]);
 
                 var simulation = d3.forceSimulation()
-                    .force("link", d3.forceLink().id(function (d) {
-                        return d.id;
-                    }))
+                    .force("link", d3.forceLink()
+                        .id(function (d) {
+                            return d.id;
+                        }).distance(function (d) {
+                            return 50;
+                        }).strength(0.9))
                     .force("charge", d3.forceManyBody().strength(-150))
                     .force("center", d3.forceCenter(width / 2, height / 2))
                     .force('collision', d3.forceCollide().radius(function (d) {
