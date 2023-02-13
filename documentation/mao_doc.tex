@@ -1020,7 +1020,7 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	\end{itemize}
 
 	\subsection{Formula parsing}
-	The formula is a sequence of characters. These characters do not give us any information for the formula's structure. It should be analyzed. Flex \cite{flex-tokenizer} and Bison \cite{bison-parser} are used to parse it into an AST (Abstract Syntax Tree). Flex is used as a tokenizer. Bison is used as the parser.
+	The formula is a sequence of characters. These characters do not give us any information for the formula's structure. It should be analyzed. Flex and Bison are used to parse it into an AST (Abstract Syntax Tree). Flex is used as a tokenizer. Bison is used as the parser. Detailed information for Flex and Bison can be found in the following references \cite{flex-tokenizer}, \cite{bison-parser}.
 
 	\subsubsection{Abstract Syntax Tree}
 	The AST is a binary tree. Each node has an operation type and up to two children. The formula nodes are prior term nodes. A formula node could have term node as children. Term nodes could not have a formula node as a child. The leaves are variables or constants.
@@ -1126,7 +1126,7 @@ public:
 	The tokenizer is responsible for demarcating the special symbols in the input formula.
 	After the symbols are identified, a token is created for each of them, or at least for those significant to the semantic of the input formula.
 	For example, the whitespaces are not significant, and a token is not created for them.
-	We shall use Flex as a tokenizer \cite{flex-tokenizer}.
+	We shall use Flex as a tokenizer.
 
 	\paragraph{Grammar} The tokenizer's grammar is composed of two types of tokens. Single character and multi character tokens.
 
@@ -1331,7 +1331,7 @@ child {node {C}
 };
 \end{tikzpicture}
 
-	\subsubsection{Visitor Pattern} The AST modification is best achieved with the visitor pattern \cite{visitor-pattern}. Uses double virtual dispatching. Separates the algorithm from the object structure on which it operates. Allows new visitors to be added in a simple manner. Each AST modification will be implemented as a visitor. Will not explain the pattern in depth. In essence, the visitor pattern requires the AST nodes to implement a virtual \textbf{accept} method. This method accepts a visitor as argument and calls the visitor's virtual \textbf{visit} method with the real node's type. This is the double virtual dispatching. One virtual call to find the node's real type. Another to find the visitor's real type. Now, adding a new visitor requires only adding its class. Does not require changes in the AST node classes or other visitor classes.
+	\subsubsection{Visitor Pattern} The AST modification is best achieved with the visitor pattern. It uses double virtual dispatching. Separates the algorithm from the object structure on which it operates. Allows new visitors to be added in a simple manner. Each AST modification will be implemented as a visitor. Detailed explanation of this design pattern is given in \cite{visitor-pattern}. In essence, the visitor pattern requires the AST nodes to implement a virtual \textbf{accept} method. This method accepts a visitor as argument and calls the visitor's virtual \textbf{visit} method with the real node's type. This is the double virtual dispatching. One virtual call to find the node's real type. Another to find the visitor's real type. Now, adding a new visitor requires only adding its class. Does not require changes in the AST node classes or other visitor classes.
 
 \newpage
 \noindent
@@ -3127,7 +3127,7 @@ auto measured_model::generate_model(const model_points_set_t& points,
 
 	\bibitem{flex-tokenizer} 
 		Flex Tokenizer,
-		\\\texttt{http://web.mit.edu/gnu/doc/html/flex\_1.html}
+		\\\texttt{https://en.wikipedia.org/wiki/Flex\_(lexical\_analyser\_generator)}
 
 	\bibitem{bison-parser} 
 		Bison Parser,
