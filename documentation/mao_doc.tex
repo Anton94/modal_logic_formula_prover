@@ -16,10 +16,12 @@
 \usepackage{tikz}
 \usepackage{multicol}
 \usepackage[utf8]{inputenc}
-\usepackage[english]{babel}
-\usepackage[T1]{fontenc}
+\usepackage[OT1]{fontenc}
+\usepackage{lmodern}
+\usepackage{graphicx}
 
 \usetikzlibrary{arrows.meta}
+\graphicspath{ {./image/} }
 
 \restylefloat{table}
 \newcommand{\tabitem}{~~\llap{\textbullet}~~}
@@ -64,12 +66,55 @@
     basicstyle=\footnotesize,% basic font setting
 }
 
-\title{Satisfiability of Quantitative Contact Logics}
-\date{2019-9-28}
-\author{Martin Stoev}
+%\renewcommand{\familydefault}{lmodern}
 
 \begin{document}
-	\maketitle
+\begin{titlepage}
+    \begin{center}
+	\LARGE
+       Sofia University ”St. Kliment Ohridski”
+
+        \vspace{0.5cm}
+       \includegraphics[width=4cm]{su_logo}
+
+        \vspace{0.5cm}
+       \Large
+       Faculty of Mathematics and Informatics 
+
+	Department of Mathematical Logic and Applications
+            
+        \vspace{0.5cm}
+        \vfill
+        \large
+        Master's Thesis
+            
+        \vspace{0.6cm}
+            
+        \vfill
+	\huge
+       \textbf{Satisfiability of Quantitative Contact Logics}
+            
+            
+        \vspace{0.8cm}
+            
+        \vfill
+	\large
+ 	\textit{Martin Stoev}
+
+	\textit{Logic and Algorithms (Mathematics)}
+
+        \vfill
+	\textit{supervised by}
+
+	\textit{Prof. Tinko Tinchev}
+
+        \vspace{0.5cm}
+	March 1, 2023
+
+    \end{center}
+\end{titlepage}
+
+	
  	\thispagestyle{empty}
 	\newpage
 
@@ -879,7 +924,7 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 			Let us take an arbitrary valid modal point $\curvedE \in \vE'(t)$, then by definition
 			of $\vE'$ it follows that:
 			\begin{align*}
-				\Rightarrow \;\;&\curvedE \in W' \textit{ and } \vBool_\curvedE(t) = \textit{ true } \\
+				\Rightarrow \;\;&\curvedE \in W' \textit{ and } \vBool_{\curvedE(t)} = \textit{ true } \\
 				\Rightarrow \;\;&\textit{Since } W' \subseteq W \Rightarrow \curvedE \in W \\
 				\Rightarrow \;\;&\curvedE \in \vE(t) \cap W'
 			\end{align*}
@@ -887,9 +932,9 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 			Let us take an arbitrary valid modal point $\curvedE \in v(t) \cap W'$, then:
 			\begin{align*}
 				\Rightarrow \;\;&\curvedE \in \vE(t) \textit{ and } \curvedE \in W' \\
-				\Rightarrow \;\;&\curvedE \in W \textit{ and } \vBool_\curvedE(t) = \textit{ true } \\
+				\Rightarrow \;\;&\curvedE \in W \textit{ and } \vBool_{\curvedE(t)} = \textit{ true } \\
 				\Rightarrow \;\;&\curvedE \in v(t)
-			\end{align*}			
+			\end{align*}
 	\end{proof}
 	This lemma implies that the valuation for each subset of W can be deduced from $\vE$ with less computations.
 
