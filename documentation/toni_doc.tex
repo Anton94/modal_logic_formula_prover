@@ -15,8 +15,11 @@
 \usepackage{hyperref}
 \usepackage{tikz}
 \usepackage{multirow}
+\usepackage[T1]{fontenc}
+\usepackage{tabularx}
 
 \usetikzlibrary{trees}
+\graphicspath{ {./image/} }
 
 \SetKw{KwBy}{by}
 \newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
@@ -69,16 +72,52 @@
     basicstyle=\footnotesize,% basic font setting
 }
 
-\title{Satisfiability Of Connected Contact Logic}
-\date{2019-9-28}
-\author{Anton Dudov}
-
 \begin{document}
-	\maketitle
+
+\begin{titlepage}
+	\begin{center}
+
+	\Large\textsc{Sofia University St. Kliment Ohridski}
+
+	\vspace{0.5cm}
+
+	\includegraphics[width=3cm]{su_logo}
+
+	\vspace{1.5cm}
+
+	\Large
+	\textsc{Faculty of Mathematics and Informatics}
+	\textsc{Department of Mathematical Logic and Applications}
+
+	\vspace{1.5cm}
+
+	\Large\textsc{Master Thesis}
+
+	\vspace{0.5cm}
+
+	{\huge\bfseries{\textsc{Satisfiability of Connected Contact Logics}}}
+
+	\vspace{2.5cm}
+
+	\large
+	\begin{tabularx}{\textwidth}{Xr}
+		Author:                  &  Supervisor:                  \\
+		\textsc{Anton Dudov}     &  Prof. \textsc{Tinko Tinchev} \\
+		Faculty number: 25691    &                               \\
+		Logic and Algorithms     &                               \\
+		(Mathematics)            &                               \\
+	\end{tabularx}
+
+	\vfill
+	March 1, 2023
+
+    \end{center}
+\end{titlepage}
+
+	\thispagestyle{empty}
 	\newpage
 
 	\tableofcontents
-
 	\newpage
 
 	\section{Tableau Method For Classic Propositional Logic}
