@@ -129,8 +129,11 @@
 	\par
 	The connection between the two roles for tableau - as a proof procedure and as a model search procedure - is simple. If we use tableau to search for a model in which X is false, and we produce a closed tableau, no such model exists, so X must be valid.
 
+	\par
+	Will follow the tableau method described in \textit{Handbook of Tableau Methods} \cite{Handbook-of-Tableau-Methods} . There are two types of tableaux - signed and unsigned. The signed version is going to be used.
+
 	\subsection{Classical Propositional Tableau}
-	We will look into the signed tableau system for classical propositional logic.
+	Let's look into the signed tableau system for classical propositional logic.
 
 	\par
 	First, we need syntactical machinery for asserting the non-validity of a formula, and for doing case analysis. For this purpose two signs are introduced: $\ST$ and $\SF$, where these are simply two new symbols, not part of the language of formulas. \textit{Signed formulas} are expressions of the form $\SF X$ and $\ST X$, where X is a formula. The intuitive meaning of $\SF X$ is that X is \textit{false} (in some model). Similarly, $\ST X$ intuitively asserts that X is \textit{true}. Then $\SF X$ is the syntactical device for (informally) asserting the non-validity of X. A tableau proof of X begins with $\SF X$.
