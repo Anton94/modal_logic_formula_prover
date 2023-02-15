@@ -17,7 +17,6 @@
 \usepackage{multicol}
 \usepackage[utf8]{inputenc}
 \usepackage[OT1]{fontenc}
-\usepackage{lmodern}
 \usepackage{graphicx}
 
 \usetikzlibrary{arrows.meta}
@@ -72,27 +71,27 @@
 \begin{titlepage}
     \begin{center}
 	\LARGE
-       Sofia University ”St. Kliment Ohridski”
+       \textsc{Sofia University ”St. Kliment Ohridski”}
 
         \vspace{0.5cm}
        \includegraphics[width=4cm]{su_logo}
 
         \vspace{0.5cm}
        \Large
-       Faculty of Mathematics and Informatics 
+       \textsc{Faculty of Mathematics and Informatics}
 
-	Department of Mathematical Logic and Applications
+	 \textsc{Department of Mathematical Logic and Applications}
             
         \vspace{0.5cm}
         \vfill
         \large
-        Master's Thesis
+        \textsc{Master Thesis}
             
         \vspace{0.6cm}
             
         \vfill
 	\huge
-       \textbf{Satisfiability of Quantitative Contact Logics}
+       \textsc{\textbf{Satisfiability of Quantitative Contact Logics}}
             
             
         \vspace{0.8cm}
@@ -108,7 +107,7 @@
 
 	\textit{Prof. Tinko Tinchev}
 
-        \vspace{0.5cm}
+        \vspace{0.8cm}
 	March 1, 2023
 
     \end{center}
@@ -963,6 +962,16 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	If such a model does not exist for each branch conjunction, then $\neg \exists \mathcal{M}: \mathcal{M} \models \varphi$ 
 
 % introduce the descending order !
+	\subsection{Formal System} 
+	So far we have considered the syntax and semantics of contact logic. Also, with multiple steps in between we have arrived at an algorithm that constructs a valid measure model for a given formula if such a model exists. 
+	\newline
+Now we are ready to support the following statement.
+	\newline
+	\newline
+	Let $\varphi$ be a measure formula. Then $\varphi$ is universally valid if for the negation of $\varphi$ the measure formula satisfiability algorithm does not produce a model in which the $\neg \varphi$ measure formula is satisfiable.
+	\newline
+	This means that there does not exist a measure model $\mathcal{M}$, such that $\mathcal{M} \models \neg \varphi$, which is a proof in the formal system that $\varphi$ is universally valid.
+
 
 	\newpage
 	\section{Implementation Introduction}
