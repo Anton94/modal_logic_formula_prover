@@ -1,4 +1,5 @@
 \documentclass{article}
+
 \usepackage{algorithm2e}
 \usepackage[noend]{algpseudocode}
 \usepackage{mathtools}
@@ -129,8 +130,11 @@
 	\par
 	The connection between the two roles for tableau - as a proof procedure and as a model search procedure - is simple. If we use tableau to search for a model in which X is false, and we produce a closed tableau, no such model exists, so X must be valid.
 
+	\par
+	Will follow the tableau method described in \textit{Handbook of Tableau Methods} \cite{Handbook-of-Tableau-Methods} . There are two types of tableaux - signed and unsigned. The signed version is going to be used.
+
 	\subsection{Classical Propositional Tableau}
-	We will look into the signed tableau system for classical propositional logic.
+	Let's look into the signed tableau system for classical propositional logic.
 
 	\par
 	First, we need syntactical machinery for asserting the non-validity of a formula, and for doing case analysis. For this purpose two signs are introduced: $\ST$ and $\SF$, where these are simply two new symbols, not part of the language of formulas. \textit{Signed formulas} are expressions of the form $\SF X$ and $\ST X$, where X is a formula. The intuitive meaning of $\SF X$ is that X is \textit{false} (in some model). Similarly, $\ST X$ intuitively asserts that X is \textit{true}. Then $\SF X$ is the syntactical device for (informally) asserting the non-validity of X. A tableau proof of X begins with $\SF X$.
@@ -623,8 +627,17 @@
 			}
 			Successfully constructed a model $\M = ((W, R), \upsilon_n)$.
 		\end{algorithm}
-
 	\newpage
+
+	\subsection{Formal system}
+	Let's describe a contact logic formal system.
+
+	All lemmas are deducible from the syntax and semantics. They are syntactically checked. Therefore, they are syntactically correct.
+
+	Let $\phi$ be a formula. If the model building procedure creates a model for $\neg\phi$, then $\phi$ is not a tautology. The process of building the model is the proof.
+
+	If the model building procedure creates a model for $\phi$, then $\phi$ is satisfiable and the model is the proof. Otherwise, the process of building a model is a proof that $\phi$ is not satisfiable.
+
 	\section{Connected Contact Logic}
 
 	\subsection{Connectivity}
@@ -806,8 +819,8 @@
 
 	\newpage
 	\section{Implementation Introduction}
-	The main programming language is C++. Flex \& Bison are used to parse the input formula. The formula proover is a C++ library. The unit and performance tests are C++ applications.
-	The user application is a Web page. The Web server is implemented with the third-party CppRestSDK library. The satisfiability checking runs on the server. There is a feature to interrupt an ongoing process. Can be triggered by the user via a button. There is a user disconnecting detection which cancels the requested formula prooving.
+	The main programming language is C++. Flex \& Bison \cite{flex-and-bison-overview} \cite{flex-and-bison-book} are used to parse the input formula. The formula proover is a C++ library. The unit and performance tests are C++ applications.
+	The user application is a Web page. The Web server is implemented with the third-party CppRestSDK \cite{cpprestsdk} library. The satisfiability checking runs on the server. There is a feature to interrupt an ongoing process. Can be triggered by the user via a button. There is a user disconnecting detection which cancels the requested formula prooving.
 
 	The project repository is at \url{https://github.com/Anton94/modal_logic_formula_prover}. Each commit is build and tested on a various compilers (Windows and Linux OS).
 		
@@ -858,7 +871,7 @@
 	\end{itemize}
 
 	\subsection{Formula parsing}
-	The formula is a sequence of characters. These characters does not give us any information for the formula's structure. It should be analyzed. Flex \cite{flex-tokenizer} and Bison \cite{bison-parser} are used to parse it into an AST (Abstract Syntax Tree). Flex is used as a tokenizer. Bison is used as the parser.
+	The formula is a sequence of characters. These characters does not give us any information for the formula's structure. It should be analyzed. Flex \cite{flex-tokenizer} and Bison \cite{bison-parser} are used to parse it into an AST (Abstract Syntax Tree) \cite{AST}. Flex is used as a tokenizer. Bison is used as the parser.
 
 	\subsubsection{Abstract Syntax Tree}
 	The AST is a binary tree. Each node has an operation type and up to two children. The formula nodes are prior term nodes. A formula node could have term node as children. Term nodes could not have a formula node as a child. The leaves are variables or constants.
@@ -3017,23 +3030,46 @@ auto connected_model::create(
 }
 \end{lstlisting}
 
-	\iffalse
-	TODOs:
-	 - inductive def. For structures, e.g. terms
-	 - recursive for functions
-	\fi
-
 	\newpage
-	TODO: separate line for the authors
+
+	\cleardoublepage
+	\phantomsection
+
+	\addcontentsline{toc}{section}{References}
+
 	\begin{thebibliography}{9}
+
 		\bibitem{Handbook-of-Tableau-Methods}
 			Handbook of Tableau Methods
 			M. D’Agostino, D. M. Gabbay, R. H¨ahnle and J. Posegga, eds.
+
 		\bibitem{modal-logics-space}
 			Modal Logics for Region-based Theories of Space
 			Philippe Balbiani, Thinko Tinchev, Dimiter Vakarelov
+
 		\bibitem{connected-space}
-			\href{https://en.wikipedia.org/wiki/Connected_space}{Connected Space}
-			or go to the next url: \url{https://en.wikipedia.org/wiki/Connected_space}
+			\href{https://en.wikipedia.org/wiki/Connected_space}{Connected Space} from Wikipedia
+
+		\bibitem{flex-and-bison-overview}
+			\href{https://aquamentus.com/flex_bison.html#0}{Flex \& Bison} overview by aquamentus
+
+		\bibitem{flex-and-bison-book}
+			\href{https://www.amazon.com/flex-bison-Text-Processing-Tools/dp/0596155972/ref=sr_1_1}{Flex \& Bison} by John Levine.
+
+		\bibitem{cpprestsdk}
+			\href{https://github.com/microsoft/cpprestsdk}{C++ Rest SDK} by Microsoft
+
+		\bibitem{flex-tokenizer}
+			\href{https://www.cs.princeton.edu/~appel/modern/c/software/flex/flex.html}{Flex tokenizer}
+
+		\bibitem{bison-parser}
+			\href{https://www.gnu.org/software/bison/}{Bison parser}
+
+		\bibitem{AST}
+			\href{https://en.wikipedia.org/wiki/Abstract_syntax_tree}{Abstract syntax tree (AST)} from Wikipedia
+
+		\bibitem{visitor-pattern}
+			\href{https://en.wikipedia.org/wiki/Visitor_pattern}{Visitor pattern} from Wikipedia
+
 	\end{thebibliography}
 \end{document}
