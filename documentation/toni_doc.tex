@@ -1,4 +1,5 @@
 \documentclass{article}
+
 \usepackage{algorithm2e}
 \usepackage[noend]{algpseudocode}
 \usepackage{mathtools}
@@ -809,8 +810,8 @@
 
 	\newpage
 	\section{Implementation Introduction}
-	The main programming language is C++. Flex \& Bison are used to parse the input formula. The formula proover is a C++ library. The unit and performance tests are C++ applications.
-	The user application is a Web page. The Web server is implemented with the third-party CppRestSDK library. The satisfiability checking runs on the server. There is a feature to interrupt an ongoing process. Can be triggered by the user via a button. There is a user disconnecting detection which cancels the requested formula prooving.
+	The main programming language is C++. Flex \& Bison \cite{flex-and-bison-overview} \cite{flex-and-bison-book} are used to parse the input formula. The formula proover is a C++ library. The unit and performance tests are C++ applications.
+	The user application is a Web page. The Web server is implemented with the third-party CppRestSDK \cite{cpprestsdk} library. The satisfiability checking runs on the server. There is a feature to interrupt an ongoing process. Can be triggered by the user via a button. There is a user disconnecting detection which cancels the requested formula prooving.
 
 	The project repository is at \url{https://github.com/Anton94/modal_logic_formula_prover}. Each commit is build and tested on a various compilers (Windows and Linux OS).
 		
@@ -861,7 +862,7 @@
 	\end{itemize}
 
 	\subsection{Formula parsing}
-	The formula is a sequence of characters. These characters does not give us any information for the formula's structure. It should be analyzed. Flex \cite{flex-tokenizer} and Bison \cite{bison-parser} are used to parse it into an AST (Abstract Syntax Tree). Flex is used as a tokenizer. Bison is used as the parser.
+	The formula is a sequence of characters. These characters does not give us any information for the formula's structure. It should be analyzed. Flex \cite{flex-tokenizer} and Bison \cite{bison-parser} are used to parse it into an AST (Abstract Syntax Tree) \cite{AST}. Flex is used as a tokenizer. Bison is used as the parser.
 
 	\subsubsection{Abstract Syntax Tree}
 	The AST is a binary tree. Each node has an operation type and up to two children. The formula nodes are prior term nodes. A formula node could have term node as children. Term nodes could not have a formula node as a child. The leaves are variables or constants.
@@ -3020,23 +3021,40 @@ auto connected_model::create(
 }
 \end{lstlisting}
 
-	\iffalse
-	TODOs:
-	 - inductive def. For structures, e.g. terms
-	 - recursive for functions
-	\fi
-
 	\newpage
-	TODO: separate line for the authors
+
 	\begin{thebibliography}{9}
 		\bibitem{Handbook-of-Tableau-Methods}
 			Handbook of Tableau Methods
 			M. D’Agostino, D. M. Gabbay, R. H¨ahnle and J. Posegga, eds.
+
 		\bibitem{modal-logics-space}
 			Modal Logics for Region-based Theories of Space
 			Philippe Balbiani, Thinko Tinchev, Dimiter Vakarelov
+
 		\bibitem{connected-space}
-			\href{https://en.wikipedia.org/wiki/Connected_space}{Connected Space}
-			or go to the next url: \url{https://en.wikipedia.org/wiki/Connected_space}
+			\href{https://en.wikipedia.org/wiki/Connected_space}{Connected Space} from Wikipedia
+
+		\bibitem{flex-and-bison-overview}
+			\href{https://aquamentus.com/flex_bison.html#0}{Flex \& Bison} overview by aquamentus
+
+		\bibitem{flex-and-bison-book}
+			\href{https://www.amazon.com/flex-bison-Text-Processing-Tools/dp/0596155972/ref=sr_1_1}{Flex \& Bison} by John Levine.
+
+		\bibitem{cpprestsdk}
+			\href{https://github.com/microsoft/cpprestsdk}{C++ Rest SDK} by Microsoft
+
+		\bibitem{flex-tokenizer}
+			\href{https://www.cs.princeton.edu/~appel/modern/c/software/flex/flex.html}{Flex tokenizer}
+
+		\bibitem{bison-parser}
+			\href{https://www.gnu.org/software/bison/}{Bison parser}
+
+		\bibitem{AST}
+			\href{https://en.wikipedia.org/wiki/Abstract_syntax_tree}{Abstract syntax tree (AST)} from Wikipedia
+
+		\bibitem{visitor-pattern}
+			\href{https://en.wikipedia.org/wiki/Visitor_pattern}{Visitor pattern} from Wikipedia
+
 	\end{thebibliography}
 \end{document}
