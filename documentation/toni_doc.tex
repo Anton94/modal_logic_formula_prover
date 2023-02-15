@@ -627,8 +627,17 @@
 			}
 			Successfully constructed a model $\M = ((W, R), \upsilon_n)$.
 		\end{algorithm}
-
 	\newpage
+
+	\subsection{Formal system}
+	Let's describe a contact logic formal system.
+
+	All lemmas are deducible from the syntax and semantics. They are syntactically checked. Therefore, they are syntactically correct.
+
+	Let $\phi$ be a formula. If the model building procedure creates a model for $\neg\phi$, then $\phi$ is not a tautology. The process of building the model is the proof.
+
+	If the model building procedure creates a model for $\phi$, then $\phi$ is satisfiable and the model is the proof. Otherwise, the process of building a model is a proof that $\phi$ is not satisfiable.
+
 	\section{Connected Contact Logic}
 
 	\subsection{Connectivity}
