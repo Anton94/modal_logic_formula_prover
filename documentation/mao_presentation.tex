@@ -1,0 +1,457 @@
+% This text is proprietary.
+% It's a part of presentation made by myself.
+% It may not used commercial.
+% The noncommercial use such as private and study is free
+% Dec 2007
+% Author: Sascha Frank 
+% University Freiburg 
+% www.informatik.uni-freiburg.de/~frank/
+%
+% 
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A,T1]{fontenc}
+\usepackage[english, bulgarian]{babel}
+\setbeamertemplate{navigation symbols}{}
+
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{systeme}
+\usepackage{newtxtext}
+\usepackage{newtxmath}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{makecell}
+\usepackage{booktabs}% http://ctan.org/pkg/booktabs
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{multicol}
+\usepackage{graphicx}
+
+\usetikzlibrary{arrows.meta}
+\graphicspath{ {./image/} }
+
+\restylefloat{table}
+\newcommand{\tabitem}{~~\llap{\textbullet}~~}
+
+\newtheorem{defn}{Дефиниция}[section]
+
+\newcommand{\curvedE}{\mathscr{e}}
+\newcommand{\vVar}{\mathscr{v}_{var}}
+\newcommand{\Var}{\mathbb{V}ar}
+\newcommand{\vE}{\mathscr{v}}
+\newcommand{\vBool}{\xi}
+\newcommand{\Ts}{\mathcal{T}_s}
+\newcommand{\signT}{\mathbb{T}}
+\newcommand{\signF}{\mathbb{F}}
+\newcommand{\BranchConjunction}{%
+\begin{align*}
+			\bigwedge_{i=1}^{I} \; C(a_i, b_i) \:\: & \wedge \:\: 
+			\bigwedge_{k=1}^{K} \; \neg C(e_k, f_k) \:\: \wedge \:\: \\
+			\bigwedge_{j=1}^{J} \; d_j \neq 0 \:\: & \wedge \:\:
+			\bigwedge_{l=1}^{L} \; g_l = 0 \:\:
+\end{align*}%
+}
+\newcommand{\BranchConjunctionWithMeasure}{%
+\begin{align*}
+			\bigwedge_{i=1}^{I} \; C(a_i, b_i) \:\: & \wedge \:\: 
+			\bigwedge_{k=1}^{K} \; \neg C(e_k, f_k) \:\: \wedge \:\: \\
+			\bigwedge_{j=1}^{J} \; d_j \neq 0 \:\: & \wedge \:\:
+			\bigwedge_{l=1}^{L} \; g_l = 0 \:\: \wedge \:\:\\
+			\bigwedge_{p=1}^{P} \; m_p \le_\mu n_p \:\: &\wedge \:\:
+			\bigwedge_{q=1}^{Q} \; u_q <_\mu v_q \:\:
+\end{align*}%
+}
+
+\lstset { %
+    literate={~} {$\sim$}{1},
+    language=C++,
+    backgroundcolor=\color{black!5}, % set backgroundcolor
+    basicstyle=\footnotesize,% basic font setting
+}
+
+
+
+\usetheme{Montpellier}
+
+\beamersetuncovermixins{\opaqueness<1>{25}}{\opaqueness<2->{15}}
+\begin{document}
+\title{Уеб система за минималната контактна логика с мярка}  
+\author{Стоев Мартин}
+\date{\today} 
+\begin{frame}
+\titlepage
+\end{frame}
+
+%\begin{frame}\frametitle{Съдържание}\tableofcontents\end{frame} 
+
+
+\section{Въведение} 
+\begin{frame}\frametitle{Въведение}
+\begin{itemize}
+	\item Защо модални логики ?
+	\item Каква е целта на тази дипломна работа ?
+	\item Теоретична част
+	\item Практическа част
+\end{itemize}
+\end{frame}
+
+\section{Съдържание} 
+\begin{frame}\frametitle{Съдържание}
+\begin{itemize}
+	\item Табло Метод
+	\item Минимална контактна логика
+	\item Изпълнимост в минималната контактна логика
+	\item Минимална контактна логика с мярка
+	\item Изпълнимост в минималната контактна логика с мярка
+\end{itemize}
+\end{frame}
+
+\section{Табло Метод}
+\begin{frame}\frametitle{Табло Метод}
+\begin{itemize}
+	\item Табло метода като процедура за опровергаване на формули
+	\item Табло Метод в Пропозиционалната Логика
+\end{itemize}
+\end{frame}
+
+\subsection{Табло Метод в Пропозиционалната Логика}
+\begin{frame}\frametitle{Табло Метод в Пропозиционалната Логика}
+Маркиране на валидността на формула $\varphi$
+\begin{itemize}
+	\item $\signT \varphi$ - маркиране на формулата $\varphi$ за валидна
+	\item $\signF \varphi$ - маркиране на формулата $\varphi$ за невалидна
+\end{itemize}
+\vspace{20px}
+Стъпки на табло метода
+\begin{itemize}
+	\item Разшираване на табло метода
+	\item Намиране на противоречия
+\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Правила}
+Негиране
+\vspace{20px}
+		\noindent\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \signT(\neg \varphi), X \\
+				      \cline{2-2}
+				      & \signF(\varphi), X
+			\end{array}
+		\end{align*}
+		\end{minipage}%
+		\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \signF(\neg \varphi), X \\
+			      \cline{2-2}
+			      & \signT(\varphi), X
+			\end{array}
+		\end{align*}
+		\end{minipage}
+Конюнкция
+		\noindent\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \signT(\varphi \: \wedge \: \psi), X \\
+			      \cline{2-2}
+			      & \signT\varphi, \signT\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}%
+		\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \:\:\: \signF(\varphi \: \wedge \: \psi), X \\
+			      \cline{2-2}
+			      & \signF\varphi, X \:\:\:\:\:\:\:\: \signF\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}
+\end{frame}
+
+\begin{frame}\frametitle{Правила}
+Дизюнкция
+\vspace{20px}
+		\noindent\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \:\:\: \signT(\varphi \: \vee \: \psi), X \\
+			      \cline{2-2}
+			      & \signT\varphi, X \:\:\:\:\:\:\:\: \signT\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}%
+		\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \signF(\varphi \: \vee \: \psi), X \\
+			      \cline{2-2}
+			      & \signF\varphi, \signF\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}
+Импликация
+		\noindent\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \:\:\: \signT(\varphi \: \rightarrow \: \psi), X \\
+			      \cline{2-2}
+			      & \signF\varphi, X \:\:\:\:\:\:\:\: \signT\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}%
+		\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \signF(\varphi \: \rightarrow \: \psi), X \\
+			      \cline{2-2}
+			      & \signT\varphi, \signF\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}
+\end{frame}
+
+\begin{frame}\frametitle{Правила}
+Еквивалентност
+		\noindent\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \:\:\:\:\:\:\:\: \signT(\varphi \: \leftrightarrow \: \psi), X \\
+			      \cline{2-2}
+			      & \signT\varphi, \signT\psi, X \:\:\:\:\:\:\:\: \signF\varphi, \signF\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}%
+		\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \:\:\:\:\:\:\:\: \signF(\varphi \: \leftrightarrow \: \psi), X \\
+			      \cline{2-2}
+			      & \signT\varphi, \signF\psi, X \:\:\:\:\:\:\:\: \signF\varphi, \signT\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}
+\end{frame}
+
+\begin{frame}\frametitle{Малко дефиниции}
+
+\begin{defn}[Затворен клон]
+Когато в него има едновременно една и съща формула маркирана за валидна и за невалидна.
+\end{defn}
+
+\begin{defn}[Затворено табло]
+Когато в таблото всички клонове са затворени.
+\end{defn}
+\end{frame}
+
+\begin{frame}\frametitle{Малко дефиниции}
+\begin{defn}[Атомарен клон]
+Когато клона не може да се разширява повече.
+\end{defn}
+
+\begin{defn}[Атомарно табло]
+Когато в таблото всички клонове са атомарни.
+\end{defn}
+
+\begin{defn}[Завършено табло]
+Когато таблото е затворено или атомарно.
+\end{defn}
+\end{frame}
+
+\begin{frame}\frametitle{Общовалидна формула}
+	Проверяваме дали дадена формула $\varphi$ е общовалидна с следните стъпки:
+\begin{enumerate}
+	\item Маркираме $\varphi$ за невалидна, т.е.  $\signF\varphi$.
+	\item Ползваме $\signF\varphi$ за почетна формула на таблото.
+	\item Разширяваме все докато таблото не е завършено.
+	\item Ако таблото е затворено, то формулата $\varphi$ е общовалидна.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Пример}
+	\hspace{50px} 1. $\signF (X \rightarrow ((X \wedge \neg Y) \vee \neg X)$ \\
+	\hspace{50px} 2. $\signT X, \signF ((X \wedge \neg Y) \vee \neg X)$ \\
+	\hspace{50px} 3. $\signT X, \signF (X \wedge \neg Y), \signF \neg X)$ \\
+	\hspace{50px} 4. $\signT X, \signF (X \wedge \neg Y), \signT X)$ \\
+	\begin{tikzpicture}[scale = 0.8]
+		\draw (-7,0) (5,1);
+        \draw[thick] (-3.1,0) -- (-2.2,1) -- (-1.3,0);
+    \end{tikzpicture} \\
+	\hspace{70px} 4. $\signF X$ \hspace{5px} 5. $\signF \neg Y$\\
+	\hspace{108px} 6. $\signT Y$
+\end{frame}
+
+\section{Минимална контактна логика}
+\begin{frame}\frametitle{мини}
+асд
+\end{frame}
+
+\subsection{Изпълнимост в минималната контактна логика}
+\begin{frame}\frametitle{мини}
+асд
+\end{frame}
+
+\section{Минимална контактна логика с мярка}
+\begin{frame}\frametitle{мини}
+асд
+\end{frame}
+
+\subsection{Изпълнимост в минималната контактна логика с мярка}
+\begin{frame}\frametitle{мини}
+асд
+\end{frame}
+
+\section{Section no. 2} 
+\subsection{Lists I}
+\begin{frame}\frametitle{unnumbered lists}
+\begin{itemize}
+\item Introduction to  \LaTeX  
+\item Course 2 
+\item Termpapers and presentations with \LaTeX 
+\item Beamer class
+\end{itemize} 
+\end{frame}
+
+\begin{frame}\frametitle{lists with pause}
+\begin{itemize}
+\item Introduction to  \LaTeX \pause 
+\item Course 2 \pause 
+\item Termpapers and presentations with \LaTeX \pause 
+\item Beamer class
+\end{itemize} 
+\end{frame}
+
+\subsection{Lists II}
+\begin{frame}\frametitle{numbered lists}
+\begin{enumerate}
+\item Introduction to  \LaTeX  
+\item Course 2 
+\item Termpapers and presentations with \LaTeX 
+\item Beamer class
+\end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{numbered lists with pause}
+\begin{enumerate}
+\item Introduction to  \LaTeX \pause 
+\item Course 2 \pause 
+\item Termpapers and presentations with \LaTeX \pause 
+\item Beamer class
+\end{enumerate}
+\end{frame}
+
+\section{Section no.3} 
+\subsection{Tables}
+\begin{frame}\frametitle{Tables}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Date} & \textbf{Instructor} & \textbf{Title} \\
+\hline
+WS 04/05 & Sascha Frank & First steps with  \LaTeX  \\
+\hline
+SS 05 & Sascha Frank & \LaTeX \ Course serial \\
+\hline
+\end{tabular}
+\end{frame}
+
+
+\begin{frame}\frametitle{Tables with pause}
+\begin{tabular}{c c c}
+A & B & C \\ 
+\pause 
+1 & 2 & 3 \\  
+\pause 
+A & B & C \\ 
+\end{tabular} 
+\end{frame}
+
+
+\section{Section no. 4}
+\subsection{blocs}
+\begin{frame}\frametitle{blocs}
+
+\begin{block}{title of the bloc}
+bloc text
+\end{block}
+
+\begin{exampleblock}{title of the bloc}
+bloc text
+\end{exampleblock}
+
+
+\begin{alertblock}{title of the bloc}
+bloc text
+\end{alertblock}
+\end{frame}
+
+\section{Section no. 5}
+\subsection{split screen}
+
+\begin{frame}\frametitle{splitting screen}
+\begin{columns}
+\begin{column}{5cm}
+\begin{itemize}
+\item Beamer 
+\item Beamer Class 
+\item Beamer Class Latex 
+\end{itemize}
+\end{column}
+\begin{column}{5cm}
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Instructor} & \textbf{Title} \\
+\hline
+Sascha Frank &  \LaTeX \ Course 1 \\
+\hline
+Sascha Frank &  Course serial  \\
+\hline
+\end{tabular}
+\end{column}
+\end{columns}
+\end{frame}
+
+\subsection{Pictures} 
+\begin{frame}\frametitle{pictures in latex beamer class}
+\begin{figure}
+\caption{show an example picture}
+\end{figure}
+\end{frame}
+
+\subsection{joining picture and lists} 
+
+\begin{frame}
+\frametitle{pictures and lists in beamer class}
+\begin{columns}
+\begin{column}{5cm}
+\begin{itemize}
+\item<1-> subject 1
+\item<3-> subject 2
+\item<5-> subject 3
+\end{itemize}
+\vspace{3cm} 
+\end{column}
+\begin{column}{5cm}
+asdsad
+\end{column}
+\end{columns}
+\end{frame}
+
+
+\subsection{pictures which need more space} 
+\begin{frame}[plain]
+\frametitle{plain, or a way to get more space}
+\begin{figure}
+\caption{show an example picture}
+\end{figure}
+\end{frame}
+
+
+
+\end{document}

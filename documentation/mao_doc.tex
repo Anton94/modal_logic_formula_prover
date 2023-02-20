@@ -91,7 +91,7 @@
             
         \vfill
 	\huge
-       \textsc{\textbf{Satisfiability of Quantitative Contact Logics}}
+       \textsc{\textbf{Web System for Minimal Quantitative Contact Logics}}
             
             
         \vspace{0.8cm}
@@ -139,6 +139,8 @@ Formally, the tableau procedure is used as a refutation procedure; to prove that
 During the expansion stage of the tableau an impossible cases can be met, where the validity and invalidity of a formula are claimed to be true. These cases are said to be closed and if each case of the tableau is closed, then we say that the tableau is closed.
 
 For our purposes, we will use a slightly different version of the method described above, namely with the help of the expansion stage we will try to find a model with certain properties in which the given formula will be satisfied.
+
+In this paper we shall follow the definitions for the tableau method described in The Handbook of Tableau methods \cite{tableau-handbook}. In the handbook there are two types of tableaux given, namely signed and unsigned. For our purposes we will use the signed version.
 
 		\subsection{Propositional logic tableau}
 The tableau method for propositional logic is mostly defined based on the presentation of Raymond Smullyan. In its simplest form it is defined with syntactical assertion for the validity of the formula and definition of the expansion stage. To reach this goal, we need to improve our syntactical arsenal, to be able to assert the validity of a formula. In order to accomplish this, we shall introduce two signs. These signs when combined with a formula will assert whether the formula is to be true or false. Formally, the two signs are $\{ \signT, \signF \}$. Let $\varphi$ be a formula, then
@@ -3134,6 +3136,10 @@ auto measured_model::generate_model(const model_points_set_t& points,
 		Melvin Fitting
 		\\\textit{Handbook of Tableau Methods}
 
+	\bibitem{region-based-theories-of-space}
+		Philippe Balbiani, Tinko Tinchev, Dimiter Vakarelov
+		\\\textit{Modal Logics for Region-based Theories of Space}
+
 	\bibitem{flex-tokenizer} 
 		Flex Tokenizer,
 		\\\texttt{https://en.wikipedia.org/wiki/Flex\_(lexical\_analyser\_generator)}
@@ -3146,9 +3152,11 @@ auto measured_model::generate_model(const model_points_set_t& points,
 		Visitor Pattern,
 		\\\texttt{https://en.wikipedia.org/wiki/Visitor\_pattern}
 
-	\bibitem{region-based-theories-of-space}
-		Philippe Balbiani, Tinko Tinchev, Dimiter Vakarelov
-		\\\textit{Modal Logics for Region-based Theories of Space}
+
+	\bibitem{cpprestsdk}
+		C++ Rest SDK by Microsoft,
+		\\\texttt{https://github.com/microsoft/cpprestsdk}
+
 	\end{thebibliography}
 
 
