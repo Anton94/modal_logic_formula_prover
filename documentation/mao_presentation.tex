@@ -269,7 +269,7 @@
 	Проверяваме дали дадена формула $\varphi$ е общовалидна с следните стъпки:
 \begin{enumerate}
 	\item Маркираме $\varphi$ за невалидна, т.е.  $\signF\varphi$.
-	\item Ползваме $\signF\varphi$ за почетна формула на таблото.
+	\item Ползваме $\signF\varphi$ за начална формула на таблото.
 	\item Разширяваме все докато таблото не е завършено.
 	\item Ако таблото е затворено, то формулата $\varphi$ е общовалидна.
 \end{enumerate}
@@ -289,8 +289,77 @@
 \end{frame}
 
 \section{Минимална контактна логика}
-\begin{frame}\frametitle{мини}
-асд
+\begin{frame}\frametitle{Минимална контактна логика}
+\begin{enumerate}
+	\item Синтаксис 
+	\item Семантика
+	\item Свойства
+	\item Изпълнимост на формула
+\end{enumerate}
+\end{frame}
+
+\subsection{Синтаксис}
+\begin{frame}\frametitle{Синтаксис}
+	\begin{itemize}
+		\item W - цял свят
+		\item $\emptyset$ - празен регион
+		\item $\mathbb{V}ar$ - изброимо множество от променливи използвани в дадена формула
+		\item Булеви константи за W и $\emptyset$, 1 и 0 съответно
+	\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Булеви операции}
+	\begin{itemize}
+		\item $\sqcap$ за булево сечение
+		\item $\sqcup$ за булево обединение
+		\item * за отрицание
+	\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Дефиниция за Терм}
+Терма се дефинира индуктивно:
+	\begin{itemize}
+		\item Булевите константи са термове
+		\item $p \in \mathbb{V}ar$ е терм
+		\item Ако x е терм, то *x е също така терм
+		\item Ако x и y са два терма, то $x \; \sigma \; y $ е също така терм,\\
+				където $\sigma \: \in \: \{\sqcap, \sqcup\}$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Атомарни формули}
+	Пропозиционални константи: $\top$ and $\bot$ \\
+	\vspace{10px}
+	Пропозиционални операции: $\neg, \vee, \wedge, \rightarrow, \leftrightarrow$
+	\vspace{10px}
+
+	Нека a и b са два терма. То тогава 
+	\begin{itemize}
+		\item C(a, b)
+		\item $a \le b$
+	\end{itemize}
+	са атомарни формули.
+\end{frame}
+
+\begin{frame}\frametitle{Дефиниция за Формула}
+Формула се дефинира индуктивно:
+		\begin{itemize}
+			\item Всяка пропозиционална константа е формула
+			\item Всяка атомарна формула е формула
+			\item Ако $\varphi$ е формула, то $\neg{\varphi}$ е също така формула
+			\item Ако $\varphi$ и $\psi$ са две формули, то $\varphi \: \sigma \: \psi $ е също така формула,\\
+				където $\sigma \in \{\vee, \wedge, \rightarrow, \leftrightarrow\}$
+		\end{itemize}
+\end{frame}
+
+\subsection{Семантика}
+\begin{frame}\frametitle{Семантика}
+
+\end{frame}
+
+\subsection{Свойства}
+\begin{frame}\frametitle{Синтаксис}
+
 \end{frame}
 
 \subsection{Изпълнимост в минималната контактна логика}
