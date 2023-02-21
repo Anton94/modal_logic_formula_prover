@@ -1,35 +1,66 @@
-\documentclass[11pt]{beamer}
+\documentclass[14pt, aspectratio=169]{beamer}
 
 % sudo apt-get install texlive-lang-cyrillic
 \usepackage[T2A,T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[main=bulgarian,english]{babel}
 
+\graphicspath{ {./image/} }
+
 \usetheme{Boadilla}
 \usecolortheme{beaver}
 
-\graphicspath{ {./image/} }
+% Hide the navigation buttons at the bottom of each slide
+\setbeamertemplate{navigation symbols}{}
 
-%\usepackage[ascii]{inputenc}
-%\usepackage{amsmath}
-%\usepackage{amsfonts}
-%\usepackage{amssymb}
-%\usepackage{graphicx}
-%\setbeamercovered{transparent} 
-%\setbeamertemplate{navigation symbols}{} 
-%\institute{} 
-%\subject{} 
+% Lets the boolet points for next slides to be seen
+\setbeamercovered{transparent}
+
+% Increase the size of title in the footer
+\makeatletter
+\defbeamertemplate*{footline}{Dan P theme}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.2\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+    \usebeamerfont{author in head/foot}\insertshortauthor\expandafter\beamer@ifempty\expandafter{\beamer@shortinstitute}{}{~~(\insertshortinstitute)}
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+    \usebeamerfont{title in head/foot}\insertshorttitle
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.3\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+    \usebeamerfont{date in head/foot}\insertshortdate{}\hspace*{2em}
+\insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+\makeatother
+
+% Teach babel the tags to translate them
+\usepackage{etoolbox}
+\patchcmd{\theorem}{Theorem}{Teorema}{}{}
+\patchcmd{\corollary}{Corollary}{Следствие}{}{}
+\patchcmd{\lemma}{Lemma}{Лема}{}{}
+\patchcmd{\proposition}{Proposition}{Предложение}{}{}
+\patchcmd{\axiom}{Axiom}{Аксиома}{}{}
+\patchcmd{\example}{Example}{Пример}{}{}
+\patchcmd{\definition}{Definition}{Дефиниция}{}{}
+\patchcmd{\remark}{Remark}{Забележка}{}{}
 
 \logo{\includegraphics[width=1cm]{fmi_logo.png}}
 
 \date[\today]{}
 
-\title{\textsc{Изпълнимост на свързаната контактна логика}}
+\title{\textsc{Уеб система за изпълнимост на свързаната контактна логика}}
+
+%\subject{}
+
+%\institute{}
 
 \author[Антон Дудов]{
 	\textsc{Факултет по математика и информатика} \\
-	\textsc{Катедра по математическа логика и приложенията ѝ} \\ [10mm]
-	\textsc{Антон Дудов} \\ [15mm]
+	\textsc{Катедра по математическа логика и приложенията ѝ} \\ [8mm]
+	\textsc{Антон Дудов} \\ [8mm]
 	\small\textsc{Научен ръководител: проф. Тинко Тинчев}
 }
 
@@ -39,14 +70,35 @@
 \titlepage
 \end{frame}
 
-%\begin{frame}
-%\tableofcontents
-%\end{frame}
-
 \begin{frame}
+\tableofcontents
+\end{frame}
 
-\frametitle{test}
+\section{Табло метод за класическа съждителна логика}
+
+\begin{frame}{Табло метод за класическа съждителна логика}
+
+Приложения:
+\begin{itemize}
+	\item<1-> Търсене на противоречие
+	\item<2-> Алгоритъм за търсене на модел
+\end{itemize}
 
 \end{frame}
+
+\section{Контактна логика}
+\subsection{Синтаксис}
+\subsection{Изпълнимост на формула}
+\subsection{Алгоритъм за строене на модел}
+
+\section{Свързана контактна логика}
+\subsection{Свързаност}
+\subsection{Алгоритъм за строене на свързан модел}
+
+\section{Имплементация}
+\subsection{Строене на формула от текст}
+\subsection{Строене на свързан модел}
+\subsection{Сървър и уеб приложение}
+\subsection{Автоматична компилация, тестване и среда}
 
 \end{document}
