@@ -34,7 +34,7 @@ Note that for memory sanitizer you will need e.g. llvm-symbolizer to see the sou
 
 This section is experimental and in progress.
 
-Linux:
+## Linux:
 
 Install emscripten - https://emscripten.org/docs/getting_started/downloads.html#installation-instructions
 
@@ -42,22 +42,24 @@ Don't forget to run > source ./emsdk_env.sh after activating the SDK.
 
 - repo_dir> mkdir build_wasm
 - repo_dir> cd build_wasm
-- repo_dir/build_wasm> emcmake cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_TOOLCHAIN_FILE=<path_to_your_emsdk_repo>/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake -DCMAKE_TOOLCHAIN_FILE=<path_to_your_emsdk_repo>/upstream/emscripten/cache/sysroot/ ..
+- repo_dir/build_wasm> emcmake cmake -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_TOOLCHAIN_FILE=<path_to_your_emsdk_repo>/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake -DEMSCRIPTEN_INCLUDE_DIR=<path_to_your_emsdk_repo>/upstream/emscripten/cache/sysroot/ ..
 - repo_dir/build_wasm> cmake --build .
+
+Note that EMSCRIPTEN_INCLUDE_DIR points to sysroot/ directory.
 
 Go to repo_dir/build_wasm/formula_proover. There are the html file and JS.
 Note that running directly the html page in the browser will not work.
 As mentioned here - https://developer.mozilla.org/en-US/docs/WebAssembly/C_to_wasm#running_your_example
 You need a local http server to run it - https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Tools_and_setup/set_up_a_local_testing_server
 
-# If you are using python 3
+If you are using python 3
 - repo_dir/build_wasm/formula_proover> python3 -m http.server
 
 Click on the formula_proover.html
 
 The formula_proover's main function should be called with some sample formula and you should see the output.
 
-Windows:
+## Windows:
 Not tested - better use WSL (Windows Subsystem for Linux)
 
 More info regarding the build as WebAssembly
