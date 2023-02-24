@@ -4,6 +4,9 @@ add_subdirectory(../formula_lib formula_lib)
 
 include_directories(${FORMULA_LIB_INCLUDE_DIR})
 
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s EXPORTED_FUNCTIONS=['_malloc','_free','_main'] -s EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap']")
+#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ALLOW_MEMORY_GROWTH=1") # Increase th heap memory limit
+
 set(executable formula_proover_wasm)
 add_executable(${executable} source.cpp)
 
@@ -18,8 +21,13 @@ if (CMAKE_SYSTEM_NAME STREQUAL Emscripten)
     get_target_property(MAIN_CFLAGS ${executable} LINK_OPTIONS)
     message("-- Target " ${executable} " link flags are: ${MAIN_CFLAGS}")
 
-    #target_link_options(${executable} PUBLIC --shell-file shell.html)
-    #target_link_options(${executable} PUBLIC -sNO_FILESYSTEM=1 -sASSERTIONS=0 -sMALLOC=emmalloc --closure=1)
+    target_compile_options(${executable} PUBLIC -s WASM=1) # make a separate .wasm file instead of adding the wasm to .js produced file.
+
+    # target_link_options(${executable} PUBLIC -s EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap']) # The exported functions to be visible in JS
+    # target_link_options(${executable} PUBLIC -s EXPORTED_FUNCTIONS=["_malloc"])
+
+    #target_compile_options(${executable} PUBLIC -s ALLOW_MEMORY_GROWTH=1) # Allow bigger memory allocation
+
 endif()
 
 if(${ENABLE_THREAD_SANITIZER})
@@ -35,3 +43,9 @@ elseif(${ENABLE_ADDRESS_UB_LEAK_SANITIZERS})
 endif()
 
 include(ECMEnableSanitizers)
+
+add_custom_command(
+        TARGET ${executable} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy # for directory try copy_directory
+                ${CMAKE_CURRENT_SOURCE_DIR}/index.html
+                ${CMAKE_CURRENT_BINARY_DIR}/index.html)

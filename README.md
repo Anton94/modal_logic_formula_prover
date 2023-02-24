@@ -63,10 +63,10 @@ The formula_proover's main function should be called with some sample formula an
 Not tested - better use WSL (Windows Subsystem for Linux)
 
 More info regarding the build as WebAssembly
+https://marcoselvatici.github.io/WASM_tutorial/#WASM_workflow
 https://github.com/emscripten-core/emscripten/blob/main/cmake/Modules/Platform/Emscripten.cmake
 https://github.com/floooh/pacman.c
 https://groups.google.com/g/emscripten-discuss/c/CMrgauxwGfE
-https://marcoselvatici.github.io/WASM_tutorial/#WASM_workflow
 
 
 # References

@@ -1,0 +1,64 @@
+<script src="formula_proover_wasm.js"></script>
+<script>
+var js_wrapped_calculate = Module.cwrap("calculate", "number", ["number", "number"]);
+var js_wrapped_free_cstr = Module.cwrap("free_cstr", null, ["number"]);
+
+function allocate_WASM_string(s) {
+    var len  = s.length;
+    var converted_formula = new Uint8Array(toUTF8Array(s)) // Array of bytes (8-bit unsigned int) representing the string
+
+    var ptr = Module._malloc(len * 1);     // Allocate memory - 1 byte per element
+
+    Module.HEAPU8.set(converted_formula, ptr); // Write WASM memory calling the set method of the Uint8Array
+
+    return ptr;
+}
+
+function free_WASM_mem(m) {
+    Module._free(m);
+}
+
+function pressBtn(){
+
+    var formula = document.getElementById('formula').value;
+    var len = formula.length;
+    var wasm_formula = allocate_WASM_string(formula);
+
+    var res = js_wrapped_calculate(wasm_formula, len); // Call the WASM function
+    var s = UTF8ToString(res);
+    console.log("The result of calling calculate is:\n", s);
+
+    free_WASM_mem(wasm_formula); // Free the allocated memory for the input formula
+    free_WASM_mem(res); // Free the memory allocated for the result.
+}
+
+// source: https://stackoverflow.com/questions/18729405/how-to-convert-utf8-string-to-byte-array
+function toUTF8Array(str) {
+    var utf8 = [];
+    for (var i=0; i < str.length; i++) {
+        var charcode = str.charCodeAt(i);
+        if (charcode < 0x80) utf8.push(charcode);
+        else if (charcode < 0x800) {
+            utf8.push(0xc0 | (charcode >> 6), 0x80 | (charcode & 0x3f));
+        }
+        else if (charcode < 0xd800 || charcode >= 0xe000) {
+            utf8.push(0xe0 | (charcode >> 12), 0x80 | ((charcode>>6) & 0x3f), 0x80 | (charcode & 0x3f));
+        }
+        else {
+            i++;
+            charcode = 0x10000 + (((charcode & 0x3ff)<<10) | (str.charCodeAt(i) & 0x3ff));
+            utf8.push(0xf0 | (charcode >>18), 0x80 | ((charcode>>12) & 0x3f), 0x80 | ((charcode>>6) & 0x3f), 0x80 | (charcode & 0x3f));
+        }
+    }
+    return utf8;
+}
+
+</script>
+
+<div class="formula_itself" style="width: 90%; display: flex; flex-direction: row">
+    <span style="margin-right: 0.6rem">Formula:</span><br>
+    <input id="formula" style="width: 100%; height: 20px;"/>
+</div>
+
+<button onclick="pressBtn()">Measured model</button>
+<p>Open the console to see the result!</p>
