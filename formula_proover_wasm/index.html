@@ -1,7 +1,6 @@
 <script src="formula_proover_wasm.js"></script>
 <script>
 var js_wrapped_calculate = Module.cwrap("calculate", "number", ["number", "number"]);
-var js_wrapped_free_cstr = Module.cwrap("free_cstr", null, ["number"]);
 
 function allocate_WASM_string(s) {
     var len  = s.length;
