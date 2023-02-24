@@ -5,6 +5,14 @@
 #include "cmd_options/cxxopts.hpp"
 #include "library.h"
 
+#include <include/emscripten/emscripten.h>
+
+
+void EMSCRIPTEN_KEEPALIVE f()
+{
+
+}
+
 int main(int argc, char* argv[])
 {
     /*
@@ -51,6 +59,7 @@ int main(int argc, char* argv[])
         info() << "Variables: " << variables;
 
         measured_model m;
+        info() << "Trying to find a measured model!";
         const auto res = f.is_satisfiable(m);
         info() << "The formula is " << (res ? "" : "not ") << "satisfiable.";
         info() << "Measured model:\n" << m;

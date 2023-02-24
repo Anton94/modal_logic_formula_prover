@@ -11,6 +11,13 @@ target_link_libraries(${executable} formula_lib)
 
 if (CMAKE_SYSTEM_NAME STREQUAL Emscripten)
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
+
+    get_target_property(MAIN_CFLAGS ${executable} COMPILE_OPTIONS)
+    message("-- Target " ${executable} " compiler flags are: ${MAIN_CFLAGS}")
+
+    get_target_property(MAIN_CFLAGS ${executable} LINK_OPTIONS)
+    message("-- Target " ${executable} " link flags are: ${MAIN_CFLAGS}")
+
     #target_link_options(${executable} PUBLIC --shell-file shell.html)
     #target_link_options(${executable} PUBLIC -sNO_FILESYSTEM=1 -sASSERTIONS=0 -sMALLOC=emmalloc --closure=1)
 endif()
