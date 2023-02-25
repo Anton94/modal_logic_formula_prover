@@ -4,280 +4,42 @@
         <link rel="shortcut icon" type="image/png" href="./img/home-icon.png"/>
         <script src="./lib/jquery.min.js" type="text/javascript"></script>
         <script src="./lib/d3.v4.js"></script>
-
-        <style>
-            #result_sets {
-              margin: 5px;
-              border: 0.5rem outset #716da7;
-              border-radius: 12px;
-              flex: 1 1 auto;
-              padding: 10px;
-            }
-
-            #visualization-graph {
-              width: 70%;
-              aspect-ratio : 1 / 1;
-              margin: 5px;
-              border: 0.5rem outset #716da7;
-              border-radius: 12px;
-              font-family: sans-serif, Arial;  
-              font-size: 12px;
-              font-weight: bold;
-            }
-            .links line {   
-              stroke: #999;
-              stroke-opacity: 0.6;
-            }
-
-            .nodes circle {
-              stroke: #fff;
-              stroke-width: 1.5px;
-              cursor: grab;
-            }
-
-            .node text {
-              pointer-events: none;
-              font: 10px sans-serif;
-            }
-
-            path {
-              fill-opacity: .1;
-              stroke-opacity: 1;
-            }
-        </style>
-        <style>
-            body {
-              font-family: "Lato", sans-serif;
-            }
-
-            .sidenav {
-              height: 100%;
-              width: 14vw;
-              position: fixed;
-              z-index: 1;
-              top: 0;
-              left: 0;
-              background-color: #d6d6f5;
-              overflow-x: hidden;
-              padding-top: 20px;
-            }
-
-            .sidenav a {
-              padding: 6px 8px 6px 16px;
-              text-decoration: none;
-              font-size: 25px;
-              color: #818181;
-              display: block;
-            }
-
-            .sidenav a:hover {
-              color: #f1f1f1;
-            }
-
-            .main {
-              margin-left: 14vw; /* Same as the width of the sidenav */
-              /* font-size: 28px;  Increased text to enable scrolling */
-              padding: 0px 10px;
-            }
-
-            @media screen and (max-height: 450px) {
-              .sidenav {padding-top: 15px;}
-              .sidenav a {font-size: 18px;}
-            }
-        </style>
-
+        <script type="text/javascript" src="./visualizer.js"></script>
+        <script type="text/javascript" src="./server_api.js"></script>
+        <link href="styles.css" rel="stylesheet" type="text/css">
         <script>
             var serverOrigin = location.origin;
             var valid_op_id = null;
 
-            // since now we are only posting tasks, these requests will be fast enough and
-            // we can make them synchronous thus returning the result as soon as it comes.
-            // this should be done better in an upcoming version.
-            function is_satisfiable(formula) {
-                document.getElementById("is_satisfied_output").innerHTML = "";
-                document.getElementById("output").innerHTML = "";
-
-                $.post(serverOrigin + "/satisfy", {
-                        formula: formula
-                    })
-                    .done(function (data) {
-                        console.log("good");
-                    });
-            }
-
-            function post_task(formula, algorithm_type, formula_filters) {
-                x = {
-  "nodes": [
-      {
-          "id": 0,
-          "name": "A0",
-          "groups": []
-      },
-      {
-          "id": 1,
-          "name": "A1",
-          "groups": [
-              2
-          ]
-      },
-      {
-          "id": 2,
-          "name": "A2",
-          "groups": [
-              1
-          ]
-      },
-      {
-          "id": 3,
-          "name": "A3",
-          "groups": [
-              1,
-              2
-          ]
-      },
-      {
-          "id": 4,
-          "name": "A4",
-          "groups": [
-              0,
-              2
-          ]
-      },
-      {
-          "id": 5,
-          "name": "A5",
-          "groups": [
-              0,
-              1,
-              2
-          ]
-      }
-  ],
-  "links": [
-      {
-          "source": 0,
-          "target": 0
-      },
-      {
-          "source": 1,
-          "target": 0
-      },
-      {
-          "source": 1,
-          "target": 1
-      },
-      {
-          "source": 2,
-          "target": 0
-      },
-      {
-          "source": 2,
-          "target": 1
-      },
-      {
-          "source": 2,
-          "target": 2
-      },
-      {
-          "source": 3,
-          "target": 0
-      },
-      {
-          "source": 3,
-          "target": 1
-      },
-      {
-          "source": 3,
-          "target": 2
-      },
-      {
-          "source": 3,
-          "target": 3
-      },
-      {
-          "source": 4,
-          "target": 0
-      },
-      {
-          "source": 4,
-          "target": 1
-      },
-      {
-          "source": 4,
-          "target": 2
-      },
-      {
-          "source": 4,
-          "target": 3
-      },
-      {
-          "source": 4,
-          "target": 4
-      },
-      {
-          "source": 5,
-          "target": 0
-      },
-      {
-          "source": 5,
-          "target": 1
-      },
-      {
-          "source": 5,
-          "target": 2
-      },
-      {
-          "source": 5,
-          "target": 3
-      },
-      {
-          "source": 5,
-          "target": 4
-      },
-      {
-          "source": 5,
-          "target": 5
-      }
-  ]
-}
-                do_visualization_v2(x, 500, 500);
-                var params =
-                    "?algorithm_type=" + algorithm_type +
-                    "&formula_filters=" + formula_filters;
-                return $.post(serverOrigin + "/task" + params, formula)
-                // on error change_computing_components_availability
-            }
-
             var running_count = 0;
 
             function ping_task(op_id, timer_id) {
-                var params = "?op_id=" + valid_op_id;
-                $.get(serverOrigin + "/rest/ping" + params, null)
-                    .done(function (data) {
+                api.ping_task(serverOrigin, op_id)
+                    .then(function (data) {
                         // depending on the data return RUNNING or CANCELED or FINISHED...
                         console.log(data);
-                        var jsonified = JSON.parse(data.replace(/'/g, "\""));
-                        if (jsonified["status"] == "FINISHED") {
+
+                        if (data.status == "FINISHED") {
                             clearInterval(timer_id);
                             valid_op_id = null;
-                            document.getElementById('algorithm_result').innerText = jsonified["is_satisfied"] ? "Satisfiable" : "Not satisfiable";
-                            document.getElementById('verbose_output').innerText += jsonified["output"];
-                            graphis = transform_contacts_to_graph(jsonified);
+                            document.getElementById('algorithm_result').innerText = data.is_satisfied ? "Satisfiable" : "Not satisfiable";
+                            document.getElementById('verbose_output').innerText += data.output;
+                            graphis = transform_contacts_to_graph(data.ids, data.contacts);
                             do_visualization_v2(graphis, 500, 500);
-                            print_result_sets(jsonified["variables"], jsonified["ids"]);
+                            print_result_sets(data.variables, data.ids);
                             change_computing_components_availability(true)
                             running_count = 0;
-                        } else if (jsonified["status"] == "CANCELED") {
+                        } else if (data.status == "CANCELED") {
                             clearInterval(timer_id);
                             valid_op_id = null;
                             document.getElementById('algorithm_result').innerText = "Canceled";
-                            document.getElementById('verbose_output').innerText += jsonified["output"];
+                            document.getElementById('verbose_output').innerText += data.output;
                             running_count = 0;
                             change_computing_components_availability(true)
                             // populate the output that the formula was canceled
-                        } else if (jsonified["status"] == "RUNNING") {
+                        } else if (data.status == "RUNNING") {
                             // populate the verbose output
-                            document.getElementById('verbose_output').innerText += jsonified["output"];
+                            document.getElementById('verbose_output').innerText += data.output;
                             let dots = ".";
                             if (running_count % 3 == 2)
                                 dots = "...";
@@ -287,7 +49,7 @@
                             document.getElementById('algorithm_result').innerText = "Running";
                         }
                     })
-                    .fail(function () {
+                    .catch(function () {
                         document.getElementById("verbose_output").innerText = "Sorry, the server is down, please try again after a few seconds.";
                         clearInterval(timer_id);
                         valid_op_id = null;
@@ -296,16 +58,15 @@
                     });
             }
 
-            function cancel_task(op_id, timer_id) {
-                var params = "?op_id=" + valid_op_id;
+            function cancel_task(op_id) {
                 let cancel_btn = document.getElementById("cancel_calculation");
                 cancel_btn.disabled = true;
-                $.get(serverOrigin + "/rest/cancel" + params, null)
-                    .done(function (data) {
-                        // return true if success, return false if the task was already canceled
+
+                api.cancel_task(serverOrigin, op_id)
+                    .then(function (data) {
                         console.log('Cancel answer: ' + data);
                     })
-                    .fail(function() {
+                    .catch(function() {
                         document.getElementById("verbose_output").innerText = "Sorry, the server is down, not able to cancel the task.";
                         console.log("Unable to cancel a task because the server is down");
                         cancel_btn.disabled = false;
@@ -320,16 +81,20 @@
 
                 var formula_filters = get_formula_filters();
 
+                const updatedUrl = new URL(window.location.href);
+                updatedUrl.searchParams.set('formula',  formula);
+                window.history.replaceState(null, null, updatedUrl);
                 document.getElementById("algorithm_result").innerText = "Running";
                 document.getElementById("verbose_output").innerText = "";
                 d3.select("svg").empty();
                 d3.select("#visualization-graph").select("svg").remove();
 
-                post_task(formula, algorithm_type, formula_filters)
-                    .done(function (data) {
-                        change_computing_components_availability(false);
-                        valid_op_id = data;
-                        console.log('Creating a task with algorithm: ' + algorithm_type + ' and op id: ' + valid_op_id);
+                change_computing_components_availability(false);
+                api.post_task(formula, algorithm_type, formula_filters, serverOrigin)
+                    .then(function (data) {
+                        console.log("Api post_task succeeded " + JSON.stringify(data));
+                        valid_op_id = data.op_id;
+                        console.log('Created a task with algorithm: ' + algorithm_type + ' and op id: ' + valid_op_id);
 
                         function myFunction() {
                             var timer_id = setInterval(function () {
@@ -338,13 +103,13 @@
                         };
                         myFunction();
                     })
-                    .fail(function (data, xx, yyy) {
-                        if (data.status === 429) {
-                            document.getElementById("verbose_output").innerText = "There are too many requests right now, please try again later.";
+                    .catch(function (status) {
+                        console.log("Api post_task failed " + status);
+                        statusText = "Sorry, the server is down, please try again after a few seconds.";
+                        if (status === 429) {
+                            statusText = "There are too many requests right now, please try again later.";
                         }
-                        else {
-                            document.getElementById("verbose_output").innerText = "Sorry, the server is down, please try again after a few seconds.";
-                        }
+                        document.getElementById("verbose_output").innerText = statusText;
                     });
 
                 // set ping on every few seconds it is best to have something like this for the ping delay [1, 2, 5, 7, 10, 10, ...
@@ -356,8 +121,9 @@
                 for (var i = 0; i < elems.length; i++) {
                     elems[i].disabled = !enable;
                 }
-                var cancel_btn = document.getElementById("cancel_calculation");
-                cancel_btn.disabled = enable; // cancel button should be enabled when the model buttons are disabled, i.e. when there is a runninng task
+                // cancel button should be enabled when the model buttons are disabled, i.e. when there is a runninng task
+                cancel_button = document.getElementById("cancel_calculation");
+                cancel_button.disabled = enable;
             }
 
             function get_formula_filters() {
@@ -381,286 +147,6 @@
                 return x
             }
 
-            function transform_contacts_to_graph(data) {
-                contacts = data["contacts"];
-                ids = data["ids"];
-
-                nodes_temp = [...Array(contacts.length).keys()]
-
-                nodes = [];
-                for (i = 0; i < nodes_temp.length; ++i) {
-                    var x = nodes_temp[i];
-                    nodes.push({
-                        "id": x,
-                        "name": "A" + x,
-                        "groups": ids.map(a => a[i]).map((a, i) => a == 1 ? i : -1).filter(a => a >= 0)
-                    });
-                }
-
-
-                links = [];
-
-                for (i = 0; i < contacts.length; ++i) {
-                    for (j = 0; j < contacts[i].length && j <= i; ++j) {
-                        if (contacts[i][j] == "1") {
-                            links.push({
-                                "source": i,
-                                "target": j
-                            });
-                        }
-                    }
-                }
-
-                return {
-                    "nodes": nodes,
-                    "links": links
-                }
-            }
-
-            function do_visualization_v2(graph, width, height) {
-                d3.select("svg").empty();
-                d3.select("#visualization-graph").select("svg").remove();
-                
-                var svg = d3.select('#visualization-graph').append('svg').attr("viewBox", [0, 0, width, height]),
-                    // width = +svg.attr('width'),
-                    // height = +svg.attr('height'),
-                    color = d3.scaleOrdinal(d3.schemeCategory20),
-                    valueline = d3.line()
-                      .x(function(d) { return d[0]; })
-                      .y(function(d) { return d[1]; })
-                      .curve(d3.curveCatmullRomClosed),
-                    paths,
-                    groups,
-                    groupIds,
-                    scaleFactor = 1.8,
-                    polygon,
-                    centroid,
-                    node,
-                    link,
-                    curveTypes = ['curveBasisClosed', 'curveCardinalClosed', 'curveCatmullRomClosed', 'curveLinearClosed'],
-                    simulation = d3.forceSimulation()
-                      .force('link', d3.forceLink().id(function(d) { return d.id; }).distance(function (d) {
-                            return 150;
-                        }).strength(0.9))
-                      .force('charge', d3.forceManyBody())
-                      .force('center', d3.forceCenter(width / 2, height / 2));
-
-
-                function start() {
-                  // create selector for curve types
-                  // var select = d3.select('#curveSettings')
-                  //   .append('select')
-                  //   .attr('class','select')
-                  //   .on('change', function() {
-                  //     var val = d3.select('select').property('value');
-                  //     d3.select('#curveLabel').text(val);
-                  //     valueline.curve(d3[val]);
-                  //     updateGroups();
-                  //   });
-                  // var options = select
-                  //   .selectAll('option')
-                  //   .data(curveTypes).enter()
-                  //   .append('option')
-                  //     .text(function (d) { return d; });
-
-
-                  // create groups, links and nodes
-                  groups = svg.append('g').attr('class', 'groups');
-
-                  link = svg.append('g')
-                      .attr('class', 'links')
-                    .selectAll('line')
-                    .data(graph.links)
-                    .enter().append('line')
-                      .attr('stroke-width', function(d) { return 3; });
-
-                  node = svg.append('g')
-                      .attr('class', 'nodes')
-                    .selectAll('circle')
-                    .data(graph.nodes)
-                    .enter().append('circle')
-                      .attr('r', 4)
-                      .attr('fill', function(d) { return color(1); })
-                      .call(d3.drag()
-                          .on('start', dragstarted)
-                          .on('drag', dragged)
-                          .on('end', dragended));
-
-                  var label = svg.append('g')
-                    .attr("class", "labels")
-                    .selectAll("text")
-                    .data(graph.nodes)
-                    .enter().append("text")
-                    .attr("class", "label")
-                    .text(function (d) {
-                        return d.name;
-                    })
-                    .call(d3.drag()
-                        .on("start", dragstarted)
-                        .on("drag", dragged)
-                        .on("end", dragended));
-
-                  // count members of each group. Groups with less
-                  // than 3 member will not be considered (creating
-                  // a convex hull need 3 points at least)
-                  groupIds = [...new Set(graph.nodes.map(function(n) { return n.groups; }).flat())];
-                    // .map( function(groupId) {
-                    //   return { 
-                    //     groupId : groupId,
-                    //     count : graph.nodes.filter(function(n) { return n.group == groupId; }).length
-                    //   };
-                    // })
-                    // //.filter( function(group) { return group.count > 2;})
-                    // .map( function(group) { return group.groupId; });
-
-                  paths = groups.selectAll('.path_placeholder')
-                    .data(groupIds, function(d) { return +d; })
-                    .enter()
-                    .append('g')
-                    .attr('class', 'path_placeholder')
-                    .append('path')
-                    .attr('stroke', function(d) { return color(d); })
-                    .attr('fill', function(d) { return color(d); })
-                    .attr('opacity', 0);
-
-                  paths
-                    .transition()
-                    .duration(2000)
-                    .attr('opacity', 1);
-
-                  // add interaction to the groups
-                  groups.selectAll('.path_placeholder')
-                    .attr("cursor", "grab")
-                    .call(d3.drag()
-                      .on('start', group_dragstarted)
-                      .on('drag', group_dragged)
-                      .on('end', group_dragended)
-                      );
-
-                  // svg.call(d3.zoom()
-                  //     .extent([
-                  //         [0, 0],
-                  //         [width, height]
-                  //     ])
-                  //     .scaleExtent([1, 8])
-                  //     .on("zoom", zoomed));
-
-                  simulation
-                      .nodes(graph.nodes)
-                      .on('tick', ticked)
-                      .force('link')
-                      .links(graph.links);
-
-                  function ticked() {
-                    link
-                        .attr('x1', function(d) { return d.source.x; })
-                        .attr('y1', function(d) { return d.source.y; })
-                        .attr('x2', function(d) { return d.target.x; })
-                        .attr('y2', function(d) { return d.target.y; });
-                    node
-                        .attr('cx', function(d) { return d.x; })
-                        .attr('cy', function(d) { return d.y; });
-                   
-                    label
-                        .attr("x", function (d) {
-                            return d.x - 12;
-                        })
-                        .attr("y", function (d) {
-                            return d.y - 5;
-                        })
-                        .style("font-size", "20px").style("fill", "#346f93");
-                    updateGroups();
-                  }
-                };
-
-                start();
-
-                // select nodes of the group, retrieve its positions
-                // and return the convex hull of the specified points
-                // (3 points as minimum, otherwise returns null)
-                var polygonGenerator = function(groupId) {
-                  var node_coords = node
-                    .filter(function(d) { return d.groups.includes(groupId); })
-                    .data()
-                    .map(function(d) { return [d.x, d.y]; });
-                    
-                  if (node_coords.length == 1) {
-                    node_coords.push([node_coords[0][0] + 10, node_coords[0][1] + 10]);
-                    node_coords.push([node_coords[0][0] + 10, node_coords[0][1] - 10]);
-                    node_coords.push([node_coords[0][0] - 10, node_coords[0][1] + 10]);
-                    node_coords.push([node_coords[0][0] - 10, node_coords[0][1] - 10]);
-                  } else if (node_coords.length == 2) {
-                    node_coords.push([(node_coords[0][0] + node_coords[1][0])/2 + 25, (node_coords[0][1] + node_coords[1][1])/2 + 25])
-                  }
-                  return d3.polygonHull(node_coords);
-                };
-
-                function updateGroups() {
-                  groupIds.forEach(function(groupId) {
-                    var path = paths.filter(function(d) { return d == groupId;})
-                      .attr('transform', 'scale(1) translate(0,0)')
-                      .attr('d', function(d) {
-                        polygon = polygonGenerator(d);          
-                        centroid = d3.polygonCentroid(polygon);
-
-                        // to scale the shape properly around its points:
-                        // move the 'g' element to the centroid point, translate
-                        // all the path around the center of the 'g' and then
-                        // we can scale the 'g' element properly
-                        return valueline(
-                          polygon.map(function(point) {
-                            return [  point[0] - centroid[0], point[1] - centroid[1] ];
-                          })
-                        );
-                      });
-
-                    d3.select(path.node().parentNode).attr('transform', 'translate('  + centroid[0] + ',' + (centroid[1]) + ') scale(' + scaleFactor + ')');
-                  });
-                }
-
-                // drag nodes
-                function dragstarted(d) {
-                  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-                  d.fx = d.x;
-                  d.fy = d.y;
-                }
-
-                function dragged(d) {
-                  d.fx = d3.event.x;
-                  d.fy = d3.event.y;
-                }
-
-                function dragended(d) {
-                  if (!d3.event.active) simulation.alphaTarget(0);
-                  d.fx = null;
-                  d.fy = null;
-                }
-
-                // drag groups
-                function group_dragstarted(groupId) {
-                  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-                  d3.select(this).select('path').style('stroke-width', 3);
-                }
-
-                function group_dragged(groupId) {
-                  node
-                    .filter(function(d) { return d.groups.includes(groupId); })
-                    .each(function(d) {
-                      d.x += d3.event.dx;
-                      d.y += d3.event.dy;
-                    })
-                }
-
-                function group_dragended(groupId) {
-                  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-                  d3.select(this).select('path').style('stroke-width', 1);
-                }
-
-                function zoomed() {
-                    d3.selectAll('g').attr("transform", d3.event.transform);
-                };
-            }
-
             function print_result_sets(variables, ids) {
                 var text = "";
                 all_strings = variables.map((x, i) => "v(" + x + ") =  { " + 
@@ -671,226 +157,7 @@
                 all_strings.forEach(x => text += x + "\n");
                 document.getElementById("result_sets").innerText = text;
             }
-
-            function do_visualization(graph, width, height) {
-                d3.select("svg").empty();
-                d3.select("#visualization-graph").select("svg").remove();
-
-                var svg = d3.select("#visualization-graph")
-                    .append("svg")
-                    .attr("viewBox", [0, 0, width, height]);
-
-                var simulation = d3.forceSimulation()
-                    .force("link", d3.forceLink()
-                        .id(function (d) {
-                            return d.id;
-                        }).distance(function (d) {
-                            return 50;
-                        }).strength(0.9))
-                    .force("charge", d3.forceManyBody().strength(-150))
-                    .force("center", d3.forceCenter(width / 2, height / 2))
-                    .force('collision', d3.forceCollide().radius(function (d) {
-                        return 25
-                    }));
-
-                const g = svg.append("g")
-                    .attr("cursor", "grab");
-
-                var link = g.append("g")
-                    .style("stroke", "#aaa")
-                    .selectAll("line")
-                    .data(graph.links)
-                    .enter().append("line");
-
-                var node = g.append("g")
-                    .attr("class", "nodes")
-                    .selectAll("circle")
-                    .data(graph.nodes)
-                    .enter()
-                    .append("circle")
-                    .attr("r", 6)
-                    .attr("cx", ({
-                        x
-                    }) => x)
-                    .attr("cy", ({
-                        y
-                    }) => y)
-                    .call(d3.drag()
-                        .on("start", dragstarted)
-                        .on("drag", dragged)
-                        .on("end", dragended));
-
-                var label = g.append("g")
-                    .attr("class", "labels")
-                    .selectAll("text")
-                    .data(graph.nodes)
-                    .enter().append("text")
-                    .attr("class", "label")
-                    .text(function (d) {
-                        return d.name;
-                    })
-                    .call(d3.drag()
-                        .on("start", dragstarted)
-                        .on("drag", dragged)
-                        .on("end", dragended));
-
-                svg.call(d3.zoom()
-                    .extent([
-                        [0, 0],
-                        [width, height]
-                    ])
-                    .scaleExtent([1, 8])
-                    .on("zoom", zoomed));
-
-                simulation
-                    .nodes(graph.nodes)
-                    .on("tick", ticked);
-
-                simulation.force("link")
-                    .links(graph.links);
-
-                function ticked() {
-                    console.log("in Tick");
-                    link
-                        .attr("x1", function (d) {
-                            return d.source.x;
-                        })
-                        .attr("y1", function (d) {
-                            return d.source.y;
-                        })
-                        .attr("x2", function (d) {
-                            return d.target.x;
-                        })
-                        .attr("y2", function (d) {
-                            return d.target.y;
-                        });
-
-                    node
-                        .attr("r", 20)
-                        .style("fill", "#d9d9d9")
-                        .style("stroke", "#969696")
-                        .style("stroke-width", "1px")
-                        .attr("cx", function (d) {
-                            return d.x - 5;
-                        })
-                        .attr("cy", function (d) {
-                            return d.y - 5;
-                        });
-
-                    label
-                        .attr("x", function (d) {
-                            return d.x - 13;
-                        })
-                        .attr("y", function (d) {
-                            return d.y;
-                        })
-                        .style("font-size", "20px").style("fill", "#4393c3");
-                }
-
-                function dragstarted() {
-                    d3.select(this).raise();
-                    g.attr("cursor", "grabbing");
-                };
-
-                function dragged(d) {
-                    d.x = d3.event.x;
-                    d.y = d3.event.y;
-                    d3.select(this).attr("cx", d.x).attr("cy", d.y);
-                    link.filter(function (l) {
-                        return l.source === d;
-                    }).attr("x1", d.x).attr("y1", d.y);
-                    link.filter(function (l) {
-                        return l.target === d;
-                    }).attr("x2", d.x).attr("y2", d.y);
-                    label.filter(function (l) {
-                        return l.id === d.id;
-                    }).attr("x", d.x - 13).attr("y", d.y);
-                    node.filter(function (n) {
-                        return n.id === d.id;
-                    }).attr("cx", d.x - 5).attr("cy", d.y - 5);
-
-                };
-
-                function dragended() {
-                    g.attr("cursor", "grab");
-                };
-
-                function zoomed() {
-                    g.attr("transform", d3.event.transform);
-                };
-
-            };
         </script>
-        <style>
-            code {
-                    font-size: 15px;
-            }
-            label {
-                    font-size: 15px;
-            }
-        </style>
-        <style>
-            .active, .accordion:hover {
-              background-color: #ccc;
-            }
-
-            .panel {
-              padding: 0 18px;
-              display: none;
-              background-color: white;
-              overflow: hidden;
-              margin-left: 20px;
-              margin-right: 20px;
-            }
-
-            .verbose_output {
-                height: auto;
-                max-height: 400px;
-                overflow: auto;
-                background-color: #eeeeee;
-                word-break: normal !important;
-                word-wrap: normal !important;
-                white-space: pre !important;
-            }
-        </style>
-        <!-- footer style -->
-        <style type="text/css">
-            .footer {
-               position: fixed;
-               left: 14vw;
-               bottom: 0;
-               width: calc(100vw - 275px);
-               padding: 1rem;
-               text-align: center;
-               background-color: #eee;
-               color: #444;
-               border: none;
-               outline: none;
-               font-size: 15px;
-               transition: 0.4s;
-               margin-left: 20px;
-               margin-right: 20px;
-               overflow-y: scroll;
-            }
-
-            .arrow {
-              margin-left: 5px;
-              border: solid black;
-              border-width: 0 3px 3px 0;
-              display: inline-block;
-              padding: 3px;
-            }
-
-            .up {
-              transform: rotate(-135deg);
-              -webkit-transform: rotate(-135deg);
-            }
-
-            .down {
-              transform: rotate(45deg);
-              -webkit-transform: rotate(45deg);
-            }
-        </style>
         <script>
             function pre_init() {
                 var loc = window.location.href;
@@ -901,53 +168,6 @@
                 }
             }
         </script>
-        <style>
-            .run_algorithm {
-                margin-top: 0.5rem;
-            }
-            .algorithm_buttons {
-                border: 0.5rem outset #716da7;
-                border-radius: 12px;
-                font: bold 1rem sans-serif;
-                margin-top: 0.5rem;
-                padding: 0.5rem;
-                background: #ebebf3;
-            }
-            .formula_filters {
-                width: 60%;
-                margin: 1rem;
-                border: 0.5rem outset #87656b;
-                border-radius: 12px;
-                font: bold 1rem sans-serif;
-                padding: 0.5rem;
-                outline-offset: 0.5rem;
-            }
-            .algorithm_cancelations {
-                width: 40%;
-                margin: 1rem;
-                border: 0.5rem outset #87656b;
-                border-radius: 12px;
-                font: bold 1rem sans-serif;
-                padding: 0.5rem;
-                outline-offset: 0.5rem;
-            }
-            .legend {
-                margin-left: 1rem;
-                border: 0.5rem outset #8d8485;
-                box-shadow: 0 0 0 0.3rem #26627a;
-                border-radius: 12px;
-                padding: 0.4rem;
-                outline-offset: 0.5rem;
-            }
-            .result {
-                margin-left: 10px;
-                border: 0.5rem outset #87656b;
-                border-radius: 12px;
-                font: bold 1rem sans-serif;
-                padding-left: 0.3rem;
-                padding-right: 0.3rem;
-            }
-        </style>
     </head>
     <body onload="pre_init();">
         <div class="sidenav">
@@ -965,16 +185,13 @@
                                 <span style="margin-right: 0.6rem">Formula:</span><br>
                                 <input id="formula" style="width: 100%; height: 20px;"/>
                             </div>
-                            <span style="margin-left: 4px;">Status:</span><span id="algorithm_result" class="result">Resting</span>
+                            <span style="margin-left: q4px;">Status:</span><span id="algorithm_result" class="result">Resting</span>
                         </div>
                         <div class="algorithm_buttons">
-                            Algorithms: 
-                            <!-- <button class="run_algorithm" onclick="create_task('OPTIMIZED_MEASURED_MODEL')" class="computing_element">OPTIMIZED MEASURED MODEL</button> -->
-                            <button class="run_algorithm" onclick="create_task('FAST_MODEL')" class="computing_element">FAST MODEL</button>
-                            <button class="run_algorithm" onclick="create_task('CONNECTIVITY')" class="computing_element">CONNECTED MODEL</button>
-                            <button class="run_algorithm" onclick="create_task('MEASURED_MODEL')" class="computing_element">MEASURED MODEL</button>
-                            <!-- Add killswitch which is only for development so that this line does not be present -->
-                            <!-- <button class="run_algorithm" onclick="create_task('BRUTEFORCE_MODEL')" class="computing_element">BRUTEFORCE MODEL</button> -->
+                            Algorithms:
+                            <button onclick="create_task('FAST_MODEL')" class="computing_element">FAST MODEL</button>
+                            <button onclick="create_task('CONNECTIVITY')" class="computing_element">CONNECTED MODEL</button>
+                            <button onclick="create_task('MEASURED_MODEL')" class="computing_element">MEASURED MODEL</button>
                         </div>
                     </div>
                     <div style="display: flex; flex-direction: row;">
@@ -988,7 +205,7 @@
                         </div>
                         <div class="algorithm_cancelations">
                             If the calculation takes too long, try to cancel it. It might help to optimize the input formula<br>
-                            <button style="margin-top:0.5rem" id="cancel_calculation" onclick="cancel_task('valid_op_id')">CANCEL CALCULATION</button>
+                            <button style="margin-top:0.5rem" id="cancel_calculation" onclick="cancel_task(valid_op_id)">CANCEL CALCULATION</button>
                         </div>
                     </div>
                     <div style="width: 100%; display: flex; flex-direction: row">
@@ -1022,14 +239,14 @@
                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;zero term, syntax:</label><code>&nbsp;T=0</code><br>
                     <code>()&nbsp;&nbsp;-&nbsp;() - </code><label>Parentheses</label><br>
                 </div>
-            </div>
-            <div class="empty-footer-holder" style="height: 5rem"></div>
-            <div class="footer" style="display: none" id="footer-with-logs">
-                <div id="hide-output" style="cursor: pointer;"><b>Hide complete output <i class="arrow down" style="margin-bottom: 3px"></i></b></div>
-                <pre class="verbose_output" id="verbose_output" style="max-height: 40vh; text-align: left;"></pre>
-            </div>
-            <div class="footer" id="simple-footer"> 
-                <b style="cursor: pointer;">Show complete output <i class="arrow up"style="margin-top: 2px"></i></b>
+                <div class="empty-footer-holder" style="height: 5rem"></div>
+                <div class="footer" style="display: none" id="footer-with-logs">
+                    <div id="hide-output" style="cursor: pointer;"><b>Hide complete output <i class="arrow down" style="margin-bottom: 3px"></i></b></div>
+                    <pre class="verbose_output" id="verbose_output" style="max-height: 40vh; text-align: left;"></pre>
+                </div>
+                <div class="footer" id="simple-footer"> 
+                    <b style="cursor: pointer;">Show complete output <i class="arrow up"style="margin-top: 2px"></i></b>
+                </div>
             </div>
         </div>
         <script type="text/javascript">

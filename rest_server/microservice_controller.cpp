@@ -95,6 +95,10 @@ void microservice_controller::handle_get(const http_request& message)
 		&& message_path != "/home.html"
 		&& message_path != "/howto.html"
 		&& message_path != "/samples.html"
+		&& message_path != "/howto.html"
+		&& message_path != "/server_api.js"
+		&& message_path != "/styles.css"
+		&& message_path != "/visualizer.js"
 		&& message_path != "/lib/jquery.min.js"
 		&& message_path != "/lib/d3.v4.js"
 		&& message_path != "/img/home-icon.png") {
@@ -114,7 +118,11 @@ void microservice_controller::handle_get(const http_request& message)
         else if(ext.compare(".js") == 0)
         {
             content_type = U("text/javascript");
-        }
+		}
+		else if (ext.compare(".css") == 0)
+		{
+			content_type = U("text/css");
+		}
 
         utility::string_t file_name_t = utility::conversions::to_string_t(relative_file);
 
