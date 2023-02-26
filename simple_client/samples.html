@@ -121,12 +121,16 @@
       function create_satisfiability_symbol(is_satisfiable) {
       	var symbol = document.createElement("SPAN");
       	var text;
+        var color;
       	if (is_satisfiable) {
-      		text = document.createTextNode("true")
+          text = document.createTextNode("\u2714");
+          color = 'green';
       	} else {
-			text = document.createTextNode("false")
+			    text = document.createTextNode('\u2718');
+          color = 'red';
       	}
       	symbol.appendChild(text);
+        symbol.style.color = color;
       	return symbol
       }
 
@@ -148,9 +152,9 @@
       function create_row(sample) {
   		tr_element = document.createElement("TR");
   		tr_element.appendChild(create_cell(create_code(sample[0]), true));
-  		tr_element.appendChild(create_text_cell(sample[1], false));
-  		tr_element.appendChild(create_text_cell(sample[2], false));
-  		tr_element.appendChild(create_text_cell(sample[3], false));
+  		tr_element.appendChild(create_text_cell(sample[1]));
+  		tr_element.appendChild(create_text_cell(sample[2]));
+  		tr_element.appendChild(create_text_cell(sample[3]));
   		return tr_element
       }
 
@@ -174,6 +178,13 @@
 
     <div class="main">
       <h2>Samples</h2>
+      <p>The following table lists some example formulas and shows in what kind 
+        of models the given formula is satisfiable.
+        <br/>
+        <span style="color: green;">&#10004;</span> is used when the formula is satisfiable in the selected model.
+        <br/>
+        <span style="color: red;">&#10008;</span> is used when the formula is not satisfiable in the selected model.
+      </p>
       <table id="samples_table">
 		  <tr>
 		    <th>Formula</th>
