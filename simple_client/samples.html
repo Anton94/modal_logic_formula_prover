@@ -102,6 +102,14 @@
         ["<=(-a, a) & <=(-b, b) & <=m(b,-b) & (~<=(a,b) | ~<=(-a,b))", false, false, false],
         ["<=(a,0) & <=(1, a) & ~<=m(a,1)", false, false, false],
         ["<=(a, 0) & <=m(a,c) & <=m(b, c) & <=(b,0) & C(a,b)", false, false, false],
+        
+        ["C(a, b) & <=m(a, 0)", true, true, false],
+        ["<=(a,b) & ~<=m(a, b)", true, true, false],
+        [" ~<=m(a*c, b+m) & <=(a*c,b+m)", true, true, false],
+
+        
+        ["<=(a,b) & <=(c, d) & (b*d) = 0 & m*b = 0 & m*d = 0 & C(a,m) & C(m, c) & ~C(a,c)", true, true, true],
+        ["<=(a,b) & <=(c, d) & (b*d) = 0 & m*b = 0 & m*d = 0 & C(a,m) & C(m, c) & ~C(a,c) & C(b,d)", true, true, true],
       ];
 
       function create_code(formula) {
