@@ -39,6 +39,8 @@
 \newcommand{\tabitem}{~~\llap{\textbullet}~~}
 
 \newtheorem{defn}{Дефиниция}[section]
+\newtheorem{axiom}{Аксиома}[section]
+\newtheorem{lema}{Лема}[section]
 
 \newcommand{\curvedE}{\mathscr{e}}
 \newcommand{\vVar}{\mathscr{v}_{var}}
@@ -352,19 +354,327 @@
 		\end{itemize}
 \end{frame}
 
+\begin{frame}\frametitle{Съкращения}
+		\begin{itemize}
+		\item $a = b,\:\textit{когато}\:\: (a \le b) \land (b \le a)$
+		\item $a \neq b,\:\textit{когато}\:\: \neg (a = b) $
+		\item $a \nleq b,\:\textit{когато}\:\: \neg (a \le b)$
+		\end{itemize}
+\end{frame}
+
 \subsection{Семантика}
 \begin{frame}\frametitle{Семантика}
+	Релационна система се дефинира като $\mathcal{F} = (W, R)$, където $W \neq \emptyset$. $\mathcal{F}$ наричаме фрейм.
+	\newline
+	\newline
+	Булева оценка на променлива означаваме с  $\mathscr{v}$ и дефинираме като:
+		\begin{itemize}
+			\item $\mathscr{v}(0) = \emptyset$
+			\item $\mathscr{v}(1) = W$
+			\item $\mathscr{v}(a \sqcap b) = \mathscr{v}(a) \cap \mathscr{v}(b)$
+			\item $\mathscr{v}(a \sqcup b) = \mathscr{v}(a) \cup \mathscr{v}(b)$
+			\item $\mathscr{v}(a*) = W \backslash  \mathscr{v}(a)$
+		\end{itemize}
+	
+\end{frame}
 
+\subsection{Семантика}
+\begin{frame}\frametitle{Модел}
+	Наредената n-торка $\mathcal{M} = (\mathcal{F}, \mu, \mathscr{v})$ наричаме модел. Дефинираме изпълнимост на дадена формула в $\mathcal{M}$ като:
+		\begin{itemize}
+			\item $\mathcal{M} \not\models \bot$ 
+			\item $\mathcal{M} \models \top$
+			\item $\mathcal{M} \models aCb \text{ когато } (\exists x \in \mathscr{v}(a)), (\exists y \in \mathscr{v}(b)) (xRy)$
+			\item $\mathcal{M} \models a \leq b \text{ когато } \mathscr{v}(a) \subseteq \mathscr{v}(b)$
+			\item $\mathcal{M} \models \neg \varphi \text{ когато } \mathcal{M} \not\models \varphi$
+			\item $\mathcal{M} \models a \; \vee \; b \text{ когато } \mathcal{M} \models a \: \textit{ или } \: \mathcal{M} \models b$
+			\item $\mathcal{M} \models a \; \wedge \; b \text{ когато } \mathcal{M} \models a \: \textit{ и } \: \mathcal{M} \models b$
+		\end{itemize}
+	
 \end{frame}
 
 \subsection{Свойства}
-\begin{frame}\frametitle{Синтаксис}
+\begin{frame}\frametitle{Свойства}
+
+\begin{axiom}[Рефлексивност на контакта]
+Нека b е терм, тогава:
+	\begin{equation*}
+		b \neq 0 \implies bCb
+	\end{equation*}
+\end{axiom}
+
+\begin{axiom}[Симетрия на контакта]
+Нека a и b са два терма, тогава:
+	\begin{equation*}
+		aCb \iff bCa
+	\end{equation*}
+\end{axiom}
+
+\begin{lema}[Еквивалентност на термове]
+Нека a и b са два терма и $\mathscr{v}$ е оценка , тогава:
+	\begin{equation*}
+		a = b \implies \mathscr{v}(a) = \mathscr{v}(b)
+	\end{equation*}
+\end{lema}
 
 \end{frame}
+\begin{frame}\frametitle{Свойства}
+\begin{lema}[Нулева формула]
+Нека a и b са два терма, тогава:
+	\begin{equation*}
+		a \le b \iff a \sqcap b* = \emptyset
+	\end{equation*}
+\end{lema}
+
+\begin{lema}[Не-нулева формула]
+Нека a и b са два терма, тогава:
+	\begin{equation*}
+		\neg(a \le b) \iff a \sqcap b* \neq \emptyset
+	\end{equation*}
+\end{lema}
+
+\begin{lema}[Монотоност на контакта]
+Нека a и b са два терма, тогава:
+	\begin{equation*}
+		aCb \land a \leq a' \land b \le b' \implies a'Cb'
+	\end{equation*}
+\end{lema}
+
+\end{frame}
+\begin{frame}\frametitle{Свойства}
+\begin{lema}[Дистрибутивност на контакта]
+Нека a и b са два терма, тогава:
+	\begin{equation*}
+		aC(b \sqcup c) \iff aCb \lor aCc
+	\end{equation*}
+\end{lema}
+
+\begin{lema}[Тривиални свойства]
+Нека a, b и c са три терма и $\varphi$ и $\psi$ са две формули, тогава:
+	\begin{itemize}
+		\item $\varphi \land T \Longrightarrow \varphi$,\;\; $T \land \varphi \Longrightarrow \varphi$,\;\;
+		      $\varphi \land F \Longrightarrow F$,\;\; $F \land \varphi \Longrightarrow F$
+		\item $\varphi \lor T \Longrightarrow T$,\;\; $T \lor \varphi \Longrightarrow T$,\;\;
+		      $\varphi \lor F \Longrightarrow \varphi$,\;\; $F \lor \varphi \Longrightarrow \varphi$,
+		\item $a \sqcap 1 \Longrightarrow a$,\;\; $1 \sqcap a \Longrightarrow a$,\;\;
+		      $a \sqcap 0 \Longrightarrow 0$,\;\; $0 \sqcap a \Longrightarrow 0$,
+		\item $a \sqcup 1 \Longrightarrow 1$,\;\; $1 \sqcup a \Longrightarrow 1$,\;\;
+		      $a \sqcup 0 \Longrightarrow a$,\;\; $0 \sqcup a \Longrightarrow a$,
+	\end{itemize}
+\end{lema}
+\end{frame}
+\begin{frame}\frametitle{Тривиални свойства, продължение}
+	\begin{itemize}
+		\item $(a \sqcup b)Cc \iff aCc \lor bCc$
+		\item $(a \sqcup b) \leq c \iff a \leq c \land b \leq c$
+		\item $aCb \Longrightarrow a \neq 0 \land b \neq 0$
+		\item $a \sqcap b \neq 0 \Longrightarrow aCb$
+		\item $a = 0 \lor b = 0 \Longrightarrow \neg(aCb)$
+		\item $0 \leq a \Longrightarrow T$
+		\item $a \leq 1 \Longrightarrow T$
+		\item $0C0 \Longrightarrow F$
+		\item $aC0 \Longrightarrow F$
+		\item $1C1 \Longrightarrow T$
+		\item $aC1 \Longrightarrow a \neq 0$
+		\item $a \neq 0 \Longrightarrow aCa$
+	\end{itemize}
+\end{frame}
+
 
 \subsection{Изпълнимост в минималната контактна логика}
-\begin{frame}\frametitle{мини}
-асд
+\begin{frame}\frametitle{Изпълнимост в минималната контактна логика}
+За да проверим дали дадена формула $\varphi$ е изпълнима в минималната контактна логика трябва да построим модел $\mathcal{M}$
+за да бъде вярно $\mathcal{M} \models \varphi$.
+\newline
+\newline
+За да опростим формулата, ползваме табло метода и вместо да строим модел за първоначалната формула, строим модел само за 
+атомарните клонове в таблото.
+\newline
+Намирането на един такъв модел $\mathcal{M}$ който изпълнява атомарните формули в клона е достатъчно, и няма нужда да се разглежда последващите клонове.
+\end{frame}
+
+\begin{frame}\frametitle{Конюнктивен табло клон}
+Един атомарен клон се състои от маркирани формули. Дадената формула е изъплнима точно тогава, когато всички атомарни формули от таблото са изпълними.
+\newline
+\newline
+		Нека $\varphi$ е формула и $\mathcal{T}$ е таблото от $\varphi$, то за означаване на конюктивен табло клон ще ползваме следното:
+		\begin{align*}
+				B = \{\signT C(a_i, b_i) \mid i \in \{1, \ldots, I\} \} &\cup 
+					\{\signF C(e_k, f_k) \mid k \in \{1, \ldots, K\} \} \cup \\
+					\{\signF d_j = 0 \mid j \in \{1, \ldots, J\} \} &\cup 
+					\{\signT g_l = 0 \mid l \in \{1, \ldots, L\} \}
+		\end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Конюнктивен табло клон}
+		За олеснение можем да махнем $\signT \textit{ и } \signF$ и получаваме.
+\begin{align*}
+			\bigwedge_{i=1}^{I} \; C(a_i, b_i) \:\: & \wedge \:\: 
+			\bigwedge_{k=1}^{K} \; \neg C(e_k, f_k) \:\: \wedge \:\: \\
+			\bigwedge_{j=1}^{J} \; d_j \neq 0 \:\: & \wedge \:\:
+			\bigwedge_{l=1}^{L} \; g_l = 0 \:\:
+\end{align*}%
+\end{frame}
+
+\begin{frame}\frametitle{Конюнктивен табло клон}
+\begin{defn}[Множеството на всички променливи]
+	С $\Var_B$ ще ознчаваме множеството от всички променливи използвани в дадена формула.
+\end{defn}
+
+\begin{defn}[Оценка на променливи]
+	С $\curvedE$ ще ознчаваме функцията която за всяка оценка от $\Var_B$ дава истина или лажа.
+		\begin{align*}
+			\curvedE : \Var_B \rightarrow \{ \textbf{лъжа}, \textbf{истина}\}
+		\end{align*}
+\end{defn}
+\end{frame}
+
+\begin{frame}\frametitle{Конюнктивен табло клон}
+\begin{defn}[Булева оценка]
+		Нека $\curvedE$ е оценка на променливи и $\Ts$ е множеството от всички термове, тогава 
+		функцията $\vBool_{\curvedE} : \Ts \rightarrow \{ \textbf{лъжа}, \textbf{истина}\}$ ще наричаме булева оценка, която се дефинира по следния начин:
+		\begin{itemize}
+			\item $\vBool_{\curvedE}(0) = \textbf{лъжа}$
+			\item $\vBool_{\curvedE}(1) = \textbf{истина}$
+			\item $\vBool_{\curvedE}(p) = \curvedE(p), \textit{ където } p \in \Var_B$
+			\item $\vBool_{\curvedE}(a \sqcap b) = \vBool_{\curvedE}(a) \textit{ и } \vBool_{\curvedE}(b)$
+			\item $\vBool_{\curvedE}(a \sqcup b) = \vBool_{\curvedE}(a) \textit{ или } \vBool_{\curvedE}(b)$
+			\item $\vBool_{\curvedE}(a*) = \textit{не } \vBool_{\curvedE}(a)$
+		\end{itemize}
+\end{defn}
+\end{frame}
+
+\begin{frame}\frametitle{Стъпки за построяване на модел}
+	Ще казваме, че модална точка $\curvedE$ е построена за терма a, когато:
+		\begin{align*}
+			\vBool_{\curvedE}(a) = \textit{ true }
+		\end{align*}
+	Ще групираме атомарните формули на такива за които е необходимо съществуването на модална точка и на такива за които не е.
+\newline
+	Следните атомарни формули се нуждаят от същестуването на поне една модална точка:
+		\begin{itemize}
+			\item $C(a_i, b_i), \textit{ for } i < I$
+			\item $d_j \neq 0, \textit{ for } j < J$
+		\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на модални точки за контактите}
+	За всеки контакт $C(a, b) \in B$ ще построим по две модални точки, такива, че:
+		\begin{itemize}
+			\item $\vBool_{p}(a) = \textbf{true}$
+			\item $\vBool_{q}(b) = \textbf{true}$
+		\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на модални точки за контактите}
+	Ново генерираните модални точки трябва да удовлетворяват не-контактите, т.е. следното условие трябва да е изпълнено:
+		\begin{align*}
+			 \neg C(e, f) \in B: (\vBool_{p}(e) = \textbf{false} & \textit{илиor } \vBool_{q}(f) = \textbf{лъжа}) \; \textit{ и } \\
+				(\vBool_{p}(f) = \textbf{лъжа} & \textit{ или } \vBool_{q}(e) = \textbf{лъжа}) \; \textit{ и } \\
+				(\vBool_{p}(e) = \textbf{лъжа} & \textit{ или } \vBool_{p}(f) = \textbf{лъжа}) \; \textit{ и } \\
+				(\vBool_{q}(e) = \textbf{лъжа} & \textit{ или } \vBool_{q}(f) = \textbf{лъжа})
+		\end{align*}
+
+	Също така за равно на нула термовете, следното условие трябва да е изпълнено:
+	\begin{align*}
+		t = 0 \in B: \vBool_{p}(t) = \textit{лъжа} \text{ и }  \vBool_{q}(t) = \textit{лъжа}
+	\end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на модални точки за контактите}
+	След успешно генерираните модални точки за двата терма, обогатяваме R със следните релации:
+	\begin{itemize}
+		\item pRp - рефлексивност на модалната точка p
+		\item qRq - рефлексивност на модалната точка q
+		\item pRq - симетричност между p и q
+		\item qRp - симетричност между q и p
+	\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на модални точки за контактите}
+	\begin{center}
+	\begin{tikzpicture}[scale = 1]
+		\filldraw[color=black!60, fill=red!0, thick](-3,0) circle (0.5);
+		\node at (-3,0) {p};
+		\node at (-3.5,-0.7) {a};
+		\draw[thick, ->] (-3.5,0) arc [
+      	  		start angle=10,
+		       end angle=335,
+        		x radius=0.5cm,
+        		y radius =0.2cm
+    			] ;
+		\draw[thick, <->](-2.5,0) -- (2.5,0);
+		\filldraw[color=black!60, fill=red!0, thick](3,0) circle (0.5);
+		\node at (3,0) {q};
+		\node at (3.5,-0.7) {b};
+		\draw[thick, ->] (3.5,0) arc [
+      	  		start angle=180,
+		      end angle=525,
+        		x radius=0.5cm,
+        		y radius =0.2cm
+    			] ;
+		\node[text width=10cm, anchor=west, right] at (-4.5,-2)
+    		{Генерираните модални точки и техните релации за контакта C(a, b)};
+      \end{tikzpicture}
+	\end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на модална точка за не-равен на нула терм}
+	За всеки не-равен на нула терм $a \neq 0 \in B$ ще построим една модални точки, такава, че:
+		\begin{itemize}
+			\item $\vBool_{\curvedE}(a) = \textbf{true}$
+		\end{itemize}
+	За равно на нула термовете, следното условие трябва да е изпълнено:
+	\begin{align*}
+		t = 0 \in B: \vBool_{\curvedE}(t) = \textit{лъжа}
+	\end{align*}
+	След успешно генериране на модалната точка, отново обогатяваме R със следната:
+	\begin{itemize}
+		\item $\curvedE R \curvedE$ - рефлексивност на модалната точка $\curvedE$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на модална точка за не-равен на нула терм}
+	\begin{center}
+	\begin{tikzpicture}[scale = 1]
+		\filldraw[color=black!60, fill=red!0, thick](-0,0) circle (0.5);
+		\draw[thick, ->] (-0.5,0) arc [
+      	  		start angle=10,
+		       end angle=345,
+        		x radius=0.5cm,
+        		y radius =0.2cm
+    			] ;
+		\node at (-0,0) {$\curvedE$};
+		\node at (-0.5,-0.7) {a};
+		\node[text width=10cm, anchor=west, right] at (-4.5,-2)
+    		{Генерираната модална точка и нейната релация за $a \neq 0$};
+      \end{tikzpicture}
+	\end{center} 
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на фрейм}
+	\begin{defn}
+		Нека $\Ts$ е множеството от всички термове и нека $\mathcal{F}$ е фрейм създаден с построяване на модални точки за контактите и не-равно на нула термове.
+		Тогава модалната оценка $\vE : \Ts \rightarrow \mathscr{P}(W)$ се дефинира рекурсивно, като:
+		\begin{itemize}
+			\item $\vE(0) = W$
+			\item $\vE(1) = \emptyset$
+			\item $\vE(p) = \{ \curvedE \; | \; \curvedE \in W \:\:\textit{и}\:\: \curvedE(p) = \textit{истина} \}$
+			\item $\vE(a \sqcap b) = \vE(a) \cap \vE(b)$
+			\item $\vE(a \sqcup b) = \vE(a) \cup \vE(b)$
+			\item $\vE(a*) = W \setminus \vE(a)$
+		\end{itemize}
+	\end{defn}
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на модел}
+	\begin{lema}
+		Нека a е терм и нека $\curvedE$ е оценка на променливи, от дефиницията на $\vBool$ и $\vE$, следва, че:
+		\begin{align*}
+			\vBool_{\curvedE}(a) = истина \leftrightarrow \curvedE \in \vE(a)
+		\end{align*}
+		В такъв случай, когато $\vBool_{\curvedE}(a) = \textbf{истина}$ ще казваме, че модална точка  $\curvedE$ is \textbf{валидна}.
+	\end{lema}
 \end{frame}
 
 \section{Минимална контактна логика с мярка}
