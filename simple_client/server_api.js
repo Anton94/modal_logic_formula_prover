@@ -16,6 +16,7 @@ window.api = {
 // return type 
 ping_return_type = { 
     'is_satisfied': 'bool',
+    'is_parsed': 'bool',
     'status': 'string', // FINISHED, CANCELED, RUNNING
     'output': 'string',
     'variables': ['string'],
@@ -69,6 +70,7 @@ window.api.ping_task = function ping_task(serverOrigin, op_id) {
 
                 resolve({ 
                     'is_satisfied': jsonified["is_satisfied"],
+                    'is_parsed': jsonified["is_parsed"],
                     'status': jsonified["status"],
                     'output': jsonified["output"],
                     'variables': jsonified["variables"],

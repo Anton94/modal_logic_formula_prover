@@ -10,7 +10,7 @@
 
     .sidenav {
       height: 100%;
-      width: 200px;
+      width: 14vw;
       position: fixed;
       z-index: 1;
       top: 0;
@@ -33,7 +33,7 @@
     }
 
     .main {
-      margin-left: 200px; /* Same as the width of the sidenav */
+      margin-left: 14vw; /* Same as the width of the sidenav */
       font-size: 28px; /* Increased text to enable scrolling */
       padding: 0px 10px;
     }
@@ -47,37 +47,55 @@
   <body>
 
     <div class="sidenav">
-      <a href="./home.html">Home</a>
       <a href="./index.html">App</a>
       <a href="./samples.html">Samples</a>
       <a href="./howto.html">How To</a>
     </div>
 
     <div class="main" style="font-size: 16px;">
+      <div style="text-align: center; font-size: 28px;">
+        <h3>
+          Algorithms for computing satisfiability formulas in the region-based contact logics
+        </h3>
+        <h5>
+          Implementation done by Martin Stoev and Anton Dudov under the supervision of prof. Tinko Tinchev<br/>
+          Faculty of Mathematics and Informatics, Sofia University
+        </h5>
+      </div>
+      <div>
+        This application provides series of algorithms, used to analyze a region-based contact logics formula.
+        <ul>
+          <li> Simple Model </li>
+          <li> Meassured Model </li>
+          <li> Connectivity Model </li>
+        </ul>
+        With the first two algorithms the modal formula can be checked for satisfiability, and if it is satisfied to find its model.
+        The connectivity algorithm is used to find a connected model of a region-based modal formula, if such a model exists.
+      </div>
+
       <h2>How To</h2>
       <h3>Brief introduction: <i>Region-based theories of space</i></h3>
         <p>
-          The goal of the Region-based theory of space is to describe elements with the usage <br/>
-          of separate scattered regions collected together, these regions<br/>
-          alone are not that interesting, but with the addition of relations<br/>
+          The goal of the Region-based theory of space is to describe elements with the usage
+          of separate scattered regions collected together, these regions
+          alone are not that interesting, but with the addition of relations
           and subregions between them a beautiful theory is achived.
         </p>
 
-        <p>For comparison the Euclidean space is composed of points as a primitive types, with multiple points <br/>
-          a line, plain and all other figures can be achived. But all of these are indivisible parts, glued together.<br/>
-          Exactly the lack of choosing scattered points to create some kind of object is achived by the Region-based theory.<br/>
+        <p>For comparison the Euclidean space is composed of points as a primitive types, with multiple points
+          a line, plain and all other figures can be achived. But all of these are indivisible parts, glued together.
+          Exactly the lack of choosing scattered points to create some kind of object is achived by the Region-based theory.
         </p>
         
         <p>
-          In the Region-based theory we have the regions as primative types, over regions a mereological relation<br/>
-          is defined which we are going to call Contact and a topological relation which defines the subrigions of a region.<br/>
-          The points are defined as series of operations over the <br/>
-          regions.
+          In the Region-based theory we have the regions as primative types, over regions a mereological relation
+          is defined which we are going to call Contact and a topological relation which defines the subrigions of a region.
+          The points are defined as series of operations over the regions.
         </p>
         <h4>Representation:</h4>
         <p>
-          Each region is going to be represented as a set of elements.<br/> 
-          We are going to use the lower case english alphabet letters to represent a region.<br/>
+          Each region is going to be represented as a set of elements. 
+          We are going to use the lower case english alphabet letters to represent a region.
           For example:<br/>
             Let's define few regions so that we can use them in the following section for our examples.
             <ul>

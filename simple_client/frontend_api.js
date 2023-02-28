@@ -20,6 +20,7 @@ var js_wrapped_calculate = function() {
 // return type 
 ping_return_type = { 
     'is_satisfied': 'bool',
+    'is_parsed': 'bool',
     'status': 'string', // FINISHED, CANCELED, RUNNING
     'output': 'string',
     'variables': ['string'],

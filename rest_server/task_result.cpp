@@ -4,6 +4,7 @@ std::string task_result::to_string()
 {
     json::value result;
     result[U("status")] = json::value(utility::conversions::to_string_t(status_code));
+	result[U("is_parsed")] = json::value(is_parsed);
     result[U("is_satisfied")] = json::value(is_satisfied);
     result[U("contacts")] = json_contants();
     result[U("ids")] = json_ids();

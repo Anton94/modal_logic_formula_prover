@@ -5,7 +5,7 @@
         <script src="./lib/jquery.min.js" type="text/javascript"></script>
         <script src="./lib/d3.v4.js"></script>
         <script type="text/javascript" src="./visualizer.js"></script>
-        <script type="text/javascript" src="./frontend_api.js"></script>
+        <script type="text/javascript" src="./server_api.js"></script>
         <link href="styles.css" rel="stylesheet" type="text/css">
         <script>
             var serverOrigin = location.origin;
@@ -22,7 +22,11 @@
                         if (data.status == "FINISHED") {
                             clearInterval(timer_id);
                             valid_op_id = null;
-                            document.getElementById('algorithm_result').innerText = data.is_satisfied ? "Satisfiable" : "Not satisfiable";
+                            if (data.is_parsed) {
+                                document.getElementById('algorithm_result').innerText = data.is_satisfied ? "Satisfiable" : "Not Satisfiable";
+                            } else {
+                                document.getElementById('algorithm_result').innerText = "Syntax Error";
+                            }
                             document.getElementById('verbose_output').innerText += data.output;
                             graphis = transform_contacts_to_graph(data.ids, data.contacts);
                             do_visualization_v2(graphis, 500, 500);
@@ -189,7 +193,6 @@
     </head>
     <body onload="pre_init();">
         <div class="sidenav">
-            <a href="./home.html">Home</a>
             <a href="./index.html">App</a>
             <a href="./samples.html">Samples</a>
             <a href="./howto.html">How To</a>
@@ -262,7 +265,7 @@
                     <div id="hide-output" style="cursor: pointer;"><b>Hide complete output <i class="arrow down" style="margin-bottom: 3px"></i></b></div>
                     <pre class="verbose_output" id="verbose_output" style="max-height: 40vh; text-align: left;"></pre>
                 </div>
-                <div class="footer" id="simple-footer"> 
+                <div class="footer" id="simple-footer" style="overflow: hidden; max-height: 4vh;"> 
                     <b style="cursor: pointer;">Show complete output <i class="arrow up"style="margin-top: 2px"></i></b>
                 </div>
             </div>
