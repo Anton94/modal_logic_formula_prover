@@ -5,7 +5,7 @@
         <script src="./lib/jquery.min.js" type="text/javascript"></script>
         <script src="./lib/d3.v4.js"></script>
         <script type="text/javascript" src="./visualizer.js"></script>
-        <script type="text/javascript" src="./frontend_api.js"></script>
+        <script type="text/javascript" src="./server_api.js"></script>
         <link href="styles.css" rel="stylesheet" type="text/css">
         <script>
             var serverOrigin = location.origin;
@@ -204,7 +204,7 @@
                             <input type="checkbox" id="remove_double_negation" checked> Remove Double Negations<br>
                         </div>
                         <div class="algorithm_cancelations">
-                            If the calculation takes too long, try to cancel it. It might help to optimize the input formula<br>
+                            If the calculation takes too long, cancel it. Try to optimize the input formula by reducing the variables and the number of atomic formulas in it.<br>
                             <button style="margin-top:0.5rem" id="cancel_calculation" onclick="cancel_task(valid_op_id)">CANCEL CALCULATION</button>
                         </div>
                     </div>

@@ -80,6 +80,7 @@
         ["C(-a , -b) & ~<=(a, 0) & C(-a, a)", true, true, true],
         ["C(-b * a, b) & C(-a , -b) & ~<=(a, 0) & C(-a, a)", true, true, true],
         ["<=(-a, a) & <=(-b, b) & (~<=(a,-b) | ~<=(-a,-b))", true, true, true],
+        ["C(a + b + c,  (a * c) + (b * c)) & (a * b) = 0 & (a * c) = 0", true, true, true],
         ["~<=(a,b) & ~<=(b, c) & ~<=(c, a) & <=(a,c)", true, true, true],
         ["T -> T | ~<=(a,c)", true, true, true],
         ["<=(a, 0) & <=(b,0) <-> C(a,b)", true, true, true],
@@ -90,6 +91,11 @@
         ["<=(-a, a) & <=(-b, b) & (~<=(a,b) | ~<=(-a,b))", false, false, false],
         ["<=(a,0) & <=(1, a)", false, false, false],
         ["<=(a, 0) & <=(b,0) & C(a,b)", false, false, false],
+        ["C(a + b + c,  a * b * c) & (a * b) = 0 & (a * c) = 0 & (b * c) = 0", false, false, false],
+        ["<=(1, a + b + c) & ~C(a + b + c, a + b + c)", false, false, false],
+
+        ["~a=0 & ~b=0 & <=(1, a + b) & ~C(a,b)", true, false, true],
+        ["(a * b * c) = 0 & ~a=0 & ~b=0 & ~c=0 & <=(1, a + b + c) & ~C(a + b, c)", true, false, true],
 
         ["~<=m(a,b) & <=(a,c) & <=(1, c) & <=(b, a)", true, true, true],
         ["C(a,b) & C(b, c) -> C(a, c) & <=m(a, b)", true, true, true],
@@ -107,7 +113,6 @@
         ["<=(a,b) & ~<=m(a, b)", true, true, false],
         [" ~<=m(a*c, b+m) & <=(a*c,b+m)", true, true, false],
 
-        
         ["<=(a,b) & <=(c, d) & (b*d) = 0 & m*b = 0 & m*d = 0 & C(a,m) & C(m, c) & ~C(a,c)", true, true, true],
         ["<=(a,b) & <=(c, d) & (b*d) = 0 & m*b = 0 & m*d = 0 & C(a,m) & C(m, c) & ~C(a,c) & C(b,d)", true, true, true],
       ];
