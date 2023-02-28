@@ -1,6 +1,7 @@
 <script src="formula_proover_wasm.js"></script>
 <script>
 var js_wrapped_calculate = Module.cwrap("calculate", "number", ["number", "number"]);
+var js_wrapped_get_accumulated_output = Module.cwrap("get_accumulated_output", "number", []);
 
 function allocate_WASM_string(s) {
     var len  = s.length;
@@ -17,8 +18,7 @@ function free_WASM_mem(m) {
     Module._free(m);
 }
 
-function pressBtn(){
-
+function calculate_model() {
     var formula = document.getElementById('formula').value;
     var len = formula.length;
     var wasm_formula = allocate_WASM_string(formula);
@@ -29,6 +29,29 @@ function pressBtn(){
 
     free_WASM_mem(wasm_formula); // Free the allocated memory for the input formula
     free_WASM_mem(res); // Free the memory allocated for the result.
+}
+
+function calculate_prom() {
+    return new Promise(calculate_model);
+}
+
+async function calculate_model_async() {
+    await calculate_prom();
+}
+
+function pressBtn(){
+    setTimeout(calculate_model, 100);
+}
+
+const intervalID = setInterval(ping_wasm, 500);
+
+function ping_wasm()
+{
+    var res = js_wrapped_get_accumulated_output();
+    var s = UTF8ToString(res);
+    free_WASM_mem(res); // Free the memory allocated for the result.
+
+    console.log('Getting accumulated output: ' + s);
 }
 
 // source: https://stackoverflow.com/questions/18729405/how-to-convert-utf8-string-to-byte-array

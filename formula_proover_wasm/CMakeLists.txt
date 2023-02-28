@@ -5,7 +5,7 @@ add_subdirectory(../formula_lib formula_lib)
 include_directories(${FORMULA_LIB_INCLUDE_DIR})
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s EXPORTED_FUNCTIONS=['_malloc','_free','_main'] -s EXTRA_EXPORTED_RUNTIME_METHODS=['cwrap']")
-#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ALLOW_MEMORY_GROWTH=1") # Increase th heap memory limit
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ALLOW_MEMORY_GROWTH=1") # Increase th heap memory limit
 
 set(executable formula_proover_wasm)
 add_executable(${executable} source.cpp)
