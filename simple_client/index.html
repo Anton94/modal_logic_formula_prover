@@ -5,7 +5,7 @@
         <script src="./lib/jquery.min.js" type="text/javascript"></script>
         <script src="./lib/d3.v4.js"></script>
         <script type="text/javascript" src="./visualizer.js"></script>
-        <script type="text/javascript" src="./server_api.js"></script>
+        <script type="text/javascript" src="./frontend_api.js"></script>
         <link href="styles.css" rel="stylesheet" type="text/css">
         <script>
             var serverOrigin = location.origin;
@@ -58,6 +58,17 @@
                     });
             }
 
+            function process_satisfiability_output(data) {
+                valid_op_id = null;
+                document.getElementById('algorithm_result').innerText = data.is_satisfied ? "Satisfiable" : "Not satisfiable";
+                document.getElementById('verbose_output').innerText += data.output;
+                graphis = transform_contacts_to_graph(data.ids, data.contacts);
+                do_visualization_v2(graphis, 500, 500);
+                print_result_sets(data.variables, data.ids);
+                change_computing_components_availability(true)
+                running_count = 0;
+            }
+
             function cancel_task(op_id) {
                 let cancel_btn = document.getElementById("cancel_calculation");
                 cancel_btn.disabled = true;
@@ -90,27 +101,34 @@
                 d3.select("#visualization-graph").select("svg").remove();
 
                 change_computing_components_availability(false);
-                api.post_task(formula, algorithm_type, formula_filters, serverOrigin)
-                    .then(function (data) {
-                        console.log("Api post_task succeeded " + JSON.stringify(data));
-                        valid_op_id = data.op_id;
-                        console.log('Created a task with algorithm: ' + algorithm_type + ' and op id: ' + valid_op_id);
+                document.getElementById('algorithm_result').innerText = "Running";
 
-                        function myFunction() {
-                            var timer_id = setInterval(function () {
-                                ping_task(valid_op_id, timer_id);
-                            }, 1000);
-                        };
-                        myFunction();
-                    })
-                    .catch(function (status) {
-                        console.log("Api post_task failed " + status);
-                        statusText = "Sorry, the server is down, please try again after a few seconds.";
-                        if (status === 429) {
-                            statusText = "There are too many requests right now, please try again later.";
-                        }
-                        document.getElementById("verbose_output").innerText = statusText;
-                    });
+                if (api.is_instant) {
+                    result = api.is_satisfiable(formula, algorithm_type, formula_filters);
+                    process_satisfiability_output(result);
+                } else {
+                    api.post_task(formula, algorithm_type, formula_filters, serverOrigin)
+                        .then(function (data) {
+                            console.log("Api post_task succeeded " + JSON.stringify(data));
+                            valid_op_id = data.op_id;
+                            console.log('Created a task with algorithm: ' + algorithm_type + ' and op id: ' + valid_op_id);
+
+                            function myFunction() {
+                                var timer_id = setInterval(function () {
+                                    ping_task(valid_op_id, timer_id);
+                                }, 1000);
+                            };
+                            myFunction();
+                        })
+                        .catch(function (status) {
+                            console.log("Api post_task failed " + status);
+                            statusText = "Sorry, the server is down, please try again after a few seconds.";
+                            if (status === 429) {
+                                statusText = "There are too many requests right now, please try again later.";
+                            }
+                            document.getElementById("verbose_output").innerText = statusText;
+                        });
+                }
 
                 // set ping on every few seconds it is best to have something like this for the ping delay [1, 2, 5, 7, 10, 10, ...
                 // on ping result FINISHED show the result probably in the output area.

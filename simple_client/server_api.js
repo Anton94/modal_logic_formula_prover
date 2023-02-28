@@ -1,4 +1,6 @@
-window.api = {};
+window.api = {
+    is_instant: false
+};
 
 // API 
 // post_task
