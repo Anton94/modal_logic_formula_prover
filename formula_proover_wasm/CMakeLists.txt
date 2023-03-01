@@ -44,8 +44,26 @@ endif()
 
 include(ECMEnableSanitizers)
 
+# Copy index.html to the build dir
 add_custom_command(
         TARGET ${executable} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy # for directory try copy_directory
                 ${CMAKE_CURRENT_SOURCE_DIR}/index.html
                 ${CMAKE_CURRENT_BINARY_DIR}/index.html)
+
+set(produced_js_filename ${executable}.js)
+set(produced_wasm_filename ${executable}.wasm)
+set(simple_app_dir ${CMAKE_CURRENT_SOURCE_DIR}/../simple_client/formula_proover_wasm)
+
+# Copy the produced .js and .wasm files to simple_client
+add_custom_command(
+  TARGET ${executable} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy
+          ${CMAKE_CURRENT_BINARY_DIR}/${produced_js_filename}
+          ${simple_app_dir}/${produced_js_filename})
+
+add_custom_command(
+  TARGET ${executable} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy
+          ${CMAKE_CURRENT_BINARY_DIR}/${produced_wasm_filename}
+          ${simple_app_dir}/${produced_wasm_filename})

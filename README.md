@@ -56,8 +56,16 @@ If you are using python 3
 - repo_dir/build_wasm/formula_proover> python3 -m http.server
 
 Click on the formula_proover.html
+The formula_proover's main function should be called with some sample formula and you should see the output in the console.
 
-The formula_proover's main function should be called with some sample formula and you should see the output.
+The procues html is a dummy one just to see the basic flow of this approach.
+
+The formula_proover_wasm app exposes a few C++ methods to WASM which are called from JS.
+The app produces two files - formula_proover_wasm.js and formula_proover_wasm.wasm. They are copied to simple_client/formula_proover_wasm directory as a post build step of formula_proover_wasm app.
+The simple_client is the web app. The rest_server app and formula_proover_wasm app both uses it. There are two api files - server_api.js (for the rest_server approach) and frontend_api.js (for WASM approach).
+There is api_wrapper.js file which includes the frontend_api.js. This is the default flow.
+rest_server app has a post build step which copies the simple_client to the build dir and replaces the api_wrapper.js with rest_server/api_wrapper.js which includes the server_api.js.
+
 
 ## Windows:
 Not tested - better use WSL (Windows Subsystem for Linux)

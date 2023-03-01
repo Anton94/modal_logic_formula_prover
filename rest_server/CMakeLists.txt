@@ -47,7 +47,15 @@ endif()
 
 include(ECMEnableSanitizers)
 
-add_custom_target(copy_client
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/simple_client ${CMAKE_BINARY_DIR}/client/dist
-)
-add_dependencies(${executable} copy_client)
+add_custom_command(
+  TARGET ${executable} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+          ${CMAKE_SOURCE_DIR}/simple_client
+          ${CMAKE_BINARY_DIR}/client/dist)
+
+# Replace the api_wrapper with the one which uses server_api.js
+add_custom_command(
+  TARGET ${executable} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy
+          ${CMAKE_BINARY_DIR}/client/dist/rest_server/api_wrapper.js
+          ${CMAKE_BINARY_DIR}/client/dist/api_wrapper.js)
