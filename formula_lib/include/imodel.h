@@ -29,14 +29,13 @@ public:
 
     friend std::ostream& operator<<(std::ostream& out, const imodel& m);
 
-    auto print(std::ostream& out, const points_t& points) const -> std::ostream&;
-    auto print_contacts(std::ostream& out, const contacts_t& contact_relations) const -> std::ostream&;
-    auto print_evaluations(std::ostream& out, const variable_id_to_points_t& variable_evaluations) const -> std::ostream&;
-
 protected:
     auto get_variable_name(variable_id_t variable_id) const -> const std::string&;
 
     auto print(std::ostream& out, const variables_evaluations_block& block) const -> std::ostream&;
+    auto print(std::ostream& out, const points_t& points) const -> std::ostream&;
+    auto print_contacts(std::ostream& out, const contacts_t& contact_relations) const -> std::ostream&;
+    auto print_evaluations(std::ostream& out, const variable_id_to_points_t& variable_evaluations) const -> std::ostream&;
 
     // Useful for models which have their first 2*@number_of_contacts points in contact (point 2k is in contact with point (2k+1))
     // Inserts 1s in the contact relations matrix between points 2k and 2k+1 (for each k in range [0, @number_of_contacts))

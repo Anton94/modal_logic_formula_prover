@@ -1,7 +1,6 @@
 <script src="formula_proover_wasm.js"></script>
 <script>
 var js_wrapped_calculate = Module.cwrap("calculate", "number", ["number", "number"]);
-var js_wrapped_get_accumulated_output = Module.cwrap("get_accumulated_output", "number", []);
 
 function allocate_WASM_string(s) {
     var len  = s.length;
@@ -18,40 +17,34 @@ function free_WASM_mem(m) {
     Module._free(m);
 }
 
-function calculate_model() {
+function is_satisfiable(formula, algorithm_type, formula_filters) {
+    input_data = JSON.stringify({
+        formula: formula,
+        algorithm_type: algorithm_type,
+        formula_filters: formula_filters
+    });
+
+    var js_wrapped_calculate = Module.cwrap("calculate", "number", ["number", "number"]);
+
+    var len = input_data.length;
+    var wasm_input_data = allocate_WASM_string(input_data);
+
+    var res = js_wrapped_calculate(wasm_input_data, len); // Call the WASM function
+    var s = UTF8ToString(res);
+    var resultAsJson = JSON.parse(s);
+
+    console.log("The result of calling calculate is:\n", resultAsJson);
+
+    free_WASM_mem(wasm_input_data); // Free the allocated memory for the input formula
+    free_WASM_mem(res); // Free the memory allocated for the result.
+
+    return resultAsJson;
+}
+
+function pressBtn() {
     var formula = document.getElementById('formula').value;
-    var len = formula.length;
-    var wasm_formula = allocate_WASM_string(formula);
-
-    var res = js_wrapped_calculate(wasm_formula, len); // Call the WASM function
-    var s = UTF8ToString(res);
-    console.log("The result of calling calculate is:\n", s);
-
-    free_WASM_mem(wasm_formula); // Free the allocated memory for the input formula
-    free_WASM_mem(res); // Free the memory allocated for the result.
-}
-
-function calculate_prom() {
-    return new Promise(calculate_model);
-}
-
-async function calculate_model_async() {
-    await calculate_prom();
-}
-
-function pressBtn(){
-    setTimeout(calculate_model, 100);
-}
-
-const intervalID = setInterval(ping_wasm, 500);
-
-function ping_wasm()
-{
-    var res = js_wrapped_get_accumulated_output();
-    var s = UTF8ToString(res);
-    free_WASM_mem(res); // Free the memory allocated for the result.
-
-    console.log('Getting accumulated output: ' + s);
+    var algorithm_type = "MEASURED_MODEL";
+    is_satisfiable(formula, algorithm_type, []);
 }
 
 // source: https://stackoverflow.com/questions/18729405/how-to-convert-utf8-string-to-byte-array

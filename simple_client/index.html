@@ -64,13 +64,20 @@
 
             function process_satisfiability_output(data) {
                 valid_op_id = null;
-                document.getElementById('algorithm_result').innerText = data.is_satisfied ? "Satisfiable" : "Not satisfiable";
-                document.getElementById('verbose_output').innerText += data.output;
+                var status = data.is_parsed ? (data.is_satisfied ? "Satisfiable" : "Not satisfiable") : "Syntax error";
+                document.getElementById('algorithm_result').innerText = status;
+                document.getElementById('verbose_output').innerText = data.output;
+                change_computing_components_availability(true)
+                running_count = 0;
+
+                if (!data.is_parsed || !data.is_satisfied) {
+                    print_result_sets([], []);
+                    return;
+                }
+
                 graphis = transform_contacts_to_graph(data.ids, data.contacts);
                 do_visualization_v2(graphis, 500, 500);
                 print_result_sets(data.variables, data.ids);
-                change_computing_components_availability(true)
-                running_count = 0;
             }
 
             function cancel_task(op_id) {
@@ -171,12 +178,14 @@
 
             function print_result_sets(variables, ids) {
                 var text = "";
-                all_strings = variables.map((x, i) => "v(" + x + ") =  { " + 
-                    ids[i].map((a, i) => a == 1 ? i : -1)
-                    .filter(a => a >= 0)
-                    .map(x => "A" + x + " ")
-                     + "}");
-                all_strings.forEach(x => text += x + "\n");
+                if(variables.length > 0) {
+                    all_strings = variables.map((x, i) => "v(" + x + ") =  { " +
+                        ids[i].map((a, i) => a == 1 ? i : -1)
+                        .filter(a => a >= 0)
+                        .map(x => "A" + x + " ")
+                         + "}");
+                    all_strings.forEach(x => text += x + "\n");
+                }
                 document.getElementById("result_sets").innerText = text;
             }
         </script>

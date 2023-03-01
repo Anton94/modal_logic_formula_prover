@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include <mutex>
 
 #include "library.h"
 
@@ -15,6 +14,8 @@
 #define EXTERN
 #endif
 
+using namespace nlohmann;
+
 namespace
 {
 
@@ -25,9 +26,6 @@ inline const char* cstr(const std::string& message)
     return cstr; // JS will free it
 }
 
-// Ugly but for the purpose of the app is more than enough!
-static thread_local std::mutex output_mutex{};
-
 auto get_output_stream() -> std::stringstream&
 {
     static std::stringstream output;
@@ -36,81 +34,153 @@ auto get_output_stream() -> std::stringstream&
 
 void write_to_output(std::stringstream&& s, const char* prefix = "")
 {
-    std::lock_guard<std::mutex> op_id_to_ctx_guard(output_mutex);
+    // std::cout << prefix << s.rdbuf() << "\n"; // Uncomment it and all of the output will be printed to the console in the browser
     get_output_stream() << prefix << s.rdbuf() << "\n";
 }
 
-auto get_and_release_accumulated_output() -> std::string
+auto json_contants(const contacts_t& contacts) -> json
 {
-    std::lock_guard<std::mutex> op_id_to_ctx_guard(output_mutex);
-    auto s = get_output_stream().str();
+    json result = json::array();
+    for(size_t i = 0, len_i = contacts.size(); i < len_i; ++i)
+    {
+        json inner_array = json::array();
+        for(size_t j = 0, len_j = contacts[i].size(); j < len_j; ++j)
+        {
+            inner_array[j] = contacts[i][j] == true ? "1" : "0";
+        }
+        result[i] = inner_array;
+    }
+
+    return result;
+}
+
+auto json_ids(const variable_id_to_points_t& ids) -> json
+{
+    json result = json::array();
+    for (size_t i = 0, len = ids.size(); i < len; ++i)
+    {
+        json inner_array = json::array();
+        for (size_t j = 0, len_j = ids[i].size(); j < len_j; ++j)
+        {
+            inner_array[j] = ids[i][j] == true ? "1" : "0";
+        }
+        result[i] = inner_array;
+    }
+
+    return result;
+}
+
+auto extract_formula_refiners(const std::vector<std::string>& formula_filters) -> formula_mgr::formula_refiners
+{
+    formula_mgr::formula_refiners formula_refs = formula_mgr::formula_refiners::none;
+
+    for(const auto& filter : formula_filters)
+    {
+        if(filter == "convert_contact_less_eq_with_same_terms")
+        {
+            formula_refs |= formula_mgr::formula_refiners::convert_contact_less_eq_with_same_terms;
+        }
+        else if(filter == "convert_disjunction_in_contact_less_eq")
+        {
+            formula_refs |= formula_mgr::formula_refiners::convert_disjunction_in_contact_less_eq;
+        }
+        else if(filter == "reduce_constants")
+        {
+            formula_refs |= formula_mgr::formula_refiners::reduce_constants;
+        }
+        else if(filter == "reduce_contacts_less_eq_with_constants")
+        {
+            formula_refs |= formula_mgr::formula_refiners::reduce_contacts_with_constants;
+        }
+        else if(filter == "remove_double_negation")
+        {
+            formula_refs |= formula_mgr::formula_refiners::remove_double_negation;
+        }
+    }
+
+    return formula_refs;
+}
+
+auto get_model_from_type(const std::string& algorithm_type) -> std::shared_ptr<imodel>
+{
+    if(algorithm_type == "MEASURED_MODEL")
+    {
+        return std::make_shared<measured_model>();
+    }
+
+    if(algorithm_type == "FAST_MODEL")
+    {
+        return std::make_shared<model>();
+    }
+
+    if(algorithm_type == "CONNECTIVITY")
+    {
+        return std::make_shared<connected_model>(10ul);
+    }
+
+    if(algorithm_type == "BRUTEFORCE_MODEL")
+    {
+        return std::make_shared<basic_bruteforce_model>();
+    }
+
+    error() << "Something went wrong, received unrecognized model type from JS. "
+               "Fallback to FAST MODEL";
+    return std::make_shared<model>();
+}
+
+}
+
+// Expecting the input data to be as json
+// Field formula and algorithm type and optional formula filters
+EXTERN EMSCRIPTEN_KEEPALIVE const char* calculate(const char* input_data, int len)
+{
     get_output_stream() = {};
-    return s;
-}
 
-}
+    std::string input_as_string(input_data, len);
+    auto input = json::parse(input_as_string);
 
-namespace
-{
-enum class state
-{
-    running,
-    finished,
-};
+    const std::string formula = input["formula"];
+    const std::string algorithm_type = input["algorithm_type"];
+    const std::vector<std::string> formula_filters = input["formula_filters"];
 
-
-}
-
-EXTERN EMSCRIPTEN_KEEPALIVE const char* calculate(const char* js_formula, int len)
-{
-    get_output_stream() = {};
-
-    std::string formula(js_formula, len);
+    const auto formula_refinres = extract_formula_refiners(formula_filters);
 
     formula_mgr f;
-    const auto correct_formula = f.build(formula);
+    const auto is_parsed = f.build(input["formula"], formula_refinres);
 
-    info() << "\t" << (correct_formula ? "success" : "failed") << "\n";
+    info() << "\t" << (is_parsed ? "success" : "failed") << "\n";
 
-    info() << "Getting the used variables...";
-    const auto variables = f.get_variables();
-    info() << "Variables: " << variables;
+    json result;
 
-    measured_model m{};
+    result["is_parsed"] = is_parsed;
 
-    info() << "Trying to find a measured model!";
-    const auto res = f.is_satisfiable(m);
-    info() << "The formula is " << (res ? "" : "not ") << "satisfiable.";
+    if(is_parsed)
+    {
+        auto m = get_model_from_type(algorithm_type);
+
+        info() << "Getting the used variables...";
+        const auto variables = f.get_variables();
+        info() << "Variables: " << variables;
+
+        info() << "Trying to find a measured model.";
+        const auto res = f.is_satisfiable(*m);
+        info() << "The formula is " << (res ? "" : "not ") << "satisfiable.";
+
+        result["is_satisfied"] = res;
+        result["variables"] = f.get_variables();
+        result["ids"] = json_ids(m->get_variables_evaluations());
+        result["contacts"] = json_contants(m->get_contact_relations());
+    }
 
     auto output = get_output_stream().str();
     get_output_stream() = {};
 
-    std::stringstream out;
-    m.print_evaluations(out, m.get_variables_evaluations());
-    auto variable_evaluations = out.str();
-
-    out = {};
-    m.print_contacts(out, m.get_contact_relations());
-    auto contacts = out.str();
-
-    nlohmann::json result;
-    result["is_satisfied"] = res;
     result["status"] = "FINISHED";
     result["output"] = std::move(output);
-    result["variables"] = f.get_variables();
-    result["ids"] = std::move(variable_evaluations);
-    result["contacts"] = std::move(contacts);
 
     const auto as_string = result.dump();
 
     return cstr(as_string);
-}
-
-EXTERN EMSCRIPTEN_KEEPALIVE const char* get_accumulated_output()
-{
-    std::cout << "Get accumulated output is called!" << std::endl;
-    const auto accumulated_output = get_and_release_accumulated_output();
-    return cstr(accumulated_output);
 }
 
 int main(int argc, char* argv[])

@@ -10,6 +10,11 @@
 # modal_logic_formula_prover
 TODO: Master degree project for prooving/disprooving formulas (space and probability)
 
+# Demo
+- repo_dir/simple_client> python3 -m http.server
+
+Or some other http server and click the link.
+
 # Dependencies:
 - CMake 3.7 or newer
 - (optional) [CppRestSDK](https://github.com/microsoft/cpprestsdk) only for the web client. Note that for Unix it will require boost's System library. If CppRestSDK is not isntalled, then the rest server project will be skipped.
