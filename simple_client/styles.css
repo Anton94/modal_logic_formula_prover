@@ -58,7 +58,7 @@ body {
     color: #f1f1f1;
 }
 .main {
-    width: -webkit-fill-available;
+    width: calc(100% - 14vw - 20px);
     left: 14vw;
     position: fixed;
    /* Same as the width of the sidenav */
@@ -171,6 +171,7 @@ label {
     border-radius: 12px;
     padding: 0.4rem;
     outline-offset: 0.5rem;
+    height: fit-content;
 }
 .result {
     margin-left: 10px;
