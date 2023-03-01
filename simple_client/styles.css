@@ -167,6 +167,7 @@ label {
 }
 .legend {
     margin-left: 1rem;
+    margin-top: 20px;
     border: 0.5rem outset #8d8485;
     box-shadow: 0 0 0 0.3rem #26627a;
     border-radius: 12px;
