@@ -106,7 +106,8 @@ label {
     position: fixed;
     left: 14vw;
     bottom: 0;
-    width: inherit;
+    /* width: inherit; */
+    width: calc(100% - 14vw - 70px);
     padding: 1rem;
     text-align: center;
     background-color: #eee;
