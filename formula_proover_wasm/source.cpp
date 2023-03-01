@@ -162,7 +162,6 @@ EXTERN EMSCRIPTEN_KEEPALIVE const char* calculate(const char* input_data, int le
         const auto variables = f.get_variables();
         info() << "Variables: " << variables;
 
-        info() << "Trying to find a measured model.";
         const auto res = f.is_satisfiable(*m);
         info() << "The formula is " << (res ? "" : "not ") << "satisfiable.";
 
