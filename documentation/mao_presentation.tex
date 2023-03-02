@@ -673,164 +673,269 @@
 		\begin{align*}
 			\vBool_{\curvedE}(a) = истина \leftrightarrow \curvedE \in \vE(a)
 		\end{align*}
-		В такъв случай, когато $\vBool_{\curvedE}(a) = \textbf{истина}$ ще казваме, че модална точка  $\curvedE$ is \textbf{валидна}.
+		В такъв случай, когато $\vBool_{\curvedE}(a) = \textbf{истина}$ ще казваме, че модална точка  $\curvedE$ е \textbf{валидна}.
 	\end{lema}
 \end{frame}
 
 \section{Минимална контактна логика с мярка}
-\begin{frame}\frametitle{мини}
-асд
+\begin{frame}\frametitle{Минимална контактна логика с мярка}
+Минималната контактна логика с мярка е самата минимална контактна логика с добавена количествена мярка.
+\newline
+\newline
+Мярката е функция която на даден на регион съпоставя положително реално число.
+\begin{equation*}
+	\mu : \mathscr{P}(W) \longrightarrow \mathbb{R}^+
+\end{equation*}
+Мярката между два терма представляваме с следната атомарна формула:
+	\begin{equation*} 
+		a \le_\mu b
+	\end{equation*}
 \end{frame}
 
-\subsection{Изпълнимост в минималната контактна логика с мярка}
-\begin{frame}\frametitle{мини}
-асд
+
+\begin{frame}\frametitle{Семантика на минималната контактна логика с мярка}
+	Модела на минималната контактна логика се разширява със следната индуктивна дефиниция за изпълнимост:
+	\begin{itemize}
+		\item $\mathcal{M} \models a \leq_\mu b \text{, iff } \mu(\mathscr{v}(a)) \le \mu(\mathscr{v}(b))$
+	\end{itemize}
+
+	\begin{lema}[Тривиални импликации за модели с мярка]
+Нека a, b и c са три терма и нека $\varphi$ и $\psi$ са две формули, тогава:
+	\begin{itemize}
+		\item $0 \le_\mu a \Longrightarrow T$
+		\item $a \le_\mu 1 \Longrightarrow T$
+		\item $(a = 0) \iff (a \le_\mu 0)$
+		\item $(a = 1) \iff (1 \le_\mu a)$
+		\item $(a \le_\mu b) \lor (b \le_\mu a) \Longrightarrow T$
+		\item $a_1 \le_\mu a_2 \land a_2 \le_\mu a_3 \Longrightarrow a_1 \le_\mu a_3$
+	\end{itemize}
+\end{lema}
 \end{frame}
 
-\section{Section no. 2} 
-\subsection{Lists I}
-\begin{frame}\frametitle{unnumbered lists}
+\begin{frame}\frametitle{Система линейни неравенства}
+Формула с повече атомарни формули с мярка създава система линейни неравенства.
+\newline
+Системата линейни неравенства има следната структура:
+		\[
+			\syslineskipcoeff{1.50}
+			\systeme*{\sum_{i^1} X_{i^1} <= \sum_{j^1} X_{j^1},
+				\:\:.\:\:.\:\:.,
+				\sum_{i^n} X_{i^n} <= \sum_{j^n} X_{j^n}, 
+				\sum_{k^1} X_{k^1} > \sum_{l^1} X_{l^1},
+				\:\:.\:\:.\:\:.,
+				\sum_{k^m} X_{k^m} > \sum_{l^m} X_{l^m}
+				}
+		\]
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на система линейни неравенства}
+Нека $M = (W, R, \vE)$ е модел. Системата се построява с оценяване на термовете в $\le_\mu$ и  $<_\mu$ атомарни формули. 
+\newline
+Броят на точки в модела са $N = | \; W \; |$. Нека подредим точките $p_0, p_1, ..., p_N$. 
+В такъв случай системата ще има N различни променливи $X_0, X_1, ..., X_N$, където $\forall i < N: X_i$ е съпоставена на точка $p_i$.
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на система линейни неравенства}
+\begin{defn}
+	Нека x и y са два терма, тогава формулата $\le_\mu(x, y)$ се преобразува в:
+	\begin{align*}
+		\sum_{i: p_i \in \vE(x)} X_i \leq \sum_{j: p_j \in \vE(y)} X_j
+	\end{align*}
+\end{defn}
+
+		\begin{lemma}
+			Това преобразуване може да се опрости до:
+			\begin{align*}
+				\sum_{i: p_i \in \vE(x) \setminus \vE(y)} X_i \leq \sum_{j: p_j \in \vE(y) \setminus \vE(x)} X_j
+			\end{align*}
+		\end{lemma}
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на система линейни неравенства}
+		\begin{defn}
+			Нека x и y са два терма, тогава формулата $<_\mu(x, y)$ се преобразува в:
+			\begin{align*}
+				\sum_{i: p_i \in \vE(x)} X_i < \sum_{j: p_j \in \vE(y)} X_j
+			\end{align*}
+		\end{defn}
+
+		\begin{lemma}
+			Това преобразуване може да се опрости до:
+			\begin{align*}
+				\sum_{i: p_i \in \vE(x) \setminus \vE(y)} X_i < \sum_{j: p_j \in \vE(y) \setminus \vE(x)} X_j
+			\end{align*}
+		\end{lemma}
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на система линейни неравенства}
+		\begin{defn}
+			Нека $M = (W, R, \vE)$ е модел. Нека $\mathscr{S}$ е система от линейни неравенства дефинирана с:
+			\begin{itemize}
+				\item неравенство за всяка $\le_\mu$ формула
+				\item неравенство за всяка $<_\mu$ формула
+				\item неравенство $0 < X_i$ за всяко i: $0 \le i < N$  
+			\end{itemize}
+			Казваме, че системата $\mathscr{S}$ е валидна ако тя има решение.
+		\end{defn}
+\end{frame}
+
+\begin{frame}\frametitle{Изпълнимост в минималната контактна логика с мярка}
+С добавянето на атомарните формули с мярка се променя и таблото и конюктивия табло клон.
+Нека $\varphi$ е формула и $\mathcal{T}$ е таблото от $\varphi$, тогава:
+		\begin{align*}
+				B = \{\signT C(a_i, b_i) \mid i \in \{1, \ldots, I\} \} &\cup 
+					\{\signF C(e_k, f_k) \mid k \in \{1, \ldots, K\} \} \cup \\
+					\{\signF d_j = 0 \mid j \in \{1, \ldots, J\} \} &\cup 
+					\{\signT g_l = 0 \mid l \in \{1, \ldots, L\} \} \cup \\
+					\{\signT m_p \le_\mu n_p \mid p \in \{1, \ldots, P\} \} &\cup
+					\{\signF u_q \le_\mu v_q \mid q \in \{1, \ldots, Q\} \}
+		\end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Конюнктивен табло клон}
+		За олеснение можем да махнем $\signT \textit{ и } \signF$ и получаваме.
+\begin{align*}
+			\bigwedge_{i=1}^{I} \; C(a_i, b_i) \:\: & \wedge \:\: 
+			\bigwedge_{k=1}^{K} \; \neg C(e_k, f_k) \:\: \wedge \:\: \\
+			\bigwedge_{j=1}^{J} \; d_j \neq 0 \:\: & \wedge \:\:
+			\bigwedge_{l=1}^{L} \; g_l = 0 \:\: \wedge \:\:\\
+			\bigwedge_{p=1}^{P} \; m_p \le_\mu n_p \:\: &\wedge \:\:
+			\bigwedge_{q=1}^{Q} \; u_q <_\mu v_q \:\:
+\end{align*}%
+\end{frame}
+
+\begin{frame}\frametitle{Изпълнимост в минималната контактна логика с мярка}
+	\begin{defn}%{Valid modal point}
+	Нека B е конюктивен табло клон. Казваме, че модалната точка $\curvedE$ е валидна в B, когато:
+	\begin{itemize}
+		\item $t = 0 \in B:  \vBool_{\curvedE}(t) = \textbf{лъжа}$
+		\item $\neg C(e, f) \in B: \vBool_{\curvedE}(e) = \textbf{лъжа} \textit{ или } \vBool_{\curvedE}(f) = \textbf{лъжа}$
+	\end{itemize}
+	\end{defn}
+
+	\begin{defn}
+		Нека B е конюктивен табло клон и нека x и y са две валидни модални точки. Казваме, че $\langle x, y \rangle$ е валдина релация, когато:
+		\begin{align*}
+				\neg C(e, f) \in B: (x \notin \vE(e) \textit{ или } y \notin \vE(f)) \textit{ и } (x \notin \vE(f) \textit{ или } y \notin \vE(e))
+		\end{align*}
+	\end{defn}
+\end{frame}
+
+\begin{frame}\frametitle{Изпълнимост в минималната контактна логика с мярка}
+	\begin{defn}
+Нека B е конюктивен табло клон и нека W е множество от валидни модални точки в B. Дефинираме модел $\mathcal{M} = (W, R, v)$ в B, където:
+		\begin{align*}
+				\vE(t) = \{ \curvedE \; | \; \curvedE \in W \textit{ и } &\vBool_{\curvedE}(t) =\; \textit{истина} \}, \\
+				\textit{ където t е терм } & \textit{от атомарните формули в B}
+		\end{align*}
+		\begin{align*}
+				R = \{ \langle x, y \rangle\; | \; x, y \in W \textit{ и } \langle x, y \rangle \textit{ е валидна релация}\}
+		\end{align*}
+	\end{defn}
+\end{frame}
+
+\begin{frame}\frametitle{Изпълнимост в минималната контактна логика с мярка}
+\begin{lema}[Невъзможни подмножествени модели]
+Нека $\mathcal{M} = (W, R, \vE)$ е модел, където W е множество от валидни модални точки.
+Нека $\mathcal{M'} = (W', R', \vE')$ е модел, където $W' \subseteq W, R' \subseteq R$, тогава:
+	\begin{enumerate}
+		\item $\mathcal{M} \not\models t \neq 0 \implies \mathcal{M'} \not\models t \neq 0$
+		\item $\mathcal{M} \not\models C(a,b) \implies \mathcal{M'} \not\models C(a,b)$
+	\end{enumerate}
+	\end{lema}
+\end{frame}
+
+\begin{frame}\frametitle{Изпълнимост в минималната контактна логика с мярка}
+	\begin{lema}[Дедукциш на променливите]
+		Нека $\mathcal{M} = (W, R, \vE)$ е модел, където W е множество от валидни точки.
+		Нека $\mathcal{M'} = (W', R', \vE')$ е модел, дефиниран от $W' \subseteq W$, тогава:
+	% NOTE kaji che R' e sechenie na R s W2
+		\begin{align*}
+			\vE'(t) =  \vE(t) \cap W'
+		\end{align*}
+	\end{lema}
+\end{frame}
+
+\subsection{Алгоритъм за построяване на модел с мярка}
+\begin{frame}\frametitle{Алгоритъм за построяване на модел с мярка}
+	вход: $\varphi$ формула  \\
+	изход: 
 \begin{itemize}
-\item Introduction to  \LaTeX  
-\item Course 2 
-\item Termpapers and presentations with \LaTeX 
-\item Beamer class
-\end{itemize} 
-\end{frame}
-
-\begin{frame}\frametitle{lists with pause}
-\begin{itemize}
-\item Introduction to  \LaTeX \pause 
-\item Course 2 \pause 
-\item Termpapers and presentations with \LaTeX \pause 
-\item Beamer class
-\end{itemize} 
-\end{frame}
-
-\subsection{Lists II}
-\begin{frame}\frametitle{numbered lists}
-\begin{enumerate}
-\item Introduction to  \LaTeX  
-\item Course 2 
-\item Termpapers and presentations with \LaTeX 
-\item Beamer class
-\end{enumerate}
-\end{frame}
-
-\begin{frame}\frametitle{numbered lists with pause}
-\begin{enumerate}
-\item Introduction to  \LaTeX \pause 
-\item Course 2 \pause 
-\item Termpapers and presentations with \LaTeX \pause 
-\item Beamer class
-\end{enumerate}
-\end{frame}
-
-\section{Section no.3} 
-\subsection{Tables}
-\begin{frame}\frametitle{Tables}
-\begin{tabular}{|c|c|c|}
-\hline
-\textbf{Date} & \textbf{Instructor} & \textbf{Title} \\
-\hline
-WS 04/05 & Sascha Frank & First steps with  \LaTeX  \\
-\hline
-SS 05 & Sascha Frank & \LaTeX \ Course serial \\
-\hline
-\end{tabular}
-\end{frame}
-
-
-\begin{frame}\frametitle{Tables with pause}
-\begin{tabular}{c c c}
-A & B & C \\ 
-\pause 
-1 & 2 & 3 \\  
-\pause 
-A & B & C \\ 
-\end{tabular} 
-\end{frame}
-
-
-\section{Section no. 4}
-\subsection{blocs}
-\begin{frame}\frametitle{blocs}
-
-\begin{block}{title of the bloc}
-bloc text
-\end{block}
-
-\begin{exampleblock}{title of the bloc}
-bloc text
-\end{exampleblock}
-
-
-\begin{alertblock}{title of the bloc}
-bloc text
-\end{alertblock}
-\end{frame}
-
-\section{Section no. 5}
-\subsection{split screen}
-
-\begin{frame}\frametitle{splitting screen}
-\begin{columns}
-\begin{column}{5cm}
-\begin{itemize}
-\item Beamer 
-\item Beamer Class 
-\item Beamer Class Latex 
+	\item Не е изпълнима, ако $\neg \exists \mathcal{M}: \mathcal{M} \models \varphi$
+	\item Модел $\mathcal{M}$, за който $\mathcal{M} \models \varphi$
 \end{itemize}
-\end{column}
-\begin{column}{5cm}
-\begin{tabular}{|c|c|}
-\hline
-\textbf{Instructor} & \textbf{Title} \\
-\hline
-Sascha Frank &  \LaTeX \ Course 1 \\
-\hline
-Sascha Frank &  Course serial  \\
-\hline
-\end{tabular}
-\end{column}
-\end{columns}
 \end{frame}
-
-\subsection{Pictures} 
-\begin{frame}\frametitle{pictures in latex beamer class}
-\begin{figure}
-\caption{show an example picture}
-\end{figure}
-\end{frame}
-
-\subsection{joining picture and lists} 
 
 \begin{frame}
-\frametitle{pictures and lists in beamer class}
-\begin{columns}
-\begin{column}{5cm}
-\begin{itemize}
-\item<1-> subject 1
-\item<3-> subject 2
-\item<5-> subject 3
-\end{itemize}
-\vspace{3cm} 
-\end{column}
-\begin{column}{5cm}
-asdsad
-\end{column}
-\end{columns}
+Стъпка 0:
+\newline
+Възможно е да може да се построи модел в всеки конюнктивен клон на таблото, затова ще проверяваме всеки клон докато не намерим модел.
+\newline
+Следващите стъпки работят върху един такъв клон.
+\newline
+\newline
+Стъпка 1:
+\newline
+Генерираме модел $\mathcal{M}$ от валидни модални точки W в B.
 \end{frame}
 
-
-\subsection{pictures which need more space} 
-\begin{frame}[plain]
-\frametitle{plain, or a way to get more space}
-\begin{figure}
-\caption{show an example picture}
-\end{figure}
+\begin{frame}
+Стъпка 2:
+\newline
+Нека $\mathbb{P} = \mathcal{P}(W)$. Нека разгледаме $W' \in \mathbb{P}$ започвайки от подмножествата с най-много елементи.
+			W' създава модела $\mathcal{M'}$ по лемата за дедукция на променливите.
+			Проверяваме дали $\mathcal{M'}$ изпълнява не-равно на нула термовете и контактие от B:
+\newline
+\newline
+Стъпка 2.а:
+\newline
+ Ако са изпълними, тогава ако системата от линейни неравенства от B и $\mathcal{M'}$ има решение, то тогава валиден модел е построен, иначе W' се премахва от $\mathbb{P}$
+\newline
+\newline
+Стъпка 2.б:
+\newline
+Ако не са изпълними, тогава по лемата за невъзможните подмножествени модели всички подмножества на W' се премахват от $\mathbb{P}$.
 \end{frame}
 
+\begin{frame}
+Стъпка 3:
+\newline
+Ако W' не е намерено в стъпка 2., тогава не съсществува модел с мярка който да удовлетворява конюнктивния клон B.
+\newline
+\newline
+Край:
+\newline
+Ако модел с мярка не е намерен в всеки от конюнктивните клонове в таблото, то тогава $\neg \exists \mathcal{M}: \mathcal{M} \models \varphi$ 
 
+\end{frame}
+
+\begin{frame}
+Благодаря ви. \\
+Нека да пробваме самата програмка!
+\end{frame}
 
 \end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
