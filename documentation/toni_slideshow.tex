@@ -5,6 +5,12 @@
 \usepackage[utf8]{inputenc}
 \usepackage[main=bulgarian,english]{babel}
 
+\usepackage{forest}
+\usepackage{mathtools}
+\forestset{
+    parse tree/.style={for tree={s sep=0.5em, minimum size=0.5em}}
+}
+
 \graphicspath{ {./image/} }
 
 \usetheme{Boadilla}
@@ -14,7 +20,7 @@
 \setbeamertemplate{navigation symbols}{}
 
 % Lets the boolet points for next slides to be seen
-\setbeamercovered{transparent}
+%\setbeamercovered{transparent}
 
 % Increase the size of title in the footer
 \makeatletter
@@ -46,6 +52,12 @@
 \patchcmd{\example}{Example}{Пример}{}{}
 \patchcmd{\definition}{Definition}{Дефиниция}{}{}
 \patchcmd{\remark}{Remark}{Забележка}{}{}
+
+\newcommand\ST{\mathbb{T}}
+\newcommand\SF{\mathbb{F}}
+
+\newcommand\TableauExampleCenter{\indent\indent\indent\indent\indent\indent\indent\indent\indent}
+\newcommand\TableauExampleFirstChildOffset{\indent\indent\indent\indent\indent\indent\indent}
 
 \logo{\includegraphics[width=1cm]{fmi_logo.png}}
 
@@ -83,7 +95,14 @@
 Приложения:
 \begin{itemize}
 	\item<1-> Доказване, че формула е тавтология
-	\item<2-> Алгоритъм за търсене на модел % Алгоритъм за търсене на модел, в който формулата е изпълнима
+	\begin{description}
+		\item<2-> $\phi = x \lor \neg x$
+	\end{description}
+
+	\item<3-> Алгоритъм за търсене на модел % Алгоритъм за търсене на модел, в който формулата е изпълнима
+	\begin{description}
+		\item<4-> $\psi = (x \land \neg x) \lor (\neg x \land y) \rightarrow x = F ,\; y = T$
+	\end{description}
 \end{itemize}
 \end{frame}
 
@@ -91,18 +110,74 @@
 % Ще следваме описанието на табло метода от книгата - Handbook of tableau methods за табло методите. Там биват два вида табла - със или без знаци. Ще ползваме версията със знаци.
 % Знаците, с които ще маркираме формулите са F и T.
 % Формулите със знаци са изрази от вида FX и TX
-%
-%
-%
-%
-%
 
-\begin{frame}{Табло метод - въведение}
-\begin{itemize}
-	\item<1-> Доказване, че формула е тавтология
-	\item<2-> Алгоритъм за търсене на модел
-\end{itemize}
+\begin{frame}{Табло метод за класическа съждителна логика}
+	Табло метод със знаци $\ST$ и $\SF$
+	\begin{itemize}
+		\item $\ST X$ - означава, че формулата X трябва да е true (в някой модел)
+		\item $\SF X$ - аналогично, X трябва да е false
+	\end{itemize}
 \end{frame}
+
+\begin{frame}{Табло метод - правила за разбиване на подформули}
+	\begin{itemize}
+	\LARGE
+		\item<1-> $\frac{\ST \neg X}{\SF X}\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{\SF \neg X}{\ST X}$
+		\\ [8mm]
+		\item<2-> $\frac{\ST X \land Y}{{\ST X \atop \ST Y}} \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\; \frac{\SF X \land Y}{\SF X \mid \SF Y}$
+		\\ [8mm]
+		\item<3-> $\frac{\ST X \lor Y}{\ST X \mid \ST Y} \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{\SF X \lor Y}{{\SF X \atop \SF Y}}$
+	\normalsize
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Табло метод - правила за разбиване на подформули}
+	\begin{itemize}
+	\LARGE
+		\item<1-> $\frac{\ST X \Rightarrow Y}{\SF X \mid \ST Y} \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{\SF X \Rightarrow Y}{{\ST X \atop \SF Y}}$
+		\\ [8mm]
+		\item<2-> $\frac{\ST X \Leftrightarrow Y}{\left.{\ST X \atop \ST Y}\right\vert{\SF X \atop \SF Y}} \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{\SF X \Leftrightarrow Y}{\left.{\ST X \atop \SF Y}\right\vert{\SF X \atop \ST Y}}$
+	\normalsize
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Табло метод - строене}
+	\begin{center}
+	\begin{forest}
+		parse tree
+		[$\ST ((x \land \neg x) \lor (\neg x \land y))$
+			[$\ST (x \land \neg x)$ [$\ST x$ [$\ST \neg x$ [$\SF x$]]]]
+			[$\ST (\neg x \land y)$ [$\ST \neg x$ [$\ST y$ [$\SF x$]]]]
+		]
+	\end{forest}
+	\end{center}
+\end{frame}
+
+\begin{frame}{Табло метод - дефиниции}
+	\begin{itemize}
+		\item<1-> Клон се нарича \textbf{затворен}, ако съдържа противоречие.
+		\item<2-> Клон се нарича \textbf{приключен}, ако всички формули в него са приложени, т.е. съдържа само променливи.
+		\item<3-> Клон се нарича \textbf{отворен}, ако е приключен и не е затворен.
+		\item<4-> \textbf{Затворено табло} е табло, на което всички клонове са затворени.
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Табло метод - тавтология}
+	\begin{lemma}
+		Затворено табло за $\SF X$ е табло доказателство за X, т.е. Х е \textbf{тавтология}.
+	\end{lemma}
+	\small
+	\begin{example}
+		\begin{center}
+		\begin{forest}
+			parse tree
+			[$\SF (x \lor \neg x)$ [$\SF x$ [$\SF \neg x$ [$\ST x$]]]]
+		\end{forest}
+		\end{center}
+	\end{example}
+\end{frame}
+
+% В последствие ще използваме табло метода, за да намерим модел, в който дадена формула е изпълнима. Ще добавим няколко атомарни формули и ще търсим отворен клон. Ако не намерим такъв - нямаме модел за формулата. Ако има - формулата няма лексикални противоречия и почваме да строим модел удоволетворяващ атомарните формули в този клон.
 
 \section{Контактна логика}
 \subsection{Синтаксис}
