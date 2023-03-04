@@ -55,6 +55,14 @@
 
 \newcommand\ST{\mathbb{T}}
 \newcommand\SF{\mathbb{F}}
+\newcommand\SB{\mathbb{B}}
+\newcommand\M{\mathcal{M}}
+\newcommand\F{\mathcal{F}}
+\newcommand\p{\mathcal{P}}
+\newcommand\V{\mathcal{V}}
+\newcommand\E{\mathcal{E}}
+\newcommand\Tb{\mathbf{T}}
+\newcommand\Vb{\mathbf{V}}
 
 \logo{\includegraphics[width=1cm]{fmi_logo.png}}
 
@@ -180,6 +188,49 @@
 
 \section{Контактна логика}
 \subsection{Синтаксис}
+
+\begin{frame}{Контактна логика - синтаксис}
+	\begin{itemize}
+		\item \textit{Булеви променливи} (изброимо множество $\V$)
+		\item \textit{Булеви константи}: 0 и 1
+		\item \textit{Булеви операции}:
+		\begin{itemize}
+			\item $\sqcap$ Сечение
+			\item $\sqcup$ Обединение
+			\item $^*$ Допълнение
+		\end{itemize}
+		\item \textit{Булеви термове}
+		\item \textit{Логически връзки}: $\neg$, $\land$, $\lor$, $\Rightarrow$, $\Leftrightarrow$
+		\item \textit{Логически константи}: $\top$ и $\bot$
+		\item \textit{Модални връзки}: $\leq$(part-of) and $C$(contact)
+		\item \textit{Формули}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Контактна логика - термове}
+	\textbf{\textit{Терм}}
+	\begin{itemize}
+		\item Булева променлива
+		\item Булева константа
+		\item Ако $a$ е терм, то $a^*$ също е терм
+		\item Ако $a$ и $b$ са термове, то и $a \sqcap b$ и $a \sqcup b$ са също термове
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Контактна логика - формули}
+	\textbf{\textit{Атомарни формули}} са от вида $a \leq b$ and $aCb$, където $a$ и $b$ са термове.
+
+	\textbf{\textit{Формула}}
+	\begin{itemize}
+		\item Логическа константа
+		\item Атомарна формула
+		\item Ако $\phi$ е формула, то $\neg\phi$  съшо е формула
+		\item Ако $\phi$ и $\psi$ са формули, то ($\phi \land \psi$), ($\phi \lor \psi$), ($\phi \Rightarrow \psi$) and ($\phi \Leftrightarrow \psi$) са също формули
+	\end{itemize}
+\end{frame}
+
+\subsection{Семантика}
+
 \subsection{Изпълнимост на формула}
 \subsection{Алгоритъм за строене на модел}
 
