@@ -63,6 +63,19 @@
 \newcommand\E{\mathcal{E}}
 \newcommand\Tb{\mathbf{T}}
 \newcommand\Vb{\mathbf{V}}
+\newcommand{\BranchConjunction}{%
+\begin{alignat}{2}
+			\bigwedge_{\ST C(a,b)\in{\SB}} C(a, b) \:\: \wedge \:\:
+			\bigwedge_{\ST d = 0\in{\SB}} d = 0 \:\: \wedge \:\:
+			\bigwedge_{\SF C(e,f)\in{\SB}} \neg C(e, f) \:\: \wedge \:\:
+			\bigwedge_{\SF g = 0\in{\SB}} g \neq 0
+\end{alignat}%
+}
+\newcommand{\pair}[2]{ \langle #1, #2 \rangle }
+\newcommand{\pairXY}{ \pair{x}{y} }
+\newcommand{\pairXX}{ \pair{x}{x} }
+\newcommand{\pairYX}{ \pair{y}{x} }
+\newcommand{\pairYY}{ \pair{y}{y} }
 
 \logo{\includegraphics[width=1cm]{fmi_logo.png}}
 
@@ -202,13 +215,13 @@
 		\item \textit{Булеви термове}
 		\item \textit{Логически връзки}: $\neg$, $\land$, $\lor$, $\Rightarrow$, $\Leftrightarrow$
 		\item \textit{Логически константи}: $\top$ и $\bot$
-		\item \textit{Модални връзки}: $\leq$(part-of) and $C$(contact)
+		\item \textit{Модални връзки}: $\leq$(част от) and $C$(контакт)
 		\item \textit{Формули}
 	\end{itemize}
 \end{frame}
 
 \begin{frame}{Контактна логика - термове}
-	\textbf{\textit{Терм}}
+	\textbf{\textit{Терм - индуктивна дефиниция}}
 	\begin{itemize}
 		\item Булева променлива
 		\item Булева константа
@@ -218,18 +231,86 @@
 \end{frame}
 
 \begin{frame}{Контактна логика - формули}
-	\textbf{\textit{Атомарни формули}} са от вида $a \leq b$ and $aCb$, където $a$ и $b$ са термове.
+	\uncover<1->{
+		\textbf{\textit{Атомарни формули}} са от вида $a \leq b$ and $aCb$, където $a$ и $b$ са термове.
+	}
 
-	\textbf{\textit{Формула}}
-	\begin{itemize}
-		\item Логическа константа
-		\item Атомарна формула
-		\item Ако $\phi$ е формула, то $\neg\phi$  съшо е формула
-		\item Ако $\phi$ и $\psi$ са формули, то ($\phi \land \psi$), ($\phi \lor \psi$), ($\phi \Rightarrow \psi$) and ($\phi \Leftrightarrow \psi$) са също формули
-	\end{itemize}
+	\uncover<2->{
+		\textbf{\textit{Формула - индуктивна дефиниция}}
+		\begin{itemize}
+			\item Логическа константа
+			\item Атомарна формула
+			\item Ако $\phi$ е формула, то $\neg\phi$  съшо е формула
+			\item Ако $\phi$ и $\psi$ са формули, то ($\phi \land \psi$), ($\phi \lor \psi$), ($\phi \Rightarrow \psi$) and ($\phi \Leftrightarrow \psi$) са също формули
+		\end{itemize}
+	}
 \end{frame}
 
 \subsection{Семантика}
+
+\begin{frame}{Контактна логика - семантика}
+	\uncover<1->{
+		$\F$ = (W, R) е релационна система с W $\neq$ $\emptyset$ и R $\subseteq$ $W^2$
+	}
+
+	\uncover<2->{
+		\begin{definition}[Оценка]
+			\textbf{\textit{Оценка}} на булеви променливи в $\F$ е всяка функция $\upsilon : \V \rightarrow \p(W)$. Разширяваме $\upsilon$ индуктивно за булевите термове:
+
+			\begin{itemize}
+				\item $\upsilon(0) = \emptyset$
+				\item $\upsilon(1) = W$
+				\item $\upsilon(a \sqcap b) = \upsilon(a) \cap \upsilon(b)$
+				\item $\upsilon(a \sqcup b) = \upsilon(a) \cup \upsilon(b)$
+				\item $\upsilon(a^*) = W \setminus \upsilon(a)$
+			\end{itemize}
+		\end{definition}
+	}
+\end{frame}
+
+\begin{frame}{Контактна логика - част от}
+	\begin{definition}[Част от]
+		\begin{gather*}
+			a \leq b \iff \upsilon(a) \subseteq \upsilon(b)
+		\end{gather*}
+		Където а и b са термове.
+	\end{definition}
+\end{frame}
+
+\begin{frame}{Контактна логика - контакт}
+	\begin{definition}[Контакт]
+		\begin{gather*}
+			aCb \iff (\exists x \in \upsilon(a))(\exists y \in \upsilon(b))(xRy)
+		\end{gather*}
+		Където а и b са термове.
+	\end{definition}
+\end{frame}
+
+\begin{frame}{Контактна логика - модел}
+	\begin{definition}[Модел]
+		$\M$ = ($\F, \upsilon$) се нарича \textbf{\textit{модел}}.
+
+		Истиността на формула $\phi$ в $\M$ ($\M \models \phi$) се разширява индуктивно за всички термове както следва:
+		\begin{itemize}
+			\item $\M \models \top$
+			\item $\M \not\models \bot$
+			\item $\M \models a \leq b \iff \upsilon(a) \subseteq \upsilon(b)$
+			\item $\M \models aCb \iff (\exists x \in \upsilon(a))(\exists y \in \upsilon(b))(xRy)$
+		\end{itemize}
+	\end{definition}
+\end{frame}
+
+\begin{frame}{Контактна логика - модел}
+	\begin{definition}[Модел]
+		\begin{itemize}
+			\item $\M \models \neg \phi \iff \M \not\models \phi$
+			\item $\M \models \phi \land \psi \iff \M \models \phi$ and $\M \models \psi$
+			\item $\M \models \phi \lor \psi \iff \M \models \phi$ or $\M \models \psi$
+			\item $\M \models \phi \Rightarrow \psi \iff \M \not\models \phi$ or $\M \models \psi$
+			\item $\M \models \phi \Leftrightarrow \psi \iff$ ($\M \models \phi$ and $\M \models \psi$) or ($\M \not\models \phi$ and $\M \not\models \psi$)
+		\end{itemize}
+	\end{definition}
+\end{frame}
 
 \subsection{Изпълнимост на формула}
 \subsection{Алгоритъм за строене на модел}
