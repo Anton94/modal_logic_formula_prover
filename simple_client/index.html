@@ -151,8 +151,8 @@
                     elems[i].disabled = !enable;
                 }
                 // cancel button should be enabled when the model buttons are disabled, i.e. when there is a runninng task
-                cancel_button = document.getElementById("cancel_calculation");
-                cancel_button.disabled = enable;
+                //cancel_button = document.getElementById("cancel_calculation");
+                //cancel_button.disabled = enable;
             }
 
             function get_formula_filters() {
@@ -232,10 +232,10 @@
                         <input type="checkbox" id="reduce_contacts_less_eq_with_constants" checked> Reduce Atomic Formulas with Contacts<br>
                         <input type="checkbox" id="remove_double_negation" checked> Remove Double Negations<br>
                     </div>
-                    <div class="algorithm_cancelations">
+                    <!-- <div class="algorithm_cancelations">
                         If the calculation takes too long, cancel it. Try to optimize the input formula by reducing the variables and the number of atomic formulas in it.<br>
                         <button style="margin-top:0.5rem" id="cancel_calculation" onclick="cancel_task(valid_op_id)">CANCEL CALCULATION</button>
-                    </div>
+                    </div> -->
                 </div>
                 <div style="width: 100%; display: flex; flex-direction: row">
                     <div id="visualization-graph"></div>

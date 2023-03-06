@@ -148,7 +148,7 @@ label {
     background: #ebebf3;
 }
 .formula_filters {
-    width: 60%;
+    width: 100%;
     margin: 1rem;
     border: 0.5rem outset #87656b;
     border-radius: 12px;
