@@ -4,12 +4,16 @@
 \usepackage[T2A,T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[main=bulgarian,english]{babel}
+\usepackage{algorithm,algorithmic}
 
 \usepackage{forest}
 \usepackage{mathtools}
 \forestset{
     parse tree/.style={for tree={s sep=0.5em, minimum size=0.5em}}
 }
+
+\renewcommand\thealgorithm{}
+\newcommand{\setalglineno}[1]{\setcounter{ALC@line}{\numexpr#1-1}}
 
 \graphicspath{ {./image/} }
 
@@ -44,6 +48,7 @@
 
 % Teach babel the tags to translate them
 \usepackage{etoolbox}
+\newtheorem{axiom}{Axiom}
 \patchcmd{\theorem}{Theorem}{Teorema}{}{}
 \patchcmd{\corollary}{Corollary}{Следствие}{}{}
 \patchcmd{\lemma}{Lemma}{Лема}{}{}
@@ -64,12 +69,13 @@
 \newcommand\Tb{\mathbf{T}}
 \newcommand\Vb{\mathbf{V}}
 \newcommand{\BranchConjunction}{%
-\begin{alignat}{2}
+\begin{equation*}
+			\beta =
 			\bigwedge_{\ST C(a,b)\in{\SB}} C(a, b) \:\: \wedge \:\:
 			\bigwedge_{\ST d = 0\in{\SB}} d = 0 \:\: \wedge \:\:
 			\bigwedge_{\SF C(e,f)\in{\SB}} \neg C(e, f) \:\: \wedge \:\:
 			\bigwedge_{\SF g = 0\in{\SB}} g \neq 0
-\end{alignat}%
+\end{equation*}%
 }
 \newcommand{\pair}[2]{ \langle #1, #2 \rangle }
 \newcommand{\pairXY}{ \pair{x}{y} }
@@ -270,21 +276,23 @@
 
 \begin{frame}{Контактна логика - част от}
 	\begin{definition}[Част от]
-		\begin{gather*}
+		\begin{equation*}
 			a \leq b \iff \upsilon(a) \subseteq \upsilon(b)
-		\end{gather*}
+		\end{equation*}
 		Където а и b са термове.
 	\end{definition}
 \end{frame}
 
 \begin{frame}{Контактна логика - контакт}
 	\begin{definition}[Контакт]
-		\begin{gather*}
+		\begin{equation*}
 			aCb \iff (\exists x \in \upsilon(a))(\exists y \in \upsilon(b))(xRy)
-		\end{gather*}
+		\end{equation*}
 		Където а и b са термове.
 	\end{definition}
 \end{frame}
+
+\subsection{Изпълнимост на формула}
 
 \begin{frame}{Контактна логика - модел}
 	\begin{definition}[Модел]
@@ -312,10 +320,294 @@
 	\end{definition}
 \end{frame}
 
-\subsection{Изпълнимост на формула}
+\begin{frame}{Контактна логика - изпълнимост на формула}
+	\uncover<1->{
+		\begin{definition}[Модел на формула]
+			Модел $\M$ е \textit{\textbf{модел на формулата}} $\phi$, ако $\phi$ е \textit{вярвна (изводима)} в $\M$.
+		\end{definition}
+	}
+
+	\uncover<2->{
+		\begin{definition}[Изпълнимост на формула]
+			Ако $\phi$ има модел $\M$, то $\phi$ е \textbf{изпълнима}.
+		\end{definition}
+	}
+\end{frame}
+
+\begin{frame}{Контактна логика}
+	Нека a и b са термове.
+	\uncover<1->{
+		\begin{lemma}[Равенство на термове]
+			\begin{equation*}
+				a = b \implies \upsilon(a) = \upsilon(b)
+			\end{equation*}
+		\end{lemma}
+	}
+
+	\uncover<2->{
+		\begin{lemma}[Нулев терм]
+			\begin{equation*}
+				a \leq b \implies a \sqcap b^*=0
+			\end{equation*}
+		\end{lemma}
+	}
+
+	\uncover<3->{
+		\begin{lemma}[Ненулев терм]
+			\begin{equation*}
+				\neg(a \leq b) \implies a \sqcap b^* \neq 0
+			\end{equation*}
+		\end{lemma}
+	}
+\end{frame}
+
+\begin{frame}{Контактна логика - свойства на релацията}
+	Нека a и b са термове.
+	\uncover<1->{
+		\begin{axiom}[Рефлексивност]
+			\begin{equation*}
+				a \neq 0 \implies aCa
+			\end{equation*}
+		\end{axiom}
+	}
+
+	\uncover<2->{
+		\begin{axiom}[Симетричност]
+			\begin{equation*}
+				aCb \iff bCa
+			\end{equation*}
+		\end{axiom}
+	}
+\end{frame}
+
+\begin{frame}{Табло - отворен клон}
+	\uncover<1->{
+		\begin{center}
+			Формула $\phi \rightarrow$ табло с начало $\phi \rightarrow$ отворен клон $\SB$.
+		\end{center}
+	}
+
+	\only<2>{
+		$\SB$ е множество състоящо се от следните атомарни формули
+		\begin{itemize}
+			\item $\ST C(a,b)$
+			\item $\SF C(e,f)$
+			\item $\ST a \leq b$
+			\item $\SF a \leq b$
+		\end{itemize}
+	}
+
+	\only<3>{
+		$\SB$ е множество състоящо се от следните атомарни формули
+		\begin{itemize}
+			\item $\ST C(a,b)$ $\rightarrow$ $C(a,b)$ (контакт)
+			\item $\SF C(a,b)$ $\rightarrow$ $\neg C(a,b)$ (не-контакт)
+			\item $\ST a \leq b$ $\rightarrow$ $a \leq b$ $\rightarrow$ $a \sqcap b^*=0$ $\rightarrow$ $g = 0$ (нулев терм)
+			\item $\SF a \leq b$ $\rightarrow$ $\neg (a \leq b)$ $\rightarrow$ $a \sqcap b^* \neq 0$ $\rightarrow$ $d \neq 0$ (ненулев терм)
+		\end{itemize}
+	}
+\end{frame}
+
 \subsection{Алгоритъм за строене на модел}
 
+\begin{frame}{Строене на модел}
+	\uncover<1->{
+		\begin{definition}[Отворен клон $\beta$]
+			\BranchConjunction
+		\end{definition}
+	}
+
+	\uncover<2->{
+		\begin{center}
+			Ако $\beta$ има модел $\M = (\F, \upsilon) = ((W, R), \upsilon)$, то $\M$ е и модел за формулата $\phi$
+		\end{center}
+	}
+\end{frame}
+
+\begin{frame}{Модални точки}
+	$\upsilon : \V \rightarrow \p(W)$
+	\begin{itemize}
+		\item $\upsilon(0) = \emptyset$ \;\;\;\;\;\;\;\;\;\;\;\; $\upsilon(1) = W$  \;\;\;\;\;\;\;\;\;\;\;\; $\upsilon(a^*) = W \setminus \upsilon(a)$
+		\item $\upsilon(a \sqcap b) = \upsilon(a) \cap \upsilon(b)$  \;\;\;\;\;\;\;\;\;\;\;\; $\upsilon(a \sqcup b) = \upsilon(a) \cup \upsilon(b)$
+	\end{itemize}
+
+	\begin{definition}[Модална точка]
+		Оценка на променливи $\E_n$ за $n$ булеви променливи е поредици от единици и нули както следва:
+		\begin{equation*}
+			\E_n = \; < e_1, e_2, \ldots , e_n >, \; where \; e_1, \ldots, e_n \in \{0, 1 \}
+		\end{equation*}
+		\textbf{Модална точка} е оценка на променливи $\E_n$
+	\end{definition}
+\end{frame}
+
+\begin{frame}{Модални точки}
+	\uncover<1->{
+		\begin{definition}[$W_n$]
+			Множеството от всички модални точки за n променливи е \textbf{$W_n$}
+			\begin{equation*}
+				W_n = \{< e_1, e_2, \ldots , e_n > \mid e_1, \ldots, e_n \in \{0, 1 \} \}
+			\end{equation*}
+			$|W_n| = 2^n$
+		\end{definition}
+	}
+
+	\uncover<2->{
+		\begin{definition}
+			$(\E_n)^i$ e i-тия елемент в поредицата $\E_n$.
+		\end{definition}
+	}
+\end{frame}
+
+\begin{frame}{Оценка}
+	\textbf{Оценка $\upsilon : \V \rightarrow \p(W)$}:
+	\begin{equation*}
+		\upsilon(x) = \{ \E \mid \E \in W \; and \; (\E)^i = 1 \}, \;\; x \in \V
+	\end{equation*}
+	Разширява се индуктивно както следва:
+	\begin{itemize}
+		\item $\upsilon(0) = \emptyset$
+		\item $\upsilon(1) = W$
+		\item $\upsilon(a \sqcap b) = \upsilon(a) \cap \upsilon(b)$
+		\item $\upsilon(a \sqcup b) = \upsilon(a) \cup \upsilon(b)$
+		\item $\upsilon(a^*) = W \setminus \upsilon(a)$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Изпълнимост на атомарни формули}
+	\uncover<1->{
+		\begin{lemma}[Изпълнимост на нулевите термове]
+			\begin{equation*}
+				g = 0 \in \beta \rightarrow \upsilon(g) = \emptyset
+			\end{equation*}
+		\end{lemma}
+	}
+
+	\uncover<2->{
+		\begin{lemma}[Изпълнимост на не-контактите]
+			\begin{equation*}
+				\neg C(e, f) \in \beta \rightarrow \neg(\exists x \in \upsilon(e))(\exists y \in \upsilon(f))(xRy)
+			\end{equation*}
+		\end{lemma}
+	}
+\end{frame}
+
+\begin{frame}{Валидна модална точка}
+	\uncover<1->{
+	\begin{definition}[Валидна модална точка]
+		$\E \in W_n$ е \textbf{валидна модална точка} на $\beta$, ако запазва изпълнимостта на нулевите термове и не-контактите
+			\begin{equation*}
+				g = 0 \in \beta \rightarrow \E_n \notin \upsilon_n(g) И
+			\end{equation*}
+			\begin{equation*}
+				\neg C(e, f) \in \beta \rightarrow \E_n \notin (\upsilon_n(e) \cap \upsilon_n(f))
+			\end{equation*}
+	\end{definition}
+	}
+
+	\uncover<2->{
+		\begin{definition}[$W^v$]
+			Множеството от всички валидни модални точки е \textbf{$W^v$}
+			\begin{center}
+				$W^v = \{ \E \mid \E \in W_n$ и $\E$ е валидна модална точка на $\beta \}$
+			\end{center}
+		\end{definition}
+	}
+\end{frame}
+
+\begin{frame}{Валидна релация между точки}
+	\uncover<1->{
+		\begin{definition}[Валидна релация]
+			Нека х, y $\in W^v$. Тогава $\pairXY$ е \textbf{валидна релация} на $\beta$, ако запазва изпълнимостта на не-контактите в $\beta$.
+			\begin{center}
+				$\neg C(e, f) \in \beta \rightarrow \neg(x \in \upsilon(e)$ и $y \in \upsilon(f))$ или $(x \in \upsilon(f)$ и $y \in \upsilon(e))$
+			\end{center}
+		\end{definition}
+	}
+
+	\uncover<2->{
+		\begin{definition}[IsValidCon]
+			$IsValidCon: (W^v \times W^v) \rightarrow \{0, 1 \}$
+			\begin{center}
+				$IsValidCon(x,y) = 1 \iff \pairXY$ е валидна релация
+			\end{center}
+		\end{definition}
+	}
+\end{frame}
+
+\begin{frame}{Точка част от оценка}
+		\begin{definition}[$\eta$]
+			$\eta: (\Tb \times W_n) \rightarrow \{0, 1 \}$ - указва дали модална точка е част от оценката на терм. Нека $t \in \Tb$ и $\E \in W_n$.
+			\begin{itemize}
+				\item $\eta(0, \E) = 0$
+				\item $\eta(1, \E) = 1$
+				\item $\eta(x_i, \E) = 1 \iff (\E)^i = 1$
+				\item $\eta(a \sqcap b, \E) = 1 \iff \eta(a, \E) = 1 \; and \; \eta(b, \E) = 1$
+				\item $\eta(a \sqcup b, \E) = 1 \iff \eta(a, \E) = 1 \; or \; \eta(b, \E) = 1$
+				\item $\eta(a^*, \E) = 1 \iff \eta(a, \E) = 0$
+			\end{itemize}
+		\end{definition}
+\end{frame}
+
+\begin{frame}{Точка част от оценка}
+	\begin{lemma}
+		Нека $t \in \Tb$ и $\E \in W_n$.
+		\begin{equation*}
+			\eta(t, \E) = 1 \iff \E \in \upsilon(t)
+		\end{equation*}
+	\end{lemma}
+\end{frame}
+
+\begin{frame}
+	\begin{algorithm}[H]
+	\renewcommand\thealgorithm{} % Remove the algotihm #number
+	\begin{algorithmic}[1] % [1] Adds line numbering
+		\STATE $W \gets \emptyset$
+		\STATE $R \gets \emptyset$
+		\FOR{$d \neq 0 \in \beta$} \label{non-zero-terms}
+			\FOR{$\E \in W^v$}
+				\IF{$\eta(d, \E_n) = 1$}
+					\STATE $W \gets W \cup \{ x \}$
+					\STATE $R \gets R \cup \{ \pairXX \}$
+					\STATE go to \ref{non-zero-terms}
+				\ENDIF
+			\ENDFOR
+			\STATE Не може да се създаде модел.
+		\ENDFOR
+	\end{algorithmic}
+
+	\caption{Алгоритъм за строене на модел}
+	\label{alg:seq}
+	\end{algorithm}
+\end{frame}
+
+\begin{frame}
+	\begin{algorithm}[H]
+	\renewcommand\thealgorithm{} % Remove the algotihm #number
+	\begin{algorithmic}[1] % [1] Adds line numbering
+		\setalglineno{13}
+		\FOR{$C(a, b) \in \beta$} \label{contacts}
+			\FOR{$x,\; y \in W^v$}
+				\IF{$\eta(a, x) = 1 \land \eta(b, x) = 1 \land IsValidCon(x,y)$}
+					\STATE $W \gets W \cup \{x, y \}$
+					\STATE $R \gets R \cup \{\pairXX, \pairYY, \pairXY, \pairYX \}$
+					\STATE go to \ref{contacts}
+				\ENDIF
+			\ENDFOR
+			\STATE Не може да се създаде модел.
+		\ENDFOR
+		\STATE Успешно е създаден модел $\M = ((W, R), \upsilon)$.
+	\end{algorithmic}
+
+	\caption{Алгоритъм за строене на модел}
+	\label{alg:seq}
+	\end{algorithm}
+\end{frame}
+
 \section{Свързана контактна логика}
+
+\begin{frame}{Свързана контактна логика}
+\end{frame}
+
 \subsection{Свързаност}
 \subsection{Алгоритъм за строене на свързан модел}
 
