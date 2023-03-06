@@ -780,6 +780,83 @@
 	\end{theorem}
 \end{frame}
 
+\section{Имплементация}
+
+\begin{frame}{Имплементация - строене на AST}
+	Flex \& Bison за строене на AST (Абстрактно синтактично дърво)
+		\begin{example}
+		\begin{center}
+		$\phi = (C(x1,x2) \;\& <=(x2, x3)) => C(x1, x3)$.
+		\begin{tikzpicture}[
+			tlabel/.style={pos=0.6,right=-1pt,font=\footnotesize\color{red!70!black}},
+		]
+		\node{=>}
+			child {node {$\&$}
+				child {node {C}
+						child {node {x1}}
+					child {node {x2}}
+				}
+				child[missing] {}
+				child {node {<=}
+					child {node {x2}}
+					child {node {x3}}
+				}
+			}
+			child[missing] {}
+			child[missing] {}
+			child {node {C}
+				child {node {x1}}
+				child {node {x3}}
+		};
+		\end{tikzpicture}
+		\end{center}
+	\end{example}
+\end{frame}
+
+\begin{frame}
+	\begin{example}[Премахване на импликацията]
+	\begin{center}
+		\begin{tikzpicture}[
+			tlabel/.style={pos=0.6,right=-1pt,font=\tiny},
+		]
+		\node{$|$}
+		child {node {$\sim$}
+			child {node {$\&$}
+				child {node {C}
+					child {node {x1}}
+					child {node {x2}}
+				}
+				child[missing] {}
+				child {node {<=}
+					child {node {x2}}
+					child {node {x3}}
+				}
+			}
+		}
+		child[missing] {}
+		child[missing] {}
+		child {node {C}
+			child {node {x1}}
+			child {node {x3}}
+		};
+		\end{tikzpicture}
+	\end{center}
+	\end{example}
+\end{frame}
+
+\begin{frame}{Имплементация}
+	\begin{itemize}
+		\item Превръщане на AST формула във формула с удобни и ефективни операции свързани за табло метода и строенето на модела
+		\item Пускане на табло метода за търсене на отворен клон
+		\item Генериране на (свързан) модел
+		\item Компилиране на библиотеката в WebAssembly
+		\item Уеб приложение
+		\item Тестове
+		\item Автоматични билдове
+		\item \url{https://github.com/Anton94/modal_logic_formula_prover}
+	\end{itemize}
+\end{frame}
+
 \section{Демо}
 
 \begin{frame}{Демо}
@@ -801,11 +878,5 @@
 	\small
 	Repository - \url{https://github.com/Anton94/modal_logic_formula_prover}
 \end{frame}
-
-\section{Имплементация}
-\subsection{Строене на формула от текст}
-\subsection{Строене на свързан модел}
-\subsection{Сървър и уеб приложение}
-\subsection{Автоматична компилация, тестване и среда}
 
 \end{document}
