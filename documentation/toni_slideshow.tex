@@ -5,6 +5,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[main=bulgarian,english]{babel}
 \usepackage{algorithm,algorithmic}
+\usepackage{hyperref}
 
 \usepackage{forest}
 \usepackage{mathtools}
@@ -49,7 +50,8 @@
 % Teach babel the tags to translate them
 \usepackage{etoolbox}
 \newtheorem{axiom}{Axiom}
-\patchcmd{\theorem}{Theorem}{Teorema}{}{}
+\newtheorem{step}[theorem]{Step}
+\patchcmd{\theorem}{Theorem}{Теорема}{}{}
 \patchcmd{\corollary}{Corollary}{Следствие}{}{}
 \patchcmd{\lemma}{Lemma}{Лема}{}{}
 \patchcmd{\proposition}{Proposition}{Предложение}{}{}
@@ -57,6 +59,7 @@
 \patchcmd{\example}{Example}{Пример}{}{}
 \patchcmd{\definition}{Definition}{Дефиниция}{}{}
 \patchcmd{\remark}{Remark}{Забележка}{}{}
+\patchcmd{\step}{Step}{Стъпка}{}{}
 
 \newcommand\ST{\mathbb{T}}
 \newcommand\SF{\mathbb{F}}
@@ -432,7 +435,7 @@
 	\end{itemize}
 
 	\begin{definition}[Модална точка]
-		Оценка на променливи $\E_n$ за $n$ булеви променливи е поредици от единици и нули както следва:
+		Оценка на променливи $\E_n$ за $n$ булеви променливи е поредица от единици и нули както следва:
 		\begin{equation*}
 			\E_n = \; < e_1, e_2, \ldots , e_n >, \; where \; e_1, \ldots, e_n \in \{0, 1 \}
 		\end{equation*}
@@ -595,7 +598,7 @@
 			\ENDFOR
 			\STATE Не може да се създаде модел.
 		\ENDFOR
-		\STATE Успешно е създаден модел $\M = ((W, R), \upsilon)$.
+		\STATE Успешно е създаден модел $\M = ((W, R), \upsilon)$
 	\end{algorithmic}
 
 	\caption{Алгоритъм за строене на модел}
@@ -606,10 +609,198 @@
 \section{Свързана контактна логика}
 
 \begin{frame}{Свързана контактна логика}
+	\uncover<1->{
+		\begin{axiom}[Свързаност]
+			\begin{equation*}
+				a \neq 0 \land a \neq 1 \implies aCa^*
+			\end{equation*}
+		\end{axiom}
+	}
+
+	\uncover<2->{
+		\begin{equation*}
+			\upsilon(a) \neq \emptyset \land \upsilon(a) \neq W \implies (\exists x \in \upsilon(a)) (\exists y \in W \setminus \upsilon(a))(xRy)
+		\end{equation*}
+	}
 \end{frame}
 
-\subsection{Свързаност}
+\begin{frame}
+	\uncover<1->{
+		Релационната система $\F = (W, R)$ дефинира ненасочен граф G(W, R). $W$ е множеството от върхове, а $R$ е множеството от ребра.
+	}
+
+	\uncover<2->{
+		\begin{definition}[Път в граф]
+			Нека G = (W, R) е граф. \textbf{Път} $\pi_G(x, y)$ е поредица от върхове $(x, v_1, \dotsc , v_k, y)$, такива че $x,  v_1,\dotsc,v_k, y \in V$ и $xRv1,v_1Rv_2,\dotsc, v_{k-1}Rv_k, v_kRy$.
+		\end{definition}
+	}
+
+	\uncover<3->{
+		\begin{definition}[Свързан граф]
+			Нека $G = (W, R)$ е ненасочен граф. $G$ е \textbf{свързан}, ако има път между всеки два различни върха в $W$.
+			\begin{equation*}
+				x, y \in W \rightarrow (x \neq y \implies \pi_G(x, y))
+			\end{equation*}
+		\end{definition}
+	}
+\end{frame}
+
+\begin{frame}{Свързан модел}
+	\uncover<1->{
+		\begin{theorem}[Свързаност]
+		 Нека $\F = (W, R)$ е релационна система и G = (W, R) е графът, дефиниран от нея.
+			\begin{center}
+				аксиомата за свързаност е удоволетворена в $\F \iff$ G е свързан
+			\end{center}
+		\end{theorem}
+	}
+
+	\uncover<2->{
+		\begin{definition}[Свързан модел]
+			Нека $\F$ = (W, R) е релационна система. Нека G = (W, R) е графът дефиниран от нея $\F$. Нека $\M = (\F, \upsilon)$ е модел на $\beta$. $\M$ е \textbf{свързан модел}, ако G e свързан граф.
+		\end{definition}
+	}
+\end{frame}
+
+\begin{frame}{Свързан модел}
+	\uncover<1->{
+		\begin{definition}[$R^v$]
+			\begin{center}
+				$R^v = \{ \pairXY  \mid x, y \in W^v$ и $\pairXY$  е валидна релация на $\beta\}$
+			\end{center}
+		\end{definition}
+	}
+
+	\uncover<2->{
+		\begin{step}
+			$\F^v = (W^v, R^v)$, $\M^v = (\F^v, \upsilon)$. $\M^v$ е модел на $\beta$, ако контактите и ненулевите термове в $\beta$ са удоволетворени. Ако $\M^v$ не е модел, тогава $\beta$ няма модел(нито свързан модел).
+		\end{step}
+	}
+\end{frame}
+
+\begin{frame}{Подграф}
+	\begin{definition}[Подграф]
+		$G'(W', R') \subseteq G(W, R)$, ако:
+		\begin{center}
+			$W' \subseteq W$ и $R' = \{ \pairXY  \mid x, y \in W'$ и $xRy \}$
+		\end{center}
+	\end{definition}
+\end{frame}
+
+\begin{frame}{Подмодел}
+	\begin{lemma}[Подмодел]
+		$\F = (W, R)$, $\M = (\F, \upsilon)$. Нека $G'=(W',R') \subseteq G=(W, R)$. Тогава G' дефинира модел $\M' = ((W', R'), \upsilon')$, където:
+		\begin{itemize}
+			\item $\upsilon'(x) = \upsilon(x) \cap W'$, за всяка променлива х
+			\item $\upsilon'(0) = \emptyset$
+			\item $\upsilon'(1) = W'$
+			\item $\upsilon'(a \sqcap b) = \upsilon'(a) \cap \upsilon'(b)$
+			\item $\upsilon'(a \sqcup b) = \upsilon'(a) \cup \upsilon'(b)$
+			\item $\upsilon'(a^*) = W' \setminus \upsilon'(a)$
+		\end{itemize}
+	\end{lemma}
+\end{frame}
+
+\begin{frame}{Запазване удоволетворимост атомарни формули}
+	\begin{lemma}[Запазване удоволетворимост атомарни формули]
+		$G^v=(W^v, R^v)$ е графът породен от $\F^v$. Нека $G=(W,R) \subseteq G^v$ and $\M=((W,R), \upsilon')$ е моделът дефиниран от G. Тогава:
+		\begin{itemize}
+			\item<1-> M запазва удоволетворимостта на контактите в $\beta$, ако
+			\begin{equation*}
+				C(a,b) \in \beta \rightarrow (\exists x \in \upsilon_n'(a))(\exists y \in \upsilon_n'(b))(xRy)
+			\end{equation*}
+
+			\item<2-> M запазва удоволетворимостта на ненулевите термове в $\beta$, ако
+			\begin{equation*}
+				g \neq 0 \in \beta \rightarrow \upsilon_n'(g) \neq \emptyset
+			\end{equation*}
+		\end{itemize}
+	\end{lemma}
+\end{frame}
+
+\begin{frame}{Свързани компоненти - дефиниции}
+	\uncover<1->{
+		\begin{definition}[Свързана компонента]
+			Нека $G=(W, R)$ е граф. Нека $G'=(W', R') \subseteq G(W, R)$. Ако $G'$ е свързан, то G' е \textbf{свързана компонента} на G.
+		\end{definition}
+	}
+
+	\uncover<2->{
+		\begin{definition}[Максимална свързана компонента]
+			Нека $G=(W, R)$ е граф. Нека $G'=(W', R')$ е свързана компонента на G. $G'$ е \textbf{максимална свързана компонента} на G, ако:
+			\begin{gather*}
+				x \in W' \rightarrow \neg(\exists y \in W \setminus W')(xRy) \\
+				x,y \in W' \rightarrow xRy \iff xR'y
+			\end{gather*}
+		\end{definition}
+	}
+\end{frame}
+
 \subsection{Алгоритъм за строене на свързан модел}
+
+\begin{frame}{Свързан модел}
+	\begin{step}
+		Нека $\M^v$ е модел на $\beta$. Всички модели, дефинирани от свързаните компоненти на $G^v$ запазват удоволетворимостта на нулевите термове и не-контактите(не добавят точки, нито релации). Ако има свързана компонента, която запазва удоволетворимостта на контактите и ненулевите термове, то тя дефинира \textbf{свързан модел} на $\beta$.
+
+		Достатъчно е да разгледаме само максималните свързани компоненти на $G^v$.
+	\end{step}
+\end{frame}
+
+\begin{frame}{Максимално свързани компоненти}
+	\begin{definition}[$Comp^G$]
+		Нека $G=(W, R)$ е граф.
+		\begin{center}
+			$Comp^G = \{ G' \mid G' \subseteq G$ и G' е максимлано свързана компонента $\}$
+		\end{center}
+	\end{definition}
+\end{frame}
+
+\begin{frame}{Свързан модел}
+	\begin{step}
+		Нека $Comp^{G^v}$ е множеството от максимлано свързани компоненти на $G^v$. Нека $|W^v|=m$, тогава $|Comp^{G^v}| <= m$.
+	\end{step}
+
+	\begin{step}
+		Всеки модел дефиниран от граф в $Comp^{G^v}$ удоволетворява нулевите термове и не-контактите на $\beta$.  Ако има такъв, който запазва удоволетворимостта на контактите и ненулевите термове, то той е \textbf{свързан модел} на $\beta$. Ако няма, то $\beta$ няма свързан модел.
+	\end{step}
+\end{frame}
+
+\begin{frame}
+	\begin{lemma}[Разширение на свързана компонента]
+		Нека G=(W,R) и $G'=(W', R') \subseteq G$ е свързана компонента на G.
+		G' може да бъде разширено до максимлано свързана компонента $G_m(W_m, R_m)$  на G  както следва:
+		\begin{center}
+			 $W_m = W' \cup \{ x \mid x \in W \setminus W'$ и $(\exists y \in W')(\pi_G(x,y)) \}$
+			 $R_m = \{ \pairXY \mid \pairXY \in R$ и $x, y \in W_m \}$
+		\end{center}
+	\end{lemma}
+
+	\begin{theorem}
+		Нека $G^v=(W^v, R^v)$ е граф дефиниран от $\F^v$. Ако $G^v$ няма максимално свързана компонента, която дефинира модел на $\beta$, то $\beta$ няма свързан модел.
+	\end{theorem}
+\end{frame}
+
+\section{Демо}
+
+\begin{frame}{Демо}
+	\begin{center}
+		Демо - \url{http://logic.fmi.uni-sofia.bg/theses/Dudov_Stoev/}
+	\end{center}
+\end{frame}
+
+\begin{frame}
+	\begin{center}
+		\Huge
+		Благодаря за вниманието!
+		\\ [12mm]
+		Въпроси?
+	\end{center}
+
+    \mbox{}
+    \\ [20mm]
+	\small
+	Repository - \url{https://github.com/Anton94/modal_logic_formula_prover}
+\end{frame}
 
 \section{Имплементация}
 \subsection{Строене на формула от текст}
