@@ -274,21 +274,12 @@ Both of the equivalence rules split the branch into separate branches, the detai
 A branch is said to be closed if and only if it contains the same formula signed as valid and invalid.
 		\end{defn}
 
-		\begin{defn}[Closed tableau]
-		\label{closed-tableau} 
-A tableau is said to be closed if, after the decomposition process, all branches are closed.
-		\end{defn}
-
 		\begin{defn}[Atomic branch]
 A branch is said to be atomic if it is not possible to apply any of the tableau rules. This means that each formula in the branch is an atomic formula.
 		\end{defn}
 
-		\begin{defn}[Atomic tableau]
-A tableau is said to be atomic if all branches are atomic.
-		\end{defn}
-
 		\begin{defn}[Finished tableau] 
-A tableau is said to be finished, if and only if it is closed or it is an atomic tableau.
+A tableau is said to be finished, if it has only closed and atomic branches.
 		\end{defn}
 
 		\paragraph{Tautology formula} 
@@ -696,8 +687,8 @@ For the purposes of our algorithm the elements of W will be such variable valuat
 	\begin{defn}
 		let $\Ts$ be the set of all terms and let $\mathcal{F}$ be a frame constructed with the Contact and Non zero term modal point construction steps. Then the model valuation $\vE : \Ts \rightarrow \mathscr{P}(W)$ is defined inductively as:
 		\begin{itemize}
-			\item $\vE(0) = W$
-			\item $\vE(1) = \emptyset$
+			\item $\vE(0) = \emptyset$
+			\item $\vE(1) = W$
 			\item $\vE(p) = \{ \curvedE \; | \; \curvedE \in W \:\:\textit{and}\:\: \curvedE(p) = \textit{true} \}$
 			\item $\vE(a \sqcap b) = \vE(a) \cap \vE(b)$
 			\item $\vE(a \sqcup b) = \vE(a) \cup \vE(b)$
@@ -713,7 +704,7 @@ For the purposes of our algorithm the elements of W will be such variable valuat
 		\begin{align*}
 			\vBool_{\curvedE}(a) = true \leftrightarrow \curvedE \in \vE(a)
 		\end{align*}
-		In such a case when $\vBool_{\curvedE}(a) = \textbf{true}$ we will say that the point p is \textbf{valid}.
+		In such a case when $\vBool_{\curvedE}(a) = \textbf{true}$ we will say that the point $\curvedE$ is \textbf{valid}.
 	\end{lemma}
 
 	\newpage
@@ -794,14 +785,6 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 			by removing all variables present on both sides of the equation. This can be written as:
 			\begin{align*}
 				\sum_{i: p_i \in \vE(x) \setminus \vE(y)} X_i \leq \sum_{j: p_j \in \vE(y) \setminus \vE(x)} X_j
-			\end{align*}
-		\end{lemma}
-
-		\begin{lemma} \label{measure_less_without_duplication}
-			Let x and y be two terms and let $\mathscr{I}_q$ be the inequality produced from $<_\mu(x, y)$. Then the inequality $\mathscr{L}_q$ can be simplified 
-			by removing all variables present on both sides of the equation. This can be written as:
-			\begin{align*}
-				\sum_{i: p_i \in \vE(x) \setminus \vE(y)} X_i < \sum_{j: p_j \in \vE(y) \setminus \vE(x)} X_j
 			\end{align*}
 		\end{lemma}
 

@@ -116,7 +116,8 @@
 \section{Табло Метод}
 \begin{frame}\frametitle{Табло Метод}
 \begin{itemize}
-	\item Табло метода като процедура за опровергаване на формули
+	\item Табло метод като процедура за опровергаване на формули
+	\item Табло метод като процедура за построяване на модели
 	\item Табло Метод в Пропозиционалната Логика
 \end{itemize}
 \end{frame}
@@ -248,22 +249,12 @@
 Когато в него има едновременно една и съща формула маркирана за валидна и за невалидна.
 \end{defn}
 
-\begin{defn}[Затворено табло]
-Когато в таблото всички клонове са затворени.
-\end{defn}
-\end{frame}
-
-\begin{frame}\frametitle{Малко дефиниции}
 \begin{defn}[Атомарен клон]
 Когато клона не може да се разширява повече.
 \end{defn}
 
-\begin{defn}[Атомарно табло]
-Когато в таблото всички клонове са атомарни.
-\end{defn}
-
 \begin{defn}[Завършено табло]
-Когато таблото е затворено или атомарно.
+Когато всеки клон в таблото е или затворен или атомарен.
 \end{defn}
 \end{frame}
 
@@ -380,7 +371,7 @@
 
 \subsection{Семантика}
 \begin{frame}\frametitle{Модел}
-	Наредената n-торка $\mathcal{M} = (\mathcal{F}, \mu, \mathscr{v})$ наричаме модел. Дефинираме изпълнимост на дадена формула в $\mathcal{M}$ като:
+	Наредената n-торка $\mathcal{M} = (\mathcal{F}, \mathscr{v})$ наричаме модел. Дефинираме изпълнимост на дадена формула в $\mathcal{M}$ като:
 		\begin{itemize}
 			\item $\mathcal{M} \not\models \bot$ 
 			\item $\mathcal{M} \models \top$
@@ -547,7 +538,7 @@
 \begin{frame}\frametitle{Стъпки за построяване на модел}
 	Ще казваме, че модална точка $\curvedE$ е построена за терма a, когато:
 		\begin{align*}
-			\vBool_{\curvedE}(a) = \textit{ true }
+			\vBool_{\curvedE}(a) = \textit{ истина }
 		\end{align*}
 	Ще групираме атомарните формули на такива за които е необходимо съществуването на модална точка и на такива за които не е.
 \newline
@@ -561,15 +552,15 @@
 \begin{frame}\frametitle{Построяване на модални точки за контактите}
 	За всеки контакт $C(a, b) \in B$ ще построим по две модални точки, такива, че:
 		\begin{itemize}
-			\item $\vBool_{p}(a) = \textbf{true}$
-			\item $\vBool_{q}(b) = \textbf{true}$
+			\item $\vBool_{p}(a) = \textbf{истина}$
+			\item $\vBool_{q}(b) = \textbf{истина}$
 		\end{itemize}
 \end{frame}
 
 \begin{frame}\frametitle{Построяване на модални точки за контактите}
 	Ново генерираните модални точки трябва да удовлетворяват не-контактите, т.е. следното условие трябва да е изпълнено:
 		\begin{align*}
-			 \neg C(e, f) \in B: (\vBool_{p}(e) = \textbf{false} & \textit{илиor } \vBool_{q}(f) = \textbf{лъжа}) \; \textit{ и } \\
+			 \neg C(e, f) \in B: (\vBool_{p}(e) = \textbf{лъжа} & \textit{ или } \vBool_{q}(f) = \textbf{лъжа}) \; \textit{ и } \\
 				(\vBool_{p}(f) = \textbf{лъжа} & \textit{ или } \vBool_{q}(e) = \textbf{лъжа}) \; \textit{ и } \\
 				(\vBool_{p}(e) = \textbf{лъжа} & \textit{ или } \vBool_{p}(f) = \textbf{лъжа}) \; \textit{ и } \\
 				(\vBool_{q}(e) = \textbf{лъжа} & \textit{ или } \vBool_{q}(f) = \textbf{лъжа})
@@ -622,7 +613,7 @@
 \begin{frame}\frametitle{Построяване на модална точка за не-равен на нула терм}
 	За всеки не-равен на нула терм $a \neq 0 \in B$ ще построим една модални точки, такава, че:
 		\begin{itemize}
-			\item $\vBool_{\curvedE}(a) = \textbf{true}$
+			\item $\vBool_{\curvedE}(a) = \textbf{истина}$
 		\end{itemize}
 	За равно на нула термовете, следното условие трябва да е изпълнено:
 	\begin{align*}
@@ -652,7 +643,7 @@
 	\end{center} 
 \end{frame}
 
-\begin{frame}\frametitle{Построяване на фрейм}
+\begin{frame}\frametitle{Построяване на модел}
 	\begin{defn}
 		Нека $\Ts$ е множеството от всички термове и нека $\mathcal{F}$ е фрейм създаден с построяване на модални точки за контактите и не-равно на нула термове.
 		Тогава модалната оценка $\vE : \Ts \rightarrow \mathscr{P}(W)$ се дефинира рекурсивно, като:
@@ -696,7 +687,7 @@
 \begin{frame}\frametitle{Семантика на минималната контактна логика с мярка}
 	Модела на минималната контактна логика се разширява със следната индуктивна дефиниция за изпълнимост:
 	\begin{itemize}
-		\item $\mathcal{M} \models a \leq_\mu b \text{, iff } \mu(\mathscr{v}(a)) \le \mu(\mathscr{v}(b))$
+		\item $\mathcal{M} \models a \leq_\mu b \text{, когато } \mu(\mathscr{v}(a)) \le \mu(\mathscr{v}(b))$
 	\end{itemize}
 
 	\begin{lema}[Тривиални импликации за модели с мярка]
@@ -846,7 +837,7 @@
 \end{frame}
 
 \begin{frame}\frametitle{Изпълнимост в минималната контактна логика с мярка}
-	\begin{lema}[Дедукциш на променливите]
+	\begin{lema}[Дедукция на променливите]
 		Нека $\mathcal{M} = (W, R, \vE)$ е модел, където W е множество от валидни точки.
 		Нека $\mathcal{M'} = (W', R', \vE')$ е модел, дефиниран от $W' \subseteq W$, тогава:
 	% NOTE kaji che R' e sechenie na R s W2
