@@ -36,10 +36,10 @@
   \begin{beamercolorbox}[wd=.2\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
     \usebeamerfont{author in head/foot}\insertshortauthor\expandafter\beamer@ifempty\expandafter{\beamer@shortinstitute}{}{~~(\insertshortinstitute)}
   \end{beamercolorbox}%
-  \begin{beamercolorbox}[wd=.5\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+  \begin{beamercolorbox}[wd=.6\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
     \usebeamerfont{title in head/foot}\insertshorttitle
   \end{beamercolorbox}%
-  \begin{beamercolorbox}[wd=.3\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+  \begin{beamercolorbox}[wd=.2\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
     \usebeamerfont{date in head/foot}\insertshortdate{}\hspace*{2em}
 \insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
   \end{beamercolorbox}}%
@@ -85,12 +85,13 @@
 \newcommand{\pairXX}{ \pair{x}{x} }
 \newcommand{\pairYX}{ \pair{y}{x} }
 \newcommand{\pairYY}{ \pair{y}{y} }
+\def\iff{\leftrightarrow}
 
 \logo{\includegraphics[width=1cm]{fmi_logo.png}}
 
 \date[\today]{}
 
-\title{\textsc{Уеб система за изпълнимост на свързаната контактна логика}}
+\title{\textsc{Уеб система за изпълнимост на контактната логика за свързаност}}
 
 %\subject{}
 
@@ -98,8 +99,11 @@
 
 \author[Антон Дудов]{
 	\textsc{Факултет по математика и информатика} \\
-	\textsc{Катедра по математическа логика и приложенията ѝ} \\ [8mm]
-	\textsc{Антон Дудов} \\ [8mm]
+	\textsc{Катедра по математическа логика и приложенията ѝ} \\ [4mm]
+	\textsc{Антон Дудов} \\ [4mm]
+	\small
+	\textsc{Магистърска програма Логика и алгоритми спец.~Информатика} \\ 
+	\textsc{Факултетен номер: 25691} \\ [3mm]
 	\small\textsc{Научен ръководител: проф. Тинко Тинчев}
 }
 
@@ -113,12 +117,13 @@
 \tableofcontents
 \end{frame}
 
-\section{Табло метод за класическа съждителна логика}
+\section{Табло метод за класическата съждителна логика}
 
 % Табло методът има няколко приложения.
 % Може да се използва за формално доказване, че дадена съждителна формула е тавтология.
 % Алгоритъм за търсене на модел, в който формулата е изпълнима.
-\begin{frame}{Табло метод за класическа съждителна логика}
+
+\begin{frame}{Табло метод за класическата съждителна логика}
 Приложения:
 \begin{itemize}
 	\item<1-> Доказване, че формула е тавтология
@@ -138,7 +143,9 @@
 % Знаците, с които ще маркираме формулите са F и T.
 % Формулите със знаци са изрази от вида FX и TX
 
-\begin{frame}{Табло метод за класическа съждителна логика}
+% Двоично дърво е, крайно е и във всеки връх от дървото слагаме крайно множество от маркирани формули.
+
+\begin{frame}{Табло метод за класическата съждителна логика}
 	Табло метод със знаци $\ST$ и $\SF$
 	\begin{itemize}
 		\item $\ST X$ - означава, че формулата X трябва да е истина (в някой модел)
@@ -173,8 +180,8 @@
 	\begin{forest}
 		parse tree
 		[$\ST ((x \land \neg x) \lor (\neg x \land y))$
-			[$\ST (x \land \neg x)$ [$\ST x$ [$\ST \neg x$ [$\SF x$]]]]
-			[$\ST (\neg x \land y)$ [$\ST \neg x$ [$\ST y$ [$\SF x$]]]]
+			[$\ST (x \land \neg x)$ [$\ST x \mbox{,} \ST \neg x$ [$\ST x \mbox{,} \SF x$]]]
+			[$\ST (\neg x \land y)$ [$\ST \neg  x \mbox{,} \ST y$ [$\SF x \mbox{,} \ST y$]]]
 		]
 	\end{forest}
 	\end{center}
@@ -183,7 +190,7 @@
 \begin{frame}{Табло метод - дефиниции}
 	\begin{itemize}
 		\item<1-> Клон се нарича \textbf{затворен}, ако съдържа противоречие.
-		\item<2-> Клон се нарича \textbf{приключен}, ако всички формули в него са приложени, т.е. съдържа само променливи.
+		\item<2-> Клон се нарича \textbf{приключен}, ако всички формули в него са приложени, т.е. съдържа само променливи със знаци.
 		\item<3-> Клон се нарича \textbf{отворен}, ако е приключен и не е затворен.
 		\item<4-> \textbf{Затворено табло} е табло, на което всички клонове са затворени.
 	\end{itemize}
@@ -198,18 +205,20 @@
 		\begin{center}
 		\begin{forest}
 			parse tree
-			[$\SF (x \lor \neg x)$ [$\SF x$ [$\SF \neg x$ [$\ST x$]]]]
+			[$\SF (x \lor \neg x)$ [$\SF x \mbox{,} \SF \neg x$ [$\SF x \mbox{,} \ST x$]]]]
 		\end{forest}
 		\end{center}
 	\end{example}
 \end{frame}
 
-% В последствие ще използваме табло метода, за да намерим модел, в който дадена формула е изпълнима. Ще добавим няколко атомарни формули и ще търсим отворен клон. Ако не намерим такъв - нямаме модел за формулата. Ако има - формулата няма лексикални противоречия и почваме да строим модел удоволетворяващ атомарните формули в този клон.
+% В последствие ще използваме табло метода, за да намерим модел, в който дадена формула е изпълнима. Ще добавим няколко атомарни формули и ще търсим отворен клон. Ако не намерим такъв - нямаме модел за формулата. Ако има - формулата няма лексикални противоречия и почваме да строим модел удовлетворяващ атомарните формули в този клон.
 
 % Всеки приключен клон в талбото е множество от атомарни формули. Таблото е множество от такива множества. Можем да си мислим за външното множество като дизункция на вътрешните множества, а вътрешните множества са  конюнкция на атомарни формули. По този начин таблото е генеризация на дизюнктивна нормална форма. По този начин преобразуваме формулата в дизюнктивна нормална форма.
 
 \section{Контактна логика}
 \subsection{Синтаксис}
+
+% ВАЖНО - два типа обекти, булеви термове за означаване на региони и формули за означаване на свойства на региони . Атомарните формули се получават като приложим модална връзка към двойка термове
 
 \begin{frame}{Контактна логика - синтаксис}
 	\begin{itemize}
@@ -257,9 +266,15 @@
 
 \subsection{Семантика}
 
+%контактните логики имат топологична, алгебрачни и релационна семантика . ние ще разглеждаме релационната семантика
+
+% R е рефлексивна и симетрична релация
+
+% теоретико множествената разлика е W \ v(a) или от W изхвърляме точките от v(a)
+
 \begin{frame}{Контактна логика - семантика}
 	\uncover<1->{
-		$\F$ = (W, R) е релационна система с W $\neq$ $\emptyset$ и R $\subseteq$ $W^2$
+		$\F$ = (W, R) е релационна система с W $\neq$ $\emptyset$ и R $\subseteq$ $W^2$, реф. и сим.
 	}
 
 	\uncover<2->{
@@ -277,23 +292,7 @@
 	}
 \end{frame}
 
-\begin{frame}{Контактна логика - част от}
-	\begin{definition}[Част от]
-		\begin{equation*}
-			a \leq b \iff \upsilon(a) \subseteq \upsilon(b)
-		\end{equation*}
-		Където а и b са термове.
-	\end{definition}
-\end{frame}
-
-\begin{frame}{Контактна логика - контакт}
-	\begin{definition}[Контакт]
-		\begin{equation*}
-			aCb \iff (\exists x \in \upsilon(a))(\exists y \in \upsilon(b))(xRy)
-		\end{equation*}
-		Където а и b са термове.
-	\end{definition}
-\end{frame}
+% Ако v е оценка M=<F,v> модел . В модела M
 
 \subsection{Изпълнимост на формула}
 
@@ -301,12 +300,12 @@
 	\begin{definition}[Модел]
 		$\M$ = ($\F, \upsilon$) се нарича \textbf{\textit{модел}}.
 
-		Истиността на формула $\phi$ в $\M$ ($\M \models \phi$) се разширява индуктивно за всички термове както следва:
+		Истиността на формула $\phi$ в $\M$ ($\M \models \phi$) се дефинира индуктивно за всички термове както следва:
 		\begin{itemize}
 			\item $\M \models \top$
 			\item $\M \not\models \bot$
 			\item $\M \models a \leq b \iff \upsilon(a) \subseteq \upsilon(b)$
-			\item $\M \models aCb \iff (\exists x \in \upsilon(a))(\exists y \in \upsilon(b))(xRy)$
+			\item $\M \models aCb \iff (\exists x \in \upsilon(a))(\exists y \in \upsilon(b))(xRy)$ % edinichni strelki
 		\end{itemize}
 	\end{definition}
 \end{frame}
@@ -315,10 +314,10 @@
 	\begin{definition}[Модел]
 		\begin{itemize}
 			\item $\M \models \neg \phi \iff \M \not\models \phi$
-			\item $\M \models \phi \land \psi \iff \M \models \phi$ and $\M \models \psi$
-			\item $\M \models \phi \lor \psi \iff \M \models \phi$ or $\M \models \psi$
-			\item $\M \models \phi \Rightarrow \psi \iff \M \not\models \phi$ or $\M \models \psi$
-			\item $\M \models \phi \Leftrightarrow \psi \iff$ ($\M \models \phi$ and $\M \models \psi$) or ($\M \not\models \phi$ and $\M \not\models \psi$)
+			\item $\M \models \phi \land \psi \iff \M \models \phi$ и $\M \models \psi$
+			\item $\M \models \phi \lor \psi \iff \M \models \phi$ или $\M \models \psi$
+			\item $\M \models \phi \Rightarrow \psi \iff \M \not\models \phi$ или $\M \models \psi$
+			\item $\M \models \phi \Leftrightarrow \psi \iff$ ($\M \models \phi$ и $\M \models \psi$) или ($\M \not\models \phi$ и $\M \not\models \psi$)
 		\end{itemize}
 	\end{definition}
 \end{frame}
@@ -326,7 +325,7 @@
 \begin{frame}{Контактна логика - изпълнимост на формула}
 	\uncover<1->{
 		\begin{definition}[Модел на формула]
-			Модел $\M$ е \textit{\textbf{модел на формулата}} $\phi$, ако $\phi$ е \textit{вярвна (изводима)} в $\M$.
+			Модел $\M$ е \textit{\textbf{модел на формулата}} $\phi$, ако $\phi$ е \textit{вярвна (изводима)} в~$\M$.
 		\end{definition}
 	}
 
@@ -339,54 +338,34 @@
 
 \begin{frame}{Контактна логика}
 	Нека a и b са термове.
+
 	\uncover<1->{
-		\begin{lemma}[Равенство на термове]
-			\begin{equation*}
-				a = b \implies \upsilon(a) = \upsilon(b)
-			\end{equation*}
-		\end{lemma}
+		Ясно е, че $\M \models a = b \iff \upsilon(a) = \upsilon(b)$
 	}
 
 	\uncover<2->{
-		\begin{lemma}[Нулев терм]
-			\begin{equation*}
-				a \leq b \implies a \sqcap b^*=0
-			\end{equation*}
-		\end{lemma}
+		$\M \models a \leq b \iff \M \models a \sqcap b^*=0$
 	}
 
 	\uncover<3->{
-		\begin{lemma}[Ненулев терм]
-			\begin{equation*}
-				\neg(a \leq b) \implies a \sqcap b^* \neq 0
-			\end{equation*}
-		\end{lemma}
+		$\M \models \neg(a \leq b) \iff \M \models  a \sqcap b^* \neq 0$
 	}
 \end{frame}
 
 \begin{frame}{Контактна логика - свойства на релацията}
 	Нека a и b са термове.
-	\uncover<1->{
-		\begin{axiom}[Рефлексивност]
-			\begin{equation*}
-				a \neq 0 \implies aCa
-			\end{equation*}
-		\end{axiom}
-	}
-
-	\uncover<2->{
-		\begin{axiom}[Симетричност]
-			\begin{equation*}
-				aCb \iff bCa
-			\end{equation*}
-		\end{axiom}
-	}
+	\begin{itemize}
+		\item<1-> $\M \models a \neq 0 \iff \M \models aCa$
+		\item<2-> $\M \models aCb \iff \M \models bCa$
+	\end{itemize}
+	\bigskip
+	Следват от рефлексивността и симетричността
 \end{frame}
 
 \begin{frame}{Табло - отворен клон}
 	\uncover<1->{
 		\begin{center}
-			Формула $\phi \rightarrow$ табло с начало $\phi \rightarrow$ отворен клон $\SB$.
+			Формула $\phi \rightarrow$ табло с начало $\ST \phi \rightarrow$ отворен клон $\SB$.
 		\end{center}
 	}
 
@@ -422,18 +401,18 @@
 
 	\uncover<2->{
 		\begin{center}
-			Ако $\beta$ има модел $\M = (\F, \upsilon) = ((W, R), \upsilon)$, то $\M$ е и модел за формулата $\phi$
+			Ако $\beta$ има модел $\M = (\F, \upsilon) = ((W, R), \upsilon)$, то $\M$ е и модел за формулата $\phi$.
+			
+			Вярно е и обратното, ако $\phi$ има модел $\M$, то някой отворен клон $\beta$ в табло за $\ST \phi$ също има $\M$ за модел.
 		\end{center}
 	}
 \end{frame}
 
-\begin{frame}{Модални точки}
-	$\upsilon : \V \rightarrow \p(W)$
-	\begin{itemize}
-		\item $\upsilon(0) = \emptyset$ \;\;\;\;\;\;\;\;\;\;\;\; $\upsilon(1) = W$  \;\;\;\;\;\;\;\;\;\;\;\; $\upsilon(a^*) = W \setminus \upsilon(a)$
-		\item $\upsilon(a \sqcap b) = \upsilon(a) \cap \upsilon(b)$  \;\;\;\;\;\;\;\;\;\;\;\; $\upsilon(a \sqcup b) = \upsilon(a) \cup \upsilon(b)$
-	\end{itemize}
+% Да си мислим за формула с Н променливи. За верността на формулата имат значение само оценките на тези променливи. В този смисъл една модална точка казва кои променливи са верни в нея и кои не са верни. Точките може да си мислим като характеристичния вектор на верността на променливите в тази точка
+% Твърде сложно за казване е горното
 
+
+\begin{frame}{Модални точки}
 	\begin{definition}[Модална точка]
 		Оценка на променливи $\E_n$ за $n$ булеви променливи е поредица от единици и нули както следва:
 		\begin{equation*}
@@ -466,7 +445,7 @@
 	\begin{center}
 		$\upsilon(x_i) = \{ \E \mid \E \in W$ и $(\E)^i = 1 \}, \;\; x_i \in \V$
 	\end{center}
-	Разширява се индуктивно както следва:
+	Дефинира се индуктивно за термове както следва:
 	\begin{itemize}
 		\item $\upsilon(0) = \emptyset$
 		\item $\upsilon(1) = W$
@@ -627,27 +606,25 @@
 	\end{algorithm}
 \end{frame}
 
-\section{Свързана контактна логика}
+\section{Контактната логика за свързаност}
 
-\begin{frame}{Свързана контактна логика}
-	\uncover<1->{
-		\begin{axiom}[Свързаност]
-			\begin{equation*}
-				a \neq 0 \land a \neq 1 \implies aCa^*
-			\end{equation*}
-		\end{axiom}
-	}
-
-	\uncover<2->{
+\begin{frame}{Контактната логика за свързаност}
+	\begin{lemma}
+		Релационната система е свързана точно тогава, когато за всяка оценка в нея следната формула е вярна
+	\begin{equation*}
+		a \neq 0 \land a \neq 1 \rightarrow aCa^*
+	\end{equation*}
+	
+	На тази формула ще ѝ казваме аксиома за свързаност.
+	\end{lemma}
 		\begin{equation*}
-			\upsilon(a) \neq \emptyset \land \upsilon(a) \neq W \implies (\exists x \in \upsilon(a)) (\exists y \in W \setminus \upsilon(a))(xRy)
+			\upsilon(a) \neq \emptyset \land \upsilon(a) \neq W \rightarrow (\exists x \in \upsilon(a)) (\exists y \in W \setminus \upsilon(a))(xRy)
 		\end{equation*}
-	}
 \end{frame}
 
 \begin{frame}
 	\uncover<1->{
-		Релационната система $\F = (W, R)$ дефинира ненасочен граф G(W, R). $W$ е множеството от върхове, а $R$ е множеството от ребра.
+		Релационната система $\F = (W, R)$ дефинира неориентиран граф G(W, R). $W$ е множеството от върхове, а $R$ е множеството от ребра.
 	}
 
 	\uncover<2->{
@@ -658,7 +635,7 @@
 
 	\uncover<3->{
 		\begin{definition}[Свързан граф]
-			Нека $G = (W, R)$ е ненасочен граф. $G$ е \textbf{свързан}, ако има път между всеки два различни върха в $W$.
+			Нека $G = (W, R)$ е неориентиран граф. $G$ е \textbf{свързан}, ако има път между всеки два различни върха в $W$.
 			\begin{equation*}
 				x, y \in W \rightarrow (x \neq y \implies \pi_G(x, y))
 			\end{equation*}
@@ -671,7 +648,7 @@
 		\begin{theorem}[Свързаност]
 		 Нека $\F = (W, R)$ е релационна система и G = (W, R) е графът, дефиниран от нея.
 			\begin{center}
-				аксиомата за свързаност е удоволетворена в $\F \iff$ G е свързан
+				аксиомата за свързаност е удовлетворена в $\F \Leftrightarrow $ G е свързан
 			\end{center}
 		\end{theorem}
 	}
@@ -694,7 +671,7 @@
 
 	\uncover<2->{
 		\begin{step}
-			$\F^v = (W^v, R^v)$, $\M^v = (\F^v, \upsilon)$. $\M^v$ е модел на $\beta$, ако контактите и ненулевите термове в $\beta$ са удоволетворени. Ако $\M^v$ не е модел, тогава $\beta$ няма модел(нито свързан модел).
+			$\F^v = (W^v, R^v)$, $\M^v = (\F^v, \upsilon)$. $\M^v$ е модел на $\beta$, ако контактите и ненулевите термове в $\beta$ са удовлетворени. Ако $\M^v$ не е модел, тогава $\beta$ няма модел(нито свързан модел).
 		\end{step}
 	}
 \end{frame}
@@ -722,16 +699,16 @@
 	\end{lemma}
 \end{frame}
 
-\begin{frame}{Запазване удоволетворимост атомарни формули}
-	\begin{lemma}[Запазване удоволетворимост атомарни формули]
-		$G^v=(W^v, R^v)$ е графът породен от $\F^v$. Нека $G=(W,R) \subseteq G^v$ and $\M=((W,R), \upsilon')$ е моделът дефиниран от G. Тогава:
+\begin{frame}{Запазване удовлетворимост атомарни формули}
+	\begin{lemma}[Запазване удовлетворимостта на атомарните формули]
+		$G^v=(W^v, R^v)$ е графът породен от $\F^v$. Нека $G=(W,R) \subseteq G^v$ и $\M=((W,R), \upsilon')$ е моделът дефиниран от G. Тогава:
 		\begin{itemize}
-			\item<1-> M запазва удоволетворимостта на контактите в $\beta$, ако
+			\item<1-> M запазва удовлетворимостта на контактите в $\beta$, ако
 			\begin{equation*}
 				C(a,b) \in \beta \rightarrow (\exists x \in \upsilon'(a))(\exists y \in \upsilon'(b))(xRy)
 			\end{equation*}
 
-			\item<2-> M запазва удоволетворимостта на ненулевите термове в $\beta$, ако
+			\item<2-> M запазва удовлетворимостта на ненулевите термове в $\beta$, ако
 			\begin{equation*}
 				g \neq 0 \in \beta \rightarrow \upsilon'(g) \neq \emptyset
 			\end{equation*}
@@ -750,7 +727,7 @@
 		\begin{definition}[Максимална свързана компонента]
 			Нека $G=(W, R)$ е граф. Нека $G'=(W', R')$ е свързана компонента на G. $G'$ е \textbf{максимална свързана компонента} на G, ако:
 			\begin{gather*}
-				x \in W' \rightarrow \neg(\exists y \in W \setminus W')(xRy) \\
+				x \in W' \rightarrow \neg(\exists y \in W \setminus W')(xRy) \mbox{ и} \\ 
 				x,y \in W' \rightarrow xRy \iff xR'y
 			\end{gather*}
 		\end{definition}
@@ -761,7 +738,7 @@
 
 \begin{frame}{Свързан модел}
 	\begin{step}
-		Нека $\M^v$ е модел на $\beta$. Всички модели, дефинирани от свързаните компоненти на $G^v$ запазват удоволетворимостта на нулевите термове и не-контактите(не добавят точки, нито релации). Ако има свързана компонента, която запазва удоволетворимостта на контактите и ненулевите термове, то тя дефинира \textbf{свързан модел} на $\beta$.
+		Нека $\M^v$ е модел на $\beta$. Всички модели, дефинирани от свързаните компоненти на $G^v$, запазват удовлетворимостта на нулевите термове и не-контактите(не добавят точки, нито релации). Ако има свързана компонента, която запазва удовлетворимостта на контактите и ненулевите термове, то тя дефинира \textbf{свързан модел} на $\beta$.
 
 		Достатъчно е да разгледаме само максималните свързани компоненти на $G^v$.
 	\end{step}
@@ -771,25 +748,25 @@
 	\begin{definition}[$Comp^G$]
 		Нека $G=(W, R)$ е граф.
 		\begin{center}
-			$Comp^G = \{ G' \mid G' \subseteq G$ и G' е максимлано свързана компонента $\}$
+			$Comp^G = \{ G' \mid G' \subseteq G$ и G' е максимално свързана компонента $\}$
 		\end{center}
 	\end{definition}
 \end{frame}
 
 \begin{frame}{Свързан модел}
 	\begin{step}
-		Нека $Comp^{G^v}$ е множеството от максимлано свързани компоненти на $G^v$. Нека $|W^v|=m$, тогава $|Comp^{G^v}| <= m$.
+		Нека $Comp^{G^v}$ е множеството от максимално свързани компоненти на $G^v$. Нека $|W^v|=m$, тогава $|Comp^{G^v}| <= m$.
 	\end{step}
 
 	\begin{step}
-		Всеки модел дефиниран от граф в $Comp^{G^v}$ удоволетворява нулевите термове и не-контактите на $\beta$.  Ако има такъв, който запазва удоволетворимостта на контактите и ненулевите термове, то той е \textbf{свързан модел} на $\beta$. Ако няма, то $\beta$ няма свързан модел.
+		Всеки модел дефиниран от граф в $Comp^{G^v}$ удовлетворява нулевите термове и не-контактите на $\beta$.  Ако има такъв, който запазва удовлетворимостта на контактите и ненулевите термове, то той е \textbf{свързан модел} на $\beta$. Ако няма, то $\beta$ няма свързан модел.
 	\end{step}
 \end{frame}
 
 \begin{frame}
 	\begin{lemma}[Разширение на свързана компонента]
 		Нека G=(W,R) и $G'=(W', R') \subseteq G$ е свързана компонента на G.
-		G' може да бъде разширено до максимлано свързана компонента $G_m(W_m, R_m)$  на G  както следва:
+		G' може да бъде разширено до максимално свързана компонента $G_m(W_m, R_m)$  на G  както следва:
 		\begin{center}
 			 $W_m = W' \cup \{ x \mid x \in W \setminus W'$ и $(\exists y \in W')(\pi_G(x,y)) \}$
 			 $R_m = \{ \pairXY \mid \pairXY \in R$ и $x, y \in W_m \}$
