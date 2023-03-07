@@ -701,16 +701,15 @@ Kонтактна логика с мярка е самата контактна 
 \end{frame}
 
 \begin{frame}\frametitle{Изпълнимост в контактна логика с мярка}
-С добавянето на атомарните формули с мярка се променя и таблото и конюктивия табло клон.
-Нека $\varphi$ е формула и $\mathcal{T}$ е таблото от $\varphi$, тогава:
-		\begin{align*}
-				B = \{\signT C(a_i, b_i) \mid i \in \{1, \ldots, I\} \} &\cup 
-					\{\signF C(e_k, f_k) \mid k \in \{1, \ldots, K\} \} \cup \\
-					\{\signF d_j = 0 \mid j \in \{1, \ldots, J\} \} &\cup 
-					\{\signT g_l = 0 \mid l \in \{1, \ldots, L\} \} \cup \\
-					\{\signT m_p \le_\mu n_p \mid p \in \{1, \ldots, P\} \} &\cup
-					\{\signF u_q \le_\mu v_q \mid q \in \{1, \ldots, Q\} \}
-		\end{align*}
+С добавянето на атомарните формули с мярка се променят клоните на таблото. В тях се появяват и атомарни формули с мярка маркирани като вярни и невярни.
+\begin{itemize}
+	\item $\signT C(a, b)$
+	\item $\signF C(a, b)$ 
+	\item $\signT t = 0$
+	\item $\signF t = 0$
+	\item $\signT m_p$
+	\item $\signF m_p$
+\end{itemize}
 \end{frame}
 
 \begin{frame}\frametitle{Конюнктивен табло клон}
@@ -832,8 +831,9 @@ Kонтактна логика с мярка е самата контактна 
 
 \begin{frame}\frametitle{Имплементация}
 \begin{itemize}
-	\item FLEX + BISON за построяване на формулата до AST (абстрактно синтактично дърво)
+	\item FLEX + BISON за построяване на формулата в AST (абстрактно синтактично дърво)
 	\item Търсене на последователни атомарни клонове с табло метода
+	\item Kiwi библиотека за смятане на система линейни неравенства
 	\item Генериране на модел с мярка
 	\item Уеб приложение за извикване на генерирането на модела и визуализиране на самия
 \end{itemize}
