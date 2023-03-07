@@ -10,7 +10,7 @@
 Master degree project for prooving/disprooving contact logic formulas
 
 # [DEMO](https://anton94.github.io/modal_logic_formula_prover/simple_client/index.html)
-Click the link above or run localy, e.g.
+Click the [DEMO](https://anton94.github.io/modal_logic_formula_prover/simple_client/index.html) link or run localy, e.g.
 - repo_dir/simple_client> python3 -m http.server
 
 The simple_client folder holds the standalone web application which is only HTML CSS and JS with the formula prooving library as WebAssembly.
