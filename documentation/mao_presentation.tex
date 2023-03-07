@@ -47,6 +47,7 @@
 
 \newtheorem{defn}{Дефиниция}[section]
 \newtheorem{axiom}{Аксиома}[section]
+\newtheorem{prop}{Свойство}[section]
 \newtheorem{lema}{Лема}[section]
 
 \newcommand{\curvedE}{\mathscr{e}}
@@ -89,10 +90,11 @@
 
 \beamersetuncovermixins{\opaqueness<1>{25}}{\opaqueness<2->{15}}
 \begin{document}
-\title{Уеб система за изпълнимост минималната контактна логика с мярка}  
+\title{Уеб система за изпълнимост в контактната логика с мярка}  
 \author{\textsc{Факултет по математика и информатика} \\
-	\textsc{Катедра по математическа логика и приложенията ѝ} \\ [8mm]
-	\textsc{Стоев Мартин} \\ [8mm]
+	\textsc{Катедра по математическа логика и приложенията ѝ} \\ [3mm]
+	\textsc{Стоев Мартин} \\ [3mm]
+	\textsc{Магистрерска програма Логика и Алгоритми, Информатика, Факултетен Номер: 27290} \\ [4mm]
 	\small\textsc{Научен ръководител: проф. Тинко Тинчев}}
 \date{\today} 
 \begin{frame}
@@ -115,10 +117,10 @@
 \begin{frame}\frametitle{Съдържание}
 \begin{itemize}
 	\item Табло метод
-	\item Минимална контактна логика
-	\item Изпълнимост в минималната контактна логика
-	\item Минимална контактна логика с мярка
-	\item Изпълнимост в минималната контактна логика с мярка
+	\item Kонтактна логика
+	\item Изпълнимост в контактна логика
+	\item Kонтактна логика с мярка
+	\item Изпълнимост в контактна логика с мярка
 \end{itemize}
 \end{frame}
 
@@ -127,21 +129,21 @@
 \begin{itemize}
 	\item Табло метод като процедура за опровергаване на формули
 	\item Табло метод като процедура за построяване на модели
-	\item Табло метод в съждителната логика
+	\item Табло метод за съждителната логика
 \end{itemize}
 \end{frame}
 
-\subsection{Табло метод в съждителната логика}
-\begin{frame}\frametitle{Табло метод в съждителната логика}
+\subsection{Табло метод за съждителната логика}
+\begin{frame}\frametitle{Табло метод за съждителната логика}
 Маркиране на валидността на формула $\varphi$
 \begin{itemize}
-	\item $\signT \varphi$ - маркиране на формулата $\varphi$ за валидна
-	\item $\signF \varphi$ - маркиране на формулата $\varphi$ за невалидна
+	\item $\signT \varphi$ - маркиране на формулата $\varphi$ за вярна
+	\item $\signF \varphi$ - маркиране на формулата $\varphi$ за невярна
 \end{itemize}
 \vspace{20px}
 Стъпки на табло метода
 \begin{itemize}
-	\item Разшираване на табло метода
+	\item Разширяване на дърво, което строи табло методът
 	\item Намиране на противоречия
 \end{itemize}
 \end{frame}
@@ -255,7 +257,7 @@
 \begin{frame}\frametitle{Дефиниции}
 
 \begin{defn}[Затворен клон]
-Когато в него има едновременно една и съща формула маркирана за валидна и за невалидна.
+Когато в него има едновременно една и съща формула маркирана за вярна и за невярна.
 \end{defn}
 
 \begin{defn}[Атомарен клон]
@@ -270,7 +272,7 @@
 \begin{frame}\frametitle{Общовалидна формула}
 	Проверяваме дали дадена формула $\varphi$ е общовалидна с следните стъпки:
 \begin{enumerate}
-	\item Маркираме $\varphi$ за невалидна, т.е.  $\signF\varphi$.
+	\item Маркираме $\varphi$ за невярна, т.е.  $\signF\varphi$.
 	\item Ползваме $\signF\varphi$ за начална формула на таблото.
 	\item Разширяваме докато таблото не е завършено.
 	\item Ако всички клонове на таблото са затворени, то формулата $\varphi$ е общовалидна.
@@ -280,8 +282,8 @@
 \begin{frame}\frametitle{Пример}
 	\hspace{50px} 1. $\signF (X \rightarrow ((X \wedge \neg Y) \vee \neg X)$ \\
 	\hspace{50px} 2. $\signT X, \signF ((X \wedge \neg Y) \vee \neg X)$ \\
-	\hspace{50px} 3. $\signT X, \signF (X \wedge \neg Y), \signF \neg X)$ \\
-	\hspace{50px} 4. $\signT X, \signF (X \wedge \neg Y), \signT X)$ \\
+	\hspace{50px} 3. $\signT X, \signF (X \wedge \neg Y), \signF \neg X$ \\
+	\hspace{50px} 4. $\signT X, \signF (X \wedge \neg Y), \signT X$ \\
 	\begin{tikzpicture}[scale = 0.8]
 		\draw (-7,0) (5,1);
         \draw[thick] (-3.1,0) -- (-2.2,1) -- (-1.3,0);
@@ -290,8 +292,8 @@
 	\hspace{108px} 7. $\signT Y$
 \end{frame}
 
-\section{Минимална контактна логика}
-\begin{frame}\frametitle{Минимална контактна логика}
+\section{Kонтактна логика}
+\begin{frame}\frametitle{Kонтактна логика}
 \begin{enumerate}
 	\item Синтаксис 
 	\item Семантика
@@ -305,7 +307,7 @@
 	\begin{itemize}
 		\item W - цял свят
 		\item $\emptyset$ - празен регион
-		\item $\mathbb{V}ar$ - изброимо множество от променливи използвани в дадена формула
+		\item $\mathbb{V}ar$ - изброимо множество от променливи
 		\item Булеви константи за W и $\emptyset$, 1 и 0 съответно
 	\end{itemize}
 \end{frame}
@@ -319,7 +321,7 @@
 \end{frame}
 
 \begin{frame}\frametitle{Дефиниция за терм}
-Терма се дефинира индуктивно:
+Терм се дефинира индуктивно:
 	\begin{itemize}
 		\item Булевите константи са термове
 		\item $p \in \mathbb{V}ar$ е терм
@@ -356,18 +358,18 @@
 
 \begin{frame}\frametitle{Съкращения}
 		\begin{itemize}
-		\item $a = b,\:\textit{когато}\:\: (a \le b) \land (b \le a)$
-		\item $a \neq b,\:\textit{когато}\:\: \neg (a = b) $
-		\item $a \nleq b,\:\textit{когато}\:\: \neg (a \le b)$
+		\item $a = b\:\textit{означава}\:\: (a \le b) \land (b \le a)$
+		\item $a \neq b\:\textit{означава}\:\: \neg (a = b) $
+		\item $a \nleq b\:\textit{означава}\:\: \neg (a \le b)$
 		\end{itemize}
 \end{frame}
 
 \subsection{Семантика}
 \begin{frame}\frametitle{Семантика}
-	Релационна система се дефинира като $\mathcal{F} = (W, R)$, където $W \neq \emptyset$. $\mathcal{F}$ наричаме фрейм.
+	Релационна система се дефинира като $(W, R)$, където $W \neq \emptyset$, R е рефлексивна и симетрична релация в W.
 	\newline
 	\newline
-	Булева оценка на променлива означаваме с  $\mathscr{v}$ и дефинираме като:
+	Булева оценка на променливите означаваме с  $\mathscr{v}: \mathbb{V}ar \rightarrow W$ и разширяваме я до множеството на всички термове:
 		\begin{itemize}
 			\item $\mathscr{v}(0) = \emptyset$
 			\item $\mathscr{v}(1) = W$
@@ -380,11 +382,11 @@
 
 \subsection{Семантика}
 \begin{frame}\frametitle{Модел}
-	Наредената n-торка $\mathcal{M} = (\mathcal{F}, \mathscr{v})$ наричаме модел. Дефинираме изпълнимост на дадена формула в $\mathcal{M}$ като:
+	Наредената тройка $\mathcal{M} = (W, R, \mathscr{v})$ наричаме модел. Дефинираме вярност на дадена формула в $\mathcal{M}$, като:
 		\begin{itemize}
 			\item $\mathcal{M} \not\models \bot$ 
 			\item $\mathcal{M} \models \top$
-			\item $\mathcal{M} \models aCb \text{ когато } (\exists x \in \mathscr{v}(a)), (\exists y \in \mathscr{v}(b)) (xRy)$
+			\item $\mathcal{M} \models aCb \text{ когато } (\exists x \in \mathscr{v}(a)) (\exists y \in \mathscr{v}(b)) (xRy)$
 			\item $\mathcal{M} \models a \leq b \text{ когато } \mathscr{v}(a) \subseteq \mathscr{v}(b)$
 			\item $\mathcal{M} \models \neg \varphi \text{ когато } \mathcal{M} \not\models \varphi$
 			\item $\mathcal{M} \models a \; \vee \; b \text{ когато } \mathcal{M} \models a \: \textit{ или } \: \mathcal{M} \models b$
@@ -396,65 +398,66 @@
 \subsection{Свойства}
 \begin{frame}\frametitle{Свойства}
 
-\begin{axiom}[Рефлексивност на контакта]
+\begin{prop}[Рефлексивност на контакта]
 Нека b е терм, тогава:
 	\begin{equation*}
-		b \neq 0 \implies bCb
+		\mathcal{M} \models b \neq 0  \iff \mathcal{M} \models bCb
 	\end{equation*}
-\end{axiom}
+\end{prop}
 
-\begin{axiom}[Симетрия на контакта]
+\begin{prop}[Симетрия на контакта]
 Нека a и b са два терма, тогава:
 	\begin{equation*}
-		aCb \iff bCa
+		\mathcal{M} \models aCb \iff \mathcal{M} \models bCa
 	\end{equation*}
-\end{axiom}
+\end{prop}
 
-\begin{lema}[Еквивалентност на термове]
+\begin{prop}[Еквивалентност на термове]
 Нека a и b са два терма и $\mathscr{v}$ е оценка , тогава:
 	\begin{equation*}
-		a = b \implies \mathscr{v}(a) = \mathscr{v}(b)
+		\mathcal{M} \models a = b \iff \mathscr{v}(a) = \mathscr{v}(b)
 	\end{equation*}
-\end{lema}
+\end{prop}
 
 \end{frame}
 \begin{frame}\frametitle{Свойства}
-\begin{lema}[Нулева формула]
-Нека a и b са два терма, тогава:
-	\begin{equation*}
-		a \le b \iff a \sqcap b* = \emptyset
-	\end{equation*}
-\end{lema}
+\begin{prop}[Нулева формула]
 
-\begin{lema}[Не-нулева формула]
 Нека a и b са два терма, тогава:
 	\begin{equation*}
-		\neg(a \le b) \iff a \sqcap b* \neq \emptyset
+		\mathcal{M} \models a \le b \iff \mathcal{M} \models a \sqcap b* = 0
 	\end{equation*}
-\end{lema}
+\end{prop}
+
+\begin{prop}[Ненулева формула]
+Нека a и b са два терма, тогава:
+	\begin{equation*}
+		\mathcal{M} \models \neg(a \le b) \iff \mathcal{M} \models a \sqcap b* \neq 0
+	\end{equation*}
+\end{prop}
 
 \end{frame}
 
 
-\subsection{Изпълнимост в минималната контактна логика}
-\begin{frame}\frametitle{Изпълнимост в минималната контактна логика}
+\subsection{Изпълнимост в контактна логика}
+\begin{frame}\frametitle{Изпълнимост в контактна логика}
 За дадена формула $\varphi$ трябва да построим модел $\mathcal{M} \models \varphi$.
 \newline
 \newline
-Използваме табло метода за да опростим формулата и търсим модел в клоновете на табло метода.
+Използваме табло метода за да опростим формулата и търсим модел в клоните на табло метода.
 \newline
 \newline
-		Нека $\varphi$ е формула и $\mathcal{T}$ е таблото от $\varphi$, то клона на таблото има следните маркирани атомарни формули:
-		\begin{align*}
-				B = \{\signT C(a_i, b_i) \mid i \in \{1, \ldots, I\} \} &\cup 
-					\{\signF C(e_k, f_k) \mid k \in \{1, \ldots, K\} \} \cup \\
-					\{\signF d_j = 0 \mid j \in \{1, \ldots, J\} \} &\cup 
-					\{\signT g_l = 0 \mid l \in \{1, \ldots, L\} \}
-		\end{align*}
+		Нека $\varphi$ е формула и $\mathcal{T}$ е таблото от $\varphi$, то клонът на таблото има следните маркирани атомарни формули:
+\begin{itemize}
+	\item $\signT C(a, b)$
+	\item $\signF C(a, b)$ 
+	\item $\signT t = 0$
+	\item $\signF t = 0$
+\end{itemize}
 \end{frame}
 
 \begin{frame}\frametitle{Конюнктивен табло клон}
-		За олеснение можем да махнем $\signT \textit{ и } \signF$ и получаваме.
+		За улеснение можем да махнем $\signT \textit{ и } \signF$ и получаваме.
 \begin{align*}
 			\bigwedge_{i=1}^{I} \; C(a_i, b_i) \:\: & \wedge \:\: 
 			\bigwedge_{k=1}^{K} \; \neg C(e_k, f_k) \:\: \wedge \:\: \\
@@ -465,11 +468,11 @@
 
 \begin{frame}\frametitle{Конюнктивен табло клон}
 \begin{defn}[Множеството на всички променливи]
-	С $\Var_B$ ще ознчаваме множеството от всички променливи използвани в дадена формула.
+	С $\Var_B$ ще ознчаваме множеството от всички променливи използвани в табло клона B.
 \end{defn}
 
 \begin{defn}[Оценка на променливи]
-	С $\curvedE$ ще ознчаваме функцията, която за всяка променлива от $\Var_B$ дава истина или лажа.
+	С $\curvedE$ ще ознчаваме функцията, която за всяка променлива от $\Var_B$ дава истина или лъжа.
 		\begin{align*}
 			\curvedE : \Var_B \rightarrow \{ \textbf{лъжа}, \textbf{истина}\}
 		\end{align*}
@@ -492,11 +495,7 @@
 \end{frame}
 
 \begin{frame}\frametitle{Стъпки за построяване на модел}
-	Ще казваме, че модална точка $\curvedE$ е построена за терма a, когато:
-		\begin{align*}
-			\vBool_{\curvedE}(a) = \textit{ истина }
-		\end{align*}
-	Ще групираме атомарните формули на такива за които е необходимо съществуването на модална точка и на такива за които не е.
+	Нека групираме атомарните формули на такива, за които е необходимо съществуването на модална точка, и на такива, за които не е.
 \newline
 	Следните атомарни формули се нуждаят от същестуването на поне една модална точка:
 		\begin{itemize}
@@ -506,7 +505,7 @@
 \end{frame}
 
 \begin{frame}\frametitle{Построяване на модални точки за контактите}
-	За всеки контакт $C(a, b) \in B$ ще построим по две модални точки, такива, че:
+	За всеки контакт $C(a, b) \in B$ ще построим по две модални точки p и q, такива, че:
 		\begin{itemize}
 			\item $\vBool_{p}(a) = \textbf{истина}$
 			\item $\vBool_{q}(b) = \textbf{истина}$
@@ -566,18 +565,18 @@
 	\end{center}
 \end{frame}
 
-\begin{frame}\frametitle{Построяване на модална точка за не-равен на нула терм}
-	За всеки не-равен на нула терм $a \neq 0 \in B$ ще построим една модални точки, такава, че $\vBool_{\curvedE}(a) = \textbf{истина}$. \\
-	За равно на нула термовете, следните условия трябва да са изпълнени:
+\begin{frame}\frametitle{Построяване на модална точка за неравен на нула терм}
+	За всеки неравен на нула терм $a \neq 0 \in B$ ще построим една модална точка, такава че $\vBool_{p}(a) = \textbf{истина}$. \\
+	Аналогично, следните условия трябва да са изпълнени:
 	\begin{align*}
-		t = 0 \in B: \vBool_{\curvedE}(t) = \textit{лъжа}
+		t = 0 \in B: \vBool_{p}(t) = \textit{лъжа}
 	\end{align*}
 	\begin{align*}
-		\neg C(e, f) \in B: (\vBool_p(e) = \textbf{лъжа} \textit{ and } \vBool_p(f) = \textbf{лъжа})
+		\neg C(e, f) \in B: (\vBool_p(e) = \textbf{лъжа} \textit{ и } \vBool_p(f) = \textbf{лъжа})
 	\end{align*}
-	След успешно генериране на модалната точка, отново обогатяваме R със следната:
+	След успешно генериране на модалната точка, отново разширяваме R със следната:
 	\begin{itemize}
-		\item $\curvedE R \curvedE$ - рефлексивност на модалната точка $\curvedE$
+		\item pRp - рефлексивност на модалната точка p
 	\end{itemize}
 \end{frame}
 
@@ -591,7 +590,7 @@
         		x radius=0.5cm,
         		y radius =0.2cm
     			] ;
-		\node at (-0,0) {$\curvedE$};
+		\node at (-0,0) {p};
 		\node at (-0.5,-0.7) {a};
 		\node[text width=10cm, anchor=west, right] at (-4.5,-2)
     		{Генерираната модална точка и нейната релация за $a \neq 0$};
@@ -601,12 +600,12 @@
 
 \begin{frame}\frametitle{Построяване на модел}
 	\begin{defn}
-		Нека $\Ts$ е множеството от всички термове и нека $\mathcal{F}$ е фрейм създаден с построяване на модални точки за контактите и не-равно на нула термове.
+		Нека $\Ts$ е множеството от всички термове и нека (W, R) е релационата система, създадена с построяване на модални точки за контактите и неравно на нула термове.
 		Тогава модалната оценка $\vE : \Ts \rightarrow \mathscr{P}(W)$ се дефинира рекурсивно, като:
 		\begin{itemize}
-			\item $\vE(0) = W$
-			\item $\vE(1) = \emptyset$
-			\item $\vE(p) = \{ \curvedE \; | \; \curvedE \in W \:\:\textit{и}\:\: \curvedE(p) = \textit{истина} \}$
+			\item $\vE(0) = \emptyset$
+			\item $\vE(1) = W$
+			\item $\vE(t) = \{ p \; | \; p \in W \:\:\textit{и}\:\: p(t) = \textit{истина} \}$
 			\item $\vE(a \sqcap b) = \vE(a) \cap \vE(b)$
 			\item $\vE(a \sqcup b) = \vE(a) \cup \vE(b)$
 			\item $\vE(a*) = W \setminus \vE(a)$
@@ -616,32 +615,27 @@
 
 \begin{frame}\frametitle{Построяване на модел}
 	\begin{lema}
-		Нека a е терм и нека $\curvedE$ е оценка на променливи, от дефиницията на $\vBool$ и $\vE$, следва, че:
+		Нека a е терм и нека p е оценка на променливи, от дефиницията на $\vBool$ и $\vE$, следва, че:
 		\begin{align*}
-			\vBool_{\curvedE}(a) = \textit{ истина } \leftrightarrow \curvedE \in \vE(a)
+			\vBool_{p}(a) = \textit{ истина } \leftrightarrow p \in \vE(a)
 		\end{align*}
-		В такъв случай, когато $\vBool_{\curvedE}(a) = \textbf{истина}$ ще казваме, че модална точка  $\curvedE$ е \textbf{валидна}.
 	\end{lema}
 \end{frame}
 
-\section{Минимална контактна логика с мярка}
-\begin{frame}\frametitle{Минимална контактна логика с мярка}
-Минималната контактна логика с мярка е самата минимална контактна логика с добавена количествена мярка.
+\section{Kонтактна логика с мярка}
+\begin{frame}\frametitle{Kонтактна логика с мярка}
+Kонтактна логика с мярка е самата контактна логика с добавена количествена мярка.
 \newline
 \newline
-Мярката е функция която на даден на регион съпоставя положително реално число.
+Мярката е функция, която на даден регион съпоставя положително реално число.
 \begin{equation*}
-	\mu : \mathscr{P}(W) \longrightarrow \mathbb{R}^+
+	\mu : \mathscr{P}(W) \setminus \{\emptyset\} \longrightarrow \mathbb{R}^+
 \end{equation*}
-Мярката между два терма представляваме с следната атомарна формула:
-	\begin{equation*} 
-		a \le_\mu b
-	\end{equation*}
 \end{frame}
 
 
-\begin{frame}\frametitle{Семантика на минималната контактна логика с мярка}
-	Модела на минималната контактна логика се разширява със следната индуктивна дефиниция за изпълнимост:
+\begin{frame}\frametitle{Семантика на контактната логика с мярка}
+	Моделът на контактната логика се разширява със следната дефиниция за вярност:
 	\begin{itemize}
 		\item $\mathcal{M} \models a \leq_\mu b \text{, когато } \mu(\mathscr{v}(a)) \le \mu(\mathscr{v}(b))$
 	\end{itemize}
@@ -671,35 +665,27 @@
 \end{frame}
 
 \begin{frame}\frametitle{Построяване на система линейни неравенства}
-\begin{defn}
 	Нека x и y са два терма, тогава формулата $\le_\mu(x, y)$ се преобразува в:
 	\begin{align*}
 		\sum_{i: p_i \in \vE(x)} X_i \leq \sum_{j: p_j \in \vE(y)} X_j
 	\end{align*}
-\end{defn}
 
-		\begin{lemma}
 			Това преобразуване може да се опрости до:
 			\begin{align*}
 				\sum_{i: p_i \in \vE(x) \setminus \vE(y)} X_i \leq \sum_{j: p_j \in \vE(y) \setminus \vE(x)} X_j
 			\end{align*}
-		\end{lemma}
 \end{frame}
 
 \begin{frame}\frametitle{Построяване на система линейни неравенства}
-		\begin{defn}
 			Нека x и y са два терма, тогава формулата $<_\mu(x, y)$ се преобразува в:
 			\begin{align*}
 				\sum_{i: p_i \in \vE(x)} X_i < \sum_{j: p_j \in \vE(y)} X_j
 			\end{align*}
-		\end{defn}
 
-		\begin{lemma}
 			Това преобразуване може да се опрости до:
 			\begin{align*}
 				\sum_{i: p_i \in \vE(x) \setminus \vE(y)} X_i < \sum_{j: p_j \in \vE(y) \setminus \vE(x)} X_j
 			\end{align*}
-		\end{lemma}
 \end{frame}
 
 \begin{frame}\frametitle{Построяване на система линейни неравенства}
@@ -710,11 +696,11 @@
 				\item неравенство за всяка $<_\mu$ формула
 				\item неравенство $0 < X_i$ за всяко i: $0 \le i < N$  
 			\end{itemize}
-			Казваме, че системата $\mathscr{S}$ е валидна ако тя има решение.
+			Казваме, че системата $\mathscr{S}$ е валидна, ако тя има решение.
 		\end{defn}
 \end{frame}
 
-\begin{frame}\frametitle{Изпълнимост в минималната контактна логика с мярка}
+\begin{frame}\frametitle{Изпълнимост в контактна логика с мярка}
 С добавянето на атомарните формули с мярка се променя и таблото и конюктивия табло клон.
 Нека $\varphi$ е формула и $\mathcal{T}$ е таблото от $\varphi$, тогава:
 		\begin{align*}
@@ -739,28 +725,28 @@
 \end{align*}%
 \end{frame}
 
-\begin{frame}\frametitle{Изпълнимост в минималната контактна логика с мярка}
+\begin{frame}\frametitle{Изпълнимост в контактна логика с мярка}
 	\begin{defn}%{Valid modal point}
-	Нека B е конюктивен табло клон. Казваме, че модалната точка $\curvedE$ е валидна в B, когато:
+	Нека B е клон в таблото. Казваме, че модалната точка p е валидна в B, когато:
 	\begin{itemize}
-		\item $t = 0 \in B:  \vBool_{\curvedE}(t) = \textbf{лъжа}$
-		\item $\neg C(e, f) \in B: \vBool_{\curvedE}(e) = \textbf{лъжа} \textit{ или } \vBool_{\curvedE}(f) = \textbf{лъжа}$
+		\item $t = 0 \in B:  \vBool_{p}(t) = \textbf{лъжа}$
+		\item $\neg C(e, f) \in B: \vBool_{p}(e) = \textbf{лъжа} \textit{ или } \vBool_{p}(f) = \textbf{лъжа}$
 	\end{itemize}
 	\end{defn}
 
 	\begin{defn}
-		Нека B е конюктивен табло клон и нека x и y са две валидни модални точки. Казваме, че $\langle x, y \rangle$ е валдина релация, когато:
+		Нека B е клон в таблото и нека x и y са две валидни модални точки. Казваме, че $\langle x, y \rangle$ е валидна релация, когато:
 		\begin{align*}
 				\neg C(e, f) \in B: (x \notin \vE(e) \textit{ или } y \notin \vE(f)) \textit{ и } (x \notin \vE(f) \textit{ или } y \notin \vE(e))
 		\end{align*}
 	\end{defn}
 \end{frame}
 
-\begin{frame}\frametitle{Изпълнимост в минималната контактна логика с мярка}
+\begin{frame}\frametitle{Изпълнимост в контактна логика с мярка}
 	\begin{defn}
-Нека B е конюктивен табло клон и нека W е множество от валидни модални точки в B. Дефинираме модел $\mathcal{M} = (W, R, v)$ в B, където:
+Нека B е клон в таблото и нека W е множество от валидни модални точки в B. Дефинираме модел $\mathcal{M} = (W, R, v)$ в B, където:
 		\begin{align*}
-				\vE(t) = \{ \curvedE \; | \; \curvedE \in W \textit{ и } &\vBool_{\curvedE}(t) =\; \textit{истина} \}, \\
+				\vE(t) = \{ p \; | \; p \in W \textit{ и } &\vBool_{p}(t) =\; \textit{истина} \}, \\
 				\textit{ където t е терм } & \textit{от атомарните формули в B}
 		\end{align*}
 		\begin{align*}
@@ -769,7 +755,7 @@
 	\end{defn}
 \end{frame}
 
-\begin{frame}\frametitle{Изпълнимост в минималната контактна логика с мярка}
+\begin{frame}\frametitle{Изпълнимост в контактна логика с мярка}
 \begin{lema}[Невъзможни подмножествени модели]
 Нека $\mathcal{M} = (W, R, \vE)$ е модел, където W е множество от валидни модални точки.
 Нека $\mathcal{M'} = (W', R', \vE')$ е модел, където $W' \subseteq W, R' \subseteq R$, тогава:
@@ -780,10 +766,10 @@
 	\end{lema}
 \end{frame}
 
-\begin{frame}\frametitle{Изпълнимост в минималната контактна логика с мярка}
+\begin{frame}\frametitle{Изпълнимост в контактна логика с мярка}
 	\begin{lema}[Дедукция на променливите]
 		Нека $\mathcal{M} = (W, R, \vE)$ е модел, където W е множество от валидни точки.
-		Нека $\mathcal{M'} = (W', R', \vE')$ е модел, дефиниран от $W' \subseteq W$, тогава:
+		Нека $\mathcal{M'} = (W', R', \vE')$ е подмодел на $\mathcal{M}$:
 	% NOTE kaji che R' e sechenie na R s W2
 		\begin{align*}
 			\vE'(t) =  \vE(t) \cap W'
@@ -804,22 +790,22 @@
 \begin{frame}
 Стъпка 0:
 \newline
-Възможно е да може да се построи модел в всеки конюнктивен клон на таблото, затова ще проверяваме всеки клон докато не намерим модел.
+Възможно е да може да се построи модел за всеки клон на таблото, затова ще проверяваме всеки клон докато не намерим модел.
 \newline
 Следващите стъпки работят върху един такъв клон.
 \newline
 \newline
 Стъпка 1:
 \newline
-Генерираме модел $\mathcal{M}$ от всички валидни модални точки W в B.
+Генерираме модел $\mathcal{M}$ от всички валидни модални точки W в~B.
 \end{frame}
 
 \begin{frame}
 Стъпка 2:
 \newline
-Нека $\mathbb{P} = \mathcal{P}(W)$. Нека разгледаме $W' \in \mathbb{P}$ започвайки от подмножествата с най-много елементи.
+Нека $\mathbb{P} = \mathcal{P}(W) \setminus \{\emptyset\}$. Нека разгледаме $W' \in \mathbb{P}$ започвайки от подмножествата с най-много елементи.
 			W' създава модела $\mathcal{M'}$ по лемата за дедукция на променливите.
-			Проверяваме дали $\mathcal{M'}$ изпълнява не-равно на нула термовете и контактие от B:
+			Проверяваме дали $\mathcal{M'}$ изпълнява неравно на нула термовете и контактите от B:
 \newline
 \newline
 Стъпка 2.а:
@@ -835,12 +821,12 @@
 \begin{frame}
 Стъпка 3:
 \newline
-Ако W' не е намерено в стъпка 2., тогава не съсществува модел с мярка който да удовлетворява конюнктивния клон B.
+Ако W' не е намерено в стъпка 2., тогава не съществува модел с мярка, който да удовлетворява клона B.
 \newline
 \newline
 Край:
 \newline
-Ако модел с мярка не е намерен в всеки от конюнктивните клонове в таблото, то тогава $\neg \exists \mathcal{M}: \mathcal{M} \models \varphi$ 
+Ако модел с мярка не е намерен за всеки от клоновете в таблото, то тогава $\neg \exists \mathcal{M}: \mathcal{M} \models \varphi$ 
 
 \end{frame}
 
