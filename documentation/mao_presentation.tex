@@ -14,6 +14,13 @@
 \usepackage[english, bulgarian]{babel}
 \setbeamertemplate{navigation symbols}{}
 
+\addtobeamertemplate{navigation symbols}{}{%
+    \usebeamerfont{footline}%
+    \usebeamercolor[fg]{footline}%
+    \hspace{1em}%
+    \insertframenumber/\inserttotalframenumber
+}
+
 \usepackage{mathtools}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -82,7 +89,7 @@
 
 \beamersetuncovermixins{\opaqueness<1>{25}}{\opaqueness<2->{15}}
 \begin{document}
-\title{Уеб система за минималната контактна логика с мярка}  
+\title{Уеб система за изпълнимост минималната контактна логика с мярка}  
 \author{\textsc{Факултет по математика и информатика} \\
 	\textsc{Катедра по математическа логика и приложенията ѝ} \\ [8mm]
 	\textsc{Стоев Мартин} \\ [8mm]
@@ -98,7 +105,6 @@
 \section{Въведение} 
 \begin{frame}\frametitle{Въведение}
 \begin{itemize}
-	\item Защо модални логики ?
 	\item Каква е целта на тази дипломна работа ?
 	\item Теоретична част
 	\item Практическа част
@@ -121,12 +127,12 @@
 \begin{itemize}
 	\item Табло метод като процедура за опровергаване на формули
 	\item Табло метод като процедура за построяване на модели
-	\item Табло Метод в Пропозиционалната Логика
+	\item Табло метод в съждителната логика
 \end{itemize}
 \end{frame}
 
-\subsection{Табло метод в пропозиционалната логика}
-\begin{frame}\frametitle{Табло метод в пропозиционалната логика}
+\subsection{Табло метод в съждителната логика}
+\begin{frame}\frametitle{Табло метод в съждителната логика}
 Маркиране на валидността на формула $\varphi$
 \begin{itemize}
 	\item $\signT \varphi$ - маркиране на формулата $\varphi$ за валидна
@@ -141,7 +147,7 @@
 \end{frame}
 
 \begin{frame}\frametitle{Правила}
-Негиране
+Отрицание
 \vspace{20px}
 		\noindent\begin{minipage}{.5\linewidth}
 		\begin{align*}
@@ -266,7 +272,7 @@
 \begin{enumerate}
 	\item Маркираме $\varphi$ за невалидна, т.е.  $\signF\varphi$.
 	\item Ползваме $\signF\varphi$ за начална формула на таблото.
-	\item Разширяваме все докато таблото не е завършено.
+	\item Разширяваме докато таблото не е завършено.
 	\item Ако всички клонове на таблото са затворени, то формулата $\varphi$ е общовалидна.
 \end{enumerate}
 \end{frame}
@@ -280,8 +286,8 @@
 		\draw (-7,0) (5,1);
         \draw[thick] (-3.1,0) -- (-2.2,1) -- (-1.3,0);
     \end{tikzpicture} \\
-	\hspace{70px} 4. $\signF X$ \hspace{5px} 5. $\signF \neg Y$\\
-	\hspace{108px} 6. $\signT Y$
+	\hspace{70px} 5. $\signF X$ \hspace{5px} 6. $\signF \neg Y$\\
+	\hspace{108px} 7. $\signT Y$
 \end{frame}
 
 \section{Минимална контактна логика}
@@ -308,7 +314,7 @@
 	\begin{itemize}
 		\item $\sqcap$ за булево сечение
 		\item $\sqcup$ за булево обединение
-		\item * за отрицание
+		\item * за допълнение
 	\end{itemize}
 \end{frame}
 
@@ -323,10 +329,10 @@
 	\end{itemize}
 \end{frame}
 
-\begin{frame}\frametitle{Атомарни формули}
-	Пропозиционални константи: $\top$ and $\bot$ \\
+\begin{frame}\frametitle{Константи, операции и атомарни формули}
+	Съждителни константи: $\top$ and $\bot$ \\
 	\vspace{10px}
-	Пропозиционални операции: $\neg, \vee, \wedge, \rightarrow, \leftrightarrow$
+	Съждителни операции: $\neg, \vee, \wedge, \rightarrow, \leftrightarrow$
 	\vspace{10px}
 
 	Нека a и b са два терма. То тогава 
@@ -340,7 +346,7 @@
 \begin{frame}\frametitle{Дефиниция за формула}
 Формула се дефинира индуктивно:
 		\begin{itemize}
-			\item Всяка пропозиционална константа е формула
+			\item Всяка съждителна константа е формула
 			\item Всяка атомарна формула е формула
 			\item Ако $\varphi$ е формула, то $\neg{\varphi}$ е също така формула
 			\item Ако $\varphi$ и $\psi$ са две формули, то $\varphi \: \sigma \: \psi $ е също така формула,\\
@@ -427,71 +433,18 @@
 	\end{equation*}
 \end{lema}
 
-\begin{lema}[Монотоност на контакта]
-Нека a и b са два терма, тогава:
-	\begin{equation*}
-		aCb \land a \leq a' \land b \le b' \implies a'Cb'
-	\end{equation*}
-\end{lema}
-
-\end{frame}
-\begin{frame}\frametitle{Свойства}
-\begin{lema}[Дистрибутивност на контакта]
-Нека a и b са два терма, тогава:
-	\begin{equation*}
-		aC(b \sqcup c) \iff aCb \lor aCc
-	\end{equation*}
-\end{lema}
-
-\begin{lema}[Тривиални свойства]
-Нека a, b и c са три терма и $\varphi$ и $\psi$ са две формули, тогава:
-	\begin{itemize}
-		\item $\varphi \land T \Longrightarrow \varphi$,\;\; $T \land \varphi \Longrightarrow \varphi$,\;\;
-		      $\varphi \land F \Longrightarrow F$,\;\; $F \land \varphi \Longrightarrow F$
-		\item $\varphi \lor T \Longrightarrow T$,\;\; $T \lor \varphi \Longrightarrow T$,\;\;
-		      $\varphi \lor F \Longrightarrow \varphi$,\;\; $F \lor \varphi \Longrightarrow \varphi$,
-		\item $a \sqcap 1 \Longrightarrow a$,\;\; $1 \sqcap a \Longrightarrow a$,\;\;
-		      $a \sqcap 0 \Longrightarrow 0$,\;\; $0 \sqcap a \Longrightarrow 0$,
-		\item $a \sqcup 1 \Longrightarrow 1$,\;\; $1 \sqcup a \Longrightarrow 1$,\;\;
-		      $a \sqcup 0 \Longrightarrow a$,\;\; $0 \sqcup a \Longrightarrow a$,
-	\end{itemize}
-\end{lema}
-\end{frame}
-\begin{frame}\frametitle{Тривиални свойства, продължение}
-	\begin{itemize}
-		\item $(a \sqcup b)Cc \iff aCc \lor bCc$
-		\item $(a \sqcup b) \leq c \iff a \leq c \land b \leq c$
-		\item $aCb \Longrightarrow a \neq 0 \land b \neq 0$
-		\item $a \sqcap b \neq 0 \Longrightarrow aCb$
-		\item $a = 0 \lor b = 0 \Longrightarrow \neg(aCb)$
-		\item $0 \leq a \Longrightarrow T$
-		\item $a \leq 1 \Longrightarrow T$
-		\item $0C0 \Longrightarrow F$
-		\item $aC0 \Longrightarrow F$
-		\item $1C1 \Longrightarrow T$
-		\item $aC1 \Longrightarrow a \neq 0$
-		\item $a \neq 0 \Longrightarrow aCa$
-	\end{itemize}
 \end{frame}
 
 
 \subsection{Изпълнимост в минималната контактна логика}
 \begin{frame}\frametitle{Изпълнимост в минималната контактна логика}
-За да проверим дали дадена формула $\varphi$ е изпълнима в минималната контактна логика трябва да построим модел $\mathcal{M}$
-за да бъде вярно $\mathcal{M} \models \varphi$.
+За дадена формула $\varphi$ трябва да построим модел $\mathcal{M} \models \varphi$.
 \newline
 \newline
-За да опростим формулата, ползваме табло метода и вместо да строим модел за първоначалната формула, строим модел само за 
-атомарните клонове в таблото.
-\newline
-Намирането на един такъв модел $\mathcal{M}$ който изпълнява атомарните формули в клона е достатъчно, и няма нужда да се разглежда последващите клонове.
-\end{frame}
-
-\begin{frame}\frametitle{Конюнктивен табло клон}
-Един атомарен клон се състои от маркирани формули. Дадената формула е изъплнима точно тогава, когато всички атомарни формули от таблото са изпълними.
+Използваме табло метода за да опростим формулата и търсим модел в клоновете на табло метода.
 \newline
 \newline
-		Нека $\varphi$ е формула и $\mathcal{T}$ е таблото от $\varphi$, то за означаване на конюктивен табло клон ще ползваме следното:
+		Нека $\varphi$ е формула и $\mathcal{T}$ е таблото от $\varphi$, то клона на таблото има следните маркирани атомарни формули:
 		\begin{align*}
 				B = \{\signT C(a_i, b_i) \mid i \in \{1, \ldots, I\} \} &\cup 
 					\{\signF C(e_k, f_k) \mid k \in \{1, \ldots, K\} \} \cup \\
@@ -516,7 +469,7 @@
 \end{defn}
 
 \begin{defn}[Оценка на променливи]
-	С $\curvedE$ ще ознчаваме функцията която за всяка оценка от $\Var_B$ дава истина или лажа.
+	С $\curvedE$ ще ознчаваме функцията, която за всяка променлива от $\Var_B$ дава истина или лажа.
 		\begin{align*}
 			\curvedE : \Var_B \rightarrow \{ \textbf{лъжа}, \textbf{истина}\}
 		\end{align*}
@@ -576,7 +529,7 @@
 \end{frame}
 
 \begin{frame}\frametitle{Построяване на модални точки за контактите}
-	След успешно генерираните модални точки за двата терма, обогатяваме R със следните релации:
+	След успешно генерираните модални точки за двата терма, разширяваме R със следните релации:
 	\begin{itemize}
 		\item pRp - рефлексивност на модалната точка p
 		\item qRq - рефлексивност на модалната точка q
@@ -614,13 +567,13 @@
 \end{frame}
 
 \begin{frame}\frametitle{Построяване на модална точка за не-равен на нула терм}
-	За всеки не-равен на нула терм $a \neq 0 \in B$ ще построим една модални точки, такава, че:
-		\begin{itemize}
-			\item $\vBool_{\curvedE}(a) = \textbf{истина}$
-		\end{itemize}
-	За равно на нула термовете, следното условие трябва да е изпълнено:
+	За всеки не-равен на нула терм $a \neq 0 \in B$ ще построим една модални точки, такава, че $\vBool_{\curvedE}(a) = \textbf{истина}$. \\
+	За равно на нула термовете, следните условия трябва да са изпълнени:
 	\begin{align*}
 		t = 0 \in B: \vBool_{\curvedE}(t) = \textit{лъжа}
+	\end{align*}
+	\begin{align*}
+		\neg C(e, f) \in B: (\vBool_p(e) = \textbf{лъжа} \textit{ and } \vBool_p(f) = \textbf{лъжа})
 	\end{align*}
 	След успешно генериране на модалната точка, отново обогатяваме R със следната:
 	\begin{itemize}
@@ -665,7 +618,7 @@
 	\begin{lema}
 		Нека a е терм и нека $\curvedE$ е оценка на променливи, от дефиницията на $\vBool$ и $\vE$, следва, че:
 		\begin{align*}
-			\vBool_{\curvedE}(a) = истина \leftrightarrow \curvedE \in \vE(a)
+			\vBool_{\curvedE}(a) = \textit{ истина } \leftrightarrow \curvedE \in \vE(a)
 		\end{align*}
 		В такъв случай, когато $\vBool_{\curvedE}(a) = \textbf{истина}$ ще казваме, че модална точка  $\curvedE$ е \textbf{валидна}.
 	\end{lema}
@@ -692,22 +645,10 @@
 	\begin{itemize}
 		\item $\mathcal{M} \models a \leq_\mu b \text{, когато } \mu(\mathscr{v}(a)) \le \mu(\mathscr{v}(b))$
 	\end{itemize}
-
-	\begin{lema}[Тривиални импликации за модели с мярка]
-Нека a, b и c са три терма и нека $\varphi$ и $\psi$ са две формули, тогава:
-	\begin{itemize}
-		\item $0 \le_\mu a \Longrightarrow T$
-		\item $a \le_\mu 1 \Longrightarrow T$
-		\item $(a = 0) \iff (a \le_\mu 0)$
-		\item $(a = 1) \iff (1 \le_\mu a)$
-		\item $(a \le_\mu b) \lor (b \le_\mu a) \Longrightarrow T$
-		\item $a_1 \le_\mu a_2 \land a_2 \le_\mu a_3 \Longrightarrow a_1 \le_\mu a_3$
-	\end{itemize}
-\end{lema}
 \end{frame}
 
 \begin{frame}\frametitle{Система линейни неравенства}
-Формула с повече атомарни формули с мярка създава система линейни неравенства.
+Формула с атомарни формули с мярка създава система линейни неравенства.
 \newline
 Системата линейни неравенства има следната структура:
 		\[
@@ -870,7 +811,7 @@
 \newline
 Стъпка 1:
 \newline
-Генерираме модел $\mathcal{M}$ от валидни модални точки W в B.
+Генерираме модел $\mathcal{M}$ от всички валидни модални точки W в B.
 \end{frame}
 
 \begin{frame}
@@ -903,9 +844,22 @@
 
 \end{frame}
 
+\begin{frame}\frametitle{Имплементация}
+\begin{itemize}
+	\item FLEX + BISON за построяване на формулата до AST (абстрактно синтактично дърво)
+	\item Търсене на последователни атомарни клонове с табло метода
+	\item Генериране на модел с мярка
+	\item Уеб приложение за извикване на генерирането на модела и визуализиране на самия
+\end{itemize}
+ https://github.com/Anton94/modal\_logic\_formula\_prover
+\end{frame}
+
+\begin{frame}\frametitle{Демо}
+http://logic.fmi.uni-sofia.bg/theses/Dudov\_Stoev/
+\end{frame}
+
 \begin{frame}
-Благодаря ви. \\
-Нека да пробваме самата програмка!
+Благодаря за вниманието.
 \end{frame}
 
 \end{document}

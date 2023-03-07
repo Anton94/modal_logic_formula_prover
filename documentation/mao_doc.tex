@@ -651,14 +651,18 @@ For the purposes of our algorithm the elements of W will be such variable valuat
 	\end{center}
 
 	\paragraph{Non zero term modal point construction step}\label{def-non-zero-construction}
-		Let B be a branch conjunction and $a \neq 0 \in B$, where a is a term. Then one modal point $\curvedE$ is generated, such that:
+		Let B be a branch conjunction and $a \neq 0 \in B$, where a is a term. Then one modal point p is generated, such that:
 		\begin{itemize}
-			\item $\vBool_{\curvedE}(a) = \textbf{true}$
+			\item $\vBool_{p}(a) = \textbf{true}$
 		\end{itemize}
 
 	To validate that the newly generated modal point satisfies the equal to zero terms, the following must be true:
 	\begin{align*}
-		t = 0 \in B: \vBool_{\curvedE}(t) = \textit{false}
+		t = 0 \in B: \vBool_{p}(t) = \textit{false}
+	\end{align*}
+	To validate that the modal point satisfies the non contacts, the following must be true:
+	\begin{align*}
+		\neg C(e, f) \in B: (\vBool_p(e) = \textbf{false} \textit{ and } \vBool_p(f) = \textbf{false})
 	\end{align*}
 	\newline
 		The R relation is extended as follows:
