@@ -7,13 +7,13 @@
 
 [![](https://codescene.io/projects/5855/status.svg)](https://codescene.io/projects/5855/jobs/latest-successful/results)
 
-# modal_logic_formula_prover
-TODO: Master degree project for prooving/disprooving formulas (space and probability)
+Master degree project for prooving/disprooving contact logic formulas
 
-# Demo
+# [DEMO](https://anton94.github.io/modal_logic_formula_prover/simple_client/index.html)
+Click the link above or run localy, e.g.
 - repo_dir/simple_client> python3 -m http.server
 
-Or some other http server and click the link.
+The simple_client folder holds the standalone web application which is only HTML CSS and JS with the formula prooving library as WebAssembly.
 
 # Dependencies:
 - CMake 3.7 or newer
