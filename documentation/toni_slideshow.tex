@@ -141,8 +141,8 @@
 \begin{frame}{Табло метод за класическа съждителна логика}
 	Табло метод със знаци $\ST$ и $\SF$
 	\begin{itemize}
-		\item $\ST X$ - означава, че формулата X трябва да е true (в някой модел)
-		\item $\SF X$ - аналогично, X трябва да е false
+		\item $\ST X$ - означава, че формулата X трябва да е истина (в някой модел)
+		\item $\SF X$ - аналогично, X трябва да е лъжа
 	\end{itemize}
 \end{frame}
 
@@ -404,7 +404,7 @@
 		$\SB$ е множество състоящо се от следните атомарни формули
 		\begin{itemize}
 			\item $\ST C(a,b)$ $\rightarrow$ $C(a,b)$ (контакт)
-			\item $\SF C(a,b)$ $\rightarrow$ $\neg C(a,b)$ (не-контакт)
+			\item $\SF C(e,f)$ $\rightarrow$ $\neg C(e,f)$ (не-контакт)
 			\item $\ST a \leq b$ $\rightarrow$ $a \leq b$ $\rightarrow$ $a \sqcap b^*=0$ $\rightarrow$ $g = 0$ (нулев терм)
 			\item $\SF a \leq b$ $\rightarrow$ $\neg (a \leq b)$ $\rightarrow$ $a \sqcap b^* \neq 0$ $\rightarrow$ $d \neq 0$ (ненулев терм)
 		\end{itemize}
@@ -499,10 +499,10 @@
 	\begin{definition}[Валидна модална точка]
 		$\E \in W_n$ е \textbf{валидна модална точка} на $\beta$, ако запазва изпълнимостта на нулевите термове и не-контактите
 			\begin{equation*}
-				g = 0 \in \beta \rightarrow \E_n \notin \upsilon_n(g) И
+				g = 0 \in \beta \rightarrow \E \notin \upsilon(g) И
 			\end{equation*}
 			\begin{equation*}
-				\neg C(e, f) \in \beta \rightarrow \E_n \notin (\upsilon_n(e) \cap \upsilon_n(f))
+				\neg C(e, f) \in \beta \rightarrow \E \notin (\upsilon(e) \cap \upsilon(f))
 			\end{equation*}
 	\end{definition}
 	}
@@ -568,7 +568,7 @@
 		\STATE $R \gets \emptyset$
 		\FOR{$d \neq 0 \in \beta$} \label{non-zero-terms}
 			\FOR{$\E \in W^v$}
-				\IF{$\eta(d, \E_n) = 1$}
+				\IF{$\eta(d, \E) = 1$}
 					\STATE $W \gets W \cup \{ x \}$
 					\STATE $R \gets R \cup \{ \pairXX \}$
 					\STATE go to \ref{non-zero-terms}
@@ -728,12 +728,12 @@
 		\begin{itemize}
 			\item<1-> M запазва удоволетворимостта на контактите в $\beta$, ако
 			\begin{equation*}
-				C(a,b) \in \beta \rightarrow (\exists x \in \upsilon_n'(a))(\exists y \in \upsilon_n'(b))(xRy)
+				C(a,b) \in \beta \rightarrow (\exists x \in \upsilon'(a))(\exists y \in \upsilon'(b))(xRy)
 			\end{equation*}
 
 			\item<2-> M запазва удоволетворимостта на ненулевите термове в $\beta$, ако
 			\begin{equation*}
-				g \neq 0 \in \beta \rightarrow \upsilon_n'(g) \neq \emptyset
+				g \neq 0 \in \beta \rightarrow \upsilon'(g) \neq \emptyset
 			\end{equation*}
 		\end{itemize}
 	\end{lemma}
