@@ -463,9 +463,9 @@
 
 \begin{frame}{Оценка}
 	\textbf{Оценка $\upsilon : \V \rightarrow \p(W)$}:
-	\begin{equation*}
-		\upsilon(x) = \{ \E \mid \E \in W \; and \; (\E)^i = 1 \}, \;\; x \in \V
-	\end{equation*}
+	\begin{center}
+		$\upsilon(x_i) = \{ \E \mid \E \in W$ и $(\E)^i = 1 \}, \;\; x_i \in \V$
+	\end{center}
 	Разширява се индуктивно както следва:
 	\begin{itemize}
 		\item $\upsilon(0) = \emptyset$
@@ -539,7 +539,7 @@
 
 \begin{frame}{Точка част от оценка}
 		\begin{definition}[$\eta$]
-			$\eta: (\Tb \times W_n) \rightarrow \{0, 1 \}$ - указва дали модална точка е част от оценката на терм. Нека $t \in \Tb$ и $\E \in W_n$.
+			$\eta: (\Tb \times W_n) \rightarrow \{0, 1 \}$ - указва дали модална точка е част от оценката на терм. Нека $\E \in W_n$.
 			\begin{itemize}
 				\item $\eta(0, \E) = 0$
 				\item $\eta(1, \E) = 1$
@@ -590,7 +590,7 @@
 		\setalglineno{13}
 		\FOR{$C(a, b) \in \beta$} \label{contacts}
 			\FOR{$x,\; y \in W^v$}
-				\IF{$\eta(a, x) = 1 \land \eta(b, x) = 1 \land IsValidCon(x,y)$}
+				\IF{$\eta(a, x) = 1 \land \eta(b, y) = 1 \land IsValidCon(x,y)$}
 					\STATE $W \gets W \cup \{x, y \}$
 					\STATE $R \gets R \cup \{\pairXX, \pairYY, \pairXY, \pairYX \}$
 					\STATE go to \ref{contacts}
@@ -598,6 +598,27 @@
 			\ENDFOR
 			\STATE Не може да се създаде модел.
 		\ENDFOR
+	\end{algorithmic}
+
+	\caption{Алгоритъм за строене на модел}
+	\label{alg:seq}
+	\end{algorithm}
+\end{frame}
+
+\begin{frame}
+	\begin{algorithm}[H]
+	\renewcommand\thealgorithm{} % Remove the algotihm #number
+	\begin{algorithmic}[1] % [1] Adds line numbering
+		\setalglineno{23}
+		\IF{$W = \emptyset$}
+			\IF{$W^v \neq \emptyset$}
+				\STATE $x \in W^v$
+				\STATE $W \gets W \cup \{ x \}$
+				\STATE $R \gets R \cup \{ \pairXX \}$
+			\ELSE
+				\STATE Не може да се създаде модел.
+			\ENDIF
+		\ENDIF
 		\STATE Успешно е създаден модел $\M = ((W, R), \upsilon)$
 	\end{algorithmic}
 
