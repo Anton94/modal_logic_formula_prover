@@ -266,10 +266,8 @@
 
 \subsection{Семантика}
 
-%контактните логики имат топологична, алгебрачни и релационна семантика . ние ще разглеждаме релационната семантика
-
+% ВАЖНО контактните логики имат топологична, алгебрачни и релационна семантика . ние ще разглеждаме релационната семантика
 % R е рефлексивна и симетрична релация
-
 % теоретико множествената разлика е W \ v(a) или от W изхвърляме точките от v(a)
 
 \begin{frame}{Контактна логика - семантика}
@@ -292,8 +290,6 @@
 	}
 \end{frame}
 
-% Ако v е оценка M=<F,v> модел . В модела M
-
 \subsection{Изпълнимост на формула}
 
 \begin{frame}{Контактна логика - модел}
@@ -305,7 +301,7 @@
 			\item $\M \models \top$
 			\item $\M \not\models \bot$
 			\item $\M \models a \leq b \iff \upsilon(a) \subseteq \upsilon(b)$
-			\item $\M \models aCb \iff (\exists x \in \upsilon(a))(\exists y \in \upsilon(b))(xRy)$ % edinichni strelki
+			\item $\M \models aCb \iff (\exists x \in \upsilon(a))(\exists y \in \upsilon(b))(xRy)$
 		\end{itemize}
 	\end{definition}
 \end{frame}
@@ -337,32 +333,27 @@
 \end{frame}
 
 \begin{frame}{Контактна логика}
-	Нека a и b са термове.
-
-	\uncover<1->{
-		Ясно е, че $\M \models a = b \iff \upsilon(a) = \upsilon(b)$
-	}
-
-	\uncover<2->{
-		$\M \models a \leq b \iff \M \models a \sqcap b^*=0$
-	}
-
-	\uncover<3->{
-		$\M \models \neg(a \leq b) \iff \M \models  a \sqcap b^* \neq 0$
-	}
+	Нека a и b са термове. Ясно е, че:
+	\begin{itemize}
+		\item<1->$\M \models a = b \iff \upsilon(a) = \upsilon(b)$
+		\item<2-> $\M \models a \leq b \iff \M \models a \sqcap b^*=0$
+		\item<3-> $\M \models \neg(a \leq b) \iff \M \models  a \sqcap b^* \neq 0$
+	\end{itemize}
 \end{frame}
 
 \begin{frame}{Контактна логика - свойства на релацията}
 	Нека a и b са термове.
 	\begin{itemize}
-		\item<1-> $\M \models a \neq 0 \iff \M \models aCa$
-		\item<2-> $\M \models aCb \iff \M \models bCa$
+		\item $\M \models a \neq 0 \iff \M \models aCa$
+		\item $\M \models aCb \iff \M \models bCa$
 	\end{itemize}
 	\bigskip
-	Следват от рефлексивността и симетричността
+	Следват от рефлексивността и симетричността на R.
 \end{frame}
 
-\begin{frame}{Табло - отворен клон}
+\subsection{Алгоритъм за строене на модел}
+
+\begin{frame}{Табло - търсене на отворен клон}
 	\uncover<1->{
 		\begin{center}
 			Формула $\phi \rightarrow$ табло с начало $\ST \phi \rightarrow$ отворен клон $\SB$.
@@ -390,8 +381,6 @@
 	}
 \end{frame}
 
-\subsection{Алгоритъм за строене на модел}
-
 \begin{frame}{Строене на модел}
 	\uncover<1->{
 		\begin{definition}[Отворен клон $\beta$]
@@ -408,7 +397,7 @@
 	}
 \end{frame}
 
-% Да си мислим за формула с Н променливи. За верността на формулата имат значение само оценките на тези променливи. В този смисъл една модална точка казва кои променливи са верни в нея и кои не са верни. Точките може да си мислим като характеристичния вектор на верността на променливите в тази точка
+% Да си мислим за формула с N променливи. За верността на формулата имат значение само оценките на тези променливи. В този смисъл една модална точка казва кои променливи са верни в нея и кои не са верни. Точките може да си мислим като характеристичния вектор на верността на променливите в тази точка
 % Твърде сложно за казване е горното
 
 
@@ -475,15 +464,15 @@
 
 \begin{frame}{Валидна модална точка}
 	\uncover<1->{
-	\begin{definition}[Валидна модална точка]
-		$\E \in W_n$ е \textbf{валидна модална точка} на $\beta$, ако запазва изпълнимостта на нулевите термове и не-контактите
+		\begin{definition}[Валидна модална точка]
+			$\E \in W_n$ е \textbf{валидна модална точка} на $\beta$, ако запазва изпълнимостта на нулевите термове и не-контактите
 			\begin{equation*}
 				g = 0 \in \beta \rightarrow \E \notin \upsilon(g) И
 			\end{equation*}
 			\begin{equation*}
 				\neg C(e, f) \in \beta \rightarrow \E \notin (\upsilon(e) \cap \upsilon(f))
 			\end{equation*}
-	\end{definition}
+		\end{definition}
 	}
 
 	\uncover<2->{
@@ -611,15 +600,16 @@
 \begin{frame}{Контактната логика за свързаност}
 	\begin{lemma}
 		Релационната система е свързана точно тогава, когато за всяка оценка в нея следната формула е вярна
-	\begin{equation*}
-		a \neq 0 \land a \neq 1 \rightarrow aCa^*
-	\end{equation*}
-	
-	На тази формула ще ѝ казваме аксиома за свързаност.
-	\end{lemma}
 		\begin{equation*}
-			\upsilon(a) \neq \emptyset \land \upsilon(a) \neq W \rightarrow (\exists x \in \upsilon(a)) (\exists y \in W \setminus \upsilon(a))(xRy)
+			a \neq 0 \land a \neq 1 \rightarrow aCa^*
 		\end{equation*}
+
+		На тази формула ще ѝ казваме аксиома за свързаност.
+	\end{lemma}
+
+	\begin{equation*}
+		\upsilon(a) \neq \emptyset \land \upsilon(a) \neq W \rightarrow (\exists x \in \upsilon(a)) (\exists y \in W \setminus \upsilon(a))(xRy)
+	\end{equation*}
 \end{frame}
 
 \begin{frame}
@@ -643,7 +633,9 @@
 	}
 \end{frame}
 
-\begin{frame}{Свързан модел}
+% Тук казвам, че че модалните точки са 2^n и всички подмножества от модални точки са 2^2^n и е твърде много. По-разумно ще е да направим модел с всички валидни модални точки и релации между тях и да търсим в него свързан подмодел
+
+\begin{frame}{Свързаност}
 	\uncover<1->{
 		\begin{theorem}[Свързаност]
 		 Нека $\F = (W, R)$ е релационна система и G = (W, R) е графът, дефиниран от нея.
@@ -699,7 +691,7 @@
 	\end{lemma}
 \end{frame}
 
-\begin{frame}{Запазване удовлетворимост атомарни формули}
+\begin{frame}
 	\begin{lemma}[Запазване удовлетворимостта на атомарните формули]
 		$G^v=(W^v, R^v)$ е графът породен от $\F^v$. Нека $G=(W,R) \subseteq G^v$ и $\M=((W,R), \upsilon')$ е моделът дефиниран от G. Тогава:
 		\begin{itemize}
