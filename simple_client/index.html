@@ -318,6 +318,29 @@
             }
             withLogs.addEventListener("click", switchFooters);
             simpleFooter.addEventListener("click", switchFooters);
+
+
+            document.addEventListener('click', (event) => {
+                const targetWithLogs = document.getElementById("footer-with-logs");
+                const targetSimpleFooter = document.getElementById("simple-footer");
+                const withinBoundariesLogs = event.composedPath().includes(targetWithLogs);
+                const withinBoundariesSimple = event.composedPath().includes(targetSimpleFooter);
+
+                if (!withinBoundariesLogs && !withinBoundariesSimple) {
+                    targetWithLogs.style.display = "none";
+                    targetSimpleFooter.style.display = "block";
+                }
+            })
+
+            $(document).keyup(function(e) {
+                if (e.key === "Escape") { // escape key maps to keycode `27`
+                    const targetWithLogs = document.getElementById("footer-with-logs");
+                    const targetSimpleFooter = document.getElementById("simple-footer");
+                    targetWithLogs.style.display = "none";
+                    targetSimpleFooter.style.display = "block";
+                }
+            });
+
         </script>
     </body>
 </html>

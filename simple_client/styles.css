@@ -96,7 +96,7 @@ label {
 .verbose_output {
     height: auto;
     max-height: 400px;
-    overflow: initial;
+    overflow: scroll;
     background-color: #eeeeee;
     word-break: normal !important;
     word-wrap: normal !important;
@@ -119,7 +119,7 @@ label {
     margin-left: 20px;
     margin-right: 20px;
     margin-bottom: 8px;
-    overflow-y: scroll;
+    overflow: hidden;
 }
 .arrow {
     margin-left: 5px;
