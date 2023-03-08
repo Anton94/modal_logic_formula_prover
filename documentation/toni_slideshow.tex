@@ -129,12 +129,12 @@
 \begin{itemize}
 	\item<1-> Доказване, че формула е тавтология
 	\begin{description}
-		\item<2-> $\phi = x \lor \neg x$
+		\item<1-> $\phi = x \lor \neg x$
 	\end{description}
 
-	\item<3-> Алгоритъм за търсене на модел % Алгоритъм за търсене на модел, в който формулата е изпълнима
+	\item<2-> Алгоритъм за търсене на модел % Алгоритъм за търсене на модел, в който формулата е изпълнима
 	\begin{description}
-		\item<4-> $\psi = (x \land \neg x) \lor (\neg x \land y) \rightarrow x = F ,\; y = T$
+		\item<2-> $\phi = (x \land \neg x) \lor (\neg x \land y) \rightarrow x = F ,\; y = T$
 	\end{description}
 \end{itemize}
 \end{frame}
@@ -144,7 +144,7 @@
 % Знаците, с които ще маркираме формулите са F и T.
 % Формулите със знаци са изрази от вида FX и TX
 
-% С табло методът строим двоично дърво, възлите на които са крайно множество от формули със знаци. Ще разбиваме тези формули със знаци докато не останат само атомарни фомрули, т.е. само променливи със знаци.
+% Стандартният начин за визуализиране на табло метода е като двоично дърво, възлите на които са крайно множество от формули със знаци. Разклоненията са дизункциите във формулата, а клоните са конюнкция на формулите Ще разбиваме тези формули със знаци докато не останат само атомарни фомрули, т.е. само променливи със знаци.
 
 % Табло - българското наименование е семантични таблици на Берт
 
@@ -171,9 +171,9 @@
 \begin{frame}{Табло метод - правила за разбиване на подформули}
 	\begin{itemize}
 	\LARGE
-		\item<1-> $\frac{\ST X \Rightarrow Y}{\SF X \mid \ST Y} \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{\SF X \Rightarrow Y}{{\ST X \atop \SF Y}}$
+		\item $\frac{\ST X \Rightarrow Y}{\SF X \mid \ST Y} \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{\SF X \Rightarrow Y}{{\ST X \atop \SF Y}}$
 		\\ [8mm]
-		\item<2-> $\frac{\ST X \Leftrightarrow Y}{\left.{\ST X \atop \ST Y}\right\vert{\SF X \atop \SF Y}} \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{\SF X \Leftrightarrow Y}{\left.{\ST X \atop \SF Y}\right\vert{\SF X \atop \ST Y}}$
+		\item $\frac{\ST X \Leftrightarrow Y}{\left.{\ST X \atop \ST Y}\right\vert{\SF X \atop \SF Y}} \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\ \frac{\SF X \Leftrightarrow Y}{\left.{\ST X \atop \SF Y}\right\vert{\SF X \atop \ST Y}}$
 	\normalsize
 	\end{itemize}
 \end{frame}
@@ -273,7 +273,7 @@
 % R е рефлексивна и симетрична релация
 % теоретико множествената разлика е W \ v(a) или от W изхвърляме точките от v(a)
 
-\begin{frame}{Контактна логика - семантика}
+\begin{frame}{Контактна логика - релационна семантика}
 	\uncover<1->{
 		$\F$ = (W, R) е релационна система с W $\neq$ $\emptyset$ и R $\subseteq$ $W^2$, реф. и сим.
 	}
@@ -299,7 +299,7 @@
 	\begin{definition}[Модел]
 		$\M$ = ($\F, \upsilon$) се нарича \textbf{\textit{модел}}.
 
-		Истиността на формула $\phi$ в $\M$ ($\M \models \phi$) се дефинира индуктивно за всички термове както следва:
+		Истиността на формула $\phi$ в $\M$ ($\M \models \phi$) се дефинира индуктивно за всички формули както следва:
 		\begin{itemize}
 			\item $\M \models \top$
 			\item $\M \not\models \bot$
@@ -385,6 +385,8 @@
 		\end{itemize}
 	}
 \end{frame}
+
+% ТУК трябва да кажа идеята на алгоритъма за строене на модел.
 
 \begin{frame}{Строене на модел}
 	\uncover<1->{
@@ -515,8 +517,8 @@
 				\item $\eta(0, \E) = 0$
 				\item $\eta(1, \E) = 1$
 				\item $\eta(x_i, \E) = 1 \iff (\E)^i = 1$
-				\item $\eta(a \sqcap b, \E) = 1 \iff \eta(a, \E) = 1 \; and \; \eta(b, \E) = 1$
-				\item $\eta(a \sqcup b, \E) = 1 \iff \eta(a, \E) = 1 \; or \; \eta(b, \E) = 1$
+				\item $\eta(a \sqcap b, \E) = 1 \iff \eta(a, \E) = 1 \; и \; \eta(b, \E) = 1$
+				\item $\eta(a \sqcup b, \E) = 1 \iff \eta(a, \E) = 1 \; или \; \eta(b, \E) = 1$
 				\item $\eta(a^*, \E) = 1 \iff \eta(a, \E) = 0$
 			\end{itemize}
 		\end{definition}
@@ -538,8 +540,8 @@
 		\STATE $W \gets \emptyset$
 		\STATE $R \gets \emptyset$
 		\FOR{$d \neq 0 \in \beta$} \label{non-zero-terms}
-			\FOR{$\E \in W^v$}
-				\IF{$\eta(d, \E) = 1$}
+			\FOR{$x\in W^v$}
+				\IF{$\eta(d, x) = 1$}
 					\STATE $W \gets W \cup \{ x \}$
 					\STATE $R \gets R \cup \{ \pairXX \}$
 					\STATE go to \ref{non-zero-terms}
