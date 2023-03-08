@@ -101,6 +101,14 @@
                     return;
                 }
 
+                var ascii = /^[ -~]+$/;
+                if ( !ascii.test( formula ) ) {
+                    // string has non-ascii characters
+                    document.getElementById('algorithm_result').innerText = "Syntax Error";
+                    document.getElementById("verbose_output").innerText = "The formula contains non-ascii characters, please use a-z and A-Z for variable names.";
+                    return;
+                }
+
                 var formula_filters = get_formula_filters();
 
                 const updatedUrl = new URL(window.location.href);
