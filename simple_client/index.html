@@ -200,14 +200,17 @@
             }
 
             function print_result_modal_points_measured_values(modal_points_measured_values) {
-                if(modal_points_measured_values.length == 0)
+                if (!modal_points_measured_values) 
+                    return;
+
+                if(modal_points_measured_values.length === 0)
                     return;
 
                 var text = document.getElementById("result_sets").innerText;
                 text += "\n";
 
                 for(var i = 0; i < modal_points_measured_values.length; i += 1) {
-                      text += "m(A" + i + ") = " + modal_points_measured_values[i] + "\n";
+                      text += "\u03BC(A" + i + ") = " + Number(modal_points_measured_values[i]).toFixed(10) + "\n";
                 }
 
                 document.getElementById("result_sets").innerText = text;
@@ -268,6 +271,7 @@
             </div>
             <div class="legend" style="margin-left: auto">
                 <h2 style="margin-left: 8px;">Term's legend</h2>
+                <label>Variables: [a-zA-Z0-9]+</label><br>
                 <code>0&nbsp;&nbsp;&nbsp;-&nbsp;&#x2205;&nbsp; - </code><label>Empty set constant</label><br>
                 <code>1&nbsp;&nbsp;&nbsp;-&nbsp;W&nbsp; - </code><label>Whole world constant</label><br>
                 <code>-&nbsp;&nbsp;&nbsp;-&nbsp;T<sup>c</sup> - </code><label>Unary Complement</label><br>

@@ -116,6 +116,7 @@
 
         ["<=(a,b) & <=(c, d) & (b*d) = 0 & m*b = 0 & m*d = 0 & C(a,m) & C(m, c) & ~C(a,c)", true, true, true],
         ["<=(a,b) & <=(c, d) & (b*d) = 0 & m*b = 0 & m*d = 0 & C(a,m) & C(m, c) & ~C(a,c) & C(b,d)", true, true, true],
+        ["~<=m(a,b) | (<=m(a,x) & <=m(b,a) & <=(1, a + b + x) & ~<=m(a,b))", true, true, true],
       ];
 
       function create_code(formula) {
