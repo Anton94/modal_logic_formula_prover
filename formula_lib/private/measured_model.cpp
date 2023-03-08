@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <iomanip>
 
 namespace
 {
@@ -349,11 +350,20 @@ auto measured_model::print_system(std::ostream& out) const -> std::ostream&
 {
     const auto points_size = points_.size();
 
+    const auto unset_common_variables = [](auto& v_a, auto& v_b)
+    {
+        const auto orig_v_a = v_a;
+        v_a = v_a & ~v_b;
+        v_b = v_b & ~orig_v_a;
+    };
+
     out << "System:\n";
     for(const auto& m : measured_less_eq_T_) // <=m(a,b)
     {
-        const auto v_a = m->get_left_child_term()->evaluate(variable_evaluations_, points_size);
-        const auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
+        auto v_a = m->get_left_child_term()->evaluate(variable_evaluations_, points_size);
+        auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
+
+        unset_common_variables(v_a, v_b);
 
         out << "| ";
         print_system_sum_variables(out, v_a);
@@ -361,10 +371,13 @@ auto measured_model::print_system(std::ostream& out) const -> std::ostream&
         print_system_sum_variables(out, v_b);
         out << " # " << *m << "\n";
     }
+
     for(const auto& m : measured_less_eq_F_) // ~<=m(a,b)
     {
-        const auto v_a = m->get_left_child_term()->evaluate(variable_evaluations_, points_size);
-        const auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
+        auto v_a = m->get_left_child_term()->evaluate(variable_evaluations_, points_size);
+        auto v_b = m->get_right_child_term()->evaluate(variable_evaluations_, points_size);
+
+        unset_common_variables(v_a, v_b);
 
         out << "| ";
         print_system_sum_variables(out, v_a);
@@ -372,6 +385,13 @@ auto measured_model::print_system(std::ostream& out) const -> std::ostream&
         print_system_sum_variables(out, v_b);
         out << " # ~" << *m << "\n";
     }
+
+    for(size_t i = 0; i < points_size; ++i) // all unknowns should be positive (i.e. each variable unknown > 0)
+    {
+        out << "| ";
+        out << "X" << i << " > 0 # Positive restriction\n";
+    }
+
     return out;
 }
 
@@ -387,13 +407,15 @@ auto measured_model::print(std::ostream& out) const -> std::ostream&
 
     if(system_.is_solvable())
     {
+        constexpr auto max_precision {std::numeric_limits<double>::digits10 + 1};
+
         out << "Solution:\n";
         auto variables_values = system_.get_variables_values();
         assert(variables_values.size() == points_.size());
 
         for(size_t i = 0; i < variables_values.size(); ++i)
         {
-            out << "X" << i << " = " << variables_values[i] << "\n";
+            out << "m(" << i << ") = X" << i << " = " << std::fixed << std::setprecision(max_precision) << variables_values[i] << "\n";
         }
     }
     else

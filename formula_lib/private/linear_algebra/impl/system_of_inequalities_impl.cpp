@@ -102,6 +102,12 @@ auto system_of_inequalities_impl::get_variables_values() -> std::vector<double>
     return variables_values;
 }
 
+void system_of_inequalities_impl::print(std::ostream& out) const
+{
+    const auto system = const_cast<system_of_inequalities_impl*const>(this)->solver_.dumps(); // For NO reason the dumps is not a constant function.
+    out << "System:\n" << system << "\n";
+}
+
 void system_of_inequalities_impl::clear()
 {
     is_solvable_ = true;

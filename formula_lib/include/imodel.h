@@ -90,6 +90,8 @@ protected:
 
     variables_t variable_names_;
 
+    variables_mask_t used_variables_{};
+
     // The modal points.
     points_t points_;
 };

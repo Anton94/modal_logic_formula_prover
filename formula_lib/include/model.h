@@ -164,7 +164,4 @@ protected:
     auto construct_point(const formulas_t& contacts_F, const terms_t& zero_terms_T) -> bool;
 
     void calculate_the_model_evaluation_of_each_variable();
-
-protected:
-    variables_mask_t used_variables_{};
 };

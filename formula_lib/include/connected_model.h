@@ -116,5 +116,4 @@ private:
     void calculate_the_model_evaluation_of_each_variable();
 
     size_t max_variables_count_;
-    variables_mask_t used_variables_{};
 };

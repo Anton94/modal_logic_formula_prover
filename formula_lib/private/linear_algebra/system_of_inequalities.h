@@ -57,6 +57,8 @@ public:
      */
     auto get_variables_values() const -> std::vector<double>;
 
+    void print(std::ostream& out) const;
+
     void clear();
 
 private:

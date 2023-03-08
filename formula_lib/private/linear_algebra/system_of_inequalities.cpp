@@ -42,6 +42,12 @@ auto system_of_inequalities::get_variables_values() const -> std::vector<double>
     return impl_->get_variables_values();
 }
 
+void system_of_inequalities::print(std::ostream& out) const
+{
+    assert(impl_);
+    return impl_->print(out);
+}
+
 void system_of_inequalities::clear()
 {
     assert(impl_);

@@ -153,8 +153,6 @@ private:
 
     size_t max_valid_modal_points_count_{};
 
-    variables_mask_t used_variables_;
-
     formulas_t measured_less_eq_T_;
     formulas_t measured_less_eq_F_;
     system_of_inequalities system_;

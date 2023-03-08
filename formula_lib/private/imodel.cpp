@@ -109,6 +109,11 @@ auto imodel::print_evaluations(std::ostream& out, const variable_id_to_points_t&
 {
     for(size_t i = 0; i < variable_evaluations.size(); ++i)
     {
+        if(!used_variables_[i])
+        {
+            continue;
+        }
+
         const auto& variable_evaluation_bitset = variable_evaluations[i];
 
         out << "v(" << get_variable_name(i) << ") = {";
