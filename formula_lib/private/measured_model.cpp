@@ -395,6 +395,16 @@ auto measured_model::print_system(std::ostream& out) const -> std::ostream&
     return out;
 }
 
+auto measured_model::get_modal_points_measured_values() const -> std::vector<double>
+{
+    if(!system_.is_solvable())
+    {
+        return {};
+    }
+
+    return system_.get_variables_values();
+}
+
 auto measured_model::print(std::ostream& out) const -> std::ostream&
 {
     if(measured_less_eq_T_.empty() && measured_less_eq_F_.empty())

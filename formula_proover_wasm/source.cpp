@@ -128,6 +128,14 @@ auto get_model_from_type(const std::string& algorithm_type) -> std::shared_ptr<i
     return std::make_shared<model>();
 }
 
+void fill_model_extra_data(std::shared_ptr<imodel>& m, json& result)
+{
+    if(auto measured = std::dynamic_pointer_cast<measured_model>(m))
+    {
+        result["modal_points_measured_values"] = measured->get_modal_points_measured_values();
+    }
+}
+
 }
 
 // Expecting the input data to be as json
@@ -169,6 +177,8 @@ EXTERN EMSCRIPTEN_KEEPALIVE const char* calculate(const char* input_data, int le
         result["variables"] = f.get_variables();
         result["ids"] = json_ids(m->get_variables_evaluations());
         result["contacts"] = json_contants(m->get_contact_relations());
+
+        fill_model_extra_data(m, result);
     }
 
     auto output = get_output_stream().str();

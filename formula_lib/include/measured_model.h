@@ -118,6 +118,9 @@ struct measured_model : public imodel
                 const formulas_t& measured_less_eq_T, const formulas_t& measured_less_eq_F,
                 const variables_mask_t& used_variables, const variables_t& variable_names) -> bool override;
 
+    /// If the system has a solution it produces value for each modal point. The first value is for the first(ordered) modal point.
+    auto get_modal_points_measured_values() const -> std::vector<double>;
+
     auto print(std::ostream& out) const -> std::ostream& override;
 
     void clear() override;

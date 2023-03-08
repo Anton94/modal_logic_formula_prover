@@ -30,7 +30,7 @@
                             document.getElementById('verbose_output').innerText += data.output;
                             graphis = transform_contacts_to_graph(data.ids, data.contacts);
                             do_visualization_v2(graphis, 500, 500);
-                            print_result_sets(data.variables, data.ids);
+                            print_result_sets(data.variables, data.ids, []); // TODO fix for the rest server
                             change_computing_components_availability(true)
                             running_count = 0;
                         } else if (data.status == "CANCELED") {
@@ -71,13 +71,13 @@
                 running_count = 0;
 
                 if (!data.is_parsed || !data.is_satisfied) {
-                    print_result_sets([], []);
+                    print_result_sets([], [], []);
                     return;
                 }
 
                 graphis = transform_contacts_to_graph(data.ids, data.contacts);
                 do_visualization_v2(graphis, 500, 500);
-                print_result_sets(data.variables, data.ids);
+                print_result_sets(data.variables, data.ids, data.modal_points_measured_values);
             }
 
             function cancel_task(op_id) {
@@ -184,7 +184,7 @@
                 return x
             }
 
-            function print_result_sets(variables, ids) {
+            function print_result_sets(variables, ids, modal_points_measured_values) {
                 var text = "";
                 if(variables.length > 0) {
                     all_strings = variables.map((x, i) => "v(" + x + ") =  { " +
@@ -194,6 +194,22 @@
                          + "}");
                     all_strings.forEach(x => text += x + "\n");
                 }
+                document.getElementById("result_sets").innerText = text;
+
+                print_result_modal_points_measured_values(modal_points_measured_values);
+            }
+
+            function print_result_modal_points_measured_values(modal_points_measured_values) {
+                if(modal_points_measured_values.length == 0)
+                    return;
+
+                var text = document.getElementById("result_sets").innerText;
+                text += "\n";
+
+                for(var i = 0; i < modal_points_measured_values.length; i += 1) {
+                      text += "m(A" + i + ") = " + modal_points_measured_values[i] + "\n";
+                }
+
                 document.getElementById("result_sets").innerText = text;
             }
         </script>
