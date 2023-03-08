@@ -105,7 +105,7 @@
                 if ( !ascii.test( formula ) ) {
                     // string has non-ascii characters
                     document.getElementById('algorithm_result').innerText = "Syntax Error";
-                    document.getElementById("verbose_output").innerText = "The formula contains non-ascii characters, please use a-z and A-Z for variable names.";
+                    document.getElementById("verbose_output").innerText = "The formula contains non-ascii characters, please use a combination of a-z, A-Z and 0-9 for variable names.";
                     return;
                 }
 
@@ -187,11 +187,11 @@
             function print_result_sets(variables, ids, modal_points_measured_values) {
                 var text = "";
                 if(variables.length > 0) {
-                    all_strings = variables.map((x, i) => "v(" + x + ") =  { " +
+                    all_strings = variables.map((x, i) => "v(" + x + ") =  {" +
                         ids[i].map((a, i) => a == 1 ? i : -1)
                         .filter(a => a >= 0)
-                        .map(x => "A" + x + " ")
-                         + "}");
+                        .map(x => " A" + x)
+                         + " }");
                     all_strings.forEach(x => text += x + "\n");
                 }
                 document.getElementById("result_sets").innerText = text;
