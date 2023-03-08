@@ -166,6 +166,7 @@ label {
     outline-offset: 0.5rem;
 }
 .legend {
+    min-width: 300px;
     margin-left: 1rem;
     margin-top: 20px;
     border: 0.5rem outset #8d8485;
