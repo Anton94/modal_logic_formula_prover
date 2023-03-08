@@ -94,7 +94,7 @@
 \author{\textsc{Факултет по математика и информатика} \\
 	\textsc{Катедра по математическа логика и приложенията ѝ} \\ [3mm]
 	\textsc{Стоев Мартин} \\ [3mm]
-	\textsc{Магистрерска програма Логика и Алгоритми, Информатика, Факултетен Номер: 27290} \\ [4mm]
+	\textsc{Магистрерска програма Логика и Алгоритми, Информатика, Факултетен Номер: 25790} \\ [4mm]
 	\small\textsc{Научен ръководител: проф. Тинко Тинчев}}
 \date{\today} 
 \begin{frame}
@@ -325,7 +325,7 @@
 	\begin{itemize}
 		\item Булевите константи са термове
 		\item $p \in \mathbb{V}ar$ е терм
-		\item Ако x е терм, то *x е също така терм
+		\item Ако x е терм, то x* е също така терм
 		\item Ако x и y са два терма, то $x \; \sigma \; y $ е също така терм,\\
 				където $\sigma \: \in \: \{\sqcap, \sqcup\}$
 	\end{itemize}
@@ -369,7 +369,7 @@
 	Релационна система се дефинира като $(W, R)$, където $W \neq \emptyset$, R е рефлексивна и симетрична релация в W.
 	\newline
 	\newline
-	Булева оценка на променливите означаваме с  $\mathscr{v}: \mathbb{V}ar \rightarrow W$ и разширяваме я до множеството на всички термове:
+	Булева оценка на променливите означаваме с  $\mathscr{v}: \mathbb{V}ar \rightarrow  \mathscr{P}(W)$ и разширяваме я до множеството на всички термове:
 		\begin{itemize}
 			\item $\mathscr{v}(0) = \emptyset$
 			\item $\mathscr{v}(1) = W$
@@ -456,7 +456,7 @@
 \end{itemize}
 \end{frame}
 
-\begin{frame}\frametitle{Конюнктивен табло клон}
+\begin{frame}\frametitle{Табло клон}
 		За улеснение можем да махнем $\signT \textit{ и } \signF$ и получаваме.
 \begin{align*}
 			\bigwedge_{i=1}^{I} \; C(a_i, b_i) \:\: & \wedge \:\: 
@@ -466,30 +466,30 @@
 \end{align*}%
 \end{frame}
 
-\begin{frame}\frametitle{Конюнктивен табло клон}
+\begin{frame}
 \begin{defn}[Множеството на всички променливи]
 	С $\Var_B$ ще ознчаваме множеството от всички променливи използвани в табло клона B.
 \end{defn}
 
 \begin{defn}[Оценка на променливи]
-	С $\curvedE$ ще ознчаваме функцията, която за всяка променлива от $\Var_B$ дава истина или лъжа.
+	С p ще ознчаваме функцията, която за всяка променлива от $\Var_B$ дава истина или лъжа.
 		\begin{align*}
-			\curvedE : \Var_B \rightarrow \{ \textbf{лъжа}, \textbf{истина}\}
+			p : \Var_B \rightarrow \{ \textbf{лъжа}, \textbf{истина}\}
 		\end{align*}
 \end{defn}
 \end{frame}
 
-\begin{frame}\frametitle{Конюнктивен табло клон}
+\begin{frame}
 \begin{defn}[Булева оценка]
-		Нека $\curvedE$ е оценка на променливи и $\Ts$ е множеството от всички термове, тогава 
-		функцията $\vBool_{\curvedE} : \Ts \rightarrow \{ \textbf{лъжа}, \textbf{истина}\}$ ще наричаме булева оценка, която се дефинира по следния начин:
+		Нека p е оценка на променливи и $\Ts$ е множеството от всички термове, тогава 
+		функцията $\vBool_p : \Ts \rightarrow \{ \textbf{лъжа}, \textbf{истина}\}$ ще наричаме булева оценка, която се дефинира по следния начин:
 		\begin{itemize}
-			\item $\vBool_{\curvedE}(0) = \textbf{лъжа}$
-			\item $\vBool_{\curvedE}(1) = \textbf{истина}$
-			\item $\vBool_{\curvedE}(p) = \curvedE(p), \textit{ където } p \in \Var_B$
-			\item $\vBool_{\curvedE}(a \sqcap b) = \vBool_{\curvedE}(a) \textit{ и } \vBool_{\curvedE}(b)$
-			\item $\vBool_{\curvedE}(a \sqcup b) = \vBool_{\curvedE}(a) \textit{ или } \vBool_{\curvedE}(b)$
-			\item $\vBool_{\curvedE}(a*) = \textit{не } \vBool_{\curvedE}(a)$
+			\item $\vBool_p(0) = \textbf{лъжа}$
+			\item $\vBool_p(1) = \textbf{истина}$
+			\item $\vBool_p(t) =p(t), \textit{ където } t \in \Var_B$
+			\item $\vBool_p(a \sqcap b) = \vBool_p(a) \textit{ и } \vBool_p(b)$
+			\item $\vBool_p(a \sqcup b) = \vBool_p(a) \textit{ или } \vBool_p(b)$
+			\item $\vBool_p(a*) = \textit{не } \vBool_p(a)$
 		\end{itemize}
 \end{defn}
 \end{frame}
@@ -734,9 +734,10 @@ Kонтактна логика с мярка е самата контактна 
 	\end{defn}
 
 	\begin{defn}
-		Нека B е клон в таблото и нека x и y са две валидни модални точки. Казваме, че $\langle x, y \rangle$ е валидна релация, когато:
+		Нека B е клон в таблото и нека p и q са две валидни модални точки. Казваме, че $\langle p, q \rangle$ е валидна релация, когато:
 		\begin{align*}
-				\neg C(e, f) \in B: (x \notin \vE(e) \textit{ или } y \notin \vE(f)) \textit{ и } (x \notin \vE(f) \textit{ или } y \notin \vE(e))
+				\neg C(e, f) \in B: &(\vBool_{p}(e) = \textbf{лъжа} \textit{ или } \vBool_{q}(f) = \textbf{лъжа}) \textit{ и } \\
+				 &(\vBool_{p}(f) = \textbf{лъжа} \textit{ или } \vBool_{q}(e) = \textbf{лъжа})
 		\end{align*}
 	\end{defn}
 \end{frame}
@@ -749,7 +750,7 @@ Kонтактна логика с мярка е самата контактна 
 				\textit{ където t е терм } & \textit{от атомарните формули в B}
 		\end{align*}
 		\begin{align*}
-				R = \{ \langle x, y \rangle\; | \; x, y \in W \textit{ и } \langle x, y \rangle \textit{ е валидна релация}\}
+				R = \{ \langle p, q \rangle\; | \; p, q \in W \textit{ и } \langle p, q \rangle \textit{ е валидна релация}\}
 		\end{align*}
 	\end{defn}
 \end{frame}

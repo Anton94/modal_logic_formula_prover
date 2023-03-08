@@ -91,16 +91,16 @@
             
         \vfill
 	\huge
-       \textsc{\textbf{Web System for Minimal Quantitative Contact Logics}}
+       \textsc{\textbf{Web System for Satisfiability of Quantitative Contact Logics}}
             
             
         \vspace{0.8cm}
             
         \vfill
 	\large
- 	\textit{Martin Stoev}
-
-	\textit{Logic and Algorithms (Mathematics)}
+ 	\textit{Martin Stoev} \\
+	\textit{Logic and Algorithms (Informatics)}\\
+ 	\textit{Faculty number: 25790}
 
         \vfill
 	\textit{supervised by}
@@ -841,7 +841,8 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	\begin{defn}
 		Let B be a branch conjunction and let x and y be two valid modal points. We say that $\langle x, y \rangle$ is a valid relation if the following holds:
 		\begin{align*}
-				\neg C(e, f) \in B: (x \notin \vE(e) \textit{ or } y \notin \vE(f)) \textit{ and } (x \notin \vE(f) \textit{ or } y \notin \vE(e))
+				\neg C(e, f) \in B: &(\vBool_{p}(e) = \textbf{false} \textit{ or } \vBool_{q}(f) = \textbf{false}) \textit{ and } \\
+				 &(\vBool_{p}(f) = \textbf{false} \textit{ or } \vBool_{q}(e) = \textbf{false})
 		\end{align*}
 	\end{defn}
 
