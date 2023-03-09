@@ -85,6 +85,8 @@
         ["~<=(a,b) & ~<=(b, c) & ~<=(c, a) & <=(a,c)", true, true, true],
         ["T -> T | ~<=(a,c)", true, true, true],
         ["<=(a, 0) & <=(b,0) <-> C(a,b)", true, true, true],
+        [" ((C(p,q) & ~C(a,b)) -> (C(p*(-a),q*(-a)) | C(p*(-b),q*(-b))))", true, true, true], // Good known formula in modal logic it is a tautology
+        ["~((C(p,q) & ~C(a,b)) -> (C(p*(-a),q*(-a)) | C(p*(-b),q*(-b))))", false, false, false],
 
         ["T & F", false, false, false],
         ["C(a,b) & <=(a,c) & ~C(b,c)", false, false, false],
