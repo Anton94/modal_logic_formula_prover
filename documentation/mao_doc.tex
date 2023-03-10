@@ -30,8 +30,9 @@
 \newtheorem{defn}{Definition}[section]
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{axiom}[theorem]{Axiom}
+\newtheorem{prop}[theorem]{Property}
 
-\newcommand{\curvedE}{\mathscr{e}}
+\newcommand{\curvedE}{p}
 \newcommand{\vVar}{\mathscr{v}_{var}}
 \newcommand{\Var}{\mathbb{V}ar}
 \newcommand{\vE}{\mathscr{v}}
@@ -125,35 +126,35 @@
 %	In this paper an algorithm is defined for proving the satisfiability of formulas defined in the space of the quantitative contact logics.When a formula is not satisfiable then a model to satisfy the formula does not exist. In case the formula is satisfiable the algorithm constructs a model which satisfies the formula.
 %\end{abstract}
 	\section{Introduction}
-	The modal logics are in a constant exploration and extended by the today's researchers. The contact modal logics is one such topic with increasing interests. This paper works its way to an algorithm which for a given contact modal logics formula constructs a model which satisfies the formula. If such a model does not exist then the algorithm proves that the formula is not satisfiable. 
+	The modal logics are in a constant exploration and extended by the today's researchers. The contact modal logics are one such topic with increasing interest. This paper works its way to an algorithm which for a given contact modal logic formula with measure constructs a model which satisfies the formula. If such a model does not exist, then the algorithm proves that the formula is not satisfiable. 
 
-The model construction process begins with a formal prove procedure to decompose the formula to a simpler state. For this the tableau method is used. The tableau method branches the formula in many paths where each path is possible to derive a valid model for the formula. The procedure of model building is done for each path, until a model is successfully constructed. This procedure creates modal points, the relations between them and the variables valuations in order to find a prove for a model satisfying the formula. 
+The model construction process begins with a formal proof procedure to decompose the formula to a simpler state. For this, the tableau method is used. The tableau method branches the formula in many paths where each path can derive a valid model for the formula. The procedure of model building is done for each path until a model is successfully constructed. This procedure creates modal points, the relations between them and the variables valuations in order to find a proof for a model satisfying the formula. 
 
-As of today an algorithm which can solve this problem in a polynomial time is not possible. This is because the problem for constructing a satisfiable model for a quantitative contact formula is at least as hard as the Boolean satisfiability problem (SAT). That is why each optimization during the formula proving process significantly reduces the algorithm execution time.
+As of today, an algorithm that can solve this problem in a polynomial time is not possible. This is because the problem of constructing a satisfiable model for a quantitative contact formula is at least as hard as the Boolean satisfiability problem (SAT). That is why each optimization during the formula proving process significantly reduces the algorithm execution time.
 
 	\newpage
 	\section{Tableaux Method}
-	The tableau is a formal proof procedure which can be found in many variants and for different logics. In modal logics the tableau method is quite common and is mostly used as a search procedure for models meeting certain conditions.
-Formally, the tableau procedure is used as a refutation procedure; to prove that a formula X is satisfied, we begin the process with some syntactical assertion that the formula is not satisfiable. After that the assertion stating that the formula is not valid is broken down syntactically, in most cases breaking the formula into several cases. This decomposition of the initial formula is called tableau expansion stage and can be thought as a generalization of disjunctive normal form expansion. 
+	The tableau is a formal proof procedure that can be found in many variants and for different logics. In modal logics, the tableau method is quite common and is mostly used as a search procedure for models meeting certain conditions.
+Formally, the tableau procedure is used as a refutation procedure; to prove that a formula X is satisfied, we begin the process with some syntactical assertion that the formula is not satisfiable. After that, the assertion stating that the formula is false, is broken down syntactically, in most cases breaking the formula into several cases. This decomposition of the initial formula is called the tableau expansion stage and can be thought as a generalization of disjunctive normal form expansion. 
 
-During the expansion stage of the tableau an impossible cases can be met, where the validity and invalidity of a formula are claimed to be true. These cases are said to be closed and if each case of the tableau is closed, then we say that the tableau is closed.
+During the expansion stage of the tableau, impossible cases can be met, where the same formula is marked as true and false. These cases are said to be closed, and if each case of the tableau is closed, then we say that the tableau is closed.
 
-For our purposes, we will use a slightly different version of the method described above, namely with the help of the expansion stage we will try to find a model with certain properties in which the given formula will be satisfied.
+For our purposes, we will use a slightly different version of the method described above; namely with the help of the expansion stage, we will try to find a model with specific properties in which the given formula will be satisfied.
 
-In this paper we shall follow the definitions for the tableau method described in The Handbook of Tableau methods \cite{tableau-handbook}. In the handbook there are two types of tableaux given, namely signed and unsigned. For our purposes we will use the signed version.
+In this paper, we shall follow the definitions for the tableau method described in The Handbook of Tableau methods \cite{tableau-handbook}. In the handbook, there are two types of tableaux given, namely signed and unsigned. For our purposes, we will use the signed version.
 
 		\subsection{Propositional logic tableau}
-The tableau method for propositional logic is mostly defined based on the presentation of Raymond Smullyan. In its simplest form it is defined with syntactical assertion for the validity of the formula and definition of the expansion stage. To reach this goal, we need to improve our syntactical arsenal, to be able to assert the validity of a formula. In order to accomplish this, we shall introduce two signs. These signs when combined with a formula will assert whether the formula is to be true or false. Formally, the two signs are $\{ \signT, \signF \}$. Let $\varphi$ be a formula, then
+The tableau method for propositional logic is mainly defined based on the presentation of Raymond Smullyan. In its simplest form, it is defined with the syntactical assertion for the formula's truth and definition of the expansion stage. To reach this goal, we need to improve our syntactical arsenal to be able to assert the truth of a formula. In order to accomplish this, we shall introduce two signs. These signs, when combined with a formula, will assert whether the formula is to be true or false. Formally, the two signs are $\{ \signT, \signF \}$. Let $\varphi$ be a formula, then
 \begin{itemize}
-	\item $\signT \varphi$ - asserts the validity of the formula $\varphi$
-	\item $\signF \varphi$ - asserts the invalidity of the formula $\varphi$
+	\item $\signT \varphi$ - asserts that the formula $\varphi$ is true
+	\item $\signF \varphi$ - asserts that the formula $\varphi$ is false
 \end{itemize} 
 
-The tableau of a formula $\varphi$ begins with $\signF \varphi$. The intuition behind it is that we start with an assertion that $\varphi$ is not valid in some model, and by decomposing the formula during the tableau process we seek for contradictions in the formals produced during the expansion stage. If such contradiction exists then the initial guess that the formula is not valid is not true; therefore the formula must be valid. On the other hand, if a contradiction does not exist then the formula is not valid. As mention above in our case the tableau will be used the other way around, namely for a given formula we will decompose it as much as possible (or until a contradiction is found) and then when there are no more possible ways to decompose the formula further we are going to seek a possible model which satisfies the formula $\varphi$. 
+The tableau of a formula $\varphi$ begins with $\signF \varphi$. The intuition behind it is that we start with an assertion that $\varphi$ is not true in some model. By decomposing the formula during the tableau process, we seek for contradictions in the formals produced during the expansion stage. If such a contradiction exists, then the initial claim that the formula is not true is not possible; therefore, the formula must be true. On the other hand, if a contradiction does not exist, then the formula is not true. As mentioned above, in our case, the tableau will be used the other way around; namely for a given formula we will decompose it as much as possible (or until a contradiction is found), and then when there are no more possible ways to decompose the formula further, we are going to seek a possible model which satisfies the formula $\varphi$. 
 
-The expansion stage is a set of tableau steps, which decompose the initial formula into signed atomic formulas. A tableau expansion step applies one of the tableau rules to slightly simplify the given formula. There are two rules for each operation in the logic. In the case of propositional logic with the following operations $\{ \neg, \vee, \wedge, \rightarrow, \leftrightarrow \}$ there are ten rules. Each rule decomposes the formula in at most two formulas which depends on the arity of the operation. The expansion process forms branches. A branch contains signed formulas which have been asserted in the decomposition process.
+The expansion stage is a set of tableau steps which decompose the initial formula into signed atomic formulas. A tableau expansion step applies one of the tableau rules to slightly simplify the given formula. There are two rules for each operation in the logic. In the case of propositional logic with the following operations $\{ \neg, \vee, \wedge, \rightarrow, \leftrightarrow \}$, there are ten rules. Each rule decomposes the formula in at most two formulas which depend on the arity of the operation. The expansion process forms branches. A branch contains signed formulas that have been asserted in the decomposition process.
 
-A tableau rule which decomposes the formula in two formulas may require the assertion of only one of the produced formulas to be satisfied. In this case, we will say that the branch is split into two branches. However, in some terminologies this is noted as a new branch spawned from the original branch, or that two new branches are created. For the sake of simplicity, we will use the terminology of branch splitting. In a scenario where the branch is split, all asserted formulas in the branch are copied in the split branch together with the newly asserted formula from the tableau rule. The newly asserted formulas depend on the tableau rule.
+A tableau rule which decomposes the formula into two formulas may require the assertion of only one of the produced formulas to be satisfied. In this case, we will say that the branch is split into two branches. However, in some terminologies, this is noted as a new branch spawned from the original branch or as two new branches are created. For the sake of simplicity, we will use the terminology of branch splitting. In a scenario where the branch is split, all asserted formulas in the branch are copied in the split branch together with the newly asserted formula from the tableau rule. The newly asserted formulas depend on the tableau rule.
 
 	\subsection{Rules}
 		\paragraph{Negation Rule}
@@ -180,8 +181,8 @@ The rules for negations are straightforward. When a negation operation is encoun
 		
 		\paragraph{Conjunction Rule}
 This is a binary operation, which means that the output of these rules is more complex than the negation rules.
-The conjunction rule for a formula signed as valid decomposes the formula in two formulas and assert the validity of both of them.
-On the other hand, the conjunction rule for a formula signed as invalid splits the branch into two branches and asserts the invalidity of the formulas in each branch, respectively.
+The conjunction rule for a formula signed as true decomposes the formula into two formulas and assert that both of them are true.
+On the other hand, the conjunction rule for a formula signed as false splits the branch into two branches and asserts that the formula is false in each branch, respectively.
 		\newline
 		\noindent\begin{minipage}{.5\linewidth}
 		\begin{align*}
@@ -203,9 +204,8 @@ On the other hand, the conjunction rule for a formula signed as invalid splits t
 		\end{minipage}
 
 		\paragraph{Disjunction Rule}
-This is a binary operation, which means that the output of these rules is more complex than the negation rules.
-The disjunction rule for a formula signed as valid splits the branch into two branches and asserts the validity of the formulas in each branch, respectively.
-On the other hand, the disjunction rule for a formula signed as invalid decomposes the formula in two formulas and assert the invalidity of both of them.
+The disjunction rule for a formula signed as true splits the branch into two branches and asserts that the formula is true in each branch, respectively.
+On the other hand, the disjunction rule for a formula signed as false decomposes the formula into two formulas and asserts that the formula is false in both of them.
 		\newline
 		\noindent\begin{minipage}{.5\linewidth}
 		\begin{align*}
@@ -227,7 +227,7 @@ On the other hand, the disjunction rule for a formula signed as invalid decompos
 		\end{minipage}
 		
 		\paragraph{Implication}
-The implication as well is a binary operation and depending on the asserting sign it decomposes the formula in two formulas or splits into two separate branches.
+The implication as well is a binary operation, and depending on the asserting sign, it decomposes the formula into two formulas or splits into two separate branches.
 		\newline
 		\noindent\begin{minipage}{.5\linewidth}
 		\begin{align*}
@@ -249,7 +249,7 @@ The implication as well is a binary operation and depending on the asserting sig
 		\end{minipage}
 		
 		\paragraph{Equivalence}
-Both of the equivalence rules split the branch into separate branches, the details can be observed in the following equations.
+Both of the equivalence rules split the branch into separate branches; the details can be observed in the following equations.
 		\newline
 		\noindent\begin{minipage}{.5\linewidth}
 		\begin{align*}
@@ -270,8 +270,9 @@ Both of the equivalence rules split the branch into separate branches, the detai
 		\end{align*}
 		\end{minipage}
 		\newline
+\label{closed-branch}
 		\begin{defn}[Closed branch]
-A branch is said to be closed if and only if it contains the same formula signed as valid and invalid.
+A branch is said to be closed if and only if it contains the same formula signed as true and false.
 		\end{defn}
 
 		\begin{defn}[Atomic branch]
@@ -279,20 +280,20 @@ A branch is said to be atomic if it is not possible to apply any of the tableau 
 		\end{defn}
 
 		\begin{defn}[Finished tableau] 
-A tableau is said to be finished, if it has only closed and atomic branches.
+A tableau is said to be finished if it has only closed and atomic branches.
 		\end{defn}
 
 		\paragraph{Tautology formula} 
-The process to determine if a formula is tautology is as follows:
+The process to determine if a formula is a tautology is as follows:
 Let $\varphi$ be a formula 
 \begin{enumerate}
-	\item Sign the formula as invalid, namely let $\signF\varphi$ be the initial formula in the tableau process
+	\item Sign the formula as false, namely, let $\signF\varphi$ be the initial formula in the tableau process
 	\item Execute the expansion stage until the finished tableau is reached.
-	\item If all branches are closed, then the formula is a tautology, otherwise it is not.
+	\item If all branches are closed, then the formula is a tautology. Otherwise it is not.
 \end{enumerate}
 \bigskip
 
-In most definitions of the tableau process the rules are non-deterministic, however sometimes the tableau rules are prioritized. This narrows the non-determinism to a deterministic approach, but this is not generally considered to be basic to a tableau system. For a non-deterministic tableau at each stage on a branch a signed formula occurrence is chosen and the tableau rule is applied. Since the order of choice is arbitrary, there can be many tableaus for a single signed formula. 
+In most definitions of the tableau process, the rules are non-deterministic; however sometimes, the tableau rules are prioritized. This narrows the non-determinism to a deterministic approach, but this is not generally considered to be basic to a tableau system. For a non-deterministic tableau at each stage on a branch, a signed formula occurrence is chosen, and the tableau rule is applied. Since the order of choice is arbitrary, there can be many tableaus for a single signed formula. 
 	\newline
 	\newline
 	The tableau method is best explained through examples. First, let us see an example of a formula which is a tautology.
@@ -312,12 +313,11 @@ In most definitions of the tableau process the rules are non-deterministic, howe
 	\\\indent\indent\indent\indent\indent\;\; 6. $\signF Y$  \indent\indent\indent\indent\;\; 7. $\signT X$
 	\newline
 	\newline
-The first step of our tableau method for proving if a formula is a tautology is to sign it as not valid and analyze it. This means that at 1. This signed formula is added to the root of the tableau method. In the next step, there is only one possibility, namely to decompose the only formula currently in the tableau process. This formula is decomposed to two formulas present in 2. 
-At this point there are 2 possible outcomes, the first one is to decompose the formula $\signT ((\neg X \wedge (Y \rightarrow X))$. The second one is to decompose the formula $\signF\neg Y$. In this example we have chosen the second approach and the result is present in step 3, namely $\signF\neg Y$ after a tableau step is $\signT Y$. From step 3 to step 4 there is only one possibility. The $\signT\neg X$ formula is decomposed to $\signF X$. in step 5. Now, the decomposition of the formula $\signT (Y \rightarrow X)$ will split the tableau branch into two branches. $\signF Y$ will be added in the one of the branches, which in turn will contradict with $\signT Y$ which can be observed from step 3. This means that the branch closes. In the other branch, $\signT X$ is added, which contradicts with $\signF X$ from the previous step. This as well means that the second branch closes. Having a tableau with all branches closed proves that the initial assumption to sign the formula as invalid was wrong, hence the formula is a tautology.
+The first step of our tableau method for proving if a formula is a tautology is to sign it as false and analyze it. This means that at 1. This signed formula is added to the root of the tableau method. In the next step, there is only one possibility, namely, to decompose the only formula currently in the tableau process. This formula is decomposed into two formulas present in 2. 
+At this point, there are two possible outcomes; the first one is to decompose the formula $\signT ((\neg X \wedge (Y \rightarrow X))$. The second one is to decompose the formula $\signF\neg Y$. In this example, we have chosen the second approach, and the result is present in step 3, namely $\signF\neg Y$ after a tableau step is $\signT Y$. From step 3 to step 4, there is only one possibility. The $\signT\neg X$ formula is decomposed to $\signF X$. in step 5. Now, the decomposition of the formula $\signT (Y \rightarrow X)$ will split the tableau branch into two branches. $\signF Y$ will be added in one of the branches, which in turn will contradict with $\signT Y$, which can be observed from step 3. This means that the branch closes. In the other branch, $\signT X$ is added, which contradicts $\signF X$ from the previous step. This as well means that the second branch closes. Having a tableau with all branches closed proves that the initial assumption to sign the formula as false was wrong; hence the formula is a tautology.
 	\newline
 
-	The following tableau method is not closed, and after the tableau process reaches all basic formulas a model in which the formula is not 
-	valid can be constructed. The formula used is $X \rightarrow (Y \vee (\neg(X \vee Y) \wedge Y))$.
+	The following tableau method is not closed, and after the tableau process reaches all basic formulas a model in which the formula is false can be constructed. The formula used is $X \rightarrow (Y \vee (\neg(X \vee Y) \wedge Y))$.
 	\newline
 	\\\indent\indent\indent\indent\indent\indent 1. $\signF (X \rightarrow (Y \vee (\neg(X \vee Y) \wedge Y)))$
 	\\\indent\indent\indent\indent\indent\indent 2. $\signT X, \signF (Y \vee (\neg(X \vee Y) \wedge Y)))$
@@ -337,28 +337,28 @@ At this point there are 2 possible outcomes, the first one is to decompose the f
 	\\\indent\indent\indent\indent 8. $\signT X$  \indent\indent\;\; 9. $\signT Y$
 	\par
 	\par
-In step 1 the input formula is signed as not valid and added to the tableau. This signed formula is decomposed into two signed formulas in step 2. Where one of them is already a basic formula and can not be decomposed in simpler signed formulas. The second one is decomposed, and the results can be seen in step 3. Again, one of the new signed formulas is a basic formula. The only formula that can  be decomposed is $\signF (\neg(X \vee Y) \wedge Y)))$ which splits the tableau branch. In the split branch $\signF Y$ is added, this is step 5. This formula does not cause a contradiction in the branch, and since there are no more possible decompositions, it follows that the branch is not closed. At this point, we know that the tableau is not closed. However, for the purposes of this example, let us examine the rest of the tableau process. In step 4 we can observe the additional signed formula which was added to the main branch. This signed formula is decomposed with the usage of one of the negation rules, as seen in step 6. Applying the disjunction rule for a formula signed as true on the formula in step 6 cases a branch split. Only one of the branches closes, namely the formula added in step 8. From this follows that the tableau is not closed and that the initial assumption was true, namely the formula is not a tautology.
+In step 1, the input formula is signed as false and added to the tableau. This signed formula is decomposed into two signed formulas in step 2. Where one of them is already a basic formula and can not be decomposed into simpler signed formulas, the second one is decomposed, and the results can be seen in step 3. Again, one of the newly signed formulas is a basic formula. The only formula that can be decomposed is $\signF (\neg(X \vee Y) \wedge Y)))$, which splits the tableau branch. In the split branch, $\signF Y$ is added; this is step 5. This formula does not cause a contradiction in the branch, and since there are no more possible decompositions, it follows that the branch is not closed. At this point, we know that the tableau is not closed. However, for the purposes of this example, let us examine the rest of the tableau process. In step 4, we can observe the additionally signed formula which was added to the main branch. This signed formula is decomposed with the usage of one of the negation rules, as seen in step 6. Applying the disjunction rule for a formula signed as true on the formula in step 6 cases a branch split. Only one of the branches closes, namely the formula added in step 8. From this follows that the tableau is not closed and that the initial assumption was true; namely the formula is not a tautology.
 	\par
 	\newpage
 	\section{Region-based Contact Logics}
 The region-based theory of space has the notion of region and relations between regions as one of the basic primitive notions of the theory.
 A region is defined as a set of elements in some space. Union and intersection are used as primary operations over regions.
-Two relations are introduced, part-of relation and contact relation. 
-The part-of relation constructs the structural dependencies between regions, namely the part-of relations defines the mereology of regions.
-The contact relation defines the topological relation of connection. We will abstract ourselves from the inner relation between two connected regions, namely
-this relation might be defined as "region A and region B are neighbors". What is of importance to us for the inner relation its reflexivity and symmetry.
+Two relations are introduced part-of relation and contact relation. 
+The part-of relation constructs the structural dependencies between regions; namely the part-of relations define the mereology of regions.
+The contact relation defines the topological relation of connection. We will abstract ourselves from the inner relation between two connected regions; namely
+this relation might be defined as "region A and region B are neighbors". It is important for us the relation to be reflexive and symmetrical.
 	
 	\subsection{Syntax}
 	\paragraph{Boolean variable} 
 represents a region. Two predefined variables shall be used in order to simplify the notation. 
 		\begin{itemize}
-			\item W represents the whole world, namely the biggest region which contains all elements.
+			\item W represents the whole world, namely the biggest region, which contains all elements.
 			\item $\emptyset$ represents the empty region
 		\end{itemize}
 The $\mathbb{V}ar$ set will be used to denote a countable set of all variables used in a formula.
 
 	\paragraph{Boolean constants}
-are defined for W and $\emptyset$, namely 1 represents the world, while 0 represents the empty region.
+are defined for W and $\emptyset$, namely, 1 represents the world, while 0 represents the empty region.
 
 	\paragraph{Boolean operations}
 are operations over regions. The followings are boolean operations:
@@ -412,21 +412,21 @@ which are commonly used in this paper. Let a and b be two terms, then:
 	\end{itemize}
 
 	\subsection{Semantics}
-		A relational system is defined as $\mathcal{F} = (W, R)$, where $W \neq \emptyset$. In most modal logic theories $\mathcal{F}$ is called a frame. In many systems $\mathcal{F}$ is also called an adjacency relation, where the cells are modeled with W and the adjacency relation is modeled with R. Simple example of such an adjacency space is our planet, where the cells are the countries and two countries are adjacent if they have a common point. In most cases is assumed that R is reflexive and symmetric, however it is more natural for R to be an arbitrary relation. In our example we might specify for countries x and y, that x be adjacent to y on the right (east), on the top (north), etc. Regions in one such adjacency system are arbitrary subsets of W and two sets a, b are in contact $C_R(a, b)$, if for some $x \in a$ and $y \in b$ we have xRy. This relational definition of the contact suggests that we give the following relational semantics. 
+		A relational system is defined as $\mathcal{F} = (W, R)$, where $W \neq \emptyset$. In most modal logic theories, $\mathcal{F}$ is called a frame. In many systems, $\mathcal{F}$ is also called an adjacency relation, where the cells are modeled with W and the adjacency relation is modeled with R. Simple example of such an adjacency space is our planet, where the cells are the countries and two countries are adjacent if they have a common point. In most cases is assumed that R is reflexive and symmetric. However it is more natural for R to be an arbitrary relation. In our example, we might specify for countries x and y that x be adjacent to y on the right (east), on the top (north), etc. Regions in one such adjacency system are arbitrary subsets of W and two sets a, b are in contact $C_R(a, b)$, if for some $x \in a$ and $y \in b$ we have xRy. This relational definition of the contact suggests that we give the following relational semantics. 
 
 	\paragraph{Boolean variable valuation}
-Let $\mathcal{F}$  be a frame, then a boolean variable valuation is any function $\mathscr{v}$ assignig to each Boolean variable a subset $v(a) \subseteq W$. The valuation is then extended inductively to all Boolean terms, as follows
+Let $\mathcal{F}$  be a frame; then a boolean variable valuation is any function $\mathscr{v}$ assigning to each Boolean variable a subset $v(a) \subseteq W$. The valuation is then extended inductively to all Boolean terms as follows:
 		\begin{itemize}
 			\item $\mathscr{v}(0) = \emptyset$
 			\item $\mathscr{v}(1) = W$
 			\item $\mathscr{v}(a \sqcap b) = \mathscr{v}(a) \cap \mathscr{v}(b)$
 			\item $\mathscr{v}(a \sqcup b) = \mathscr{v}(a) \cup \mathscr{v}(b)$
-			\item $\mathscr{v}(a*) = W \backslash  \mathscr{v}(a)$
+			\item $\mathscr{v}(*a) = W \backslash  \mathscr{v}(a)$
 		\end{itemize}
 
 	\paragraph{Model}
 		\label{formula-satisfiability-model} 
-		The tuple $\mathcal{M} = (\mathcal{F}, \mu, \mathscr{v})$ is called a model. The truth of a formula $\varphi$ in $\mathcal{M}$ ( in symbols $\mathcal{M} \models \varphi$) is defined inductively as follows:
+		The tuple $\mathcal{M} = (\mathcal{F}, \mathscr{v})$ is called a model. The truth of a formula $\varphi$ in $\mathcal{M}$ ( in symbols $\mathcal{M} \models \varphi$) is defined inductively as follows:
 		\begin{itemize}
 			\item $\mathcal{M} \not\models \bot$ 
 			\item $\mathcal{M} \models \top$
@@ -436,7 +436,7 @@ Let $\mathcal{F}$  be a frame, then a boolean variable valuation is any function
 			\item $\mathcal{M} \models a \; \vee \; b \text{ iff } \mathcal{M} \models a \: \textit{ or } \: \mathcal{M} \models b$
 			\item $\mathcal{M} \models a \; \wedge \; b \text{ iff } \mathcal{M} \models a \: \textit{ and } \: \mathcal{M} \models b$
 		\end{itemize}
-In the previously defined semantics we evaluate formulas not locally at points, as it is in the standard modal semantics, but globally in the whole model and this is one of the main differences of the present modal approach with the standard Kripke approach.
+In the previously defined semantics, we evaluate formulas not locally at points, as it is in the standard modal semantics, but globally in the whole model, and this is one of the main differences between the present modal approach with the standard Kripke approach.
 
 A model $\mathcal{M}$ is a model of a formula $\varphi$ if $\varphi$ is true in $\mathcal{M}$, in such a case we say that $\mathcal{M}$ satisfies $\varphi$, in symbols $\mathcal{M} \models \varphi$;
 $\mathcal{M}$ is a model of a set of formulas A if $\mathcal{M}$ is a model of all formulas from A, in symbols $\mathcal{M} \models A$. A formula $\varphi$ is true in a frame $\mathcal{F}$, or that $\mathcal{F}$ is a frame for $\varphi$, in symbols $\mathcal{F} \models \varphi$,
@@ -446,60 +446,60 @@ formulas A is satisfiable in $\Sigma$, or A is $\Sigma$-consistent, if there is 
 is a model of A.
 
 	\subsection{Formula Properties}
-\begin{axiom}[Contact reflexivity]
+\begin{prop}[Contact reflexivity]
 	Let b be a term, then
 	\begin{equation*}
-		b \neq 0 \implies bCb
+		\mathcal{M} \models b \neq 0  \iff \mathcal{M} \models bCb
 	\end{equation*}
-\end{axiom}
+\end{prop}
 
-\begin{axiom}[Contact symmetry]
+\begin{prop}[Contact symmetry]
 	Let a and b be two terms, then
 	\begin{equation*}
-		aCb \iff bCa
+		\mathcal{M} \models aCb \iff \mathcal{M} \models bCa
 	\end{equation*}
-\end{axiom}
+\end{prop}
 
-\begin{lemma}[Term equality]
+\begin{prop}[Term equality]
 	Let a and b be two terms and let $\mathscr{v}$ be a valuation, then
 	\begin{equation*}
-		a = b \implies \mathscr{v}(a) = \mathscr{v}(b)
+		\mathcal{M} \models a = b \iff \mathscr{v}(a) = \mathscr{v}(b)
 	\end{equation*}
-\end{lemma}
+\end{prop}
 
-\begin{lemma}[Zero term formula]
+\begin{prop}[Zero term formula]
 	Let a and b be two terms, then
 	\begin{equation*}
-		a \le b \iff a \sqcap b* = \emptyset
+		\mathcal{M} \models a \le b \iff \mathcal{M} \models a \sqcap b* = 0
 	\end{equation*}
-	The formula $a \sqcap b* = \emptyset$ will be called zero term formula.
+	The formula $a \sqcap b* = 0$ will be called zero term formula.
 	Since $a \sqcap b*$ is a new term, it can be assigned a variable $s = a \sqcap b*$, 
 	and now the zero term formula above can be written as $s  = 0$ which is with better readability and 
 	can be straightforwardly grasped in proofs and definitions.
-\end{lemma}
+\end{prop}
 
-\begin{lemma}[Non-zero term]
+\begin{prop}[Non-zero term]
 	Let a and b be two terms, then
 	\begin{equation*}
-		\neg(a \le b) \iff a \sqcap b* \neq \emptyset
+		\mathcal{M} \models \neg(a \le b) \iff \mathcal{M} \models a \sqcap b* \neq 0
 	\end{equation*}
-\end{lemma}
+\end{prop}
 
-\begin{lemma}[Contact monotonicity]
+\begin{prop}[Contact monotonicity]
 	Let a and b be two terms, then
 	\begin{equation*}
-		aCb \land a \leq a' \land b \le b' \implies a'Cb'
+		\mathcal{M} \models aCb \land a \leq a' \land b \le b' \implies \mathcal{M} \models  a'Cb'
 	\end{equation*}
-\end{lemma}
+\end{prop}
 
-\begin{lemma}[Contact distributivity]
+\begin{prop}[Contact distributivity]
 	Let a and b be two terms, then
 	\begin{equation*}
-		aC(b \sqcup c) \iff aCb \lor aCc
+		\mathcal{M} \models aC(b \sqcup c) \iff \mathcal{M} \models aCb \lor aCc
 	\end{equation*}
-\end{lemma}
+\end{prop}
 
-\begin{lemma}[Trivial implications] The following trivial implications are of huge importance for the model construction algorithm since they are trivial to be applied and can in some cases eliminate a lot of computations. This is because they can be applied over a complex term or formula to reduce it to something simple.
+\begin{prop}[Trivial implications] The following trivial implications are of huge importance for the model construction algorithm since they are trivial to be applied and can in some cases eliminate a lot of computations. This is because they can be applied over a complex term or formula to reduce it to something simple.
 \newline
 	Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	\begin{itemize}
@@ -524,13 +524,13 @@ is a model of A.
 		\item $aC1 \Longrightarrow a \neq 0$
 		\item $a \neq 0 \Longrightarrow aCa$
 	\end{itemize}
-\end{lemma}
+\end{prop}
 
 	\subsection{Formula Satisfiability} \label{formula-satisfiability}
-The satisfiability verification or sometimes called a satisfiability proof for a given formula is done by constructing a model. The formula is satisfiable only if such a model exists. The model construction is done in several steps. Foremost, the tableau method is used to simplify the problem and to detect contradictions earlier in the process, even before the model construction begins. If the produced tableau is closed as per definition \ref{closed-tableau}, then a model in which the given formula is satisfiable does not exist. If there are open branches in the tableau result, then semantical reasoning shall be done in order to construct a model, if such a model exists. Let us define few definitions before we dive into the procedure for the satisfiability proof of a formula.
+The satisfiability verification or sometimes called a satisfiability proof for a given formula, is done by constructing a model. The formula is satisfiable only if such a model exists. The model construction is done in several steps. Foremost, the tableau method is used to simplify the problem and to detect contradictions earlier in the process, even before the model construction begins. If each branch in the produced tableau is closed as per definition \ref{closed-branch}, then a model in which the given formula is satisfiable does not exist. If there are open branches in the tableau result, then semantical reasoning shall be done in order to construct a model if such a model exists. Let us define a few definitions before we dive into the procedure for the satisfiability proof of a formula.
 
 	\paragraph{Tableau Branch Conjunction}
-		A branch from the tableau method consists of signed atomic formulas. For a formula to be satisfiable, it means that all atomic formulas in a tableau branch should be satisfied. This in terms can be represented as a conjunction of the atomic formulas. Let us call it a branch conjunction.
+		A branch from the tableau method consists of signed atomic formulas. For a formula to be satisfiable, it means that all atomic formulas in a tableau branch should be satisfied. This, in terms, can be represented as a conjunction of the atomic formulas. Let us call it branch conjunction.
 	\begin{defn}
 		Let $\varphi$ be a formula and let $\mathcal{T}$ be a tableau applied over the $\varphi$ formula. Then a branch of the tableau method is defined with the following notation:
 		\begin{align*}
@@ -553,9 +553,9 @@ The satisfiability verification or sometimes called a satisfiability proof for a
 			\curvedE : \Var_B \rightarrow \{ \textbf{false}, \textbf{true}\}
 		\end{align*}
 	\end{defn}
-	The variable valuation can be thought as a boolean array where the indexes are the variables from $\Var_B$. This way a \emph{true} element in the array at index \emph{i} corresponds to a true valuation of the variable represented with index \emph{i} . Having in mind that the size of $\Var_B$ is n, we know that there are $2^n$ possible valuations. 
+	The variable valuation can be thought as a boolean array where the indexes are the variables from $\Var_B$. This way, a \emph{true} element in the array at index \emph{i} corresponds to a true valuation of the variable represented with index \emph{i} . Having in mind that the size of $\Var_B$ is n, we know that there are $2^n$ possible valuations. 
 
-For the purposes of our algorithm the elements of W will be such variable valuations. The variable valuations depends on the number of variables in the formula, this bounds the world W to have at most $2^n$ possible elements. From now on we will use the term modal point and variable valuation interchangeably.
+For the purposes of our algorithm, the elements of W will be such variable valuations. The variable valuations depend on the number of variables in the formula; this bounds the world W to have at most $2^n$ possible elements. From now on, we will use the term modal point and variable valuation interchangeably.
 	% The idea of a modal points is to be represented by a separate $\curvedE$ variable valuation, which will be used to satisfy the term representing that modal point.
 
 	\paragraph{Boolean valuation}
@@ -573,20 +573,20 @@ For the purposes of our algorithm the elements of W will be such variable valuat
 	\paragraph{Modal Point Construction}
 		Constructing a valid model for a given branch conjunction of a formula consists of finding W, R and the model valuation function $\vE$.
 		The model construction depends on the atomic formulas in a branch conjunction. 
-		The algorithm to validate that a branch conjunction produces a model where the given formula is satisfiable iterates over the atomic formulas and extends the model in such a way that at any point in time the model does not contain contradictions.
-		If on some step a contradiction occurs, then the valuation $\vE$ is modified in order to remove the contradiction.
-		When there are no possibilities for further modifications, then the branch conjunction is closed and a model does not exist for that branch conjunction.
-		The number of modal points generated in the model depend on the contacts and non zero terms.
+		The algorithm to validate that a branch conjunction produces a model where the given formula is satisfiable iterates over the atomic formulas and extends the model in such a way that, at any point in time, the model does not contain contradictions.
+		If, on some step, a contradiction occurs, then the valuation $\vE$ is modified in order to remove the contradiction.
+		When there are no possibilities for further modifications, then the branch conjunction is closed, and a model does not exist for that branch conjunction.
+		The number of modal points generated in the model depends on the contacts and non-zero terms.
 		The goal is to search for a model with enough modal points in order to make sure that all possible models which are not duplicated are considered.
 		Duplicated modal points lead to additional unnecessary computation. 
 		\newline
 
 		Let $\Var_B$ be the set of all variables in a branch conjunction B and let a be a term.
-		Then we will say that a modal point p is constructed, when a variable valuation $\curvedE$ is generated, such that p is valid:
+		Then we will say that a modal point p is constructed, when a variable valuation p is generated, such that p is valid:
 		\begin{align*}
-			\vBool_{\curvedE}(a) = \textit{ true }
+			\vBool_{p}(a) = \textit{ true }
 		\end{align*}
-		Let n be the number of variables in $\Var_B$, then all possible variants of a variable valuations are $2^n$.
+		Let n be the number of variables in $\Var_B$, then all possible variants of variable valuations are $2^n$.
 		It is of huge importance for us to be able to determine the number of points required in order to construct a valid model. The number of modal points is determined from the atomic formulas in the tableau branch. Let B be a branch conjunction as:
 		\BranchConjunction
 		The following atomic formulas require modal point existence:
@@ -601,7 +601,7 @@ For the purposes of our algorithm the elements of W will be such variable valuat
 			\item $\vBool_{p}(a) = \textbf{true}$
 			\item $\vBool_{q}(b) = \textbf{true}$
 		\end{itemize}
-		To validate that the newly generated modal points for this contact satisfy the non contacts, the following must be true.
+		To validate that the newly generated modal points for this contact satisfy the non-contacts, the following must be true.
 		\begin{align*}
 			 \neg C(e, f) \in B: (\vBool_{p}(e) = \textbf{false} & \textit{ or } \vBool_{q}(f) = \textbf{false}) \; \textit{ and } \\
 				(\vBool_{p}(f) = \textbf{false} & \textit{ or } \vBool_{q}(e) = \textbf{false}) \; \textit{ and } \\
@@ -650,7 +650,7 @@ For the purposes of our algorithm the elements of W will be such variable valuat
       \end{tikzpicture}
 	\end{center}
 
-	\paragraph{Non zero term modal point construction step}\label{def-non-zero-construction}
+	\paragraph{Non-zero term modal point construction step}\label{def-non-zero-construction}
 		Let B be a branch conjunction and $a \neq 0 \in B$, where a is a term. Then one modal point p is generated, such that:
 		\begin{itemize}
 			\item $\vBool_{p}(a) = \textbf{true}$
@@ -660,7 +660,7 @@ For the purposes of our algorithm the elements of W will be such variable valuat
 	\begin{align*}
 		t = 0 \in B: \vBool_{p}(t) = \textit{false}
 	\end{align*}
-	To validate that the modal point satisfies the non contacts, the following must be true:
+	To validate that the modal point satisfies the non-contacts, the following must be true:
 	\begin{align*}
 		\neg C(e, f) \in B: (\vBool_p(e) = \textbf{false} \textit{ and } \vBool_p(f) = \textbf{false})
 	\end{align*}
@@ -689,7 +689,7 @@ For the purposes of our algorithm the elements of W will be such variable valuat
 	\end{center} 
 
 	\begin{defn}
-		let $\Ts$ be the set of all terms and let $\mathcal{F}$ be a frame constructed with the Contact and Non zero term modal point construction steps. Then the model valuation $\vE : \Ts \rightarrow \mathscr{P}(W)$ is defined inductively as:
+		let $\Ts$ be the set of all terms and let $\mathcal{F}$ be a frame constructed with the Contact and Non-zero term modal point construction steps. Then the model valuation $\vE : \Ts \rightarrow \mathscr{P}(W)$ is defined inductively as:
 		\begin{itemize}
 			\item $\vE(0) = \emptyset$
 			\item $\vE(1) = W$
@@ -713,7 +713,7 @@ For the purposes of our algorithm the elements of W will be such variable valuat
 
 	\newpage
 	\section{Quantitative Contact Logics}
-	The quantitative contact logics is basically the region based contact logics with the addition of quantitative measures. This is done by assigning a 
+	The quantitative contact logic is basically the region-based contact logic with the addition of quantitative measures. This is done by assigning a 
 	positive real number to each of the model points in the model. The assignment (restriction) of the weight is done with an atomic measure formula.
 
 	\paragraph{Measure function} A measure function will denote a function which maps a region to a positive real number.
@@ -734,7 +734,7 @@ For the purposes of our algorithm the elements of W will be such variable valuat
 		\item $\mathcal{M} \models a \leq_\mu b \text{, iff } \mu(\mathscr{v}(a)) \le \mu(\mathscr{v}(b))$
 	\end{itemize}
 
-\begin{lemma}[Trivial measure model implications]
+\begin{prop}[Trivial measure model implications]
 Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	\begin{itemize}
 		\item $0 \le_\mu a \Longrightarrow T$
@@ -744,7 +744,7 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 		\item $(a \le_\mu b) \lor (b \le_\mu a) \Longrightarrow T$
 		\item $a_1 \le_\mu a_2 \land a_2 \le_\mu a_3 \Longrightarrow a_1 \le_\mu a_3$
 	\end{itemize}
-\end{lemma}
+\end{prop}
 
 	\newpage
 	\subsection{System of Inequalities} 
@@ -762,10 +762,10 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 
 		\leavevmode\newline
 		\subsection{System Construction}
-		A formula with multiple measure atomic formulas produce a system of inequalities.
+		A formula with multiple measure atomic formulas produces a system of inequalities.
 		This system of inequalities must have a solution in order for a model to satisfy the given formula.
 
-		Let $M = (W, R, \vE)$ be a model. The system of inequalities is constructed from a formula by evaluating each
+		Let $M = (W, R, \mu, \vE)$ be a model. The system of inequalities is constructed from a formula by evaluating each
 		of the terms in the $\le_\mu$ and $<_\mu$ atomic formulas. The number of points in the model are $N = | \; W \; |$. Let us enumerate the points
 		$p_0, p_1, ..., p_N$. The system will have N different variables $X_0, X_1, ..., X_N$, 
 		where $\forall i < N: X_i$ is mapped to point $p_i$.
@@ -774,13 +774,6 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 			Let x and y be two terms, then the formula $\le_\mu(x, y)$ is transformed to an inequality as follows:
 			\begin{align*}
 				\sum_{i: p_i \in \vE(x)} X_i \leq \sum_{j: p_j \in \vE(y)} X_j
-			\end{align*}
-		\end{defn}
-
-		\begin{defn}
-			Let x and y be two terms, then the formula $<_\mu(x, y)$ is transformed to an inequality as follows:
-			\begin{align*}
-				\sum_{i: p_i \in \vE(x)} X_i < \sum_{j: p_j \in \vE(y)} X_j
 			\end{align*}
 		\end{defn}
 
@@ -793,7 +786,22 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 		\end{lemma}
 
 		\begin{defn}
-			Let $M = (W, R, \vE)$ be a model. Let $\mathscr{S}$ be the system of inequalities defined by
+			Let x and y be two terms, then the formula $<_\mu(x, y)$ is transformed to an inequality as follows:
+			\begin{align*}
+				\sum_{i: p_i \in \vE(x)} X_i < \sum_{j: p_j \in \vE(y)} X_j
+			\end{align*}
+		\end{defn}
+
+		\begin{lemma} \label{measure_less_without_duplication}
+			Let x and y be two terms and let $\mathscr{I}_q$ be the inequality produced from $<_\mu(x, y)$. Then the inequality $\mathscr{L}_q$ can be simplified 
+			by removing all variables present on both sides of the equation. This can be written as:
+			\begin{align*}
+				\sum_{i: p_i \in \vE(x) \setminus \vE(y)} X_i < \sum_{j: p_j \in \vE(y) \setminus \vE(x)} X_j
+			\end{align*}
+		\end{lemma}
+
+		\begin{defn}
+			Let $M = (W, R, \mu, \vE)$ be a model. Let $\mathscr{S}$ be the system of inequalities defined by
 			\begin{itemize}
 				\item inequalities for all $\le_\mu$ fromulas by lemma \ref{measure_less_equal_without_duplication}
 				\item inequalities for all $<_\mu$ fromulas by lemma: \ref{measure_less_without_duplication}
@@ -803,10 +811,10 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 		\end{defn}
 
 \subsection{Measure formula satisfiability}
-	Finding a model to satisfy a formula which includes measure atomic formulas, follows the same initial steps as the formula satisfiability in \ref{formula-satisfiability}, 
-	namely the tableau method is used to simplify the formula and to create a tableau branch conjunctions.
-	The tableau branch conjunction for the quantitative contact logics contains the signed contact, zero term and measure atomic formula.
-	For the rest of this section the term formula will be used to indicate a formula which might be defined with atomic measure formulas.
+	Finding a model to satisfy a formula with measure atomic formulas follows the same initial steps as the formula satisfiability in \ref{formula-satisfiability}, 
+	namely the tableau method is used to simplify the formula and to create tableau branch conjunctions.
+	The tableau branch conjunction for the quantitative contact logic contains the signed contact, zero term and measure atomic formula.
+	For the rest of this section, the term formula will be used to indicate a formula that might be defined with atomic measure formulas.
 
 	\begin{defn}
 		Let $\varphi$ be a formula and let $\mathcal{T}$ be a tableau applied over the $\varphi$ formula.
@@ -820,13 +828,13 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 					\{\signF u_q \le_\mu v_q \mid q \in \{1, \ldots, Q\} \}
 		\end{align*}
 	\end{defn}
-	To simplify it further we can remove the signed symbols $\signT \textit{ and } \signF$, in which case the branch conjunction of the tableau method branch is defined as:
+	To simplify it further, we can remove the signed symbols $\signT \textit{ and } \signF$, in which case the branch conjunction of the tableau method branch is defined as:
 	\BranchConjunctionWithMeasure
 
 	Having measure atomic formulas in a branch conjunction makes it difficult to define an approach where a suitable point valuation is created for each term 
 	in the atomic formulas in that branch conjunction.
 	The measure atomic formulas require some weight to be computed over all existing points. 
-	To find a model satisfying the branch conjunction the algorithm tries each subset of the modal points.
+	To find a model satisfying the branch conjunction, the algorithm tries each subset of the modal points.
 
 	\begin{defn}%{Valid modal point}
 	Let B be a branch conjunction. We say that the modal point $\curvedE$ is valid over B, if the following statements hold:
@@ -861,13 +869,13 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 	it must satisfy the contacts and non-equal to zero formulas from B and to have a solution for the system of inequalities defined over $\mathcal{M}$ and B.
 
 	In case the system of inequalities over $\mathcal{M}$ and B has a solution, then this model satisfies the initial formula.
-	However in the opposite scenario, where the contacts and non-equal to zero formulas from B are not satisfied or the system of inequalities does not have a solution,
+	However, in the opposite scenario, where the contacts and non-equal to zero formulas from B are not satisfied or the system of inequalities does not have a solution,
 	it does not mean that the branch conjunction B does not construct a valid model.
 
-	It is possible that the satisfying model has less modal points,
+	It is possible that the satisfying model has fewer modal points,
 	This imposes that we should test the satisfiability of the branch conjunction against each subset of W.
 	
-	Testing the satisfiability for each subset of W creates a lot of combinations, that is why having a structural approach to eliminate 
+	Testing the satisfiability for each subset of W creates a lot of combinations, which is why having a structural approach to eliminate 
 	multiple combinations at once is a huge performance optimization. The following lemmas provide such optimizations.
 
 	\begin{lemma}[Impossible subset models] \label{impossible-subset-models}
@@ -942,8 +950,9 @@ Let a, b, c be three terms and let $\varphi$ and $\psi$ be two formulas, then
 			Test if $\mathcal{M'}$ satisfies the non-equal to zero terms and contacts from B:
 		\begin{enumerate}
 		\item In case the non-equal to zero terms and contacts from B are satisfied by $\mathcal{M'}$,
-			verify whether the system of inequality over B and $\mathcal{M'}$ has a solution. 
-			If the system has a solution then a valid model for the formula is constructed, otherwise W' is removed from $\mathbb{P}$.
+			verify whether the system of inequalities over B and $\mathcal{M'}$ has a solution. 
+			If the system has a solution then a valid model $\mathcal{M'} = (W', R', \mu, \vE')$ for the formula is constructed, where $\mu$ is defined from the result of the system of inequalities.\\
+Otherwise W' is removed from $\mathbb{P}$.
 		\item If W' does not satisfy the non-equal to zero terms and contacts  
 			then by lemma \ref{impossible-subset-models} all subsets of W' are removed from $\mathbb{P}$.
 		\end{enumerate}
@@ -960,7 +969,7 @@ Now we are ready to support the following statement.
 	\newline
 	Let $\varphi$ be a measure formula. Then $\varphi$ is universally valid if for the negation of $\varphi$ the measure formula satisfiability algorithm does not produce a model in which the $\neg \varphi$ measure formula is satisfiable.
 	\newline
-	This means that there does not exist a measure model $\mathcal{M}$, such that $\mathcal{M} \models \neg \varphi$, which is a proof in the formal system that $\varphi$ is universally valid.
+	This means that there does not exist a measure model $\mathcal{M}$, such that $\mathcal{M} \models \neg \varphi$, which is a proof in the formal system that $\varphi$ is tautology.
 
 
 	\newpage
@@ -2211,7 +2220,7 @@ auto tableau::satisfiable_step() -> bool
 	As stated above the ouput of a branch in the tableaux process is a set of atomic formulas. These atomic formulas are grouped in six sets:
 	\begin{itemize}
 		\item Contacts ($contacts\_T$)
-		\item Non Contacts ($contacts\_F$)
+		\item Non-Contacts ($contacts\_F$)
 		\item Equal to Zero Terms ($zero\_terms\_T$)
 		\item Not Equal to Zero Terms ($zero\_terms\_F$)
 		\item Meassured Equal to Zero Terms ($measured\_less\_eq\_T$)
