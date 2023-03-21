@@ -1,0 +1,876 @@
+% This text is proprietary.
+% It's a part of presentation made by myself.
+% It may not used commercial.
+% The noncommercial use such as private and study is free
+% Dec 2007
+% Author: Sascha Frank 
+% University Freiburg 
+% www.informatik.uni-freiburg.de/~frank/
+%
+% 
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A,T1]{fontenc}
+\usepackage[english, bulgarian]{babel}
+\setbeamertemplate{navigation symbols}{}
+
+\addtobeamertemplate{navigation symbols}{}{%
+    \usebeamerfont{footline}%
+    \usebeamercolor[fg]{footline}%
+    \hspace{1em}%
+    \insertframenumber/\inserttotalframenumber
+}
+
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{systeme}
+\usepackage{newtxtext}
+\usepackage{newtxmath}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{makecell}
+\usepackage{booktabs}% http://ctan.org/pkg/booktabs
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{multicol}
+\usepackage{graphicx}
+
+\usetikzlibrary{arrows.meta}
+\graphicspath{ {./image/} }
+
+\restylefloat{table}
+\newcommand{\tabitem}{~~\llap{\textbullet}~~}
+
+\newtheorem{defn}{Дефиниция}[section]
+\newtheorem{axiom}{Аксиома}[section]
+\newtheorem{prop}{Свойство}[section]
+\newtheorem{lema}{Лема}[section]
+
+\newcommand{\curvedE}{\mathscr{e}}
+\newcommand{\vVar}{\mathscr{v}_{var}}
+\newcommand{\Var}{\mathbb{V}ar}
+\newcommand{\vE}{\mathscr{v}}
+\newcommand{\vBool}{\xi}
+\newcommand{\Ts}{\mathcal{T}_s}
+\newcommand{\signT}{\mathbb{T}}
+\newcommand{\signF}{\mathbb{F}}
+\newcommand{\BranchConjunction}{%
+\begin{align*}
+			\bigwedge_{i=1}^{I} \; C(a_i, b_i) \:\: & \wedge \:\: 
+			\bigwedge_{k=1}^{K} \; \neg C(e_k, f_k) \:\: \wedge \:\: \\
+			\bigwedge_{j=1}^{J} \; d_j \neq 0 \:\: & \wedge \:\:
+			\bigwedge_{l=1}^{L} \; g_l = 0 \:\:
+\end{align*}%
+}
+\newcommand{\BranchConjunctionWithMeasure}{%
+\begin{align*}
+			\bigwedge_{i=1}^{I} \; C(a_i, b_i) \:\: & \wedge \:\: 
+			\bigwedge_{k=1}^{K} \; \neg C(e_k, f_k) \:\: \wedge \:\: \\
+			\bigwedge_{j=1}^{J} \; d_j \neq 0 \:\: & \wedge \:\:
+			\bigwedge_{l=1}^{L} \; g_l = 0 \:\: \wedge \:\:\\
+			\bigwedge_{p=1}^{P} \; m_p \le_\mu n_p \:\: &\wedge \:\:
+			\bigwedge_{q=1}^{Q} \; u_q <_\mu v_q \:\:
+\end{align*}%
+}
+
+\lstset { %
+    literate={~} {$\sim$}{1},
+    language=C++,
+    backgroundcolor=\color{black!5}, % set backgroundcolor
+    basicstyle=\footnotesize,% basic font setting
+}
+
+
+
+\usetheme{Montpellier}
+
+\beamersetuncovermixins{\opaqueness<1>{25}}{\opaqueness<2->{15}}
+\begin{document}
+\title{Уеб система за изпълнимост в контактната логика с мярка}  
+\author{\textsc{Факултет по математика и информатика} \\
+	\textsc{Катедра по математическа логика и приложенията ѝ} \\ [3mm]
+	\textsc{Стоев Мартин} \\ [3mm]
+	\textsc{Магистерска програма Логика и Алгоритми, Информатика, Факултетен Номер: 25790} \\ [4mm]
+	\small\textsc{Научен ръководител: проф. Тинко Тинчев}}
+\date{\today} 
+\begin{frame}
+\titlepage
+\end{frame}
+
+%\begin{frame}\frametitle{Съдържание}\tableofcontents\end{frame} 
+
+
+\section{Въведение} 
+\begin{frame}\frametitle{Въведение}
+\begin{itemize}
+	\item Каква е целта на тази дипломна работа ?
+	\item Теоретична част
+	\item Практическа част
+\end{itemize}
+\end{frame}
+
+\section{Съдържание} 
+\begin{frame}\frametitle{Съдържание}
+\begin{itemize}
+	\item Табло метод
+	\item Kонтактна логика
+	\item Изпълнимост в контактна логика
+	\item Kонтактна логика с мярка
+	\item Изпълнимост в контактна логика с мярка
+\end{itemize}
+\end{frame}
+
+\section{Табло метод}
+\begin{frame}\frametitle{Табло метод}
+\begin{itemize}
+	\item Табло метод като процедура за опровергаване на формули
+	\item Табло метод като процедура за построяване на модели
+	\item Табло метод за съждителната логика
+\end{itemize}
+\end{frame}
+
+\subsection{Табло метод за съждителната логика}
+\begin{frame}\frametitle{Табло метод за съждителната логика}
+Маркиране на валидността на формула $\varphi$
+\begin{itemize}
+	\item $\signT \varphi$ - маркиране на формулата $\varphi$ за вярна
+	\item $\signF \varphi$ - маркиране на формулата $\varphi$ за невярна
+\end{itemize}
+\vspace{20px}
+Стъпки на табло метода
+\begin{itemize}
+	\item Разширяване на дърво, което строи табло методът
+	\item Намиране на противоречия
+\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Правила}
+Отрицание
+\vspace{20px}
+		\noindent\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \signT(\neg \varphi), X \\
+				      \cline{2-2}
+				      & \signF(\varphi), X
+			\end{array}
+		\end{align*}
+		\end{minipage}%
+		\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \signF(\neg \varphi), X \\
+			      \cline{2-2}
+			      & \signT(\varphi), X
+			\end{array}
+		\end{align*}
+		\end{minipage}
+Конюнкция
+		\noindent\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \signT(\varphi \: \wedge \: \psi), X \\
+			      \cline{2-2}
+			      & \signT\varphi, \signT\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}%
+		\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \:\:\: \signF(\varphi \: \wedge \: \psi), X \\
+			      \cline{2-2}
+			      & \signF\varphi, X \:\:\:\:\:\:\:\: \signF\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}
+\end{frame}
+
+\begin{frame}\frametitle{Правила}
+Дизюнкция
+\vspace{20px}
+		\noindent\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \:\:\: \signT(\varphi \: \vee \: \psi), X \\
+			      \cline{2-2}
+			      & \signT\varphi, X \:\:\:\:\:\:\:\: \signT\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}%
+		\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \signF(\varphi \: \vee \: \psi), X \\
+			      \cline{2-2}
+			      & \signF\varphi, \signF\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}
+Импликация
+		\noindent\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \:\:\: \signT(\varphi \: \rightarrow \: \psi), X \\
+			      \cline{2-2}
+			      & \signF\varphi, X \:\:\:\:\:\:\:\: \signT\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}%
+		\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \signF(\varphi \: \rightarrow \: \psi), X \\
+			      \cline{2-2}
+			      & \signT\varphi, \signF\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}
+\end{frame}
+
+\begin{frame}\frametitle{Правила}
+Еквивалентност
+		\noindent\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \:\:\:\:\:\:\:\: \signT(\varphi \: \leftrightarrow \: \psi), X \\
+			      \cline{2-2}
+			      & \signT\varphi, \signT\psi, X \:\:\:\:\:\:\:\: \signF\varphi, \signF\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}%
+		\begin{minipage}{.5\linewidth}
+		\begin{align*}
+			\begin{array}{rl}
+				& \:\:\:\:\:\:\:\: \signF(\varphi \: \leftrightarrow \: \psi), X \\
+			      \cline{2-2}
+			      & \signT\varphi, \signF\psi, X \:\:\:\:\:\:\:\: \signF\varphi, \signT\psi, X
+			\end{array}
+		\end{align*}
+		\end{minipage}
+\end{frame}
+
+\begin{frame}\frametitle{Дефиниции}
+
+\begin{defn}[Затворен клон]
+Когато в него има едновременно една и съща формула маркирана за вярна и за невярна.
+\end{defn}
+
+\begin{defn}[Атомарен клон]
+Когато клона не може да се разширява повече.
+\end{defn}
+
+\begin{defn}[Завършено табло]
+Когато всеки клон в таблото е или затворен или атомарен.
+\end{defn}
+\end{frame}
+
+\begin{frame}\frametitle{Общовалидна формула}
+	Проверяваме дали дадена формула $\varphi$ е общовалидна с следните стъпки:
+\begin{enumerate}
+	\item Маркираме $\varphi$ за невярна, т.е.  $\signF\varphi$.
+	\item Ползваме $\signF\varphi$ за начална формула на таблото.
+	\item Разширяваме докато таблото не е завършено.
+	\item Ако всички клонове на таблото са затворени, то формулата $\varphi$ е общовалидна.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}\frametitle{Пример}
+	\hspace{50px} 1. $\signF (X \rightarrow ((X \wedge \neg Y) \vee \neg X)$ \\
+	\hspace{50px} 2. $\signT X, \signF ((X \wedge \neg Y) \vee \neg X)$ \\
+	\hspace{50px} 3. $\signT X, \signF (X \wedge \neg Y), \signF \neg X$ \\
+	\hspace{50px} 4. $\signT X, \signF (X \wedge \neg Y), \signT X$ \\
+	\begin{tikzpicture}[scale = 0.8]
+		\draw (-7,0) (5,1);
+        \draw[thick] (-3.1,0) -- (-2.2,1) -- (-1.3,0);
+    \end{tikzpicture} \\
+	\hspace{70px} 5. $\signF X$ \hspace{5px} 6. $\signF \neg Y$\\
+	\hspace{108px} 7. $\signT Y$
+\end{frame}
+
+\section{Kонтактна логика}
+\begin{frame}\frametitle{Kонтактна логика}
+\begin{enumerate}
+	\item Синтаксис 
+	\item Семантика
+	\item Свойства
+	\item Изпълнимост на формула
+\end{enumerate}
+\end{frame}
+
+\subsection{Синтаксис}
+\begin{frame}\frametitle{Синтаксис}
+	\begin{itemize}
+		\item W - цял свят
+		\item $\emptyset$ - празен регион
+		\item $\mathbb{V}ar$ - изброимо множество от променливи
+		\item Булеви константи за W и $\emptyset$, 1 и 0 съответно
+	\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Булеви операции}
+	\begin{itemize}
+		\item $\sqcap$ за булево сечение
+		\item $\sqcup$ за булево обединение
+		\item * за допълнение
+	\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Дефиниция за терм}
+Терм се дефинира индуктивно:
+	\begin{itemize}
+		\item Булевите константи са термове
+		\item $p \in \mathbb{V}ar$ е терм
+		\item Ако x е терм, то x* е също така терм
+		\item Ако x и y са два терма, то $x \; \sigma \; y $ е също така терм,\\
+				където $\sigma \: \in \: \{\sqcap, \sqcup\}$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Константи, операции и атомарни формули}
+	Съждителни константи: $\top$ and $\bot$ \\
+	\vspace{10px}
+	Съждителни операции: $\neg, \vee, \wedge, \rightarrow, \leftrightarrow$
+	\vspace{10px}
+
+	Нека a и b са два терма. То тогава 
+	\begin{itemize}
+		\item C(a, b)
+		\item $a \le b$
+	\end{itemize}
+	са атомарни формули.
+\end{frame}
+
+\begin{frame}\frametitle{Дефиниция за формула}
+Формула се дефинира индуктивно:
+		\begin{itemize}
+			\item Всяка съждителна константа е формула
+			\item Всяка атомарна формула е формула
+			\item Ако $\varphi$ е формула, то $\neg{\varphi}$ е също така формула
+			\item Ако $\varphi$ и $\psi$ са две формули, то $\varphi \: \sigma \: \psi $ е също така формула,\\
+				където $\sigma \in \{\vee, \wedge, \rightarrow, \leftrightarrow\}$
+		\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Съкращения}
+		\begin{itemize}
+		\item $a = b\:\textit{означава}\:\: (a \le b) \land (b \le a)$
+		\item $a \neq b\:\textit{означава}\:\: \neg (a = b) $
+		\item $a \nleq b\:\textit{означава}\:\: \neg (a \le b)$
+		\end{itemize}
+\end{frame}
+
+\subsection{Семантика}
+\begin{frame}\frametitle{Семантика}
+	Релационна система се дефинира като $(W, R)$, където $W \neq \emptyset$, R е рефлексивна и симетрична релация в W.
+	\newline
+	\newline
+	Булева оценка на променливите означаваме с  $\mathscr{v}: \mathbb{V}ar \rightarrow  \mathscr{P}(W)$ и разширяваме я до множеството на всички термове:
+		\begin{itemize}
+			\item $\mathscr{v}(0) = \emptyset$
+			\item $\mathscr{v}(1) = W$
+			\item $\mathscr{v}(a \sqcap b) = \mathscr{v}(a) \cap \mathscr{v}(b)$
+			\item $\mathscr{v}(a \sqcup b) = \mathscr{v}(a) \cup \mathscr{v}(b)$
+			\item $\mathscr{v}(a*) = W \backslash  \mathscr{v}(a)$
+		\end{itemize}
+	
+\end{frame}
+
+\subsection{Семантика}
+\begin{frame}\frametitle{Модел}
+	Наредената тройка $\mathcal{M} = (W, R, \mathscr{v})$ наричаме модел. Дефинираме вярност на дадена формула в $\mathcal{M}$, като:
+		\begin{itemize}
+			\item $\mathcal{M} \not\models \bot$ 
+			\item $\mathcal{M} \models \top$
+			\item $\mathcal{M} \models aCb \text{ когато } (\exists x \in \mathscr{v}(a)) (\exists y \in \mathscr{v}(b)) (xRy)$
+			\item $\mathcal{M} \models a \leq b \text{ когато } \mathscr{v}(a) \subseteq \mathscr{v}(b)$
+			\item $\mathcal{M} \models \neg \varphi \text{ когато } \mathcal{M} \not\models \varphi$
+			\item $\mathcal{M} \models a \; \vee \; b \text{ когато } \mathcal{M} \models a \: \textit{ или } \: \mathcal{M} \models b$
+			\item $\mathcal{M} \models a \; \wedge \; b \text{ когато } \mathcal{M} \models a \: \textit{ и } \: \mathcal{M} \models b$
+		\end{itemize}
+	
+\end{frame}
+
+\subsection{Свойства}
+\begin{frame}\frametitle{Свойства}
+
+\begin{prop}[Рефлексивност на контакта]
+Нека b е терм, тогава:
+	\begin{equation*}
+		\mathcal{M} \models b \neq 0  \iff \mathcal{M} \models bCb
+	\end{equation*}
+\end{prop}
+
+\begin{prop}[Симетрия на контакта]
+Нека a и b са два терма, тогава:
+	\begin{equation*}
+		\mathcal{M} \models aCb \iff \mathcal{M} \models bCa
+	\end{equation*}
+\end{prop}
+
+\begin{prop}[Еквивалентност на термове]
+Нека a и b са два терма и $\mathscr{v}$ е оценка , тогава:
+	\begin{equation*}
+		\mathcal{M} \models a = b \iff \mathscr{v}(a) = \mathscr{v}(b)
+	\end{equation*}
+\end{prop}
+
+\end{frame}
+\begin{frame}\frametitle{Свойства}
+\begin{prop}[Нулева формула]
+
+Нека a и b са два терма, тогава:
+	\begin{equation*}
+		\mathcal{M} \models a \le b \iff \mathcal{M} \models a \sqcap b* = 0
+	\end{equation*}
+\end{prop}
+
+\begin{prop}[Ненулева формула]
+Нека a и b са два терма, тогава:
+	\begin{equation*}
+		\mathcal{M} \models \neg(a \le b) \iff \mathcal{M} \models a \sqcap b* \neq 0
+	\end{equation*}
+\end{prop}
+
+\end{frame}
+
+
+\subsection{Изпълнимост в контактна логика}
+\begin{frame}\frametitle{Изпълнимост в контактна логика}
+За дадена формула $\varphi$ трябва да построим модел $\mathcal{M} \models \varphi$.
+\newline
+\newline
+Използваме табло метода за да опростим формулата и търсим модел в клоните на табло метода.
+\newline
+\newline
+		Нека $\varphi$ е формула и $\mathcal{T}$ е таблото от $\varphi$, то клонът на таблото има следните маркирани атомарни формули:
+\begin{itemize}
+	\item $\signT C(a, b)$
+	\item $\signF C(a, b)$ 
+	\item $\signT t = 0$
+	\item $\signF t = 0$
+\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Табло клон}
+		За улеснение можем да махнем $\signT \textit{ и } \signF$ и получаваме.
+\begin{align*}
+			\bigwedge_{i=1}^{I} \; C(a_i, b_i) \:\: & \wedge \:\: 
+			\bigwedge_{k=1}^{K} \; \neg C(e_k, f_k) \:\: \wedge \:\: \\
+			\bigwedge_{j=1}^{J} \; d_j \neq 0 \:\: & \wedge \:\:
+			\bigwedge_{l=1}^{L} \; g_l = 0 \:\:
+\end{align*}%
+\end{frame}
+
+\begin{frame}
+\begin{defn}[Множеството на всички променливи]
+	С $\Var_B$ ще ознчаваме множеството от всички променливи използвани в табло клона B.
+\end{defn}
+
+\begin{defn}[Оценка на променливи]
+	С p ще ознчаваме функцията, която за всяка променлива от $\Var_B$ дава истина или лъжа.
+		\begin{align*}
+			p : \Var_B \rightarrow \{ \textbf{лъжа}, \textbf{истина}\}
+		\end{align*}
+\end{defn}
+\end{frame}
+
+\begin{frame}
+\begin{defn}[Булева оценка]
+		Нека p е оценка на променливи и $\Ts$ е множеството от всички термове, тогава 
+		функцията $\vBool_p : \Ts \rightarrow \{ \textbf{лъжа}, \textbf{истина}\}$ ще наричаме булева оценка, която се дефинира по следния начин:
+		\begin{itemize}
+			\item $\vBool_p(0) = \textbf{лъжа}$
+			\item $\vBool_p(1) = \textbf{истина}$
+			\item $\vBool_p(t) =p(t), \textit{ където } t \in \Var_B$
+			\item $\vBool_p(a \sqcap b) = \vBool_p(a) \textit{ и } \vBool_p(b)$
+			\item $\vBool_p(a \sqcup b) = \vBool_p(a) \textit{ или } \vBool_p(b)$
+			\item $\vBool_p(a*) = \textit{не } \vBool_p(a)$
+		\end{itemize}
+\end{defn}
+\end{frame}
+
+\begin{frame}\frametitle{Стъпки за построяване на модел}
+	Нека групираме атомарните формули на такива, за които е необходимо съществуването на модална точка, и на такива, за които не е.
+\newline
+	Следните атомарни формули се нуждаят от същестуването на поне една модална точка:
+		\begin{itemize}
+			\item $C(a_i, b_i), \textit{ for } i < I$
+			\item $d_j \neq 0, \textit{ for } j < J$
+		\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на модални точки за контактите}
+	За всеки контакт $C(a, b) \in B$ ще построим по две модални точки p и q, такива, че:
+		\begin{itemize}
+			\item $\vBool_{p}(a) = \textbf{истина}$
+			\item $\vBool_{q}(b) = \textbf{истина}$
+		\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на модални точки за контактите}
+	Ново генерираните модални точки трябва да удовлетворяват не-контактите, т.е. следното условие трябва да е изпълнено:
+		\begin{align*}
+			 \neg C(e, f) \in B: (\vBool_{p}(e) = \textbf{лъжа} & \textit{ или } \vBool_{q}(f) = \textbf{лъжа}) \; \textit{ и } \\
+				(\vBool_{p}(f) = \textbf{лъжа} & \textit{ или } \vBool_{q}(e) = \textbf{лъжа}) \; \textit{ и } \\
+				(\vBool_{p}(e) = \textbf{лъжа} & \textit{ или } \vBool_{p}(f) = \textbf{лъжа}) \; \textit{ и } \\
+				(\vBool_{q}(e) = \textbf{лъжа} & \textit{ или } \vBool_{q}(f) = \textbf{лъжа})
+		\end{align*}
+
+	Също така за равно на нула термовете, следното условие трябва да е изпълнено:
+	\begin{align*}
+		t = 0 \in B: \vBool_{p}(t) = \textit{лъжа} \text{ и }  \vBool_{q}(t) = \textit{лъжа}
+	\end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на модални точки за контактите}
+	След успешно генерираните модални точки за двата терма, разширяваме R със следните релации:
+	\begin{itemize}
+		\item pRp - рефлексивност на модалната точка p
+		\item qRq - рефлексивност на модалната точка q
+		\item pRq - симетричност между p и q
+		\item qRp - симетричност между q и p
+	\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на модални точки за контактите}
+	\begin{center}
+	\begin{tikzpicture}[scale = 1]
+		\filldraw[color=black!60, fill=red!0, thick](-3,0) circle (0.5);
+		\node at (-3,0) {p};
+		\node at (-3.5,-0.7) {a};
+		\draw[thick, ->] (-3.5,0) arc [
+      	  		start angle=10,
+		       end angle=335,
+        		x radius=0.5cm,
+        		y radius =0.2cm
+    			] ;
+		\draw[thick, <->](-2.5,0) -- (2.5,0);
+		\filldraw[color=black!60, fill=red!0, thick](3,0) circle (0.5);
+		\node at (3,0) {q};
+		\node at (3.5,-0.7) {b};
+		\draw[thick, ->] (3.5,0) arc [
+      	  		start angle=180,
+		      end angle=525,
+        		x radius=0.5cm,
+        		y radius =0.2cm
+    			] ;
+		\node[text width=10cm, anchor=west, right] at (-4.5,-2)
+    		{Генерираните модални точки и техните релации за контакта C(a, b)};
+      \end{tikzpicture}
+	\end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на модална точка за неравен на нула терм}
+	За всеки неравен на нула терм $a \neq 0 \in B$ ще построим една модална точка, такава че $\vBool_{p}(a) = \textbf{истина}$. \\
+	Аналогично, следните условия трябва да са изпълнени:
+	\begin{align*}
+		t = 0 \in B: \vBool_{p}(t) = \textit{лъжа}
+	\end{align*}
+	\begin{align*}
+		\neg C(e, f) \in B: (\vBool_p(e) = \textbf{лъжа} \textit{ и } \vBool_p(f) = \textbf{лъжа})
+	\end{align*}
+	След успешно генериране на модалната точка, отново разширяваме R със следната:
+	\begin{itemize}
+		\item pRp - рефлексивност на модалната точка p
+	\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на модална точка за не-равен на нула терм}
+	\begin{center}
+	\begin{tikzpicture}[scale = 1]
+		\filldraw[color=black!60, fill=red!0, thick](-0,0) circle (0.5);
+		\draw[thick, ->] (-0.5,0) arc [
+      	  		start angle=10,
+		       end angle=345,
+        		x radius=0.5cm,
+        		y radius =0.2cm
+    			] ;
+		\node at (-0,0) {p};
+		\node at (-0.5,-0.7) {a};
+		\node[text width=10cm, anchor=west, right] at (-4.5,-2)
+    		{Генерираната модална точка и нейната релация за $a \neq 0$};
+      \end{tikzpicture}
+	\end{center} 
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на модел}
+	\begin{defn}
+		Нека $\Ts$ е множеството от всички термове и нека (W, R) е релационата система, създадена с построяване на модални точки за контактите и неравно на нула термове.
+		Тогава модалната оценка $\vE : \Ts \rightarrow \mathscr{P}(W)$ се дефинира рекурсивно, като:
+		\begin{itemize}
+			\item $\vE(0) = \emptyset$
+			\item $\vE(1) = W$
+			\item $\vE(t) = \{ p \; | \; p \in W \:\:\textit{и}\:\: p(t) = \textit{истина} \}$
+			\item $\vE(a \sqcap b) = \vE(a) \cap \vE(b)$
+			\item $\vE(a \sqcup b) = \vE(a) \cup \vE(b)$
+			\item $\vE(a*) = W \setminus \vE(a)$
+		\end{itemize}
+	\end{defn}
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на модел}
+	\begin{lema}
+		Нека a е терм и нека p е оценка на променливи, от дефиницията на $\vBool$ и $\vE$, следва, че:
+		\begin{align*}
+			\vBool_{p}(a) = \textit{ истина } \leftrightarrow p \in \vE(a)
+		\end{align*}
+	\end{lema}
+\end{frame}
+
+\section{Kонтактна логика с мярка}
+\begin{frame}\frametitle{Kонтактна логика с мярка}
+Kонтактна логика с мярка е самата контактна логика с добавена количествена мярка.
+\newline
+\newline
+Мярката е функция, която на даден регион съпоставя положително реално число.
+\begin{equation*}
+	\mu : \mathscr{P}(W) \setminus \{\emptyset\} \longrightarrow \mathbb{R}^+
+\end{equation*}
+\end{frame}
+
+
+\begin{frame}\frametitle{Семантика на контактната логика с мярка}
+	Моделът на контактната логика ще го бележим с  $\mathcal{M} = (W, R, \mu, \mathscr{v})$ и се разширява със следната дефиниция за вярност:
+	\begin{itemize}
+		\item $\mathcal{M} \models a \leq_\mu b \text{, когато } \mu(\mathscr{v}(a)) \le \mu(\mathscr{v}(b))$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Система линейни неравенства}
+Формула с атомарни формули с мярка създава система линейни неравенства.
+\newline
+Системата линейни неравенства има следната структура:
+		\[
+			\syslineskipcoeff{1.50}
+			\systeme*{\sum_{i^1} X_{i^1} <= \sum_{j^1} X_{j^1},
+				\:\:.\:\:.\:\:.,
+				\sum_{i^n} X_{i^n} <= \sum_{j^n} X_{j^n}, 
+				\sum_{k^1} X_{k^1} > \sum_{l^1} X_{l^1},
+				\:\:.\:\:.\:\:.,
+				\sum_{k^m} X_{k^m} > \sum_{l^m} X_{l^m}
+				}
+		\]
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на система линейни неравенства}
+Нека $M = (W, R,\mu, \vE)$ е модел. Системата се построява с оценяване на термовете в $\le_\mu$ и  $<_\mu$ атомарни формули. 
+\newline
+Броят на точки в модела са $N = | \; W \; |$. Нека подредим точките $p_0, p_1, ..., p_N$. 
+В такъв случай системата ще има N различни променливи $X_0, X_1, ..., X_N$, където $\forall i < N: X_i$ е съпоставена на точка $p_i$.
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на система линейни неравенства}
+	Нека x и y са два терма, тогава формулата $\le_\mu(x, y)$ се преобразува в:
+	\begin{align*}
+		\sum_{i: p_i \in \vE(x)} X_i \leq \sum_{j: p_j \in \vE(y)} X_j
+	\end{align*}
+
+			Това преобразуване може да се опрости до:
+			\begin{align*}
+				\sum_{i: p_i \in \vE(x) \setminus \vE(y)} X_i \leq \sum_{j: p_j \in \vE(y) \setminus \vE(x)} X_j
+			\end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на система линейни неравенства}
+			Нека x и y са два терма, тогава формулата $<_\mu(x, y)$ се преобразува в:
+			\begin{align*}
+				\sum_{i: p_i \in \vE(x)} X_i < \sum_{j: p_j \in \vE(y)} X_j
+			\end{align*}
+
+			Това преобразуване може да се опрости до:
+			\begin{align*}
+				\sum_{i: p_i \in \vE(x) \setminus \vE(y)} X_i < \sum_{j: p_j \in \vE(y) \setminus \vE(x)} X_j
+			\end{align*}
+\end{frame}
+
+\begin{frame}\frametitle{Построяване на система линейни неравенства}
+		\begin{defn}
+			Нека $M = (W, R, \mu \vE)$ е модел. Нека $\mathscr{S}$ е система от линейни неравенства дефинирана с:
+			\begin{itemize}
+				\item неравенство за всяка $\le_\mu$ формула
+				\item неравенство за всяка $<_\mu$ формула
+				\item неравенство $0 < X_i$ за всяко i: $0 \le i < N$  
+			\end{itemize}
+			Казваме, че системата $\mathscr{S}$ е валидна, ако тя има решение.
+		\end{defn}
+\end{frame}
+
+\begin{frame}\frametitle{Изпълнимост в контактна логика с мярка}
+С добавянето на атомарните формули с мярка се променят клоните на таблото. В тях се появяват и атомарни формули с мярка маркирани като вярни и невярни.
+\begin{itemize}
+	\item $\signT C(a, b)$
+	\item $\signF C(a, b)$ 
+	\item $\signT t = 0$
+	\item $\signF t = 0$
+	\item $\signT a  \le_\mu b$
+	\item $\signF a <_\mu b$
+\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Конюнктивен табло клон}
+		За олеснение можем да махнем $\signT \textit{ и } \signF$ и получаваме.
+\begin{align*}
+			\bigwedge_{i=1}^{I} \; C(a_i, b_i) \:\: & \wedge \:\: 
+			\bigwedge_{k=1}^{K} \; \neg C(e_k, f_k) \:\: \wedge \:\: \\
+			\bigwedge_{j=1}^{J} \; d_j \neq 0 \:\: & \wedge \:\:
+			\bigwedge_{l=1}^{L} \; g_l = 0 \:\: \wedge \:\:\\
+			\bigwedge_{p=1}^{P} \; m_p \le_\mu n_p \:\: &\wedge \:\:
+			\bigwedge_{q=1}^{Q} \; u_q <_\mu v_q \:\:
+\end{align*}%
+\end{frame}
+
+\begin{frame}\frametitle{Изпълнимост в контактна логика с мярка}
+	\begin{defn}%{Valid modal point}
+	Нека B е клон в таблото. Казваме, че модалната точка p е валидна в B, когато:
+	\begin{itemize}
+		\item $t = 0 \in B:  \vBool_{p}(t) = \textbf{лъжа}$
+		\item $\neg C(e, f) \in B: \vBool_{p}(e) = \textbf{лъжа} \textit{ или } \vBool_{p}(f) = \textbf{лъжа}$
+	\end{itemize}
+	\end{defn}
+
+	\begin{defn}
+		Нека B е клон в таблото и нека p и q са две валидни модални точки. Казваме, че $\langle p, q \rangle$ е валидна релация, когато:
+		\begin{align*}
+				\neg C(e, f) \in B: &(\vBool_{p}(e) = \textbf{лъжа} \textit{ или } \vBool_{q}(f) = \textbf{лъжа}) \textit{ и } \\
+				 &(\vBool_{p}(f) = \textbf{лъжа} \textit{ или } \vBool_{q}(e) = \textbf{лъжа})
+		\end{align*}
+	\end{defn}
+\end{frame}
+
+\begin{frame}\frametitle{Изпълнимост в контактна логика с мярка}
+	\begin{defn}
+Нека B е клон в таблото и нека W е множество от валидни модални точки в B. Дефинираме модел $\mathcal{M} = (W, R, \mu, v)$ в B, където:
+		\begin{align*}
+				\vE(t) = \{ p \; | \; p \in W \textit{ и } &\vBool_{p}(t) =\; \textit{истина} \}, \\
+				\textit{ където t е терм } & \textit{от атомарните формули в B}
+		\end{align*}
+		\begin{align*}
+				R = \{ \langle p, q \rangle\; | \; p, q \in W \textit{ и } \langle p, q \rangle \textit{ е валидна релация}\}
+		\end{align*}
+	\end{defn}
+\end{frame}
+
+\begin{frame}\frametitle{Изпълнимост в контактна логика с мярка}
+\begin{lema}[Невъзможни подмножествени модели]
+Нека $\mathcal{M} = (W, R, \mu,\vE)$ е модел, където W е множество от валидни модални точки.
+Нека $\mathcal{M'} = (W', R', \mu, \vE')$ е модел, където $W' \subseteq W, R' \subseteq R$, тогава:
+	\begin{enumerate}
+		\item $\mathcal{M} \not\models t \neq 0 \implies \mathcal{M'} \not\models t \neq 0$
+		\item $\mathcal{M} \not\models C(a,b) \implies \mathcal{M'} \not\models C(a,b)$
+	\end{enumerate}
+	\end{lema}
+\end{frame}
+
+\begin{frame}\frametitle{Изпълнимост в контактна логика с мярка}
+	\begin{lema}[Дедукция на променливите]
+		Нека $\mathcal{M} = (W, R, \mu, \vE)$ е модел, където W е множество от валидни точки.
+		Нека $\mathcal{M'} = (W', R', \mu, \vE')$ е подмодел на $\mathcal{M}$:
+	% NOTE kaji che R' e sechenie na R s W2
+		\begin{align*}
+			\vE'(t) =  \vE(t) \cap W'
+		\end{align*}
+	\end{lema}
+\end{frame}
+
+\subsection{Алгоритъм за построяване на модел с мярка}
+\begin{frame}\frametitle{Алгоритъм за построяване на модел с мярка}
+	вход: $\varphi$ формула  \\
+	изход: 
+\begin{itemize}
+	\item Не е изпълнима, ако $\neg \exists \mathcal{M}: \mathcal{M} \models \varphi$
+	\item Модел $\mathcal{M}$, за който $\mathcal{M} \models \varphi$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+Стъпка 0:
+\newline
+Възможно е да може да се построи модел за всеки клон на таблото, затова ще проверяваме всеки клон докато не намерим модел.
+\newline
+Следващите стъпки работят върху един такъв клон.
+\newline
+\newline
+Стъпка 1:
+\newline
+Генерираме модел $\mathcal{M}$ от всички валидни модални точки W в~B.
+\end{frame}
+
+\begin{frame}
+Стъпка 2:
+\newline
+Нека $\mathbb{P} = \mathcal{P}(W) \setminus \{\emptyset\}$. Нека разгледаме $W' \in \mathbb{P}$ започвайки от подмножествата с най-много елементи.
+			W' създава модела $\mathcal{M'}$ по лемата за дедукция на променливите.
+			Проверяваме дали $\mathcal{M'}$ изпълнява неравно на нула термовете и контактите от B:
+\newline
+\newline
+Стъпка 2.а:
+\newline
+ Да, тогава ако системата от линейни неравенства от B и $\mathcal{M'}$ има решение, то тогава валиден модел е построен, иначе W' се премахва от $\mathbb{P}$
+\newline
+\newline
+Стъпка 2.б:
+\newline
+ Не, тогава по лемата за невъзможните подмножествени модели всички подмножества на W' се премахват от $\mathbb{P}$.
+\end{frame}
+
+\begin{frame}
+Стъпка 3:
+\newline
+Ако W' не е намерено в стъпка 2., тогава не съществува модел с мярка, който да удовлетворява клона B.
+\newline
+\newline
+Край:
+\newline
+Ако модел с мярка не е намерен за всеки от клоновете в таблото, то тогава $\neg \exists \mathcal{M}: \mathcal{M} \models \varphi$ 
+
+\end{frame}
+
+\begin{frame}\frametitle{Имплементация}
+\begin{itemize}
+	\item FLEX + BISON за построяване на формулата в AST (абстрактно синтактично дърво)
+	\item Търсене на последователни атомарни клонове с табло метода
+	\item Генериране на модел с мярка
+	\item Kiwi библиотека за смятане на система линейни неравенства
+	\item Уеб приложение за извикване на генерирането на модела и визуализиране на самия
+\end{itemize}
+ https://github.com/Anton94/modal\_logic\_formula\_prover
+\end{frame}
+
+\begin{frame}\frametitle{Демо}
+\url{http://logic.fmi.uni-sofia.bg/theses/Dudov\_Stoev/}
+\end{frame}
+
+\begin{frame}
+Благодаря за вниманието.
+\end{frame}
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
