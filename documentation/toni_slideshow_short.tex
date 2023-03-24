@@ -1,0 +1,522 @@
+\documentclass[14pt, aspectratio=169]{beamer}
+
+% sudo apt-get install texlive-lang-cyrillic
+\usepackage[T2A,T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[main=bulgarian,english]{babel}
+\usepackage{algorithm,algorithmic}
+\usepackage{hyperref}
+
+\usepackage{forest}
+\usepackage{mathtools}
+\forestset{
+    parse tree/.style={for tree={s sep=0.5em, minimum size=0.5em}}
+}
+
+\renewcommand\thealgorithm{}
+\newcommand{\setalglineno}[1]{\setcounter{ALC@line}{\numexpr#1-1}}
+
+\graphicspath{ {./image/} }
+
+\usetheme{Boadilla}
+\usecolortheme{beaver}
+
+% Hide the navigation buttons at the bottom of each slide
+\setbeamertemplate{navigation symbols}{}
+
+% Lets the boolet points for next slides to be seen
+%\setbeamercovered{transparent}
+
+% Increase the size of title in the footer
+\makeatletter
+\defbeamertemplate*{footline}{Dan P theme}
+{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.2\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+    \usebeamerfont{author in head/foot}\insertshortauthor\expandafter\beamer@ifempty\expandafter{\beamer@shortinstitute}{}{~~(\insertshortinstitute)}
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.6\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+    \usebeamerfont{title in head/foot}\insertshorttitle
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.2\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+    \usebeamerfont{date in head/foot}\insertshortdate{}\hspace*{2em}
+\insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+\makeatother
+
+% Teach babel the tags to translate them
+\usepackage{etoolbox}
+\newtheorem{axiom}{Axiom}
+\newtheorem{step}[theorem]{Step}
+\patchcmd{\theorem}{Theorem}{Теорема}{}{}
+\patchcmd{\corollary}{Corollary}{Следствие}{}{}
+\patchcmd{\lemma}{Lemma}{Лема}{}{}
+\patchcmd{\proposition}{Proposition}{Предложение}{}{}
+\patchcmd{\axiom}{Axiom}{Аксиома}{}{}
+\patchcmd{\example}{Example}{Пример}{}{}
+\patchcmd{\definition}{Definition}{Дефиниция}{}{}
+\patchcmd{\remark}{Remark}{Забележка}{}{}
+\patchcmd{\step}{Step}{Стъпка}{}{}
+
+\newcommand\ST{\mathbb{T}}
+\newcommand\SF{\mathbb{F}}
+\newcommand\SB{\mathbb{B}}
+\newcommand\M{\mathcal{M}}
+\newcommand\F{\mathcal{F}}
+\newcommand\p{\mathcal{P}}
+\newcommand\V{\mathcal{V}}
+\newcommand\E{\mathcal{E}}
+\newcommand\Tb{\mathbf{T}}
+\newcommand\Vb{\mathbf{V}}
+\newcommand{\BranchConjunction}{%
+\begin{equation*}
+			\beta =
+			\bigwedge_{} C(a, b) \:\: \wedge \:\:
+			\bigwedge_{} d = 0 \:\: \wedge \:\:
+			\bigwedge_{} \neg C(e, f) \:\: \wedge \:\:
+			\bigwedge_{} g \neq 0
+\end{equation*}%
+}
+\newcommand{\pair}[2]{ \langle #1, #2 \rangle }
+\newcommand{\pairXY}{ \pair{x}{y} }
+\newcommand{\pairXX}{ \pair{x}{x} }
+\newcommand{\pairYX}{ \pair{y}{x} }
+\newcommand{\pairYY}{ \pair{y}{y} }
+\def\iff{\leftrightarrow}
+
+\logo{\includegraphics[width=1cm]{fmi_logo.png}}
+
+\date[\today]{}
+
+\title{\textsc{Уеб система за изпълнимост на контактната логика за свързаност}}
+
+%\subject{}
+
+%\institute{}
+
+\author[Антон Дудов]{
+	\textsc{Факултет по математика и информатика} \\
+	\textsc{Катедра по математическа логика и приложенията ѝ} \\ [3mm]
+	\textsc{Антон Дудов} \\ [3mm]
+	\small
+	\textsc{Магистърска програма Логика и алгоритми} \\
+	\textsc{спец.~Информатика} \\
+	\textsc{Факултетен номер: 25691} \\ [3mm]
+	\small\textsc{Научен ръководител: проф. Тинко Тинчев}
+}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+% На кратко казано чрез табло методът свеждаме формулата в дизюнктивна нормална форма.
+% Конюнктите, на която нямат атомарна формула и отрицание на същата атомарна формула.
+% Ще разглеждаме конюнктите и ще се опитаме да създадем модел за някой от тях.
+
+% ВАЖНО - два типа обекти, булеви термове за означаване на региони и формули за означаване на свойства на региони . Атомарните формули се получават като приложим модална връзка към двойка термове
+
+\begin{frame}{Контактна логика - синтаксис}
+	\begin{itemize}
+		\item \textit{Булеви променливи} (изброимо множество $\V$)
+		\item \textit{Булеви константи}: 0 и 1
+		\item \textit{Булеви операции}:
+		\begin{itemize}
+			\item $\sqcap$ Сечение
+			\item $\sqcup$ Обединение
+			\item $^*$ Допълнение
+		\end{itemize}
+		\item \textit{Булеви термове}
+		\item \textit{Логически връзки}: $\neg$, $\land$, $\lor$, $\Rightarrow$, $\Leftrightarrow$
+		\item \textit{Логически константи}: $\top$ и $\bot$
+		\item \textit{Модални връзки}: $\leq$(част от) and $C$(контакт)
+		\item \textit{Формули}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Контактна логика - термове}
+	\textbf{\textit{Терм - индуктивна дефиниция}}
+	\begin{itemize}
+		\item Булева променлива
+		\item Булева константа
+		\item Ако $a$ е терм, то $a^*$ също е терм
+		\item Ако $a$ и $b$ са термове, то и $a \sqcap b$ и $a \sqcup b$ са също термове
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Контактна логика - формули}
+	\uncover<1->{
+		\textbf{\textit{Атомарни формули}} са от вида $a \leq b$ and $aCb$, където $a$ и $b$ са термове.
+	}
+
+	\uncover<2->{
+		\textbf{\textit{Формула - индуктивна дефиниция}}
+		\begin{itemize}
+			\item Логическа константа
+			\item Атомарна формула
+			\item Ако $\phi$ е формула, то $\neg\phi$  съшо е формула
+			\item Ако $\phi$ и $\psi$ са формули, то ($\phi \land \psi$), ($\phi \lor \psi$), ($\phi \Rightarrow \psi$) and ($\phi \Leftrightarrow \psi$) са също формули
+		\end{itemize}
+	}
+\end{frame}
+
+% ВАЖНО контактните логики имат топологична, алгебрачни и релационна семантика . ние ще разглеждаме релационната семантика
+% R е рефлексивна и симетрична релация
+% теоретико множествената разлика е W \ v(a) или от W изхвърляме точките от v(a)
+
+\begin{frame}{Контактна логика - релационна семантика}
+	\uncover<1->{
+		$\F$ = (W, R) е релационна система с W $\neq$ $\emptyset$ и R $\subseteq$ $W^2$, реф. и сим.
+	}
+
+	\uncover<2->{
+		\begin{definition}[Оценка]
+			\textbf{\textit{Оценка}} на булеви променливи в $\F$ е всяка функция $\upsilon : \V \rightarrow \p(W)$. Разширяваме $\upsilon$ индуктивно за булевите термове:
+
+			\begin{itemize}
+				\item $\upsilon(0) = \emptyset$
+				\item $\upsilon(1) = W$
+				\item $\upsilon(a \sqcap b) = \upsilon(a) \cap \upsilon(b)$
+				\item $\upsilon(a \sqcup b) = \upsilon(a) \cup \upsilon(b)$
+				\item $\upsilon(a^*) = W \setminus \upsilon(a)$
+			\end{itemize}
+		\end{definition}
+	}
+\end{frame}
+
+\begin{frame}{Контактна логика - модел}
+	\begin{definition}[Модел]
+		$\M$ = ($\F, \upsilon$) се нарича \textbf{\textit{модел}}.
+
+		Истиността на формула $\phi$ в $\M$ ($\M \models \phi$) се дефинира индуктивно за всички формули както следва:
+		\begin{itemize}
+			\item $\M \models \top$
+			\item $\M \not\models \bot$
+			\item $\M \models a \leq b \iff \upsilon(a) \subseteq \upsilon(b)$
+			\item $\M \models aCb \iff (\exists x \in \upsilon(a))(\exists y \in \upsilon(b))(xRy)$
+		\end{itemize}
+	\end{definition}
+\end{frame}
+
+\begin{frame}{Контактна логика - модел}
+	\begin{definition}[Модел]
+		\begin{itemize}
+			\item $\M \models \neg \phi \iff \M \not\models \phi$
+			\item $\M \models \phi \land \psi \iff \M \models \phi$ и $\M \models \psi$
+			\item $\M \models \phi \lor \psi \iff \M \models \phi$ или $\M \models \psi$
+			\item $\M \models \phi \Rightarrow \psi \iff \M \not\models \phi$ или $\M \models \psi$
+			\item $\M \models \phi \Leftrightarrow \psi \iff$ ($\M \models \phi$ и $\M \models \psi$) или ($\M \not\models \phi$ и $\M \not\models \psi$)
+		\end{itemize}
+	\end{definition}
+\end{frame}
+
+% В модел фи е вярна (изводима е формално, а сме доста далеч от формалността)
+
+\begin{frame}{Контактна логика - изпълнимост на формула}
+	\begin{definition}[Модел на формула]
+		Модел $\M$ е \textit{\textbf{модел на формулата}} $\phi$, ако $\phi$ е \textit{вярвна} в~$\M$.
+	\end{definition}
+	\begin{definition}[Изпълнимост на формула]
+		Ако $\phi$ има модел $\M$, то $\phi$ е \textbf{изпълнима}.
+	\end{definition}
+\end{frame}
+
+\begin{frame}{Контактна логика}
+	Нека a и b са термове. Ясно е, че:
+	\begin{itemize}
+		\item $\M \models a = b \iff \upsilon(a) = \upsilon(b)$
+		\item $\M \models a \leq b \iff \M \models a \sqcap b^*=0$ (нулев терм)
+		\item $\M \models \neg(a \leq b) \iff \M \models  a \sqcap b^* \neq 0$ (ненулев терм)
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Контактна логика - свойства на релацията}
+	Нека a и b са термове.
+	\begin{itemize}
+		\item $\M \models a \neq 0 \iff \M \models aCa$
+		\item $\M \models aCb \iff \M \models bCa$
+	\end{itemize}
+	\bigskip
+	Следват от рефлексивността и симетричността на R.
+\end{frame}
+
+\begin{frame}{Контактната логика за свързаност}
+	\begin{lemma}
+		Релационната система е свързана точно тогава, когато за всяка оценка в нея следната формула е вярна
+		\begin{equation*}
+			a \neq 0 \land a \neq 1 \rightarrow aCa^*
+		\end{equation*}
+
+		На тази формула ще ѝ казваме аксиома за свързаност.
+	\end{lemma}
+
+	\begin{equation*}
+		\upsilon(a) \neq \emptyset \land \upsilon(a) \neq W \rightarrow (\exists x \in \upsilon(a)) (\exists y \in W \setminus \upsilon(a))(xRy)
+	\end{equation*}
+\end{frame}
+
+\begin{frame}
+	\uncover<1->{
+		Релационната система $\F = (W, R)$ дефинира неориентиран граф G(W, R). $W$ е множеството от върхове, а $R$ е множеството от ребра.
+	}
+
+	\uncover<2->{
+		\begin{definition}[Път в граф]
+			Нека G = (W, R) е граф. \textbf{Път} $\pi_G(x, y)$ е поредица от върхове $(x, v_1, \dotsc , v_k, y)$, такива че $x,  v_1,\dotsc,v_k, y \in V$ и $xRv1,v_1Rv_2,\dotsc, v_{k-1}Rv_k, v_kRy$.
+		\end{definition}
+	}
+
+	\uncover<3->{
+		\begin{definition}[Свързан граф]
+			Нека $G = (W, R)$ е неориентиран граф. $G$ е \textbf{свързан}, ако има път между всеки два различни върха в $W$.
+			\begin{equation*}
+				x, y \in W \rightarrow (x \neq y \implies \pi_G(x, y))
+			\end{equation*}
+		\end{definition}
+	}
+\end{frame}
+
+% Тук казвам, че че модалните точки са 2^n и всички подмножества от модални точки са 2^2^n и е твърде много. По-разумно ще е да направим модел с всички валидни модални точки и релации между тях и да търсим в него свързан подмодел
+
+\begin{frame}{Свързаност}
+	\uncover<1->{
+		\begin{theorem}[Свързаност]
+		 Нека $\F = (W, R)$ е релационна система и G = (W, R) е графът, дефиниран от нея.
+			\begin{center}
+				аксиомата за свързаност е удовлетворена в $\F \Leftrightarrow $ G е свързан
+			\end{center}
+		\end{theorem}
+	}
+
+	\uncover<2->{
+		\begin{definition}[Свързан модел]
+			Нека $\F$ = (W, R) е релационна система. Нека G = (W, R) е графът дефиниран от нея $\F$. Нека $\M = (\F, \upsilon)$ е модел на $\beta$. $\M$ е \textbf{свързан модел} на $\beta$, ако G e свързан граф.
+		\end{definition}
+	}
+\end{frame}
+
+\begin{frame}{Строене на модел}
+	\begin{center}
+		Формула $\phi \rightarrow$ ДНФ $\rightarrow \beta$
+	\end{center}
+	
+	\BranchConjunction
+	
+	\begin{center}
+		Ако $\beta$ има модел $\M = (\F, \upsilon) = ((W, R), \upsilon)$, то $\M$ е и модел за формулата $\phi$.
+	\end{center}
+\end{frame}
+
+% ТУК трябва да кажа идеята на алгоритъма за строене на модел.
+
+% Да си мислим за формула с N променливи. За верността на формулата имат значение само оценките на тези променливи. В този смисъл една модална точка казва кои променливи са верни в нея и кои не са верни. Точките може да си мислим като характеристичния вектор на верността на променливите в тази точка
+
+\begin{frame}{Модални точки}
+	\begin{definition}[Модална точка]
+		Оценка на променливи $\E_n$ за $n$ булеви променливи е поредица от единици и нули както следва:
+		\begin{equation*}
+			\E_n = \; < e_1, e_2, \ldots , e_n >, \; where \; e_1, \ldots, e_n \in \{0, 1 \}
+		\end{equation*}
+		\textbf{Модална точка} е оценка на променливи $\E_n$
+	\end{definition}
+\end{frame}
+
+\begin{frame}{Модални точки}
+	\uncover<1->{
+		\begin{definition}[$W_n$]
+			Множеството от всички модални точки за n променливи е \textbf{$W_n$}
+			\begin{equation*}
+				W_n = \{< e_1, e_2, \ldots , e_n > \mid e_1, \ldots, e_n \in \{0, 1 \} \}
+			\end{equation*}
+			$|W_n| = 2^n$
+		\end{definition}
+	}
+
+	\uncover<2->{
+		\begin{definition}
+			$(\E_n)^i$ e i-тия елемент в поредицата $\E_n$.
+		\end{definition}
+	}
+\end{frame}
+
+\begin{frame}{Оценка}
+	\textbf{Оценка $\upsilon : \V \rightarrow \p(W)$}:
+	\begin{center}
+		$\upsilon(x_i) = \{ \E \mid \E \in W$ и $(\E)^i = 1 \}, \;\; x_i \in \V$
+	\end{center}
+	Дефинира се индуктивно за термове както следва:
+	\begin{itemize}
+		\item $\upsilon(0) = \emptyset$
+		\item $\upsilon(1) = W$
+		\item $\upsilon(a \sqcap b) = \upsilon(a) \cap \upsilon(b)$
+		\item $\upsilon(a \sqcup b) = \upsilon(a) \cup \upsilon(b)$
+		\item $\upsilon(a^*) = W \setminus \upsilon(a)$
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Изпълнимост на атомарни формули}
+	\begin{lemma}[Изпълнимост на нулевите термове]
+		\begin{equation*}
+			d = 0 \in \beta \rightarrow \upsilon(d) = \emptyset
+		\end{equation*}
+	\end{lemma}
+	\begin{lemma}[Изпълнимост на ненулевите термове]
+		\begin{equation*}
+			g \neq 0 \in \beta \rightarrow \upsilon(g) \neq \emptyset
+		\end{equation*}
+	\end{lemma}
+\end{frame}
+
+\begin{frame}{Валидна модална точка}
+	\uncover<1->{
+		\begin{definition}[Валидна модална точка]
+			$\E \in W_n$ е \textbf{валидна модална точка} на $\beta$, ако запазва изпълнимостта на нулевите термове и не-контактите
+			\begin{equation*}
+				g = 0 \in \beta \rightarrow \E \notin \upsilon(g) И
+			\end{equation*}
+			\begin{equation*}
+				\neg C(e, f) \in \beta \rightarrow \E \notin (\upsilon(e) \cap \upsilon(f))
+			\end{equation*}
+		\end{definition}
+	}
+
+	\uncover<2->{
+		\begin{definition}[$W^v$]
+			Множеството от всички валидни модални точки е \textbf{$W^v$}
+			\begin{center}
+				$W^v = \{ \E \mid \E \in W_n$ и $\E$ е валидна модална точка на $\beta \}$
+			\end{center}
+		\end{definition}
+	}
+\end{frame}
+
+\begin{frame}{Валидна релация между точки}
+	\uncover<1->{
+		\begin{definition}[Валидна релация]
+			Нека х, y $\in W^v$. Тогава $\pairXY$ е \textbf{валидна релация} на $\beta$, ако запазва изпълнимостта на не-контактите в $\beta$.
+			\begin{center}
+				$\neg C(e, f) \in \beta \rightarrow \neg((x \in \upsilon(e)$ и $y \in \upsilon(f))$ или $(x \in \upsilon(f)$ и $y \in \upsilon(e)))$
+			\end{center}
+		\end{definition}
+	}
+
+	\uncover<2->{
+		\begin{definition}[$R^v$]
+			\begin{center}
+				$R^v = \{ \pairXY  \mid x, y \in W^v$ и $\pairXY$  е валидна релация на $\beta\}$
+			\end{center}
+		\end{definition}
+	}
+\end{frame}
+
+\begin{frame}{Свързан модел}
+	\begin{step}
+		$\F^v = (W^v, R^v)$, $\M^v = (\F^v, \upsilon)$. $\M^v$ е модел на $\beta$, ако контактите и ненулевите термове в $\beta$ са удовлетворени. Ако $\M^v$ не е модел, тогава $\beta$ няма модел(нито свързан модел).
+	\end{step}
+\end{frame}
+
+\begin{frame}{Подграф}
+	\begin{definition}[Подграф]
+		$G'(W', R') \subseteq G(W, R)$, ако:
+		\begin{center}
+			$W' \subseteq W$ и $R' = \{ \pairXY  \mid x, y \in W'$ и $xRy \}$
+		\end{center}
+	\end{definition}
+\end{frame}
+
+\begin{frame}{Подмодел}
+	\begin{lemma}[Подмодел]
+		$\F = (W, R)$, $\M = (\F, \upsilon)$. Нека $G'=(W',R') \subseteq G=(W, R)$. Тогава G' дефинира модел $\M' = ((W', R'), \upsilon')$, където:
+		\begin{itemize}
+			\item $\upsilon'(x) = \upsilon(x) \cap W'$, за всяка променлива х
+			\item $\upsilon'(0) = \emptyset$
+			\item $\upsilon'(1) = W'$
+			\item $\upsilon'(a \sqcap b) = \upsilon'(a) \cap \upsilon'(b)$
+			\item $\upsilon'(a \sqcup b) = \upsilon'(a) \cup \upsilon'(b)$
+			\item $\upsilon'(a^*) = W' \setminus \upsilon'(a)$
+		\end{itemize}
+	\end{lemma}
+\end{frame}
+
+\begin{frame}
+	\begin{lemma}[Запазване удовлетворимостта на атомарните формули]
+		$G^v=(W^v, R^v)$ е графът породен от $\F^v$. Нека $G=(W,R) \subseteq G^v$ и $\M=((W,R), \upsilon')$ е моделът дефиниран от G. Тогава:
+		\begin{itemize}
+			\item<1-> M запазва удовлетворимостта на контактите в $\beta$, ако
+			\begin{equation*}
+				C(a,b) \in \beta \rightarrow (\exists x \in \upsilon'(a))(\exists y \in \upsilon'(b))(xRy)
+			\end{equation*}
+
+			\item<2-> M запазва удовлетворимостта на ненулевите термове в $\beta$, ако
+			\begin{equation*}
+				g \neq 0 \in \beta \rightarrow \upsilon'(g) \neq \emptyset
+			\end{equation*}
+		\end{itemize}
+	\end{lemma}
+\end{frame}
+
+\begin{frame}{Свързани компоненти - дефиниции}
+	\uncover<1->{
+		\begin{definition}[Свързана компонента]
+			Нека $G=(W, R)$ е граф. Нека $G'=(W', R') \subseteq G(W, R)$. Ако $G'$ е свързан, то G' е \textbf{свързана компонента} на G.
+		\end{definition}
+	}
+
+	\uncover<2->{
+		\begin{definition}[Максимална свързана компонента]
+			Нека $G=(W, R)$ е граф. Нека $G'=(W', R')$ е свързана компонента на G. $G'$ е \textbf{максимална свързана компонента} на G, ако:
+			\begin{gather*}
+				x \in W' \rightarrow \neg(\exists y \in W \setminus W')(xRy) \mbox{ и} \\ 
+				x,y \in W' \rightarrow xRy \iff xR'y
+			\end{gather*}
+		\end{definition}
+	}
+\end{frame}
+
+\begin{frame}{Свързан модел}
+	\begin{step}
+		Нека $\M^v$ е модел на $\beta$. Всички модели, дефинирани от свързаните компоненти на $G^v$, запазват удовлетворимостта на нулевите термове и не-контактите(не добавят точки, нито релации). Ако има свързана компонента, която запазва удовлетворимостта на контактите и ненулевите термове, то тя дефинира \textbf{свързан модел} на $\beta$.
+
+		Достатъчно е да разгледаме само максималните свързани компоненти на $G^v$.
+	\end{step}
+\end{frame}
+
+\begin{frame}{Имплементация}
+	\begin{itemize}
+		\item Flex \& Bison за строене на AST (Абстрактно синтактично дърво)
+		\item Превръщане на AST формула във формула с удобни и ефективни операции свързани за табло метода и строенето на модела
+		\item Пускане на табло метода за търсене на отворен клон
+		\item Генериране на (свързан) модел
+		\item Компилиране на библиотеката в WebAssembly
+		\item Уеб приложение
+		\item Тестове
+		\item Автоматични билдове
+		\item \url{https://github.com/Anton94/modal_logic_formula_prover}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}{Демо}
+	\begin{center}
+		Демо - \url{http://logic.fmi.uni-sofia.bg/theses/Dudov_Stoev/}
+	\end{center}
+\end{frame}
+
+\begin{frame}
+	\begin{center}
+		\Huge
+		Благодаря за вниманието!
+		\\ [12mm]
+		Въпроси?
+	\end{center}
+
+    \mbox{}
+    \\ [20mm]
+	\small
+	Repository - \url{https://github.com/Anton94/modal_logic_formula_prover}
+\end{frame}
+
+\end{document}
