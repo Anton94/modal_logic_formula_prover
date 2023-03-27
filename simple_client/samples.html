@@ -85,8 +85,13 @@
         ["~<=(a,b) & ~<=(b, c) & ~<=(c, a) & <=(a,c)", true, true, true],
         ["T -> T | ~<=(a,c)", true, true, true],
         ["<=(a, 0) & <=(b,0) <-> C(a,b)", true, true, true],
+        ["~(x1*x2*x3*x4*x5)=0", true, true, true],
         [" ((C(p,q) & ~C(a,b)) -> (C(p*(-a),q*(-a)) | C(p*(-b),q*(-b))))", true, true, true], // Good known formula in modal logic it is a tautology
         ["~((C(p,q) & ~C(a,b)) -> (C(p*(-a),q*(-a)) | C(p*(-b),q*(-b))))", false, false, false],
+        ["~C(a,c+d) &~C(b, d+e) & ~C(c, a+e) & ~C(d,a+b) & ~C(e,b+c) & (a*(b+c+d+e))=0 & (b*(c+d+e))=0 & (c*(d+e))=0 & (d*(e))=0 & <=(1, a+b+c+d+e)", true, true, true],
+        ["~C(a,c+d+e) &~C(b, d+e) & ~C(c, a+e) & ~C(d,a+b) & ~C(e,b+c) & (a*(b+c+d+e))=0 & (b*(c+d+e))=0 & (c*(d+e))=0 & (d*(e))=0 & <=(1, a+b+c+d+e)", true, true, true],
+        ["~C(a,c+d) &~C(b, d+e) & ~C(c, a+e) & ~C(d,a+b) & ~C(e,b+c) & (a*(b+c+d+e))=0 & (b*(c+d+e))=0 & (c*(d+e))=0 & (d*(e))=0 & <=(1, a+b+c+d+e) & <=(h, a) & ~C(h, b+c+d+e)", true, true, true],
+        ["~C(a,c+d) &~C(b, d+e) & ~C(c, a+e) & ~C(d,a+b) & ~C(e,b+c) & (a*(b+c+d+e))=0 & (b*(c+d+e))=0 & (c*(d+e))=0 & (d*(e))=0 & <=(1, a+b+c+d+e) & <=(h+j, a) &~C(h+j, b+c+d+e) & <=(h+j, a) & ~C(h,j)", true, true, true],
 
         ["T & F", false, false, false],
         ["C(a,b) & <=(a,c) & ~C(b,c)", false, false, false],
