@@ -94,7 +94,7 @@
 \author{\textsc{Факултет по математика и информатика} \\
 	\textsc{Катедра по математическа логика и приложенията ѝ} \\ [3mm]
 	\textsc{Стоев Мартин} \\ [3mm]
-	\textsc{Магистерска програма Логика и Алгоритми, Информатика, Факултетен Номер: 25790} \\ [4mm]
+	\textsc{Магистърска програма ,,Логика и Алгоритми'', Информатика, факултетен номер: 25790} \\ [4mm]
 	\small\textsc{Научен ръководител: проф. Тинко Тинчев}}
 \date{\today} 
 \begin{frame}
@@ -126,16 +126,16 @@
 \begin{itemize}
 	\item $\signT C(a, b)$
 	\item $\signF C(a, b)$ 
-	\item $\signT а \leq b \iff \signT a \sqcap b* = 0$
-	\item $\signF t = 0 \iff \signF a \sqcap b* = 0$
+	\item $\signT a \leq b \iff \signT a \sqcap b* = 0$
+	\item $\signF a \leq b \iff \signF a \sqcap b* = 0$
 	\item $\signT a  \le_\mu b$
-	\item $\signF a <_\mu b$
+	\item $\signF a \le_\mu b$
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 	\begin{center}
-	За дадена формула $\varphi$ търсим: $\mathcal{M} = (W, R, \mathscr{v})$ \\
+	За дадена формула $\varphi$ търсим: $\mathcal{M} = (W, R, \mu, \mathscr{v})$ \\
 	$ \mathcal{M} \models \varphi$
 	\end{center}
 \end{frame}
@@ -150,15 +150,16 @@
 			\begin{align*}
 				\sum_{i: p_i \in \vE(x) \setminus \vE(y)} X_i \leq \sum_{j: p_j \in \vE(y) \setminus \vE(x)} X_j
 			\end{align*}
+    	Търсим решение на получената система в множеството от положителните числа.
 \end{frame}
 
 \begin{frame}
 \begin{defn}[Множеството на всички променливи]
-	С $\Var_B$ ще ознчаваме множеството от всички променливи използвани в табло клона B.
+	С $\Var_B$ ще означаваме множеството от всички променливи използвани в табло клона B.
 \end{defn}
 
 \begin{defn}[Оценка на променливи]
-	С p ще ознчаваме функцията, която за всяка променлива от $\Var_B$ дава истина или лъжа.
+	С p ще означаваме функцията, която за всяка променлива от $\Var_B$ дава истина или лъжа.
 		\begin{align*}
 			p : \Var_B \rightarrow \{ \textbf{лъжа}, \textbf{истина}\}
 		\end{align*}
@@ -201,7 +202,7 @@
 
 \begin{frame}\frametitle{Изпълнимост в контактна логика с мярка}
 	\begin{defn}
-Нека B е клон в таблото и нека W е множество от валидни модални точки в B. Дефинираме модел $\mathcal{M} = (W, R, \mu, v)$ в B, където:
+Нека B е клон в таблото и нека W е множество от валидни модални точки в B. Дефинираме модел $\mathcal{M} = (W, R, \mu, \vE)$ в B, където:
 		\begin{align*}
 				\vE(t) = \{ p \; | \; p \in W \textit{ и } &\vBool_{p}(t) =\; \textit{истина} \}, \\
 				\textit{ където t е терм } & \textit{от атомарните формули в B}
