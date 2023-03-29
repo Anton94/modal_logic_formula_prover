@@ -202,22 +202,17 @@
             }
 
            function print_modal_point_relations(contacts) {
-               if (!contacts)
-                   return;
-
-               if(contacts.length === 0)
-                   return;
-
                var text = "Model points relations (excluding reflexivity):\n";
 
-               var all_relations =
-                      contacts.map(
-                          (x, i) => "R(A" + i + ") =  {" +
-                          contacts[i].map((a, j) => (a == 1 && i != j) ? j : -1).
-                          filter(a => a >= 0).
-                          map(x => " A" + x) + " }");
-
-               all_relations.forEach(x => text += x + "\n");
+               if (contacts && contacts.length > 0) {
+                   var all_relations =
+                   contacts.map(
+                       (x, i) => "R(A" + i + ") =  {" +
+                       contacts[i].map((a, j) => (a == 1 && i != j) ? j : -1).
+                       filter(a => a >= 0).
+                       map(x => " A" + x) + " }");
+                       all_relations.forEach(x => text += x + "\n");
+               }
 
                document.getElementById("result_sets").innerText += "\n" + text;
            }
