@@ -75,6 +75,8 @@
       const sample_formulas = [
         ["(a=0 & C(a,b)) | (C(a,b))", true, true, true],
         ["C(a, b) & C(c, b)", true, true, true],
+        ["C(a,b) & C(-a,b) & C(a,-b) & C(-a,-b)", true, true, true],
+        ["~a=0 & ~b=0 & ~-a=0 & ~-b=0", true, true, true],
         ["C(a,b) & C(b, c) & ~C(a, c)", true, true, true],
         ["<=(-a, a)", true, true, true],
         ["C(a,b) & <=(a,c) | C(a, c) & <=(c, a)", true, true, true],
