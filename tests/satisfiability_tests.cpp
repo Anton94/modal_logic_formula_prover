@@ -44,6 +44,34 @@ void is_satisfiable(const char* input_f, bool has_satisfiable_model, bool has_sa
     }
 }
 
+void is_satisfiable(const char* input_f, bool has_satisfiable_model, std::pair<size_t, size_t> expected_model_points_range)
+{
+    formula_mgr f;
+    CHECK(f.build(input_f));
+
+    model m;
+    CHECK(f.is_satisfiable(m) == has_satisfiable_model);
+
+    if(has_satisfiable_model)
+    {
+        CHECK(f.is_model_satisfiable(m));
+    }
+
+    const auto model_points_count = m.get_model_points().size();
+    CHECK(model_points_count >= expected_model_points_range.first);
+    CHECK(model_points_count <= expected_model_points_range.second);
+}
+
+TEST_CASE("satisfiable expected model points contacts", "[satisfiability]")
+{
+    is_satisfiable("C(a,b) & C(-a,b) & C(a,-b) & C(-a, -b)", true, {3, 4});
+}
+
+TEST_CASE("satisfiable expected model points non zero terms", "[satisfiability]")
+{
+    is_satisfiable("~a=0 & ~b=0 & ~-a=0 & ~-b=0", true, {2, 3});
+}
+
 TEST_CASE("satisfiable 0", "[satisfiability]")
 {
     is_satisfiable("C(a,b+d) & T & ~(<=(a,a)) | <=m(m,x + j * -t)", true, true, true);
