@@ -163,5 +163,31 @@ protected:
      */
     auto construct_point(const formulas_t& contacts_F, const terms_t& zero_terms_T) -> bool;
 
+    /*
+     * Adds a point to the collection of all points.
+     * Returns false if the point is already in the list of all points, otherwise returns true.
+     */
+    auto add_point(const point_t& point) -> bool;
+
+    /*
+     * Returns the point index in the already added points.
+     */
+    auto get_point_index(const point_t& point) -> size_t;
+
+    /*
+     * Creates a @modal_points_count X @modal_points_count contact matrix with reflexivity between the points.
+     */
+    void construct_contact_matrix(size_t modal_points_count);
+
+    /*
+     * Adds contact in contact matrix between the points @a and @b.
+     */
+    void add_contact(const point_t& a, const point_t& b);
+
+    /*
+     * Resizes the contact relations matrix to @modal_points_count X @modal_points_count matrix.
+     */
+    void reduce_contact_matrix(size_t modal_points_count);
+
     void calculate_the_model_evaluation_of_each_variable();
 };

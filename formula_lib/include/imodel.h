@@ -10,7 +10,8 @@ class formula_mgr;
 class imodel
 {
 public:
-    using points_t = std::vector<variables_evaluations_block>;
+    using point_t = variables_evaluations_block;
+    using points_t = std::vector<point_t>;
 
     virtual auto create(const formulas_t& contacts_T, const formulas_t& contacts_F,
                         const terms_t& zero_terms_T,  const terms_t& zero_terms_F,

@@ -21,6 +21,9 @@ auto model::create(const formulas_t& contacts_T, const formulas_t& contacts_F,
 
     trace() << "Used variables are " << used_variables_.count() << ". Total variables in the formula are " << used_variables_.size() << ".";
 
+    const auto expected_maximal_number_of_modal_points = std::max(1ul, contacts_T.size() * 2 + zero_terms_F.size());
+    construct_contact_matrix(expected_maximal_number_of_modal_points);
+
     if(!construct_contact_model_points(contacts_T, contacts_F, zero_terms_T) ||
        !construct_non_zero_model_points(zero_terms_F, contacts_F, zero_terms_T))
     {
@@ -34,7 +37,9 @@ auto model::create(const formulas_t& contacts_T, const formulas_t& contacts_F,
     }
 
     calculate_the_model_evaluation_of_each_variable();
-    create_contact_relations_first_2k_in_contact(points_.size(), contacts_T.size());
+
+    // Reduce the contact matrix to the used modal points count
+    reduce_contact_matrix(points_.size());
 
     trace() << "Found a model:\n" << *this;
 
@@ -46,6 +51,35 @@ void model::clear()
     used_variables_.clear();
 
     imodel::clear();
+}
+
+void model::construct_contact_matrix(size_t modal_points_count)
+{
+    contact_relations_.clear();
+    contact_relations_.resize(modal_points_count, model_points_set_t(modal_points_count)); // Fill NxN matrix with 0s
+
+    // Add the reflexivity of each modal point.
+    for(size_t i = 0; i < modal_points_count; ++i)
+    {
+        contact_relations_[i].set(i);
+    }
+}
+
+void model::add_contact(const point_t& a, const point_t& b)
+{
+    const auto index_a = get_point_index(a);
+    const auto index_b = get_point_index(b);
+    contact_relations_[index_a].set(index_b);
+    contact_relations_[index_b].set(index_a);
+}
+
+void model::reduce_contact_matrix(size_t modal_points_count)
+{
+    contact_relations_.resize(modal_points_count);
+    for(auto& contct_relation : contact_relations_)
+    {
+        contct_relation.resize(modal_points_count);
+    }
 }
 
 auto model::construct_contact_model_points(const formulas_t& contacts_T, const formulas_t& contacts_F,
@@ -76,7 +110,7 @@ auto model::construct_non_zero_model_points(const terms_t& zero_terms_F, const f
         {
             return false;
         }
-        points_.push_back(std::move(eval));
+        add_point(eval);
     }
 
     return true;
@@ -132,8 +166,10 @@ auto model::construct_contact_points(const formula* c, const formulas_t& contact
         {
             if(is_contacts_F_connectivity_rule_satisfied(contacts_F, left_eval, right_eval))
             {
-                points_.push_back(std::move(left_eval));
-                points_.push_back(std::move(right_eval));
+                add_point(left_eval);
+                add_point(right_eval);
+                add_contact(left_eval, right_eval);
+
                 return true;
             }
         } while(generate_next_point_evaluation(right, right_eval, contacts_F, zero_terms_T));
@@ -162,11 +198,30 @@ auto model::construct_point(const formulas_t& contacts_F, const terms_t& zero_te
     variables_evaluations_block eval(variables_mask_t(0)); // it will be overridden if succeed
     if(create_point_evaluation(nullptr, eval, contacts_F, zero_terms_T))
     {
-        points_.push_back(std::move(eval));
+        add_point(eval);
         return true;
     }
 
     return false;
+}
+
+auto model::add_point(const point_t& point) -> bool
+{
+    const auto it = std::find(points_.begin(), points_.end(), point);
+    if(it != points_.end())
+    {
+        return false;
+    }
+
+    points_.push_back(point);
+    return true;
+}
+
+auto model::get_point_index(const point_t& point) -> size_t
+{
+    const auto it = std::find(points_.begin(), points_.end(), point);
+    assert(it != points_.end());
+    return size_t(std::distance(points_.begin(), it));
 }
 
 void model::calculate_the_model_evaluation_of_each_variable()
