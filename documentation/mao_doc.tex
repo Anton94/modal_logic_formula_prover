@@ -16,9 +16,8 @@
 \usepackage{tikz}
 \usepackage{multicol}
 \usepackage[utf8]{inputenc}
-\usepackage[OT1]{fontenc}
+\usepackage[T1]{fontenc}
 \usepackage{graphicx}
-
 \usetikzlibrary{arrows.meta}
 \graphicspath{ {./image/} }
 
@@ -126,11 +125,11 @@
 %	In this paper an algorithm is defined for proving the satisfiability of formulas defined in the space of the quantitative contact logics.When a formula is not satisfiable then a model to satisfy the formula does not exist. In case the formula is satisfiable the algorithm constructs a model which satisfies the formula.
 %\end{abstract}
 	\section{Introduction}
-	The modal logics are in a constant exploration and extended by the today's researchers. The contact modal logics are one such topic with increasing interest. This paper works its way to an algorithm which for a given contact modal logic formula with measure constructs a model which satisfies the formula. If such a model does not exist, then the algorithm proves that the formula is not satisfiable. 
+	The modal logics are in a constant exploration and extended by the today's researchers. The contact modal logics are one such topic with increasing interest. This paper works its way to an algorithm which for a given contact modal logic formula with measure constructs a model which satisfies the formula. If such a model does not exist, then the algorithm provides a proof that the formula is not satisfiable. 
 
 The model construction process begins with a formal proof procedure to decompose the formula to a simpler state. For this, the tableau method is used. The tableau method branches the formula in many paths where each path can derive a valid model for the formula. The procedure of model building is done for each path until a model is successfully constructed. This procedure creates modal points, the relations between them and the variables valuations in order to find a proof for a model satisfying the formula. 
 
-As of today, an algorithm that can solve this problem in a polynomial time is not possible. This is because the problem of constructing a satisfiable model for a quantitative contact formula is at least as hard as the Boolean satisfiability problem (SAT). That is why each optimization during the formula proving process significantly reduces the algorithm execution time.
+As of today, an algorithm that can solve this problem in a polynomial time is not existant. This is because the problem of constructing a satisfiable model for a quantitative contact formula is at least as hard as the Boolean satisfiability problem (SAT). That is why each optimization during the formula proving process significantly reduces the algorithm execution time.
 
 	\newpage
 	\section{Tableaux Method}
@@ -3123,6 +3122,9 @@ auto measured_model::generate_model(const model_points_set_t& points,
 			\item Visualized graph - This is the end result of the model, if such model exists \\
 				The visualization is done with a JavaScript third party library for drawing graphs.
 		\end{itemize}
+		The web-system is hosted on: \\
+
+	\url{http://logic.fmi.uni-sofia.bg/theses/Dudov\_Stoev}
 	\newpage
 	\begin{thebibliography}{9}
 	\bibitem{boolean-satisfiability-problem}

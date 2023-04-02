@@ -101,6 +101,8 @@
                     return;
                 }
 
+                formula = formula.replaceAll('\n', ' ');
+
                 var ascii = /^[ -~]+$/;
                 if ( !ascii.test( formula ) ) {
                     // string has non-ascii characters
