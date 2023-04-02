@@ -184,3 +184,9 @@ label {
     padding-left: 0.3rem;
     padding-right: 0.3rem;
 }
+textarea {
+    resize: none;
+    overflow: hidden;
+    min-height: 50px;
+    max-height: 100px;
+}
