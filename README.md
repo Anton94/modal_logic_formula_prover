@@ -9,6 +9,11 @@
 
 Master degree project for prooving/disprooving contact logic formulas
 
+# Documentation
+  [Satisfiability of Quantitative Contact Logics](https://github.com/Anton94/modal_logic_formula_prover/blob/master/documentation/mao_doc.pdf)
+  
+  [Satisfiability of Connected Contact Logics](https://github.com/Anton94/modal_logic_formula_prover/blob/master/documentation/toni_doc.pdf)
+
 # [DEMO](https://anton94.github.io/modal_logic_formula_prover/simple_client/index.html)
 Click the [DEMO](https://anton94.github.io/modal_logic_formula_prover/simple_client/index.html) link or run localy, e.g.
 - repo_dir/simple_client> python3 -m http.server
